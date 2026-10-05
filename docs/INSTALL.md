@@ -23,6 +23,10 @@ node src/main.mjs demo --state .state
 node src/main.mjs doctor --state .state
 ```
 
+## Existing schema-v1 workspaces
+
+New workspaces initialize with durable revision history. If doctor reports history_ready false, keep the workspace backed up and perform the explicit migration before any further mutation with node src/main.mjs migrate-history --state .state. Migration preserves the current stored revision for each entity; it does not reconstruct older revisions that the previous schema never retained.
+
 ## Portable recovery
 
 Create an offline JSON snapshot:

@@ -4,12 +4,13 @@ import { Store } from './store.mjs';
 import { APP_VERSION, RESOURCE, makeRequest, iso, digest } from './base.mjs';
 import { KINDS, EDITABLE, validateEntity, inputObject, idText, str, lines, choice } from './contracts.mjs';
 import { proposeChange, inspectChange, applyChange } from './change-proposal.mjs';
+import { getHistory, listHistory, diffHistory } from './history.mjs';
 
 export const CORE_NATIVE_OPERATIONS=Object.freeze([
-  'workspace.describe','resource.get','events.list','change.inspect',
+  'workspace.describe','resource.get','events.list','history.get','history.list','history.diff','change.inspect',
   'entity.create','entity.update','entity.retire','change.propose','change.apply','template.instantiate'
 ]);
-const CORE_NATIVE_READS=new Set(['workspace.describe','resource.get','events.list','change.inspect']);
+const CORE_NATIVE_READS=new Set(['workspace.describe','resource.get','events.list','history.get','history.list','history.diff','change.inspect']);
 const driverName=operation=>'driver.launchwright.'+operation.replaceAll('.','-');
 
 export class CoreNativeApplication {
@@ -55,6 +56,9 @@ export class CoreNativeApplication {
     if(op==='workspace.describe'){inputObject(input,[]);return this.describe();}
     if(op==='resource.get'){inputObject(input,['id']);return this.get(input.id);}
     if(op==='events.list'){inputObject(input,['after','limit'],[]);const after=integer(input.after??0,0,Number.MAX_SAFE_INTEGER),limit=integer(input.limit??50,1,128);const rows=this.store.db.prepare('SELECT * FROM events WHERE seq>? ORDER BY seq LIMIT ?').all(after,limit+1),more=rows.length>limit,items=rows.slice(0,limit).map(e=>({...e,payload:JSON.parse(e.payload),schema_version:'launchwright-event/1'}));return{items,next_after:more?items.at(-1).seq:null,watermark:this.store.db.prepare('SELECT coalesce(max(seq),0) AS n FROM events').get().n,complete:!more};}
+    if(op==='history.get')return getHistory(this,input);
+    if(op==='history.list')return listHistory(this,input);
+    if(op==='history.diff')return diffHistory(this,input);
     if(op==='change.inspect'){inputObject(input,['id']);return inspectChange(this,input.id);}
     throw new NativeError('Unsupported','Operation is outside this native profile');
   }
