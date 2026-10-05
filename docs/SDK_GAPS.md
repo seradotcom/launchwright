@@ -23,6 +23,6 @@ Publication actions currently fail closed before network send. Cost-bearing reci
 
 ## Local claims that are safe to make
 
-Launchwright can persist and review release-domain records, render bounded editorial text formats, freeze immutable candidates, export deterministic private ZIP bundles, maintain private aliases with compare-and-swap, and export/restore verified local workspace state.
+Launchwright can persist and review release-domain records, render bounded editorial text formats, freeze immutable candidates, export deterministic private ZIP bundles, maintain private aliases with compare-and-swap, journal per-channel attempts with durable pre-send custody and no automatic resend, record bounded withdrawal plans, and export/restore verified local workspace state. It does not yet contain a production external channel adapter, so a ChannelAttempt record is not itself proof that bytes were sent or published.
 
 Those capabilities do not imply external delivery or technical product verification.

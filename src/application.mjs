@@ -74,7 +74,7 @@ export class LaunchwrightApplication {
   }
   describe(){return{app:'Launchwright',version:APP_VERSION,schema_version:'launchwright/1',workspace_version:this.s.version(),request_epoch:this.s.meta().epoch,
     scope_mode:'local-single-owner',principal:this.principal,scopes:[...this.scopes],native_sdk:'0.9.0-dev.1',operations:Object.entries(OPERATION_SCOPES).map(([name,scope])=>({name,scope,read_only:scope==='read'})),
-    capabilities:{editorial_text_exports:'available',private_draft_delivery:'available',declared_release_contracts:'available',state_anchors:'contract-and-assessment-only',impact_proposals:'available-no-execution-authority',native_driver_host:'requires-owner-pinned-bundle-and-broker',platform:this.capabilities.platform??'not-connected',canonical_graph:'requires-platform-observation',browser_capture:'requires-canonical-driver-recipe',media_render:'requires-composition-recipe',mobile:'provenance-import-only',public_delivery:'not-implemented',...this.capabilities},
+    capabilities:{editorial_text_exports:'available',private_draft_delivery:'available',channel_attempt_journal:'available-no-browser-send',withdrawal_plans:'available-plan-only',declared_release_contracts:'available',state_anchors:'contract-and-assessment-only',impact_proposals:'available-no-execution-authority',native_driver_host:'requires-owner-pinned-bundle-and-broker',platform:this.capabilities.platform??'not-connected',canonical_graph:'requires-platform-observation',browser_capture:'requires-canonical-driver-recipe',media_render:'requires-composition-recipe',mobile:'provenance-import-only',public_delivery:'adapter-required',...this.capabilities},
     limits:{page_items:128,reply_bytes:256*1024,artifact_bytes:1024*1024,receipt_epoch_items:20000},disclosure:'Local checks are not canonical verification.'};}
   invoke(operation,args,context){
     const scope=OPERATION_SCOPES[operation];this.allow(scope);checkCancelled(context);
@@ -97,6 +97,8 @@ export class LaunchwrightApplication {
       }
       case'release.coverage':inputObject(input,['release_id']);return this.coverage(input.release_id);
       case'release.impact':inputObject(input,['release_id']);return this.impact(input.release_id);
+      case'release.channels':inputObject(input,['release_id']);return this.releaseChannels(input.release_id);
+      case'channel.inspect':inputObject(input,['id']);return this.inspectChannelAttempt(this.g(input.id,'channel_attempt'));
       case'anchor.assess':{
         inputObject(input,['id','observed_matches']);const anchor=this.g(input.id,'anchor');const observed=integer(input.observed_matches,0,1000);
         const expected=anchor.data.expected_count,state=observed===expected?'PASS':'FAIL';
@@ -183,7 +185,39 @@ export class LaunchwrightApplication {
       review_dimensions[dimension]={required:required.includes(dimension),required_reviewers:required.includes(dimension)?needed:0,approvals,state:blocked?'CHANGES_REQUESTED':approvals>=(required.includes(dimension)?needed:1)?'APPROVED':'PENDING',decisions};
     }
     const fresh=!gates.some(g=>g.name==='input-versions'&&g.state==='FAIL'),review_ready=required.every(d=>review_dimensions[d].state==='APPROVED');
-    return{candidate,gates,reviews,review_dimensions,required_review_dimensions:required,review_ready,fresh,external_publication_allowed:false,private_draft_allowed:fresh&&!gates.some(g=>g.state==='artifact-bytes'&&g.state==='FAIL'),technical_state:gates.some(g=>g.state==='FAIL')?'FAIL':'UNKNOWN'};
+    return{candidate,gates,reviews,review_dimensions,required_review_dimensions:required,review_ready,fresh,external_publication_allowed:false,private_draft_allowed:fresh&&!gates.some(g=>g.name==='artifact-bytes'&&g.state==='FAIL'),technical_state:gates.some(g=>g.state==='FAIL')?'FAIL':'UNKNOWN'};
+  }
+  channelCompatibility(candidate,profile){
+    const issues=[],checked=this.inspectCandidate(candidate);
+    if(profile.kind!=='channel_profile')issues.push({reason:'channel-profile-retired-or-missing'});
+    const pin=candidate.data.manifest.inputs.find(p=>p.id===profile.id);
+    if(!candidate.data.manifest.channel_profile_ids?.includes(profile.id)||!pin)issues.push({reason:'profile-not-frozen-in-candidate'});
+    else if(!sameVersion(pin.version,profile.version))issues.push({reason:'channel-profile-revision-changed',expected:pin.version,observed:profile.version});
+    if(!checked.fresh)issues.push({reason:'candidate-inputs-changed'});
+    if(!checked.review_ready)issues.push({reason:'required-review-dimensions-pending'});
+    if(candidate.data.manifest.contract.require_claims_verified&&candidate.data.manifest.claim_ids.length)issues.push({reason:'canonical-claim-verification-unavailable'});
+    const artifacts=[];
+    if(profile.kind==='channel_profile')for(const id of candidate.data.manifest.artifact_ids){
+      const artifact=this.g(id,'artifact'),deliverable=this.g(artifact.data.deliverable_id,'deliverable');
+      const row={artifact_id:id,format:deliverable.data.format,size_bytes:artifact.data.size_bytes,format_allowed:profile.data.formats.includes(deliverable.data.format),size_allowed:artifact.data.size_bytes<=profile.data.max_artifact_bytes};
+      artifacts.push(row);
+      if(!row.format_allowed)issues.push({reason:'artifact-format-not-allowed',...row});
+      if(!row.size_allowed)issues.push({reason:'artifact-exceeds-channel-limit',...row});
+    }
+    return{ready:issues.length===0,issues,artifacts,candidate_fresh:checked.fresh,review_ready:checked.review_ready};
+  }
+  inspectChannelAttempt(attempt){
+    const candidate=this.g(attempt.data.candidate_id,'candidate'),profile=this.g(attempt.data.channel_profile_id);
+    const candidate_current=sameVersion(candidate.version,attempt.data.candidate_version),profile_current=profile.kind==='channel_profile'&&sameVersion(profile.version,attempt.data.channel_profile_version);
+    const compatibility=profile.kind==='channel_profile'?this.channelCompatibility(candidate,profile):{ready:false,issues:[{reason:'channel-profile-retired-or-missing'}],artifacts:[],candidate_fresh:true,review_ready:false};
+    const pending=this.s.db.prepare('SELECT state,record FROM pending WHERE work_id=?').get(attempt.id);
+    const pending_digest=pending?digest('channel-pending',JSON.parse(pending.record)):null;
+    return{attempt,candidate_version_current:candidate_current,channel_profile_version_current:profile_current,compatibility,pending:{present:!!pending,state:pending?.state??null,digest_matches:pending?pending_digest===attempt.data.pending_digest:null},reconcile_required:['SENT','PROCESSING','UNKNOWN'].includes(attempt.data.state),automatic_resend_allowed:false,retry_allowed:attempt.data.retry_allowed===true};
+  }
+  releaseChannels(releaseId){
+    this.g(releaseId,'release');const attempts=this.l('channel_attempt',releaseId),withdrawals=this.l('withdrawal',releaseId),state_counts={};
+    for(const attempt of attempts)state_counts[attempt.data.state]=(state_counts[attempt.data.state]??0)+1;
+    return{release_id:releaseId,attempts,withdrawals,state_counts,atomic_across_channels:false,participant_states_independent:true,note:'A channel participant may fail or remain UNKNOWN without rolling back another participant.'};
   }
   mutate(operation,input){
     switch(operation){
@@ -270,6 +304,57 @@ export class LaunchwrightApplication {
         const generation=row?.generation??randomUUID(),revision=row?(BigInt(row.revision)+1n).toString():'1';
         this.s.db.prepare('INSERT INTO aliases VALUES(?,?,?,?) ON CONFLICT(name) DO UPDATE SET revision=excluded.revision,candidate_id=excluded.candidate_id').run(name,generation,revision,c.id);
         return{entity:this.s.create('delivery',{release_id:c.data.release_id,name,candidate_id:c.id,candidate_sha256:c.data.candidate_sha256,state:'PRIVATE_DRAFT_RECORDED',external_state:'NOT_SENT',alias_version:{resource:`alias:${name}`,generation,revision},artifact_ids:c.data.manifest.artifact_ids,technical_state:checked.technical_state,delivered_by:this.principal})};
+      }
+      case'channel.prepare':{
+        inputObject(input,['candidate_id','candidate_sha256','channel_profile_id','logical_key','authorization','retry_of'],['candidate_id','candidate_sha256','channel_profile_id','logical_key','authorization']);
+        const candidate=this.g(input.candidate_id,'candidate'),profile=this.g(input.channel_profile_id,'channel_profile');sha(input.candidate_sha256);ensure(candidate.data.candidate_sha256===input.candidate_sha256,'Candidate digest mismatch','Conflict');
+        str(input.logical_key,128);ensure(/^[a-z0-9][a-z0-9._:-]{0,127}$/.test(input.logical_key),'Invalid logical channel request key');ensure(profile.data.delivery_mode!=='export','Export-only profiles use candidate.export_bundle and never create a delivery attempt','InvalidArgument');
+        ensure(input.authorization==='explicit-channel-delivery','Explicit channel delivery authorization required','ConsentRequired');
+        const compatibility=this.channelCompatibility(candidate,profile);ensure(compatibility.ready,'Candidate is not ready for this ChannelProfile','PolicyDenied');
+        const duplicates=this.l('channel_attempt',candidate.data.release_id).filter(a=>a.data.channel_profile_id===profile.id&&a.data.logical_key===input.logical_key);
+        let retry=null,attempt_no=1;
+        if(input.retry_of){
+          retry=this.g(input.retry_of,'channel_attempt');ensure(retry.data.channel_profile_id===profile.id&&retry.data.candidate_id===candidate.id&&retry.data.logical_key===input.logical_key,'Retry binding differs from original attempt','Conflict');
+          ensure(retry.data.state==='FAILED'&&retry.data.reconciliation_outcome==='NOT_FOUND'&&retry.data.retry_allowed===true,'Retry is not authorized by a conclusive reconciliation','PolicyDenied');
+          const latest=duplicates.sort((a,b)=>a.data.attempt_no-b.data.attempt_no).at(-1);ensure(latest?.id===retry.id,'Retry must continue the latest reconciled attempt','Conflict');attempt_no=retry.data.attempt_no+1;
+        }else ensure(duplicates.length===0,'Logical channel request already exists; inspect/reconcile instead of resending','Conflict');
+        return{entity:this.s.create('channel_attempt',{release_id:candidate.data.release_id,name:`${profile.data.name} · ${input.logical_key}`,candidate_id:candidate.id,candidate_sha256:candidate.data.candidate_sha256,candidate_version:candidate.version,channel_profile_id:profile.id,channel_profile_version:profile.version,channel_profile_label:profile.data.profile_version,channel_policy:{channel:profile.data.channel,delivery_mode:profile.data.delivery_mode,idempotency:profile.data.idempotency,withdrawal:profile.data.withdrawal,formats:profile.data.formats,locales:profile.data.locales,max_artifact_bytes:profile.data.max_artifact_bytes},logical_key:input.logical_key,attempt_no,retry_of:retry?.id??null,state:'PREPARED',dispatch_state:'NOT_CLAIMED',external_state:'NOT_SENT',artifact_ids:candidate.data.manifest.artifact_ids,pending_digest:null,external_id:null,observation:null,reconciliation_outcome:null,retry_allowed:false,resent:false,prepared_by:this.principal,prepared_at:iso(),authorization:'explicit-channel-delivery',platform_cost_ledger:'external'})};
+      }
+      case'channel.claim':{
+        inputObject(input,['id','prepared_record','acknowledge_external_effect']);const attempt=this.g(input.id,'channel_attempt');ensure(attempt.data.state==='PREPARED'&&attempt.data.dispatch_state==='NOT_CLAIMED','Channel attempt already claimed','Conflict');ensure(input.acknowledge_external_effect===true,'External effect acknowledgment required','ConsentRequired');
+        const candidate=this.g(attempt.data.candidate_id,'candidate'),profile=this.g(attempt.data.channel_profile_id,'channel_profile');ensure(sameVersion(candidate.version,attempt.data.candidate_version)&&sameVersion(profile.version,attempt.data.channel_profile_version),'Pinned candidate or ChannelProfile changed','StaleReference');
+        ensure(this.channelCompatibility(candidate,profile).ready,'Channel attempt is no longer admissible','PolicyDenied');object(input.prepared_record);noSecrets(input.prepared_record);
+        ensure(!this.s.db.prepare('SELECT 1 FROM pending WHERE work_id=?').get(attempt.id),'Pending channel request already exists','Conflict');
+        const pending=digest('channel-pending',input.prepared_record);this.s.db.prepare('INSERT INTO pending VALUES(?,?,?)').run(attempt.id,JSON.stringify(input.prepared_record),'CLAIMED');
+        return{entity:this.s.update(attempt.id,{...attempt.data,dispatch_state:'CLAIMED',pending_digest:pending,claimed_by:this.principal,claimed_at:iso()}),pending_digest:pending,send_once:true};
+      }
+      case'channel.mark_unknown':{
+        inputObject(input,['id','pending_digest']);const attempt=this.g(input.id,'channel_attempt');sha(input.pending_digest);ensure(attempt.data.pending_digest===input.pending_digest,'Pending channel request binding mismatch','Conflict');ensure(attempt.data.dispatch_state==='CLAIMED'||attempt.data.state==='UNKNOWN','Channel attempt is not awaiting an outcome','Conflict');
+        const pending=this.s.db.prepare('SELECT state FROM pending WHERE work_id=?').get(attempt.id);ensure(pending,'Durable pending channel request is missing','NotFound');this.s.db.prepare('UPDATE pending SET state=? WHERE work_id=?').run('OUTCOME_UNKNOWN',attempt.id);
+        return{entity:this.s.update(attempt.id,{...attempt.data,state:'UNKNOWN',dispatch_state:'OUTCOME_UNKNOWN',external_state:'UNKNOWN',last_transition_at:iso(),resent:false,retry_allowed:false}),resent:false,reconcile_required:true};
+      }
+      case'channel.complete':{
+        inputObject(input,['id','pending_digest','outcome']);const attempt=this.g(input.id,'channel_attempt');sha(input.pending_digest);ensure(attempt.data.pending_digest===input.pending_digest,'Pending channel request binding mismatch','Conflict');ensure(attempt.data.dispatch_state==='CLAIMED'||attempt.data.state==='UNKNOWN','Channel attempt is not awaiting completion','Conflict');ensure(this.s.db.prepare('SELECT 1 FROM pending WHERE work_id=?').get(attempt.id),'Durable pending channel request is missing','NotFound');
+        object(input.outcome,['transport','provider_state','external_id','observation'],['transport','provider_state']);noSecrets(input.outcome);choice(input.outcome.transport,['accepted','rejected']);choice(input.outcome.provider_state,['sent','processing','published','failed','unknown']);
+        if(input.outcome.external_id)str(input.outcome.external_id,256);
+        let observation=null;if(input.outcome.observation){object(input.outcome.observation,['source','fingerprint','inspected_at'],['source','fingerprint','inspected_at']);str(input.outcome.observation.source,128);ensure(/^[a-z0-9][a-z0-9._:-]{0,127}$/.test(input.outcome.observation.source),'Invalid observation source');str(input.outcome.observation.fingerprint,512);str(input.outcome.observation.inspected_at,64);ensure(Number.isFinite(Date.parse(input.outcome.observation.inspected_at)),'Invalid observation time');observation={...input.outcome.observation};}
+        if(input.outcome.provider_state==='published')ensure(observation,'Published state requires independent destination observation','PolicyDenied');
+        const state=input.outcome.transport==='rejected'||input.outcome.provider_state==='failed'?'FAILED':input.outcome.provider_state==='published'?'OBSERVED_PUBLISHED':input.outcome.provider_state==='processing'?'PROCESSING':input.outcome.provider_state==='unknown'?'UNKNOWN':'SENT';
+        this.s.db.prepare('UPDATE pending SET state=? WHERE work_id=?').run(state==='UNKNOWN'?'OUTCOME_UNKNOWN':'COMPLETED',attempt.id);
+        return{entity:this.s.update(attempt.id,{...attempt.data,state,dispatch_state:state==='UNKNOWN'?'OUTCOME_UNKNOWN':'RESPONSE_RECORDED',external_state:state,transport:input.outcome.transport,provider_state:input.outcome.provider_state,external_id:input.outcome.external_id??attempt.data.external_id,observation,completed_at:iso(),resent:false,retry_allowed:false}),published_observed:state==='OBSERVED_PUBLISHED',resent:false};
+      }
+      case'channel.reconcile':{
+        inputObject(input,['id','pending_digest','observation']);const attempt=this.g(input.id,'channel_attempt');sha(input.pending_digest);ensure(attempt.data.pending_digest===input.pending_digest,'Pending channel request binding mismatch','Conflict');ensure(['SENT','PROCESSING','UNKNOWN'].includes(attempt.data.state),'Only an uncertain or non-final channel attempt can be reconciled','Conflict');ensure(this.s.db.prepare('SELECT 1 FROM pending WHERE work_id=?').get(attempt.id),'Durable pending channel request is missing','NotFound');
+        object(input.observation,['state','source','checked_at','fingerprint','external_id'],['state','source','checked_at']);noSecrets(input.observation);choice(input.observation.state,['published','processing','failed','not_found','unknown']);str(input.observation.source,128);ensure(/^[a-z0-9][a-z0-9._:-]{0,127}$/.test(input.observation.source),'Invalid reconciliation source');str(input.observation.checked_at,64);ensure(Number.isFinite(Date.parse(input.observation.checked_at)),'Invalid reconciliation time');
+        if(input.observation.fingerprint)str(input.observation.fingerprint,512);if(input.observation.external_id)str(input.observation.external_id,256);if(input.observation.state==='published')ensure(input.observation.fingerprint,'Published reconciliation requires a destination fingerprint','PolicyDenied');
+        const outcome=input.observation.state.toUpperCase(),state=input.observation.state==='published'?'OBSERVED_PUBLISHED':input.observation.state==='processing'?'PROCESSING':input.observation.state==='unknown'?'UNKNOWN':'FAILED';
+        const retry_allowed=input.observation.state==='not_found'&&attempt.data.channel_policy.idempotency!=='none';this.s.db.prepare('UPDATE pending SET state=? WHERE work_id=?').run('RECONCILED',attempt.id);
+        return{entity:this.s.update(attempt.id,{...attempt.data,state,dispatch_state:'RECONCILED',external_state:state,reconciliation_outcome:outcome,reconciliation:{...input.observation},external_id:input.observation.external_id??attempt.data.external_id,retry_allowed,resent:false,last_transition_at:iso()}),resent:false,retry_allowed,automatic_resend:false};
+      }
+      case'channel.withdraw_plan':{
+        inputObject(input,['id','reason','scope','replacement_candidate_id'],['id','reason','scope']);const attempt=this.g(input.id,'channel_attempt');ensure(attempt.data.state!=='PREPARED','Nothing has left the prepared state','Conflict');lines(input.reason,8000);choice(input.scope,['destination-resource','published-version','known-owned-copies']);
+        let replacement=null;if(input.replacement_candidate_id){replacement=this.g(input.replacement_candidate_id,'candidate');ensure(replacement.data.release_id===attempt.data.release_id,'Replacement candidate belongs to another release','PermissionDenied');ensure(this.inspectCandidate(replacement).fresh,'Replacement candidate is stale','StaleReference');}
+        return{entity:this.s.create('withdrawal',{release_id:attempt.data.release_id,name:`Withdrawal plan · ${attempt.data.name}`,channel_attempt_id:attempt.id,channel_profile_id:attempt.data.channel_profile_id,candidate_id:attempt.data.candidate_id,reason:input.reason,scope:input.scope,replacement_candidate_id:replacement?.id??null,channel_capability:attempt.data.channel_policy.withdrawal,state:'PLAN_ONLY',external_action_performed:false,all_copies_removed:false,universe_complete:false,planned_by:this.principal,planned_at:iso(),note:'This plan cannot prove deletion from downstream copies or caches.'})};
       }
       case'template.instantiate':{
         inputObject(input,['id','release_id','target_id','parameters','name']);const template=this.g(input.id,'template');object(input.parameters,template.data.parameters,template.data.parameters);for(const value of Object.values(input.parameters))str(value,4000);

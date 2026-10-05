@@ -14,7 +14,7 @@ Launchwright owns release-domain state and delegates runtime authority to Semwri
 
 ## Release graph
 
-The local model includes Product, Build, Release, Source, Target, Feature, Availability, Anchor, Scenario, Claim, CopyBlock, ReleaseContract, Relation, Evidence, Deliverable, Artifact, Candidate, Review, Delivery, Binding, Template, ChannelProfile, Bundle, ImpactProposal and Work.
+The local model includes Product, Build, Release, Source, Target, Feature, Availability, Anchor, Scenario, Claim, CopyBlock, ReleaseContract, Relation, Evidence, Deliverable, Artifact, Candidate, Review, Delivery, ChannelAttempt, Withdrawal, Binding, Template, ChannelProfile, Bundle, ImpactProposal and Work.
 
 Local Relation and Impact records are explicitly incomplete unless admitted by canonical Graph authority. Imported evidence never manufactures technical PASS.
 
@@ -25,6 +25,8 @@ A Candidate freezes exact artifact hashes, input versions, destination, review c
 Review dimensions are independent: technical, editorial and permissions. A waiver is durable review data and does not promote technical UNKNOWN or FAIL.
 
 `candidate.export_bundle` creates deterministic ZIP bytes and records a Bundle in `EXPORTED_NOT_DELIVERED` state. Export and private-draft delivery are separate mutations. External publishing is not inferred from either one.
+
+For a non-export ChannelProfile, `channel.prepare` creates a per-participant ChannelAttempt only after format/size compatibility, pinned versions and required review dimensions pass. An external adapter must persist its prepared request through `channel.claim` before its one send. A lost reply becomes `UNKNOWN`; recovery is destination reconciliation, not resend. `OBSERVED_PUBLISHED` requires a separately recorded destination fingerprint. Channel participants are intentionally non-atomic, and withdrawal is a bounded plan until an external adapter supplies evidence.
 
 ## Portability
 

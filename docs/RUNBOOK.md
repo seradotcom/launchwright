@@ -38,6 +38,23 @@ node src/main.mjs platform --state .state --work <work_id> --recover
 
 Launchwright does not resend an outstanding unknown Platform mutation during recovery.
 
+## Lost or ambiguous external channel acknowledgement
+
+Do not prepare a second channel request after a timeout.
+
+1. Keep the original ChannelAttempt and its logical request key.
+2. The external adapter must have called `channel.claim` before its one send.
+3. If the response was lost, call `channel.mark_unknown`; the participant becomes `UNKNOWN`.
+4. Inspect the destination by a permitted external identifier or fingerprint.
+5. Record that result with `channel.reconcile`.
+6. Only a conclusive `NOT_FOUND` on a profile whose pinned idempotency policy allows it can enable an explicit retry. Create that retry with `retry_of` pointing to the latest attempt.
+
+A transport acknowledgement is not proof of publication. `OBSERVED_PUBLISHED` requires a separately recorded observation source, timestamp and fingerprint. See `CHANNELS.md`.
+
+## Withdrawal
+
+Create a `channel.withdraw_plan` before a future adapter performs any withdrawal. The current implementation records scope/reason/replacement and the pinned channel capability only. It never claims that downstream caches, recipients or copies were deleted.
+
 ## Workspace backup and restore
 
 ```sh

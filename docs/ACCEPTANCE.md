@@ -4,7 +4,7 @@ This ledger separates implemented behavior from execution evidence. It does not 
 
 ## Current local evidence
 
-On the workstation with Node **22.22.0**, the complete light suite passes **75/75** with zero failures. This engine is outside the Native SDK's declared Node 24.21 range, so the result is supplemental rather than supported-engine acceptance.
+On the workstation with Node **22.22.0**, the complete light suite passes **83/83** with zero failures. This engine is outside the Native SDK's declared Node 24.21 range, so the result is supplemental rather than supported-engine acceptance.
 
 The current light suite covers, among other boundaries:
 
@@ -21,6 +21,12 @@ The current light suite covers, among other boundaries:
 - deterministic candidate ZIP bundles and authenticated exact-byte download
 - portable workspace export, integrity rejection, dry-run and restore with generation rotation
 - anti-replay portability: receipts and pending dispatch are not restored
+- artifact-integrity failure blocks private export instead of remaining draft-safe
+- ChannelProfile format/byte limits and stale-profile dispatch rejection
+- durable ChannelAttempt custody before send, per-participant PREPARED/SENT/PROCESSING/OBSERVED_PUBLISHED/FAILED/UNKNOWN states and duplicate logical-request blocking
+- lost-acknowledgement UNKNOWN/reconcile flow with no automatic resend and an explicit, reconciled retry chain
+- publication claims requiring independent destination observation/fingerprint
+- bounded withdrawal plans that never claim all downstream copies were removed
 
 A real CLI portability smoke exported **27 entities and 4 blobs**, previewed the restore, committed it into a new workspace and confirmed a new workspace generation. That run restored zero receipts and zero pending dispatch records.
 
@@ -28,7 +34,7 @@ A real CLI portability smoke exported **27 entities and 4 blobs**, previewed the
 
 ## CI evidence
 
-The supported-engine application workflow and the native/browser heavy workflow are configured but must be tied to the exact Launchwright commit and GitHub run IDs. Do not transplant a green result from another SHA.
+Heavy run `37269134839` passed both the real Rust NativeDriver/bundle lane and Chromium application-UI lane on commit `74e11e604e9b07a6b9f9fe2c2c3944345f40f4d4` using Node 24.21.0. That PASS validates the deterministic compressed bundle fix at that exact SHA only; the later ChannelAttempt wave must be rerun on its own commit before receiving the same status. Do not transplant a green result from another SHA.
 
 ## Not established by local tests
 

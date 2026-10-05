@@ -4,7 +4,7 @@ import { object, text, integer, requireCondition as ensure, exactRequestDigest, 
 export const APP_VERSION = '0.2.0-dev.2';
 export const RESOURCE = 'launchwright:workspace';
 const words=s=>s.split(' ');
-export const KINDS = words('product build release source target feature availability anchor scenario claim copy_block release_contract relation evidence deliverable artifact bundle candidate review delivery binding template channel_profile impact_proposal work tombstone');
+export const KINDS = words('product build release source target feature availability anchor scenario claim copy_block release_contract relation evidence deliverable artifact bundle candidate review delivery channel_attempt withdrawal binding template channel_profile impact_proposal work tombstone');
 export const EDITABLE = words('product build release source target feature availability anchor scenario claim copy_block release_contract deliverable binding template channel_profile');
 export const CLASSES = words('actual demo sanitized editorial generated imported');
 export const FORMATS = words('markdown html json email vtt');
@@ -131,8 +131,8 @@ export function validateCaptions(cues) {
   array(cues,128).forEach(c => { object(c, ['start_ms','end_ms','text'], ['start_ms','end_ms','text']); integer(c.start_ms,0,86400000); integer(c.end_ms,1,86400000); ensure(c.start_ms >= end && c.end_ms > c.start_ms, 'Invalid caption timing'); str(c.text,1000); ensure(!c.text.includes('-->'), 'Invalid caption text'); end = c.end_ms; });
 }
 const scopeGroups={
-  read:'workspace.describe resource.get events.list release.coverage release.impact anchor.assess artifact.read candidate.inspect',
-  edit:'entity.create entity.update entity.retire relation.record impact.plan evidence.import deliverable.render candidate.freeze candidate.export_bundle template.instantiate work.prepare work.claim work.complete work.mark_unknown',
-  review:'candidate.review',publish:'candidate.deliver_private',admin:'workspace.rotate_epoch',
+  read:'workspace.describe resource.get events.list release.coverage release.impact release.channels channel.inspect anchor.assess artifact.read candidate.inspect',
+  edit:'entity.create entity.update entity.retire relation.record impact.plan evidence.import deliverable.render candidate.freeze candidate.export_bundle channel.prepare channel.withdraw_plan template.instantiate work.prepare work.claim work.complete work.mark_unknown',
+  review:'candidate.review',publish:'candidate.deliver_private channel.claim channel.mark_unknown channel.complete channel.reconcile',admin:'workspace.rotate_epoch',
 };
 export const OPERATION_SCOPES = Object.freeze(Object.fromEntries(Object.entries(scopeGroups).flatMap(([scope,names])=>words(names).map(name=>[name,scope]))));

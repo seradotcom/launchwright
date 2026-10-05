@@ -26,7 +26,7 @@ node src/main.mjs demo
 
 ## Implemented local workflow
 
-Create a product and build-pinned release. Define separate UI/editorial/audio locales, plan, role, flags and viewport. Declare sources and scenarios; import provenance without turning producer assertions into technical PASS. Write a deliverable and generate immutable Markdown, safe HTML, JSON, email-draft or VTT output. Version ChannelProfiles, freeze exact artifact hashes, source/profile versions, destination and review contract, and record technical/editorial/permissions decisions independently. Export deterministic private ZIP bytes or record a reviewed private draft under a compare-and-swap alias. Exported, privately delivered and externally published are separate states; this local workflow sends nothing to an external service.
+Create a product and build-pinned release. Define separate UI/editorial/audio locales, plan, role, flags and viewport. Declare sources and scenarios; import provenance without turning producer assertions into technical PASS. Write a deliverable and generate immutable Markdown, safe HTML, JSON, email-draft or VTT output. Version ChannelProfiles, freeze exact artifact hashes, source/profile versions, destination and review contract, and record technical/editorial/permissions decisions independently. Export deterministic private ZIP bytes or record a reviewed private draft under a compare-and-swap alias. For non-export channels, prepare a durable DeliveryAttempt that pins the candidate, ChannelProfile and logical request; transport acceptance, destination observation, reconciliation and withdrawal remain distinct states, and lost acknowledgements never trigger an automatic resend. Exported, privately delivered and externally published are separate states; this local workflow itself sends nothing to an external service.
 
 The UI, public HTTP client, CLI and native bridge share the same application dispatcher and SQLite transactions. Durable request receipts, events and business writes commit together. Large revisions remain strings. A changed request under an old idempotency key conflicts. A lost reply is recovered, never silently replaced with another mutation. Portable workspace ZIP export/restore verifies CRC/SHA-256, rotates workspace generation and intentionally excludes session tokens, mutation receipts and outstanding dispatch state.
 
@@ -52,7 +52,7 @@ GitHub Actions runs the application checks on Linux, Windows and macOS. Dispatch
 
 One local owner, one workspace. No remote access, SaaS tenant isolation or team role claim is implied. Imported evidence remains unverified. Local editorial approval never overwrites technical verification. Text formatting is not Composition rendering. Input-pin comparisons are not canonical Project Graph verdicts. Historical LTS bindings retain their artifact versions. Direct public-channel delivery is blocked.
 
-See `docs/INSTALL.md`, `docs/ARCHITECTURE.md`, `docs/NATIVE_SDK.md`, `docs/SDK_GAPS.md`, `docs/RUNBOOK.md` and `docs/ACCEPTANCE.md`.
+See `docs/INSTALL.md`, `docs/ARCHITECTURE.md`, `docs/NATIVE_SDK.md`, `docs/CHANNELS.md`, `docs/SDK_GAPS.md`, `docs/RUNBOOK.md` and `docs/ACCEPTANCE.md`.
 
 ## License
 

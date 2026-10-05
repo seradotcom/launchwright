@@ -9,9 +9,10 @@ const VERSION:&str=env!("CARGO_PKG_VERSION");
 const BUNDLE:Option<&str>=option_env!("LAUNCHWRIGHT_NATIVE_BUNDLE_SHA256");
 const OPERATIONS:&[(&str,bool,bool)]=&[
  ("workspace-describe",true,false),("resource-get",true,false),("events-list",true,false),
- ("release-coverage",true,false),("release-impact",true,false),("anchor-assess",true,false),("artifact-read",true,false),("candidate-inspect",true,false),
+ ("release-coverage",true,false),("release-impact",true,false),("release-channels",true,false),("channel-inspect",true,false),("anchor-assess",true,false),("artifact-read",true,false),("candidate-inspect",true,false),
  ("entity-create",false,false),("entity-update",false,false),("entity-retire",false,false),("relation-record",false,false),("impact-plan",false,false),("evidence-import",false,false),("deliverable-render",false,false),
  ("candidate-freeze",false,false),("candidate-export_bundle",false,false),("candidate-review",false,false),("candidate-deliver_private",false,true),
+ ("channel-prepare",false,false),("channel-withdraw_plan",false,false),("channel-claim",false,true),("channel-mark_unknown",false,true),("channel-complete",false,true),("channel-reconcile",false,true),
  ("template-instantiate",false,false),("work-prepare",false,false),("work-claim",false,false),("work-complete",false,false),
  ("work-mark_unknown",false,false),("workspace-rotate_epoch",false,true),
 ];

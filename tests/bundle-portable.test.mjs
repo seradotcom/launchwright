@@ -123,6 +123,15 @@ test('portable export and restore preserve domain identity but rotate workspace 
   assert.equal(reopened.store.db.prepare('SELECT candidate_id FROM aliases WHERE name=?').get('release-draft').candidate_id,made.candidate.id);
 });
 
+test('artifact integrity failure blocks private export instead of being treated as draft-safe', async t=>{
+  const {app}=setup(t),b=await baseline(app),made=await candidate(app,b);
+  app.store.db.prepare('UPDATE blobs SET content=? WHERE sha256=?').run(Buffer.from('corrupt synthetic bytes'),made.artifact.data.sha256);
+  const inspected=app.inspectCandidate(made.candidate);
+  assert.equal(inspected.gates.find(g=>g.name==='artifact-bytes').state,'FAIL');
+  assert.equal(inspected.private_draft_allowed,false);
+  await assert.rejects(execute(app,'candidate.export_bundle',{id:made.candidate.id,candidate_sha256:made.candidate.data.candidate_sha256}),err=>err?.code==='StaleReference');
+});
+
 test('portable reader rejects corrupted blob bytes instead of restoring them', async t=>{
   const {app}=setup(t),b=await baseline(app);
   const artifact=(await execute(app,'deliverable.render',{id:b.deliverable.id})).entity;
