@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-import { NativeError, object, integer, requestIdentity, sameVersion, checkCancelled, requireCondition as ensure, text } from '@semwright/native-sdk';
+import { NativeError, object, requestIdentity, sameVersion, checkCancelled, requireCondition as ensure, text } from '@semwright/native-sdk';
 import { Store } from './store.mjs';
 import { APP_VERSION, RESOURCE, makeRequest, iso, digest } from './base.mjs';
 import { KINDS, EDITABLE, validateEntity, inputObject, idText, str, lines, choice } from './contracts.mjs';
 import { proposeChange, inspectChange, applyChange } from './change-proposal.mjs';
 import { getHistory, listHistory, diffHistory } from './history.mjs';
+import { listEvents } from './events.mjs';
 
 export const CORE_NATIVE_OPERATIONS=Object.freeze([
   'workspace.describe','resource.get','events.list','history.get','history.list','history.diff','change.inspect',
@@ -55,7 +56,7 @@ export class CoreNativeApplication {
   read(op,input){
     if(op==='workspace.describe'){inputObject(input,[]);return this.describe();}
     if(op==='resource.get'){inputObject(input,['id']);return this.get(input.id);}
-    if(op==='events.list'){inputObject(input,['after','limit'],[]);const after=integer(input.after??0,0,Number.MAX_SAFE_INTEGER),limit=integer(input.limit??50,1,128);const rows=this.store.db.prepare('SELECT * FROM events WHERE seq>? ORDER BY seq LIMIT ?').all(after,limit+1),more=rows.length>limit,items=rows.slice(0,limit).map(e=>({...e,payload:JSON.parse(e.payload),schema_version:'launchwright-event/1'}));return{items,next_after:more?items.at(-1).seq:null,watermark:this.store.db.prepare('SELECT coalesce(max(seq),0) AS n FROM events').get().n,complete:!more};}
+    if(op==='events.list')return listEvents(this,input);
     if(op==='history.get')return getHistory(this,input);
     if(op==='history.list')return listHistory(this,input);
     if(op==='history.diff')return diffHistory(this,input);

@@ -15,6 +15,7 @@ import { getHistory, listHistory, diffHistory } from './history.mjs';
 import { createMediaPlan, reviseMediaPlan, inspectMediaPlan, recordMediaOutput, recordMediaReview } from './media.mjs';
 import { createReleaseTemplate, updateReleaseTemplate, freezeProductVersion, createDeployment, transitionDeployment, prepareInvocation, inspectPublish, exportProductVersion, importProductVersion, rebindImportedTemplate } from './publish.mjs';
 import { PLATFORM_ACTIONS, PUBLICATION_ACTIONS, PLATFORM_READ_ACTIONS, preparePublicationWork } from './publish-work.mjs';
+import { listEvents } from './events.mjs';
 
 export class LaunchwrightApplication {
   constructor(root, { initialize = false, readOnly = false, principal = 'local-owner', scopes = ['read','edit','capture','review','publish','consume','admin'], capabilities = {} } = {}) {
@@ -133,12 +134,7 @@ export class LaunchwrightApplication {
       case'workspace.describe':inputObject(input,[]);return this.describe();
       case'workspace.snapshot':inputObject(input,[]);return snapshotSummary(this);
       case'resource.get':inputObject(input,['id']);return this.get(input.id);
-      case'events.list':{
-        inputObject(input,['after','limit'],[]);const after=integer(input.after??0,0,Number.MAX_SAFE_INTEGER),limit=integer(input.limit??50,1,128);
-        const rows=this.store.db.prepare('SELECT * FROM events WHERE seq>? ORDER BY seq LIMIT ?').all(after,limit+1);const more=rows.length>limit;
-        const items=rows.slice(0,limit).map(e=>({...e,payload:JSON.parse(e.payload),schema_version:'launchwright-event/1'}));
-        return{items,next_after:more?items.at(-1).seq:null,watermark:this.store.db.prepare('SELECT coalesce(max(seq),0) AS n FROM events').get().n,complete:!more};
-      }
+      case'events.list':return listEvents(this,input);
       case'history.get':return getHistory(this,input);
       case'history.list':return listHistory(this,input);
       case'history.diff':return diffHistory(this,input);

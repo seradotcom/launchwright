@@ -44,6 +44,13 @@ try{
  await page.getByRole('link',{name:'Review room',exact:false}).click();
  await page.getByRole('button',{name:'Freeze candidate',exact:true}).first().click();await save('Freeze exact candidate');
  await page.getByRole('button',{name:'Inspect gates',exact:true}).click();
+ assert.match(page.url(),/#review\/candidate_/);
+ const deepLink=page.url(),beforeDeepLinkReload=network.filter(item=>item.url?.endsWith('/api/v1/invoke')).length,networkStart=network.length;
+ await page.reload();await page.locator('.review-gate').first().waitFor();
+ assert.equal(page.url(),deepLink);
+ assert.equal(network.filter(item=>item.url?.endsWith('/api/v1/invoke')).length,beforeDeepLinkReload,'Deep-link reload must not mutate the workspace');
+ const reloadTrace=network.slice(networkStart),discoveryIndex=reloadTrace.findIndex(item=>item.url?.endsWith('/api/v1/discovery')),observeIndex=reloadTrace.findIndex(item=>item.url?.endsWith('/api/v1/observe'));
+ assert.ok(discoveryIndex>=0&&observeIndex>discoveryIndex,'Authorized UI reload must discover the contract before inventory observation');
  await page.getByRole('button',{name:'Record editorial decision',exact:true}).click();
  await dialog.getByLabel('Decision',{exact:true}).selectOption('approve-editorial');
  await fill('Reason or requested change','UI test decision on exact candidate');await save('Record decision');

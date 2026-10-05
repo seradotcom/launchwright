@@ -20,6 +20,7 @@ The private specification text is intentionally not redistributed in this AGPL r
 - Publish-side application contracts for RS-PUB-01..08: editable ReleaseTemplate drafts, immutable ProductVersion pins, bounded consumer parameters/budgets, exact deployment lifecycle, per-consumer invocation isolation/idempotency and export/import without transferring authority. Actual external Platform acceptance remains separate.
 - Portable snapshot/restore v2 with exact stored revision history, migration provenance, epoch/generation rotation, uncertain-intent suspension and backward-compatible v1 restore without historical reconstruction.
 - Loopback HTTP/UI security, bounded payloads and session-cookie authentication.
+- API/UX foundations for RS-API/RS-UX: authenticated capability discovery before UI inventory, snapshot-bound resource observation, fixed-watermark event pagination with source/revision/cause metadata, public-client event iteration, and reloadable resource deep links that do not mutate state.
 
 ## Integration-dependent / not accepted
 

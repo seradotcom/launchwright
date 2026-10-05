@@ -45,7 +45,7 @@ Synthetic data is never described as a real product capture.
 - bounded Publish product contracts: editable ReleaseTemplate drafts, immutable ProductVersion pins, deployment lifecycle, isolated consumer invocations, idempotent attempt keys and authority-free export/import with explicit local rebind/recheck; external activation still belongs to Platform Publish;
 - private-draft alias delivery with compare-and-swap;
 - portable snapshot/restore v2 that preserves exact stored revision history, rotates workspace generation/request epoch, suspends uncertain intents, and accepts older snapshots without fabricating historical revisions;
-- public HTTP client, browser UI, CLI and Native Application bridge sharing the same dispatcher and SQLite transaction model.
+- public HTTP client, browser UI, CLI and Native Application bridge sharing the same dispatcher and SQLite transaction model, with authenticated discovery, snapshot-bound event pagination and URL-addressable inspection state that performs no mutation.
 
 ## Semwright Native SDK
 
@@ -100,6 +100,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 
 - [Install](docs/INSTALL.md)
 - [Architecture and authority boundaries](docs/ARCHITECTURE.md)
+- [Public HTTP, client and event contract](docs/API.md)
 - [Native SDK integration](docs/NATIVE_SDK.md)
 - [Known SDK/platform gaps](docs/SDK_GAPS.md)
 - [Storage and portability](docs/PORTABILITY.md)

@@ -14,7 +14,9 @@ The application never converts an imported declaration, screenshot, capture rece
 
 UI, public HTTP client, CLI and Native Application bridge converge on `LaunchwrightApplication`. Mutations are bound to an exact request digest, workspace revision, epoch and principal. SQLite commits business data, durable mutation receipt and audit event in one transaction.
 
-Lost replies are recovered by request identity. Reusing an idempotency key with another body conflicts. Observation pagination is bound to one workspace revision.
+Lost replies are recovered by request identity. Reusing an idempotency key with another body conflicts. Entity observation pagination is bound to one workspace revision. Audit-event pagination is independently frozen to the durable event watermark established on its first page; later commits cannot appear inside that snapshot. Event envelopes carry a durable ID/sequence, application source, workspace generation, committed revision and original request cause.
+
+The authenticated loopback API exposes discovery before inventory use, so public clients can inspect exact operations/scopes, route names, event semantics and authority boundaries instead of assuming capabilities. Browser inspection state can be encoded as `#<section>/<resource-id>`; resolving or reloading that link performs discovery and read-only observation only, never an implicit mutation.
 
 ## Data model
 
