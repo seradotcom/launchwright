@@ -103,7 +103,7 @@ export function freezeCandidate(app,input){
     release_version:release.version,
     base_workspace_version:app.store.version(),
     artifact_ids:[...artifactIds].sort(),
-    artifacts:artifacts.map(a=>({id:a.id,version:a.version,sha256:a.data.sha256,bytes:a.data.size_bytes,target_id:a.data.target_id,deliverable_id:a.data.deliverable_id})).sort((a,b)=>a.id.localeCompare(b.id)),
+    artifacts:artifacts.map(a=>({id:a.id,version:a.version,sha256:a.data.sha256,bytes:a.data.size_bytes,mime:a.data.mime,extension:a.data.extension,classification:a.data.classification,producer:a.data.producer,target_id:a.data.target_id,deliverable_id:a.data.deliverable_id})).sort((a,b)=>a.id.localeCompare(b.id)),
     target_contexts:targets,
     inputs:[...inputs.values()].sort((a,b)=>a.id.localeCompare(b.id)),
     claim_ids:[...claimIds].sort(),

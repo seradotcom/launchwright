@@ -43,4 +43,5 @@ export class LaunchwrightClient {
   async mutate(operation,input,options){const prepared=await this.prepare(operation,input,options);try{const result=await this.sendPrepared(prepared);if(this.pendingStore)await this.pendingStore.clear(prepared.args.request.key);return result;}catch(err){err.prepared=prepared;throw err;}}
   async recover(prepared){return this.request('/api/v1/recover',prepared.args.request);}
   artifactUrl(id){return this.baseUrl+'/api/v1/artifacts/'+encodeURIComponent(id)+'/download';}
+  channelBundleUrl(id){return this.baseUrl+'/api/v1/channel-deliveries/'+encodeURIComponent(id)+'/bundle.zip';}
 }

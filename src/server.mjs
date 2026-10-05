@@ -6,6 +6,7 @@ import { dirname, join } from 'node:path';
 import { randomBytes, timingSafeEqual, randomUUID } from 'node:crypto';
 import { NativeError, dispatchApplication, applicationContext, requireCondition as ensure, object, validateValue } from '@semwright/native-sdk';
 import { OPERATION_SCOPES, makeRequest, str, idText } from './contracts.mjs';
+import { buildPrivateChannelBundle } from './channel-bundle.mjs';
 const CODE=dirname(dirname(fileURLToPath(import.meta.url)));
 const statusFor={InvalidArgument:400,PermissionDenied:403,PolicyDenied:403,ConsentRequired:403,NotFound:404,StaleReference:409,Conflict:409,ResourceExhausted:413,Unavailable:503,Unsupported:501};
 const equal=(a,b)=>typeof a==='string'&&typeof b==='string'&&Buffer.byteLength(a)===Buffer.byteLength(b)&&timingSafeEqual(Buffer.from(a),Buffer.from(b));
@@ -44,6 +45,10 @@ export function createAppServer(app,{token=localToken(app.store.root),port=4317}
       if(req.method==='GET'&&/^\/api\/v1\/artifacts\/[a-z0-9_-]+\/download$/.test(path)){
         app.allow('read');const id=path.split('/')[4];idText(id);const artifact=app.get(id,'artifact');const bytes=app.store.readBlob(artifact.data.sha256);
         res.writeHead(200,{'Content-Type':bytes.mime,'Content-Disposition':`attachment; filename="${artifact.id}.${artifact.data.extension}"`,'Content-Length':bytes.bytes.length,'Cache-Control':'no-store','ETag':`"${artifact.data.sha256}"`});res.end(bytes.bytes);return;
+      }
+      if(req.method==='GET'&&/^\/api\/v1\/channel-deliveries\/[a-z0-9_-]+\/bundle\.zip$/.test(path)){
+        app.allow('read');const id=path.split('/')[4];idText(id);const bundle=buildPrivateChannelBundle(app,id);
+        res.writeHead(200,{'Content-Type':bundle.mime,'Content-Disposition':`attachment; filename="${bundle.filename}"`,'Content-Length':bundle.bytes.length,'Cache-Control':'no-store','ETag':`"${bundle.sha256}"`});res.end(bundle.bytes);return;
       }
       ensure(req.method==='POST','Route not found','NotFound');const data=await body(req);
       if(path==='/api/v1/read'){object(data,['operation','input'],['operation','input']);ensure(OPERATION_SCOPES[data.operation]==='read','This route accepts only read operations');json(res,200,await call(data.operation,data.input));}
