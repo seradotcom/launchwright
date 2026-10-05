@@ -7,8 +7,10 @@ This ledger separates implemented behavior from execution evidence. A PASS belon
 Current pass, before commit:
 
 - Node: 22.22.0 — **outside** the Native SDK supported engine.
-- `npm test`: **76 passed, 0 failed, 0 skipped**.
-- `node scripts/verify.mjs`: source-lock integrity and syntax PASS; 28 JavaScript modules checked.
+- `npm test`: **85 passed, 0 failed, 0 skipped**.
+- `node scripts/verify.mjs`: source-lock integrity and syntax PASS; 46 JavaScript modules checked.
+- Native profile build: **43/43 public operations assigned exactly once** across five compacted canonical bridge bundles; largest local bundle was 35,714 bytes under the 48 KiB NodeBridge limit.
+- Multi-profile canonical bridge smoke: **PASS** for `core`, `production`, `review`, `integrations` and `work`; exact bundle SHA-256 values were rechecked before execution. This is not Driver Host isolation acceptance.
 - Clean CLI drill: init → synthetic demo → portable snapshot → restore to a new state directory → doctor PASS.
 - Restore drill confirmed a new workspace generation, advanced request epoch and no activation of historical mutation receipts.
 - Git diff whitespace gate: PASS.
@@ -21,7 +23,7 @@ The repository requires Node 24.21.x. The current branch must pass `Application 
 
 The manual heavy workflow provides independent lanes:
 
-- **native**: build pinned canonical TypeScript SDK, generate exact native bundle, compile/test real Rust NativeDriver, run bundle smoke.
+- **native**: build the pinned canonical TypeScript SDK, generate/hash all five bounded bridge profiles, compile/test the real Rust NativeDriver, and run a bridge smoke against each profile.
 - **browser**: install Chromium on a disposable GitHub runner and exercise the real Launchwright UI.
 - **stress**: create a bounded high-volume workspace, page observations, export a portable snapshot, restore it and verify row continuity.
 

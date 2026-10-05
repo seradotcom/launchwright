@@ -1,0 +1,132 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+import { NativeError, requireCondition as ensure, sameVersion, integer } from '@semwright/native-sdk';
+import { NativeProfileApplication } from './native-profile-base.mjs';
+import { CLASSES, RIGHTS, inputObject, array, choice, str, lines, sha } from './contracts.mjs';
+import { digest, iso } from './base.mjs';
+import { validateCapture } from './records.mjs';
+import { renderText } from './render.mjs';
+
+export const PRODUCTION_NATIVE_READS=Object.freeze([
+  'release.coverage','release.impact','anchor.assess','artifact.read'
+]);
+export const PRODUCTION_NATIVE_MUTATIONS=Object.freeze([
+  'relation.record','impact.plan','evidence.import','capture.ingest','deliverable.render'
+]);
+export const PRODUCTION_NATIVE_OPERATIONS=Object.freeze([...PRODUCTION_NATIVE_READS,...PRODUCTION_NATIVE_MUTATIONS]);
+
+export class ProductionNativeApplication extends NativeProfileApplication {
+  constructor(root,options={}){super(root,{...options,readOperations:PRODUCTION_NATIVE_READS,operations:PRODUCTION_NATIVE_OPERATIONS});}
+  dependencies(deliverable){
+    const d=deliverable.data,entries=[deliverable,this.get(d.release_id,'release'),this.get(d.target_id,'target')];
+    const addClaim=id=>{const c=this.get(id,'claim');entries.push(c);if(c.data.availability_id)entries.push(this.get(c.data.availability_id,'availability'));for(const eid of c.data.evidence_ids)entries.push(this.get(eid,'evidence'));};
+    for(const id of d.source_ids)entries.push(this.get(id,'source'));
+    for(const id of d.claim_ids)addClaim(id);
+    for(const id of d.copy_block_ids??[]){const block=this.get(id,'copy_block');entries.push(block);addClaim(block.data.claim_id);}
+    return[...new Map(entries.map(e=>[e.id,{id:e.id,kind:e.kind,version:e.version}])).values()].sort((a,b)=>a.id.localeCompare(b.id));
+  }
+  claimCheck(claim){
+    const c=claim.data,release=this.get(c.release_id,'release'),target=this.get(c.target_id,'target');
+    const evidence=c.evidence_ids.map(id=>this.get(id,'evidence')),reasons=[];
+    if(!evidence.length)reasons.push('no-evidence');
+    for(const e of evidence){
+      if(e.data.build!==release.data.build)reasons.push('build-mismatch');
+      if(!sameVersion(e.data.target_version,target.version))reasons.push('target-revision-changed');
+      if(!['owned','licensed'].includes(e.data.rights))reasons.push('rights-unresolved');
+      if(e.data.technical!=='PASS')reasons.push('technical-verification-unknown');
+    }
+    if(c.valid_until&&Date.parse(c.valid_until)<=Date.now())reasons.push('claim-validity-expired');
+    if(c.availability_id){
+      const a=this.get(c.availability_id,'availability');
+      if(a.data.target_id!==c.target_id)reasons.push('availability-target-mismatch');
+      if(a.data.valid_until&&Date.parse(a.data.valid_until)<=Date.now())reasons.push('availability-validity-expired');
+      if(a.data.state==='unavailable')reasons.push('declared-availability-contradiction');
+      if(a.data.state==='unknown')reasons.push('declared-availability-unknown');
+      if(a.data.basis!=='observed')reasons.push('availability-not-observed');
+    }
+    const status=reasons.includes('declared-availability-contradiction')?'FAIL':'UNKNOWN';
+    return{claim_id:claim.id,target_id:c.target_id,status,reasons:[...new Set([...reasons,'canonical-claim-verifier-unavailable'])],evidence_count:evidence.length,category:c.category};
+  }
+  coverage(releaseId){
+    this.get(releaseId,'release');
+    const claimEntities=this.list('claim',releaseId),claims=claimEntities.map(c=>this.claimCheck(c)),byClaim=new Map(claims.map(c=>[c.claim_id,c]));
+    const contracts=this.list('release_contract',releaseId).map(contract=>{
+      const obligations=[];
+      for(const id of contract.data.required_claim_ids){const check=byClaim.get(id)??{status:'UNKNOWN',reasons:['claim-not-enumerated']};obligations.push({kind:'claim',id,state:check.status,reasons:check.reasons});}
+      for(const id of contract.data.required_deliverable_ids){
+        const artifacts=this.list('artifact',releaseId).filter(a=>a.data.deliverable_id===id);let state='UNKNOWN',reasons=['no-current-artifact'];
+        for(const artifact of artifacts){const changed=this.freshness(artifact.data.inputs);if(changed.length)continue;try{this.store.readBlob(artifact.data.sha256);state='PASS';reasons=[];break;}catch{state='FAIL';reasons=['artifact-integrity-failed'];}}
+        obligations.push({kind:'deliverable',id,state,reasons});
+      }
+      return{id:contract.id,name:contract.data.name,total:obligations.length,ready:obligations.filter(o=>o.state==='PASS').length,failed:obligations.filter(o=>o.state==='FAIL').length,unknown:obligations.filter(o=>o.state==='UNKNOWN').length,obligations,optional_claim_ids:contract.data.optional_claim_ids};
+    });
+    const scenarios=this.list('scenario',releaseId);
+    return{release_id:releaseId,claims,obligations:claims.length,pass:claims.filter(c=>c.status==='PASS').length,fail:claims.filter(c=>c.status==='FAIL').length,unknown:claims.filter(c=>c.status==='UNKNOWN').length,contracts,scenarios:scenarios.map(s=>({id:s.id,status:'UNKNOWN',reason:'canonical-execution-not-observed'})),inventory_scope:'registered-only',unknown_frontier:true,canonical_graph_authority:false};
+  }
+  impact(releaseId){
+    this.get(releaseId,'release');const items=[];
+    for(const a of this.list('artifact',releaseId)){const changed=this.freshness(a.data.inputs);if(changed.length)items.push({artifact_id:a.id,deliverable_id:a.data.deliverable_id,state:'INPUTS_CHANGED',changed});}
+    const bindings=this.list('binding',releaseId).map(b=>({binding_id:b.id,mode:b.data.mode,action:b.data.mode==='rolling'?'revalidate-if-inputs-changed':'retain-pinned-history',pinned_artifact_id:b.data.pinned_artifact_id??null}));
+    const contract_blockers=this.coverage(releaseId).contracts.flatMap(c=>c.obligations.filter(o=>o.state!=='PASS').map(o=>({contract_id:c.id,...o})));
+    const relations=this.list('relation',releaseId).map(r=>({id:r.id,from_id:r.data.from_id,to_id:r.data.to_id,kind:r.data.relation_kind,provenance:r.data.provenance,completeness:r.data.completeness,admission:r.data.admission}));
+    return{release_id:releaseId,items,bindings,contract_blockers,relations,coverage:'DECLARED_DEPENDENCIES_ONLY',canonical_graph_authority:false,unknown_frontier:true,note:'This is an app input-revision comparison, explicit relation inventory and release-contract projection, not a Project Graph freshness verdict.'};
+  }
+  read(operation,input){
+    switch(operation){
+      case'release.coverage':inputObject(input,['release_id']);return this.coverage(input.release_id);
+      case'release.impact':inputObject(input,['release_id']);return this.impact(input.release_id);
+      case'anchor.assess':{
+        inputObject(input,['id','observed_matches']);const anchor=this.get(input.id,'anchor'),observed=integer(input.observed_matches,0,1000),expected=anchor.data.expected_count,state=observed===expected?'PASS':'FAIL';
+        return{anchor_id:anchor.id,state,expected_count:expected,observed_matches:observed,unique:state==='PASS',selected:state==='PASS',reason:state==='PASS'?'unique-anchor':'anchor-cardinality-mismatch'};
+      }
+      case'artifact.read':{
+        inputObject(input,['id']);const a=this.get(input.id,'artifact'),b=this.store.readBlob(a.data.sha256);
+        ensure(b.bytes.length<=160000,'Use authenticated artifact download for this output','ResourceExhausted');
+        return{artifact:a,text:b.bytes.toString('utf8')};
+      }
+      default:throw new NativeError('Unsupported','Read operation is outside production profile');
+    }
+  }
+  mutate(operation,input){
+    switch(operation){
+      case'relation.record':{
+        inputObject(input,['release_id','name','from_id','to_id','relation_kind','provenance','completeness','evidence_ids'],['release_id','name','from_id','to_id','relation_kind','provenance','completeness']);
+        const release=this.get(input.release_id,'release'),from=this.get(input.from_id),to=this.get(input.to_id);
+        str(input.name,160);str(input.relation_kind,128);ensure(/^[a-z][a-z0-9_.-]{0,127}$/.test(input.relation_kind),'Invalid relation kind');
+        ensure(this.productOf(from)===release.data.product_id&&this.productOf(to)===release.data.product_id,'Relation crosses product boundary','PermissionDenied');
+        choice(input.provenance,['declared','imported','heuristic','observed']);choice(input.completeness,['complete','partial','unknown']);
+        if(input.provenance==='heuristic')ensure(input.completeness!=='complete','Heuristic relation cannot claim complete coverage');
+        const evidenceIds=input.evidence_ids??[];array(evidenceIds,32);ensure(new Set(evidenceIds).size===evidenceIds.length,'Duplicate relation evidence');
+        for(const id of evidenceIds){const evidence=this.get(id,'evidence');ensure(evidence.data.release_id===release.id,'Relation evidence belongs to another release');}
+        if(input.provenance==='observed'){ensure(this.capabilities.canonical_graph_admission===true,'Observed relation requires canonical Graph admission','PolicyDenied');ensure(evidenceIds.length>0,'Observed relation requires admitted evidence');}
+        return{entity:this.store.create('relation',{release_id:release.id,name:input.name,from_id:from.id,to_id:to.id,relation_kind:input.relation_kind,provenance:input.provenance,completeness:input.completeness,evidence_ids:evidenceIds,from_version:from.version,to_version:to.version,admission:input.provenance==='observed'?'canonical-owner-admitted':'local-explicit-record',created_at:iso()})};
+      }
+      case'impact.plan':{
+        inputObject(input,['release_id','cause_ids','note'],['release_id','cause_ids']);const release=this.get(input.release_id,'release');array(input.cause_ids,64);ensure(new Set(input.cause_ids).size===input.cause_ids.length,'Duplicate impact causes');
+        for(const id of input.cause_ids){const cause=this.get(id);ensure(this.productOf(cause)===release.data.product_id,'Impact cause belongs to another product','PermissionDenied');}
+        if(input.note)lines(input.note,8000);
+        return{entity:this.store.create('impact_proposal',{release_id:release.id,name:'Impact proposal · '+release.data.name,cause_ids:[...input.cause_ids].sort(),note:input.note??'',source_workspace_version:this.store.version(),impact:this.impact(release.id),state:'PROPOSED',authority:'NONE',jobs_created:0,created_at:iso()})};
+      }
+      case'evidence.import':{
+        inputObject(input,['release_id','target_id','source_id','name','build','classification','rights','description','origin_digest','job_id'],['release_id','target_id','source_id','name','build','classification','rights','description','origin_digest']);
+        const release=this.get(input.release_id,'release'),target=this.get(input.target_id,'target'),source=this.get(input.source_id,'source');
+        ensure(target.data.release_id===release.id&&source.data.product_id===release.data.product_id,'Evidence scope mismatch');
+        choice(input.classification,CLASSES);choice(input.rights,RIGHTS);str(input.name,160);str(input.build,256);lines(input.description,8000);sha(input.origin_digest);if(input.job_id)str(input.job_id,96);
+        return{entity:this.store.create('evidence',{...input,target_version:target.version,source_version:source.version,admission:'imported-declaration',technical:'UNKNOWN',host_acceptance:'NOT_ESTABLISHED',rights_basis:'operator-declaration',observed_at:iso()})};
+      }
+      case'capture.ingest':{
+        const data=validateCapture(input),release=this.get(data.release_id,'release'),target=this.get(data.target_id,'target'),source=this.get(data.source_id,'source'),scenario=this.get(data.scenario_id,'scenario');
+        ensure(target.data.release_id===release.id&&scenario.data.release_id===release.id,'Capture target or scenario belongs to another release','PermissionDenied');
+        ensure(source.data.product_id===release.data.product_id&&scenario.data.source_id===source.id&&scenario.data.target_id===target.id,'Capture source/scenario binding mismatch','PermissionDenied');
+        ensure(source.data.approval==='approved','Capture source is not approved for execution','PermissionDenied');ensure(data.build===release.data.build,'Capture build differs from the release build','Conflict');
+        if(data.receipt.build_observation!==undefined)ensure(data.receipt.build_observation===data.build,'Capture receipt observed another build','Conflict');
+        const admission=data.receipt.authority==='imported'?'imported-declaration':'semwright-receipt-recorded';
+        return{entity:this.store.create('evidence',{release_id:release.id,target_id:target.id,source_id:source.id,scenario_id:scenario.id,name:data.name,build:data.build,classification:data.classification,rights:data.rights,description:'Capture receipt for '+scenario.data.name,origin_digest:digest('capture-receipt',data.receipt),evidence_type:'capture',capture_state:data.receipt.outcome,receipt:data.receipt,observations:data.observations,segments:data.segments??[],target_version:target.version,source_version:source.version,scenario_version:scenario.version,admission,technical:'UNKNOWN',host_acceptance:'NOT_ESTABLISHED',rights_basis:'operator-declaration',started_at:data.started_at,finished_at:data.finished_at,observed_at:data.finished_at})};
+      }
+      case'deliverable.render':{
+        inputObject(input,['id']);const d=this.get(input.id,'deliverable'),r=this.get(d.data.release_id,'release'),t=this.get(d.data.target_id,'target'),rendered=renderText(d,t,r),hash=this.store.blob(rendered.bytes,rendered.mime);
+        return{entity:this.store.create('artifact',{name:d.data.name,release_id:r.id,target_id:t.id,deliverable_id:d.id,sha256:hash,size_bytes:rendered.bytes.length,mime:rendered.mime,extension:rendered.extension,inputs:this.dependencies(d),classification:'editorial',producer:'launchwright-text/1',draft:true,technical:'UNKNOWN'})};
+      }
+      default:throw new NativeError('Unsupported','Mutation is outside production profile');
+    }
+  }
+}

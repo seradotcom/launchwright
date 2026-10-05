@@ -23,6 +23,12 @@ export class LaunchwrightClient {
   impact(releaseId){return this.read('release.impact',{release_id:releaseId});}
   verificationSummary(candidateId){return this.read('verification.summary',{candidate_id:candidateId});}
   channelStatus(releaseId){return this.read('channel.status',{release_id:releaseId});}
+  localizationAssessment(id){return this.read('localization.assess',{id});}
+  profileMatrix(){return this.read('profile.matrix');}
+  profilePreflight(input){return this.read('profile.preflight',input);}
+  extensionDiscovery(input={}){return this.read('extension.discovery',input);}
+  negotiateCompatibility(input){return this.read('compatibility.negotiate',input);}
+  compatibilityInspect(id){return this.read('compatibility.inspect',{id});}
   observe(scope='all',cursor=null,limit=64){return this.request('/api/v1/observe',{resource:'launchwright:workspace',scope,cursor,limit});}
   async *pages(scope='all',{limit=64,maxPages=100}={}){let cursor=null;for(let n=0;n<maxPages;n++){const p=await this.observe(scope,cursor,limit);yield p;if(p.complete)return;if(!p.next)throw new LaunchwrightError({code:'ProtocolMismatch',message:'Incomplete observation has no cursor',outcome_known:true});cursor=p.next;}throw new LaunchwrightError({code:'ResourceExhausted',message:'Observation page budget reached; resume explicitly',outcome_known:true});}
   async inventory(){const entities=[];let version=null;for await(const page of this.pages()){version=page.version;entities.push(...page.items);}return{entities,version};}

@@ -1,21 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-import { randomUUID } from 'node:crypto';
-import { object, text, integer, requireCondition as ensure, exactRequestDigest, validateValue } from '@semwright/native-sdk';
-export const APP_VERSION = '0.2.0-dev.3';
-export const RESOURCE = 'launchwright:workspace';
-export const KINDS = ['product','build','release','source','target','feature','availability','anchor','scenario','claim','copy_block','release_contract','relation','evidence','verification','waiver','deliverable','artifact','candidate','review','delivery','channel_profile','channel_delivery','binding','template','impact_proposal','work','tombstone'];
-export const EDITABLE = ['product','build','release','source','target','feature','availability','anchor','scenario','claim','copy_block','release_contract','deliverable','channel_profile','binding','template'];
+import { object, text, integer, requireCondition as ensure, validateValue } from '@semwright/native-sdk';
+import { APP_VERSION, RESOURCE, iso, digest, makeRequest } from './base.mjs';
+export { APP_VERSION, RESOURCE, iso, digest, makeRequest };
+export const KINDS = ['product','build','release','source','target','feature','availability','anchor','scenario','claim','copy_block','glossary','localized_copy','release_contract','relation','evidence','verification','waiver','deliverable','artifact','candidate','review','delivery','channel_profile','channel_delivery','binding','template','extension_package','compatibility_lock','impact_proposal','work','tombstone'];
+export const EDITABLE = ['product','build','release','source','target','feature','availability','anchor','scenario','claim','copy_block','glossary','release_contract','deliverable','channel_profile','binding','template'];
 export const CLASSES = ['actual','demo','sanitized','editorial','generated','imported'];
 export const FORMATS = ['markdown','html','json','email','vtt'];
 export const RIGHTS = ['owned','licensed','unknown','restricted'];
 export const STATES = ['PASS','FAIL','UNKNOWN'];
-export const iso = () => new Date().toISOString();
-export const digest = (domain, value) => exactRequestDigest('launchwright/' + domain + '/1', value);
-export function makeRequest(operation, input, expected, epoch = 0, key = randomUUID()) {
-  const request = { resource: RESOURCE, epoch, key,
-    request_sha256: digest('request', { app_version: APP_VERSION, operation, input, expected, epoch, key }) };
-  return { request, input };
-}
 export const idText = value => { const s = text(value, 96, 'resource ID'); ensure(/^[a-z][a-z0-9_-]{1,95}$/.test(s), 'Invalid resource ID'); return s; };
 export const str = (v, max = 4000) => text(v, max, 'text');
 export function lines(v, max = 24000) { ensure(typeof v === 'string' && Buffer.byteLength(v) <= max && !/[\0\u0001-\u0008\u000b\u000c\u000e-\u001f]/u.test(v), 'Invalid bounded text'); return v; }
@@ -47,6 +39,7 @@ export function validateEntity(kind, raw) {
     scenario: [['release_id','name','source_id','target_id','steps','anchors','readiness','version_label','reset_strategy','effects'], ['release_id','name','source_id','target_id','steps','anchors','readiness']],
     claim: [['release_id','name','text','target_id','category','evidence_ids','subject','scope','owner','valid_from','valid_until','unit','currency','availability_id'], ['release_id','name','text','target_id','category','evidence_ids']],
     copy_block: [['release_id','name','target_id','claim_id','locale','content','owner'], ['release_id','name','target_id','claim_id','locale','content','owner']],
+    glossary: [['product_id','name','source_locale','target_locale','version_label','terms','owner','status'], ['product_id','name','source_locale','target_locale','version_label','terms','owner','status']],
     release_contract: [['release_id','name','required_claim_ids','optional_claim_ids','required_deliverable_ids'], ['release_id','name','required_claim_ids','optional_claim_ids','required_deliverable_ids']],
     deliverable: [['release_id','name','target_id','format','content','claim_ids','copy_block_ids','source_ids','captions'], ['release_id','name','target_id','format','content','claim_ids','source_ids']],
     channel_profile: [['product_id','name','channel','profile_version','destination_class','requirements','source','effective_at','idempotency'], ['product_id','name','channel','profile_version','destination_class','requirements','source','effective_at','idempotency']],
@@ -104,6 +97,11 @@ export function validateEntity(kind, raw) {
     if(d.valid_from&&d.valid_until)ensure(Date.parse(d.valid_until)>Date.parse(d.valid_from),'Claim validity window is reversed');
   }
   if (kind === 'copy_block') { locale(d.locale); lines(d.content,24000); choice(d.owner,['human','managed']); }
+  if (kind === 'glossary') {
+    locale(d.source_locale); locale(d.target_locale); ensure(d.source_locale!==d.target_locale,'Glossary locales must differ'); str(d.version_label,96); choice(d.owner,['human','managed']); choice(d.status,['active','deprecated']);
+    array(d.terms,512).forEach(term=>{object(term,['source','target','critical','notes'],['source','target','critical']);str(term.source,256);str(term.target,256);ensure(typeof term.critical==='boolean','Glossary critical must be boolean');if(term.notes)lines(term.notes,1000);});
+    ensure(new Set(d.terms.map(term=>term.source.toLocaleLowerCase())).size===d.terms.length,'Duplicate glossary source term');
+  }
   if (kind === 'release_contract') {
     ensure(!d.required_claim_ids.some(id=>d.optional_claim_ids.includes(id)),'A claim cannot be both required and optional');
     ensure(d.required_claim_ids.length+d.optional_claim_ids.length+d.required_deliverable_ids.length>0,'Release contract cannot be empty');
@@ -129,7 +127,7 @@ export function validateCaptions(cues) {
   array(cues,128).forEach(c => { object(c, ['start_ms','end_ms','text'], ['start_ms','end_ms','text']); integer(c.start_ms,0,86400000); integer(c.end_ms,1,86400000); ensure(c.start_ms >= end && c.end_ms > c.start_ms, 'Captions overlap or have invalid timing'); str(c.text,1000); ensure(!c.text.includes('-->'), 'Caption text contains a timing delimiter'); end = c.end_ms; });
 }
 export const OPERATION_SCOPES = Object.freeze({
-  'workspace.describe':'read','workspace.snapshot':'read','resource.get':'read','events.list':'read','release.coverage':'read','release.impact':'read','anchor.assess':'read','artifact.read':'read','candidate.inspect':'read','verification.summary':'read','channel.status':'read',
+  'workspace.describe':'read','workspace.snapshot':'read','resource.get':'read','events.list':'read','release.coverage':'read','release.impact':'read','anchor.assess':'read','artifact.read':'read','candidate.inspect':'read','verification.summary':'read','channel.status':'read','localization.assess':'read','profile.matrix':'read','profile.preflight':'read','extension.discovery':'read','compatibility.negotiate':'read','compatibility.inspect':'read',
   'entity.create':'edit','entity.update':'edit','entity.retire':'edit','relation.record':'edit','impact.plan':'edit','evidence.import':'edit','capture.ingest':'capture','verification.record':'review','waiver.record':'review','deliverable.render':'edit','candidate.freeze':'edit','candidate.review':'review','candidate.deliver_private':'publish','channel.package':'publish','channel.record_outcome':'publish',
-  'template.instantiate':'edit','work.prepare':'edit','work.claim':'edit','work.complete':'edit','work.mark_unknown':'edit','workspace.rotate_epoch':'admin',
+  'localization.create':'edit','localization.update':'edit','extension.register':'admin','extension.retire':'admin','compatibility.lock':'admin','template.instantiate':'edit','work.prepare':'edit','work.claim':'edit','work.complete':'edit','work.mark_unknown':'edit','workspace.rotate_epoch':'admin',
 });

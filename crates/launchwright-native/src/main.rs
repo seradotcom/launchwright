@@ -1,39 +1,427 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-//! Thin canonical Native SDK adapter. Launchwright owns its SQLite transactions;
-//! Broker/Driver Host still own references, grants, sealed runtime tools and mounts.
-use semwright_native_sdk::cooperation::{Application,CancellationSemantics,CommitSemantics,OperationContract,RetrySemantics,TargetRequirement,UndoSemantics};
-use semwright_native_sdk::process_bridge::{NodeBridge,NodeBridgeConfig};
-use semwright_native_sdk::{CommandDescriptor,Idempotency,NativeDriver,Result,Risk,json,serve};
-use std::time::Duration;
-const VERSION:&str=env!("CARGO_PKG_VERSION");
-const BUNDLE:Option<&str>=option_env!("LAUNCHWRIGHT_NATIVE_BUNDLE_SHA256");
-const OPERATIONS:&[(&str,bool,bool)]=&[
- ("workspace-describe",true,false),("resource-get",true,false),("events-list",true,false),
- ("release-coverage",true,false),("release-impact",true,false),("anchor-assess",true,false),("artifact-read",true,false),("candidate-inspect",true,false),
- ("entity-create",false,false),("entity-update",false,false),("entity-retire",false,false),("relation-record",false,false),("impact-plan",false,false),("evidence-import",false,false),("deliverable-render",false,false),
- ("candidate-freeze",false,false),("candidate-review",false,false),("candidate-deliver_private",false,true),
- ("template-instantiate",false,false),("work-prepare",false,false),("work-claim",false,false),("work-complete",false,false),
- ("work-mark_unknown",false,false),("workspace-rotate_epoch",false,true),
+//! Thin canonical Native SDK adapter. Launchwright owns SQLite transactions;
+//! Broker/Driver Host own references, grants, sealed runtime tools and mounts.
+use semwright_native_sdk::cooperation::{
+    Application, CancellationSemantics, CommitSemantics, OperationContract, RetrySemantics,
+    TargetRequirement, UndoSemantics,
+};
+use semwright_native_sdk::process_bridge::{NodeBridge, NodeBridgeConfig};
+use semwright_native_sdk::{
+    CommandDescriptor, Idempotency, NativeDriver, Result, Risk, json, serve,
+};
+use std::{sync::Arc, time::Duration};
+
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+const CORE_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_CORE_BUNDLE_SHA256");
+const PRODUCTION_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_PRODUCTION_BUNDLE_SHA256");
+const REVIEW_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_REVIEW_BUNDLE_SHA256");
+const INTEGRATIONS_BUNDLE: Option<&str> =
+    option_env!("LAUNCHWRIGHT_NATIVE_INTEGRATIONS_BUNDLE_SHA256");
+const WORK_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_WORK_BUNDLE_SHA256");
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd)]
+enum Profile {
+    Core,
+    Production,
+    Review,
+    Integrations,
+    Work,
+}
+#[derive(Clone, Copy)]
+struct Operation {
+    suffix: &'static str,
+    read: bool,
+    consent: bool,
+    profile: Profile,
+}
+
+const OPERATIONS: &[Operation] = &[
+    Operation {
+        suffix: "workspace-describe",
+        read: true,
+        consent: false,
+        profile: Profile::Core,
+    },
+    Operation {
+        suffix: "resource-get",
+        read: true,
+        consent: false,
+        profile: Profile::Core,
+    },
+    Operation {
+        suffix: "events-list",
+        read: true,
+        consent: false,
+        profile: Profile::Core,
+    },
+    Operation {
+        suffix: "entity-create",
+        read: false,
+        consent: false,
+        profile: Profile::Core,
+    },
+    Operation {
+        suffix: "entity-update",
+        read: false,
+        consent: false,
+        profile: Profile::Core,
+    },
+    Operation {
+        suffix: "entity-retire",
+        read: false,
+        consent: false,
+        profile: Profile::Core,
+    },
+    Operation {
+        suffix: "template-instantiate",
+        read: false,
+        consent: false,
+        profile: Profile::Core,
+    },
+    Operation {
+        suffix: "release-coverage",
+        read: true,
+        consent: false,
+        profile: Profile::Production,
+    },
+    Operation {
+        suffix: "release-impact",
+        read: true,
+        consent: false,
+        profile: Profile::Production,
+    },
+    Operation {
+        suffix: "anchor-assess",
+        read: true,
+        consent: false,
+        profile: Profile::Production,
+    },
+    Operation {
+        suffix: "artifact-read",
+        read: true,
+        consent: false,
+        profile: Profile::Production,
+    },
+    Operation {
+        suffix: "relation-record",
+        read: false,
+        consent: false,
+        profile: Profile::Production,
+    },
+    Operation {
+        suffix: "impact-plan",
+        read: false,
+        consent: false,
+        profile: Profile::Production,
+    },
+    Operation {
+        suffix: "evidence-import",
+        read: false,
+        consent: false,
+        profile: Profile::Production,
+    },
+    Operation {
+        suffix: "capture-ingest",
+        read: false,
+        consent: false,
+        profile: Profile::Production,
+    },
+    Operation {
+        suffix: "deliverable-render",
+        read: false,
+        consent: false,
+        profile: Profile::Production,
+    },
+    Operation {
+        suffix: "candidate-inspect",
+        read: true,
+        consent: false,
+        profile: Profile::Review,
+    },
+    Operation {
+        suffix: "verification-summary",
+        read: true,
+        consent: false,
+        profile: Profile::Review,
+    },
+    Operation {
+        suffix: "channel-status",
+        read: true,
+        consent: false,
+        profile: Profile::Review,
+    },
+    Operation {
+        suffix: "verification-record",
+        read: false,
+        consent: false,
+        profile: Profile::Review,
+    },
+    Operation {
+        suffix: "waiver-record",
+        read: false,
+        consent: false,
+        profile: Profile::Review,
+    },
+    Operation {
+        suffix: "candidate-freeze",
+        read: false,
+        consent: false,
+        profile: Profile::Review,
+    },
+    Operation {
+        suffix: "candidate-review",
+        read: false,
+        consent: false,
+        profile: Profile::Review,
+    },
+    Operation {
+        suffix: "candidate-deliver_private",
+        read: false,
+        consent: true,
+        profile: Profile::Review,
+    },
+    Operation {
+        suffix: "channel-package",
+        read: false,
+        consent: false,
+        profile: Profile::Review,
+    },
+    Operation {
+        suffix: "channel-record_outcome",
+        read: false,
+        consent: false,
+        profile: Profile::Review,
+    },
+    Operation {
+        suffix: "localization-assess",
+        read: true,
+        consent: false,
+        profile: Profile::Integrations,
+    },
+    Operation {
+        suffix: "profile-matrix",
+        read: true,
+        consent: false,
+        profile: Profile::Integrations,
+    },
+    Operation {
+        suffix: "profile-preflight",
+        read: true,
+        consent: false,
+        profile: Profile::Integrations,
+    },
+    Operation {
+        suffix: "extension-discovery",
+        read: true,
+        consent: false,
+        profile: Profile::Integrations,
+    },
+    Operation {
+        suffix: "compatibility-negotiate",
+        read: true,
+        consent: false,
+        profile: Profile::Integrations,
+    },
+    Operation {
+        suffix: "compatibility-inspect",
+        read: true,
+        consent: false,
+        profile: Profile::Integrations,
+    },
+    Operation {
+        suffix: "localization-create",
+        read: false,
+        consent: false,
+        profile: Profile::Integrations,
+    },
+    Operation {
+        suffix: "localization-update",
+        read: false,
+        consent: false,
+        profile: Profile::Integrations,
+    },
+    Operation {
+        suffix: "extension-register",
+        read: false,
+        consent: false,
+        profile: Profile::Integrations,
+    },
+    Operation {
+        suffix: "extension-retire",
+        read: false,
+        consent: false,
+        profile: Profile::Integrations,
+    },
+    Operation {
+        suffix: "compatibility-lock",
+        read: false,
+        consent: false,
+        profile: Profile::Integrations,
+    },
+    Operation {
+        suffix: "workspace-snapshot",
+        read: true,
+        consent: false,
+        profile: Profile::Work,
+    },
+    Operation {
+        suffix: "work-prepare",
+        read: false,
+        consent: false,
+        profile: Profile::Work,
+    },
+    Operation {
+        suffix: "work-claim",
+        read: false,
+        consent: false,
+        profile: Profile::Work,
+    },
+    Operation {
+        suffix: "work-complete",
+        read: false,
+        consent: false,
+        profile: Profile::Work,
+    },
+    Operation {
+        suffix: "work-mark_unknown",
+        read: false,
+        consent: false,
+        profile: Profile::Work,
+    },
+    Operation {
+        suffix: "workspace-rotate_epoch",
+        read: false,
+        consent: true,
+        profile: Profile::Work,
+    },
 ];
-fn operation(suffix:&str,read:bool,consent:bool)->OperationContract{
- let request=json!({"type":"object","properties":{"resource":{"const":"launchwright:workspace"},"epoch":{"type":"integer","minimum":0,"maximum":9007199254740991_u64},"key":{"type":"string","minLength":1,"maxLength":128},"request_sha256":{"type":"string","pattern":"^[0-9a-f]{64}$"}},"required":["resource","epoch","key","request_sha256"],"additionalProperties":false});
- let schema=if read {json!({"type":"object","properties":{"ref":{"type":"string"},"input":{"type":"object"}},"required":["ref","input"],"additionalProperties":false})}else{json!({"type":"object","properties":{"ref":{"type":"string"},"input":{"type":"object"},"request":request},"required":["ref","request","input"],"additionalProperties":false})};
- OperationContract{
-  descriptor:CommandDescriptor{name:format!("driver.launchwright.{suffix}"),version:VERSION.into(),description:format!("Launchwright {suffix}; app-owned transaction, no implied Platform acceptance"),input_schema:schema,output_schema:json!({"type":"object"}),requires:vec!["driver:launchwright".into()],risk:if read{Risk::ReadOnly}else{Risk::Mutating},idempotency:if read{Idempotency::ReadOnly}else{Idempotency::Idempotent},timeout_ms:10000,dry_run:false,interactive_consent:consent,backends:vec!["driver:launchwright".into()]},
-  target:TargetRequirement::ObservedResource,commit:if read{CommitSemantics::ReadOnly}else{CommitSemantics::ApplicationTransaction},retry:if read{RetrySemantics::StateIdempotent}else{RetrySemantics::DurableRequestKey},undo:UndoSemantics::None,cancellation:CancellationSemantics::BeforeEffects,atomic_revision_cas:!read,
- }
+
+fn operation(spec: Operation) -> OperationContract {
+    let request = json!({"type":"object","properties":{
+        "resource":{"const":"launchwright:workspace"},
+        "epoch":{"type":"integer","minimum":0,"maximum":9007199254740991_u64},
+        "key":{"type":"string","minLength":1,"maxLength":128},
+        "request_sha256":{"type":"string","pattern":"^[0-9a-f]{64}$"}
+    },"required":["resource","epoch","key","request_sha256"],"additionalProperties":false});
+    let schema = if spec.read {
+        json!({"type":"object","properties":{"ref":{"type":"string"},"input":{"type":"object"}},"required":["ref","input"],"additionalProperties":false})
+    } else {
+        json!({"type":"object","properties":{"ref":{"type":"string"},"input":{"type":"object"},"request":request},"required":["ref","request","input"],"additionalProperties":false})
+    };
+    OperationContract {
+        descriptor: CommandDescriptor {
+            name: format!("driver.launchwright.{}", spec.suffix),
+            version: VERSION.into(),
+            description: format!(
+                "Launchwright {}; app-owned transaction, no implied Platform acceptance",
+                spec.suffix
+            ),
+            input_schema: schema,
+            output_schema: json!({"type":"object"}),
+            requires: vec!["driver:launchwright".into()],
+            risk: if spec.read {
+                Risk::ReadOnly
+            } else {
+                Risk::Mutating
+            },
+            idempotency: if spec.read {
+                Idempotency::ReadOnly
+            } else {
+                Idempotency::Idempotent
+            },
+            timeout_ms: 10000,
+            dry_run: false,
+            interactive_consent: spec.consent,
+            backends: vec!["driver:launchwright".into()],
+        },
+        target: TargetRequirement::ObservedResource,
+        commit: if spec.read {
+            CommitSemantics::ReadOnly
+        } else {
+            CommitSemantics::ApplicationTransaction
+        },
+        retry: if spec.read {
+            RetrySemantics::StateIdempotent
+        } else {
+            RetrySemantics::DurableRequestKey
+        },
+        undo: UndoSemantics::None,
+        cancellation: CancellationSemantics::BeforeEffects,
+        atomic_revision_cas: !spec.read,
+    }
 }
-#[tokio::main(flavor="current_thread")]
-async fn main()->Result<()>{
- let sha=BUNDLE.ok_or_else(||semwright_native_sdk::Error::invalid("Build with LAUNCHWRIGHT_NATIVE_BUNDLE_SHA256 fixed to the reviewed bundle; runtime caller pins are forbidden"))?;
- let bridge=NodeBridge::new(NodeBridgeConfig{tool:"node".into(),bundle_mount:"launchwright-runtime".into(),bundle_file:"launchwright.cjs".into(),bundle_sha256:sha.into(),data_mount:"launchwright-data".into(),output_mount:None,timeout:Duration::from_secs(8)})?;
- let mut app=Application::new("launchwright",VERSION)?.require_host_tools().with_observer(bridge.clone()).with_recovery(bridge.clone());
- for(suffix,read,consent)in OPERATIONS {let contract=operation(suffix,*read,*consent);let name=contract.descriptor.name.clone();app=app.register(contract,bridge.operation(name))?;}
- serve(NativeDriver::new(app)?).await
+
+fn bridge(file: &str, sha: Option<&str>) -> Result<Arc<NodeBridge>> {
+    let sha=sha.ok_or_else(||semwright_native_sdk::Error::invalid(
+        "Build with all LAUNCHWRIGHT_NATIVE_*_BUNDLE_SHA256 values fixed to reviewed bundles; runtime caller pins are forbidden"
+    ))?;
+    NodeBridge::new(NodeBridgeConfig {
+        tool: "node".into(),
+        bundle_mount: "launchwright-runtime".into(),
+        bundle_file: file.into(),
+        bundle_sha256: sha.into(),
+        data_mount: "launchwright-data".into(),
+        output_mount: None,
+        timeout: Duration::from_secs(8),
+    })
 }
+
+#[tokio::main(flavor = "current_thread")]
+async fn main() -> Result<()> {
+    let core = bridge("launchwright-core.cjs", CORE_BUNDLE)?;
+    let production = bridge("launchwright-production.cjs", PRODUCTION_BUNDLE)?;
+    let review = bridge("launchwright-review.cjs", REVIEW_BUNDLE)?;
+    let integrations = bridge("launchwright-integrations.cjs", INTEGRATIONS_BUNDLE)?;
+    let work = bridge("launchwright-work.cjs", WORK_BUNDLE)?;
+    let mut app = Application::new("launchwright", VERSION)?
+        .require_host_tools()
+        .with_observer(core.clone())
+        .with_recovery(core.clone());
+    for spec in OPERATIONS {
+        let contract = operation(*spec);
+        let name = contract.descriptor.name.clone();
+        let provider = match spec.profile {
+            Profile::Core => core.clone(),
+            Profile::Production => production.clone(),
+            Profile::Review => review.clone(),
+            Profile::Integrations => integrations.clone(),
+            Profile::Work => work.clone(),
+        };
+        app = app.register(contract, provider.operation(name))?;
+    }
+    serve(NativeDriver::new(app)?).await
+}
+
 #[cfg(test)]
-mod tests{
- use super::*;
- #[test]fn every_mutation_declares_atomic_app_cas(){for(suffix,read,consent)in OPERATIONS{let c=operation(suffix,*read,*consent);assert_eq!(c.atomic_revision_cas,!read);assert!(!c.descriptor.dry_run);assert!(c.descriptor.name.starts_with("driver.launchwright."));}}
- #[test]fn names_are_unique(){let mut names=std::collections::BTreeSet::new();for(suffix,_,_)in OPERATIONS{assert!(names.insert(*suffix));}}
+mod tests {
+    use super::*;
+    #[test]
+    fn every_mutation_declares_atomic_app_cas() {
+        for spec in OPERATIONS {
+            let contract = operation(*spec);
+            assert_eq!(contract.atomic_revision_cas, !spec.read);
+            assert!(!contract.descriptor.dry_run);
+            assert!(contract.descriptor.name.starts_with("driver.launchwright."));
+        }
+    }
+    #[test]
+    fn names_are_unique_and_surface_is_complete() {
+        let mut names = std::collections::BTreeSet::new();
+        for spec in OPERATIONS {
+            assert!(names.insert(spec.suffix));
+        }
+        assert_eq!(names.len(), 43);
+    }
+    #[test]
+    fn profile_partition_counts_are_stable() {
+        let mut counts = std::collections::BTreeMap::new();
+        for spec in OPERATIONS {
+            *counts.entry(spec.profile).or_insert(0usize) += 1;
+        }
+        assert_eq!(counts.get(&Profile::Core), Some(&7));
+        assert_eq!(counts.get(&Profile::Production), Some(&9));
+        assert_eq!(counts.get(&Profile::Review), Some(&10));
+        assert_eq!(counts.get(&Profile::Integrations), Some(&11));
+        assert_eq!(counts.get(&Profile::Work), Some(&6));
+    }
 }

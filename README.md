@@ -38,6 +38,8 @@ Synthetic data is never described as a real product capture.
 - immutable verifier identity/version/digest, coverage, omissions and findings;
 - waivers that annotate failures without changing verifier truth;
 - versioned channel profiles, exact package generation and receipt/recovery state without performing the external send;
+- source-linked localization with glossary revision pins, explicit rebase, RTL/font-rights/critical-term blockers and no invented language/layout PASS;
+- bounded extension descriptors, discovery, retirement, source-profile preflight and compatibility locks without executing remote extension code;
 - private-draft alias delivery with compare-and-swap;
 - portable snapshot/restore that rotates workspace generation and request epoch and suspends uncertain intents;
 - public HTTP client, browser UI, CLI and Native Application bridge sharing the same dispatcher and SQLite transaction model.
@@ -50,7 +52,7 @@ The public `@semwright/native-sdk` source is vendored unchanged under its upstre
 - Native SDK `0.9.0-dev.1`
 - exact SHA-256 hashes for the redistributed SDK files/archive
 
-`src/native-entry.mjs` uses the real canonical bridge and dispatcher. `crates/launchwright-native` is a thin Rust `NativeDriver + NodeBridge` adapter with a build-time-pinned JavaScript bundle hash. The caller cannot choose arbitrary executable code, mounts or runtime paths.
+The canonical `NodeBridge` allows at most 48 KiB per owner-pinned executable bundle. Launchwright therefore maps all 43 public operations exactly once across five bounded profiles (`core`, `production`, `review`, `integrations`, `work`) instead of weakening that upstream limit. `scripts/build-native-bundle.mjs` hashes each exact bundle and rejects missing/duplicate operations or oversized output. `crates/launchwright-native` pins those five hashes at build time. The caller cannot choose arbitrary executable code, mounts or runtime paths.
 
 The optional Platform adapter consumes an owner-supplied byte-pinned package. The inspected Platform source is not licensed for redistribution, so it is not copied into this public repository.
 
