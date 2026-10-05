@@ -16,10 +16,10 @@ test('portable snapshot restores durable identities and bytes but disables old m
   await execute(app,'work.claim',{id:work.id,prepared_record:{schema_version:'fixture/1',request_id:'pending'}});
   const before=app.store.version(),oldEpoch=app.store.meta().epoch,snapshot=exportSnapshot(app);
   assert.equal(snapshot.restore_policy.receipts_replayed,false);
-  const root=mkdtempSync(join(tmpdir(),'launchwright-restore-'));t.after(()=>rmSync(root,{recursive:true,force:true}));
+  const root=mkdtempSync(join(tmpdir(),'launchwright-restore-'));let restored=null;t.after(()=>{try{restored?.close();}catch{}rmSync(root,{recursive:true,force:true,maxRetries:5,retryDelay:50});});
   const result=restoreSnapshot(root,snapshot);
   assert.notEqual(result.workspace_version.generation,before.generation);
-  const restored=new LaunchwrightApplication(root);t.after(()=>restored.close());
+  restored=new LaunchwrightApplication(root);
   assert.equal(restored.get(b.release.id).data.name,b.release.data.name);
   assert.equal(restored.get(artifact.id).data.sha256,artifact.data.sha256);
   assert.equal(restored.store.readBlob(artifact.data.sha256).bytes.length,artifact.data.size_bytes);
