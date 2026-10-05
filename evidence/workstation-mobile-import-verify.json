@@ -1,0 +1,3 @@
+{"verified":true,"native_sdk_sha":"4d291de26724810017ce7b6d185326514cb79fa6","javascript_modules_checked":72,"native_driver_operations_checked":66,"host_acceptance":false}
+(node:3196166) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)

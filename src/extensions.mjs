@@ -5,7 +5,7 @@ import { str, lines, array, choice, sha, noSecrets } from './contracts.mjs';
 export const PROFILE_MATRIX=Object.freeze({
   browser:{source_types:['web'],execution:'canonical-driver-required',capture:'requires-authorized-driver',readback:'provider-dependent'},
   cli:{source_types:['cli'],execution:'sandboxed-real-tool-required',capture:'stdout-stderr-receipt-required',readback:'process-output'},
-  'mobile-import':{source_types:['mobile-import'],execution:'import-only',capture:'external-origin-required',readback:'bundle-provenance-only'},
+  'mobile-import':{source_types:['mobile-import'],execution:'import-only',capture:'bounded-manifest-hash-dimension-validation',readback:'content-addressed-assets-with-imported-provenance',native_capture:false,max_assets:8,max_asset_bytes:2097152,max_total_bytes:8388608},
   godot:{source_types:['godot'],execution:'canonical-driver-required',capture:'scene-camera-behavior-contract-required',readback:'driver-supported-only'},
   document:{source_types:['document'],execution:'parse-only',capture:'not-applicable',readback:'bounded-structured-import'}
 });

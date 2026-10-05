@@ -2,7 +2,8 @@
 import { randomUUID } from 'node:crypto';
 import { NativeError, applicationContext, dispatchApplication, requireCondition as ensure, object, integer, requestIdentity, sameVersion, checkCancelled, validateValue } from '@semwright/native-sdk';
 import { Store } from './store.mjs';
-import { APP_VERSION, RESOURCE, KINDS, EDITABLE, RIGHTS, CLASSES, OPERATION_SCOPES, READ_OPERATIONS, validateEntity, inputObject, idText, str, lines, array, choice, sha, digest, makeRequest, iso, noSecrets } from './contracts.mjs';
+import { APP_VERSION, RESOURCE, KINDS, EDITABLE, RIGHTS, CLASSES, validateEntity, inputObject, idText, str, lines, array, choice, sha, digest, makeRequest, iso, noSecrets } from './contracts.mjs';
+import { OPERATION_SCOPES, READ_OPERATIONS } from './operations.mjs';
 import { renderText } from './render.mjs';
 import { validateVerification, validateWaiver, validateChannelPackage, validateChannelOutcome } from './records.mjs';
 import { recordCapture } from './capture.mjs';
@@ -16,6 +17,7 @@ import { createMediaPlan, reviseMediaPlan, inspectMediaPlan, recordMediaOutput, 
 import { createReleaseTemplate, updateReleaseTemplate, freezeProductVersion, createDeployment, transitionDeployment, prepareInvocation, inspectPublish, exportProductVersion, importProductVersion, rebindImportedTemplate } from './publish.mjs';
 import { PLATFORM_ACTIONS, PUBLICATION_ACTIONS, PLATFORM_READ_ACTIONS, preparePublicationWork } from './publish-work.mjs';
 import { listEvents } from './events.mjs';
+import { inspectMobileImport, registerMobileImport } from './mobile-import.mjs';
 
 export class LaunchwrightApplication {
   constructor(root, { initialize = false, readOnly = false, principal = 'local-owner', scopes = ['read','edit','capture','review','publish','consume','admin'], capabilities = {} } = {}) {
@@ -154,6 +156,7 @@ export class LaunchwrightApplication {
       case'extension.discovery':return this.extensionDiscovery(input);
       case'compatibility.negotiate':return this.compatibilityNegotiate(input);
       case'compatibility.inspect':inputObject(input,['id']);return this.compatibilityInspect(input.id);
+      case'mobile.inspect':return inspectMobileImport(this,input);
       case'change.inspect':inputObject(input,['id']);return inspectChange(this,input.id);
       case'media.inspect':return inspectMediaPlan(this,input);
       case'publish.inspect':return inspectPublish(this,input);
@@ -280,6 +283,7 @@ export class LaunchwrightApplication {
         return{entity:this.store.create('evidence',{...input,target_version:target.version,source_version:source.version,admission:'imported-declaration',technical:'UNKNOWN',host_acceptance:'NOT_ESTABLISHED',rights_basis:'operator-declaration',observed_at:iso()})};
       }
       case'capture.ingest':return recordCapture(this,input);
+      case'mobile.import':return registerMobileImport(this,input);
       case'media.plan':return createMediaPlan(this,input);
       case'media.revise':return reviseMediaPlan(this,input);
       case'media.output_record':return recordMediaOutput(this,input);

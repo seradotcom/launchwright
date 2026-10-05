@@ -1,0 +1,38 @@
+
+  dist/core.esbuild.cjs  43.8kb
+
+⚡ Done in 7ms
+core: 44559 bytes 57da422643bd54ff877c9be4aa16148fbedfb4773c0984ea4351191dbd061755
+
+  dist/production.esbuild.cjs  43.2kb
+
+⚡ Done in 8ms
+production: 44001 bytes 3017113fac691c3d76fece6ecbe01bc15455a24a133f7a2eb0f1ce08264bdf0b
+
+  dist/review.esbuild.cjs  46.8kb
+
+⚡ Done in 11ms
+review: 47553 bytes 0b60c58146d9187666eaabab6483e899b867425b85e6ca36f5702af55d7d9e34
+
+  dist/integrations.esbuild.cjs  47.5kb
+
+⚡ Done in 7ms
+integrations: 48283 bytes e9257ee01880083732b041aadde6e04016ba8db45e295d25d12a3e518db3b7d8
+
+  dist/work.esbuild.cjs  29.7kb
+
+⚡ Done in 8ms
+work: 30126 bytes d2ccf438e2c2456799bf21c007702c4ebd3fcae873a6193bfc1d7fda8c8f7295
+
+  dist/media.esbuild.cjs  37.5kb
+
+⚡ Done in 7ms
+media: 38048 bytes 91df090cd8be516e8cea37766995f0991230d44dbe3cb32d1ef6a6f0d8b64f31
+
+  dist/publish.esbuild.cjs  45.9kb
+
+⚡ Done in 7ms
+publish: 46552 bytes ba55ea7e2a0e802b6bd305949ee83c8d23f249e0c3baf92c9264187a65b0f042
+Native profile partition: 66 operations across 7 bundles.
+(node:3195530) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Public HTTP consumer. It intentionally has no application/database imports.
-export const CLIENT_VERSION='0.2.0-dev.11';
+export const CLIENT_VERSION='0.2.0-dev.12';
 export const SUPPORTED_DISCOVERY_SCHEMAS=Object.freeze(['launchwright-http-discovery/1']);
 export const SUPPORTED_APP_APIS=Object.freeze(['0.2']);
 
@@ -48,6 +48,7 @@ export class LaunchwrightClient {
   extensionDiscovery(input={}){return this.read('extension.discovery',input);}
   negotiateCompatibility(input){return this.read('compatibility.negotiate',input);}
   compatibilityInspect(id){return this.read('compatibility.inspect',{id});}
+  mobileInspect(id){return this.read('mobile.inspect',{id});}
   publishInspect(input){return this.read('publish.inspect',input);}
   events({after=0,limit=50,watermark}={}){return this.request('/api/v1/events',{after,limit,...(watermark===undefined?{}:{watermark})});}
   async *eventPages({after=0,limit=50,watermark,maxPages=100}={}){let cursor=after,snapshot=watermark;for(let n=0;n<maxPages;n++){const page=await this.events({after:cursor,limit,...(snapshot===undefined?{}:{watermark:snapshot})});if(snapshot===undefined)snapshot=page.watermark;yield page;if(page.complete)return;if(page.next_after===null)throw new LaunchwrightError({code:'ProtocolMismatch',message:'Incomplete event page has no cursor',outcome_known:true});cursor=page.next_after;}throw new LaunchwrightError({code:'ResourceExhausted',message:'Event page budget reached; resume explicitly',outcome_known:true});}

@@ -76,7 +76,17 @@ export class Store {
       return{installed:true,schema_version:LATEST_SCHEMA,history_ready:true,backfilled_entities:rows.length,pre_migration_history:'NOT_RECONSTRUCTED',workspace_version:this.version()};
     }catch(err){try{this.db.exec('ROLLBACK');}catch{}throw err;}
   }
-  blob(bytes,mime) { ensure(bytes.length <= 1024*1024, 'Artifact exceeds local text export budget','ResourceExhausted'); const hash=createHash('sha256').update(bytes).digest('hex'); this.db.prepare('INSERT OR IGNORE INTO blobs VALUES(?,?,?)').run(hash,mime,bytes); return hash; }
+  blob(bytes,mime,{maxBytes=1024*1024,label='Artifact'}={}) {
+    ensure(Buffer.isBuffer(bytes),'Blob content must be a Buffer');
+    ensure(Number.isInteger(maxBytes)&&maxBytes>0&&maxBytes<=8*1024*1024,'Blob size budget is invalid');
+    ensure(typeof mime==='string'&&mime.length>0&&mime.length<=160,'Blob MIME is invalid');
+    ensure(bytes.length<=maxBytes,`${label} exceeds local byte budget`,'ResourceExhausted');
+    const hash=createHash('sha256').update(bytes).digest('hex');
+    const prior=this.db.prepare('SELECT mime FROM blobs WHERE sha256=?').get(hash);
+    if(prior){ensure(prior.mime===mime,'Content-addressed blob MIME differs from stored bytes','Conflict');return hash;}
+    this.db.prepare('INSERT INTO blobs VALUES(?,?,?)').run(hash,mime,bytes);
+    return hash;
+  }
   readBlob(hash) { const r=this.db.prepare('SELECT mime,content FROM blobs WHERE sha256=?').get(hash); ensure(r,'Artifact bytes not available','NotFound'); const bytes=Buffer.from(r.content); ensure(createHash('sha256').update(bytes).digest('hex')===hash,'Artifact integrity check failed','Conflict'); return {bytes,mime:r.mime}; }
   transaction(operation,principal,request,expected,mutate) {
     ensure(!this.readOnly,'Read-only workspace','PermissionDenied');

@@ -41,6 +41,7 @@ Synthetic data is never described as a real product capture.
 - versioned channel profiles, exact package generation, authenticated deterministic private ZIP bundles, and receipt/recovery state without performing the external send;
 - source-linked localization with glossary revision pins, explicit rebase, RTL/font-rights/critical-term blockers and no invented language/layout PASS;
 - bounded extension descriptors, discovery, retirement, source-profile preflight and compatibility locks without executing remote extension code;
+- bounded mobile import packages for PNG/JPEG screenshots and MP4 screen recordings with non-symlink package roots, path containment, exact SHA-256, container/dimension checks, build/device/OS/locale/origin/rights provenance, immutable asset artifacts and candidate/channel packaging while admission remains `imported-unverified` and technical state remains `UNKNOWN`;
 - versioned media plans with exact rational timing, source/claim pins, video/screenshot/interactive variants, per-variant reuse detection, sanitized interactive-source policy and independent technical/editorial state while canonical Composition remains the rendering authority;
 - bounded Publish product contracts: editable ReleaseTemplate drafts, immutable ProductVersion pins, deployment lifecycle, isolated consumer invocations, idempotent attempt keys and authority-free export/import with explicit local rebind/recheck; external activation still belongs to Platform Publish;
 - private-draft alias delivery with compare-and-swap;
@@ -55,7 +56,7 @@ The public `@semwright/native-sdk` source is vendored unchanged under its upstre
 - Native SDK `0.9.0-dev.1`
 - exact SHA-256 hashes for the redistributed SDK files/archive
 
-The canonical `NodeBridge` allows at most 48 KiB per owner-pinned executable bundle. Launchwright therefore maps all 64 public operations exactly once across seven bounded profiles (`core`, `production`, `review`, `integrations`, `work`, `media`, `publish`) instead of weakening that upstream limit. `scripts/build-native-bundle.mjs` hashes each exact bundle and rejects missing/duplicate operations or oversized output. `crates/launchwright-native` pins those seven hashes at build time. The caller cannot choose arbitrary executable code, mounts or runtime paths.
+The canonical `NodeBridge` allows at most 48 KiB per owner-pinned executable bundle. Launchwright therefore maps all 66 public operations exactly once across seven bounded profiles (`core`, `production`, `review`, `integrations`, `work`, `media`, `publish`) instead of weakening that upstream limit. `scripts/build-native-bundle.mjs` hashes each exact bundle and rejects missing/duplicate operations or oversized output. `crates/launchwright-native` pins those seven hashes at build time. The caller cannot choose arbitrary executable code, mounts or runtime paths.
 
 The optional Platform adapter consumes an owner-supplied byte-pinned package. The inspected Platform source is not licensed for redistribution, so it is not copied into this public repository.
 
@@ -102,6 +103,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [Architecture and authority boundaries](docs/ARCHITECTURE.md)
 - [Public HTTP, client and event contract](docs/API.md)
 - [Native SDK integration](docs/NATIVE_SDK.md)
+- [Mobile import contract](docs/MOBILE_IMPORT.md)
 - [Known SDK/platform gaps](docs/SDK_GAPS.md)
 - [Storage and portability](docs/PORTABILITY.md)
 - [Operator runbook](docs/RUNBOOK.md)

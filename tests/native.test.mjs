@@ -6,7 +6,8 @@ import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { dispatchApplication, applicationContext, exactRequestDigest, validateValue, NativeError } from '@semwright/native-sdk';
 import { nativeApplication } from '../src/native-entry.mjs';
-import { makeRequest, RESOURCE, OPERATION_SCOPES } from '../src/contracts.mjs';
+import { makeRequest, RESOURCE } from '../src/contracts.mjs';
+import { OPERATION_SCOPES } from '../src/operations.mjs';
 import { NATIVE_PROFILES } from '../src/native-profiles.mjs';
 import { setup } from './helpers.mjs';
 
@@ -17,4 +18,4 @@ test('bridge rejects bad schema before opening an uninitialized data root',()=>{
 test('canonical exact digest is key-order invariant and rejects non-integer floats',()=>{assert.equal(exactRequestDigest('test/1',{b:2,a:1}),exactRequestDigest('test/1',{a:1,b:2}));assert.throws(()=>exactRequestDigest('test/1',{scale:1.25}),{code:'InvalidArgument'});});
 test('canonical SDK JSON budgets reject oversized, cyclic and accessor input',()=>{assert.throws(()=>validateValue({text:'x'.repeat(270000)}),{code:'ResourceExhausted'});const a={};a.self=a;assert.throws(()=>validateValue(a),{code:'InvalidArgument'});const accessor={};Object.defineProperty(accessor,'a',{enumerable:true,get(){throw Error('should not execute');}});assert.throws(()=>validateValue(accessor),{code:'InvalidArgument'});});
 
-test('native profiles cover every public application operation exactly once',()=>{const assigned=Object.entries(NATIVE_PROFILES).flatMap(([profile,p])=>p.operations.map(operation=>({profile,operation})));assert.equal(assigned.length,Object.keys(OPERATION_SCOPES).length);assert.equal(new Set(assigned.map(x=>x.operation)).size,assigned.length);assert.deepEqual(assigned.map(x=>x.operation).sort(),Object.keys(OPERATION_SCOPES).sort());assert.deepEqual(Object.fromEntries(Object.entries(NATIVE_PROFILES).map(([name,p])=>[name,p.operations.length])),{core:13,production:9,review:9,integrations:12,work:6,media:5,publish:10});});
+test('native profiles cover every public application operation exactly once',()=>{const assigned=Object.entries(NATIVE_PROFILES).flatMap(([profile,p])=>p.operations.map(operation=>({profile,operation})));assert.equal(assigned.length,Object.keys(OPERATION_SCOPES).length);assert.equal(new Set(assigned.map(x=>x.operation)).size,assigned.length);assert.deepEqual(assigned.map(x=>x.operation).sort(),Object.keys(OPERATION_SCOPES).sort());assert.deepEqual(Object.fromEntries(Object.entries(NATIVE_PROFILES).map(([name,p])=>[name,p.operations.length])),{core:13,production:9,review:9,integrations:14,work:6,media:5,publish:10});});

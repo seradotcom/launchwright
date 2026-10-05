@@ -50,6 +50,14 @@ The public HTTP mutation flow remains two-phase:
 
 SQLite commits the domain mutation, durable receipt and audit event in one transaction. Repeating the identical request identity returns the recorded result and does not append a second event. Reusing that identity for another body or principal conflicts.
 
+## Mobile import boundary
+
+Filesystem package ingestion is intentionally **not** an HTTP or Native bridge feature. The local CLI validates a non-symlink package root, path containment, asset budgets, exact hashes and PNG/JPEG/MP4 container dimensions, then stages exact bytes in the application content-addressed store. Only after that step does it invoke the normal `mobile.import` mutation with a bounded manifest; no local path is retained in domain state.
+
+`mobile.import` is a capture-scoped canonical operation for pre-staged hashes. It records imported/unverified evidence and immutable artifact resources, never native observation. `mobile.inspect` is read-only and is available through `POST /api/v1/read` and `LaunchwrightClient.mobileInspect(id)`; it rechecks bytes, source/target/build pins and rights state. Actual Android/iOS runner or device capture remains outside this application contract.
+
+See [Mobile import contract](MOBILE_IMPORT.md) for the package schema and limits.
+
 ## Deep links
 
 The browser accepts `#<section>/<resource-id>` for resource-backed inspection state such as an exact review candidate. Reloading a deep link repeats discovery and read-only observation, then reopens the same registered resource. It does not invoke a mutation and it carries no token, credential, approval or execution authority.

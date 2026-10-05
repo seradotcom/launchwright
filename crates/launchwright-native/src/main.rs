@@ -269,6 +269,18 @@ const OPERATIONS: &[Operation] = &[
         profile: Profile::Integrations,
     },
     Operation {
+        suffix: "mobile-inspect",
+        read: true,
+        consent: false,
+        profile: Profile::Integrations,
+    },
+    Operation {
+        suffix: "mobile-import",
+        read: false,
+        consent: false,
+        profile: Profile::Integrations,
+    },
+    Operation {
         suffix: "localization-create",
         read: false,
         consent: false,
