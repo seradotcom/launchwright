@@ -42,6 +42,7 @@ Synthetic data is never described as a real product capture.
 - source-linked localization with glossary revision pins, explicit rebase, RTL/font-rights/critical-term blockers and no invented language/layout PASS;
 - bounded extension descriptors, discovery, retirement, source-profile preflight and compatibility locks without executing remote extension code;
 - bounded mobile import packages for PNG/JPEG screenshots and MP4 screen recordings with non-symlink package roots, path containment, exact SHA-256, container/dimension checks, build/device/OS/locale/origin/rights provenance, immutable asset artifacts and candidate/channel packaging while admission remains `imported-unverified` and technical state remains `UNKNOWN`;
+- a pinned Godot source profile bound to Semwright commit `4d291de…`, the canonical `semwright-godot-driver` and Godot 4.7.2, with logical project locators and exact runtime-pin preflight; generic CLI execution remains unavailable rather than falling back to an arbitrary shell;
 - versioned media plans with exact rational timing, source/claim pins, video/screenshot/interactive variants, per-variant reuse detection, sanitized interactive-source policy and independent technical/editorial state while canonical Composition remains the rendering authority;
 - bounded Publish product contracts: editable ReleaseTemplate drafts, immutable ProductVersion pins, deployment lifecycle, isolated consumer invocations, idempotent attempt keys and authority-free export/import with explicit local rebind/recheck; external activation still belongs to Platform Publish;
 - private-draft alias delivery with compare-and-swap;
@@ -89,10 +90,11 @@ node scripts/verify.mjs
 node src/main.mjs doctor --state .state
 ```
 
-GitHub Actions runs the supported Node 24.21 runtime on Linux, Windows and macOS. The manual heavy workflow has three independently selectable lanes:
+GitHub Actions runs the supported Node 24.21 runtime on Linux, Windows and macOS. The manual heavy workflow has four independently selectable lanes:
 
 - **native** — builds the pinned TypeScript SDK, native bundle and real Rust NativeDriver;
 - **browser** — installs Chromium on the runner and exercises the real Launchwright UI;
+- **godot** — checks out the exact reviewed Semwright SHA, verifies the pinned Godot 4.7.2 binary, runs the production Godot driver against the real engine, and binds that trace to Launchwright source-profile preflight without inventing Platform/Host authority;
 - **stress** — bounded high-volume persistence, observation and portable-restore acceptance.
 
 Run expensive dependencies on GitHub Actions rather than the development workstation.
@@ -104,6 +106,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [Public HTTP, client and event contract](docs/API.md)
 - [Native SDK integration](docs/NATIVE_SDK.md)
 - [Mobile import contract](docs/MOBILE_IMPORT.md)
+- [Godot source profile and real-engine lane](docs/GODOT_SOURCE.md)
 - [Known SDK/platform gaps](docs/SDK_GAPS.md)
 - [Storage and portability](docs/PORTABILITY.md)
 - [Operator runbook](docs/RUNBOOK.md)

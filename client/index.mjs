@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Public HTTP consumer. It intentionally has no application/database imports.
-export const CLIENT_VERSION='0.2.0-dev.12';
+export const CLIENT_VERSION='0.2.0-dev.13';
 export const SUPPORTED_DISCOVERY_SCHEMAS=Object.freeze(['launchwright-http-discovery/1']);
 export const SUPPORTED_APP_APIS=Object.freeze(['0.2']);
 

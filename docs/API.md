@@ -58,6 +58,8 @@ Filesystem package ingestion is intentionally **not** an HTTP or Native bridge f
 
 See [Mobile import contract](MOBILE_IMPORT.md) for the package schema and limits.
 
+Godot source execution is likewise not an HTTP shell. `profile.preflight` exposes only the pinned compatibility/readiness contract; the real Godot driver and engine remain Semwright-owned runtime boundaries. See [Godot source profile](GODOT_SOURCE.md).
+
 ## Deep links
 
 The browser accepts `#<section>/<resource-id>` for resource-backed inspection state such as an exact review candidate. Reloading a deep link repeats discovery and read-only observation, then reopens the same registered resource. It does not invoke a mutation and it carries no token, credential, approval or execution authority.

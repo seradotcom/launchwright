@@ -5,12 +5,11 @@ import { KINDS, inputObject, str, choice, array, lines } from './contracts.mjs';
 import { OPERATION_SCOPES } from './operations.mjs';
 import { iso } from './base.mjs';
 import { validateLocalization, assessLocalization } from './localization.mjs';
-import { PROFILE_MATRIX, validateExtensionManifest, validateCompatibilityLock } from './extensions.mjs';
+import { validateExtensionManifest, validateCompatibilityLock } from './extensions.mjs';
 import { inspectMobileImport, registerMobileImport } from './mobile-import.mjs';
 
 export const INTEGRATIONS_NATIVE_READS=Object.freeze([
-  'localization.assess','profile.matrix','profile.preflight',
-  'extension.discovery','compatibility.negotiate','compatibility.inspect','mobile.inspect','channel.status'
+  'localization.assess','extension.discovery','compatibility.negotiate','compatibility.inspect','mobile.inspect','channel.status'
 ]);
 export const INTEGRATIONS_NATIVE_MUTATIONS=Object.freeze([
   'localization.create','localization.update','extension.register','extension.retire','compatibility.lock','mobile.import'
@@ -19,19 +18,6 @@ export const INTEGRATIONS_NATIVE_OPERATIONS=Object.freeze([...INTEGRATIONS_NATIV
 
 export class IntegrationsNativeApplication extends NativeProfileApplication {
   constructor(root,options={}){super(root,{...options,readOperations:INTEGRATIONS_NATIVE_READS,operations:INTEGRATIONS_NATIVE_OPERATIONS});}
-  profilePreflight(input){
-    inputObject(input,['profile','source_id','target_id'],['profile','source_id']);str(input.profile,64);
-    const profile=PROFILE_MATRIX[input.profile];ensure(profile,'Unknown source profile','NotFound');
-    const source=this.get(input.source_id,'source');let target=null,release=null;
-    if(input.target_id){target=this.get(input.target_id,'target');release=this.get(target.data.release_id,'release');ensure(release.data.product_id===source.data.product_id,'Source and target belong to different products','PermissionDenied');}
-    const checks=[
-      {name:'source-type',state:profile.source_types.includes(source.data.type)?'PASS':'FAIL',detail:source.data.type},
-      {name:'source-purpose',state:source.data.approval==='approved'?'PASS':input.profile==='mobile-import'||input.profile==='document'?'UNKNOWN':'FAIL',detail:source.data.approval??'undeclared'},
-      {name:'build-match',state:release?source.data.build===release.data.build?'PASS':'FAIL':'UNKNOWN',detail:release?{source:source.data.build,release:release.data.build}:'target-not-supplied'},
-      {name:'execution-authority',state:this.capabilities.profile_execution?.[input.profile]==='available'?'PASS':'UNKNOWN',detail:profile.execution}
-    ];
-    return{profile:input.profile,contract:profile,source_id:source.id,target_id:target?.id??null,checks,ready_for_native_execution:checks.every(c=>c.state==='PASS')&&profile.execution!=='import-only',import_only:profile.execution==='import-only',note:'Preflight validates Launchwright contracts only; tool presence, permissions and Host isolation require the owning runtime.'};
-  }
   extensionDiscovery(input){
     inputObject(input,['type','include_retired'],[]);
     if(input.type!==undefined)choice(input.type,['source_adapter','deliverable_renderer','channel_adapter','verifier_profile']);
@@ -68,8 +54,6 @@ export class IntegrationsNativeApplication extends NativeProfileApplication {
   read(operation,input){
     switch(operation){
       case'localization.assess':inputObject(input,['id']);return assessLocalization(this,this.get(input.id,'localized_copy'));
-      case'profile.matrix':inputObject(input,[]);return{profiles:PROFILE_MATRIX,execution_proof:false};
-      case'profile.preflight':return this.profilePreflight(input);
       case'extension.discovery':return this.extensionDiscovery(input);
       case'compatibility.negotiate':return this.compatibilityNegotiate(input);
       case'compatibility.inspect':inputObject(input,['id']);return this.compatibilityInspect(input.id);

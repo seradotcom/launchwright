@@ -5,14 +5,16 @@ import { join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { NATIVE_PROFILES } from '../src/native-profiles.mjs';
+import { APP_VERSION } from '../src/base.mjs';
 const lock=JSON.parse(readFileSync('SOURCE_LOCK.json','utf8'));let count=0;
 for(const[path,expected]of Object.entries(lock.native_sdk.files)){
  const bytes=readFileSync(join('vendor/semwright-native-sdk',path));if(createHash('sha256').update(bytes).digest('hex')!==expected)throw Error('Canonical Native SDK bytes changed: '+path);
 }
 function walk(dir){for(const name of readdirSync(dir)){if(['node_modules','.git','.state','.ci-tools','target','dist','private-reference'].includes(name)||name.startsWith('.state-'))continue;const path=join(dir,name),st=lstatSync(path);if(st.isSymbolicLink())throw Error('Unexpected repository symlink');if(st.isDirectory())walk(path);else if(path.endsWith('.mjs')){const result=spawnSync(process.execPath,['--check',path],{encoding:'utf8'});if(result.status!==0)throw Error(result.stderr);count++;}}}
 walk('.');
+const rootPackage=JSON.parse(readFileSync('package.json','utf8'));
 const publicClient=JSON.parse(readFileSync('client/package.json','utf8'));
-if(publicClient.name!=='@launchwright/client'||publicClient.version!=='0.2.0-dev.12')throw Error('Public client package metadata is inconsistent');
+if(rootPackage.version!==APP_VERSION||publicClient.name!=='@launchwright/client'||publicClient.version!==APP_VERSION)throw Error('Application/public client package metadata is inconsistent');
 const publicClientSource=readFileSync('client/index.mjs','utf8');
 if(/(?:from|import\()\s*['\"]\.\.\//.test(publicClientSource))throw Error('Public client imports private repository modules');
 if(!readFileSync('LICENSE','utf8').includes('GNU AFFERO GENERAL PUBLIC LICENSE'))throw Error('Full AGPL license missing');
