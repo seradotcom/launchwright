@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { LaunchwrightApplication, execute } from '../src/application.mjs';
 import { exportSnapshot, restoreSnapshot } from '../src/snapshot.mjs';
-import { setup, baseline, candidate, update } from './helpers.mjs';
+import { setup, baseline, candidate, update, captureInput } from './helpers.mjs';
 
 const verifier=(authority='heuristic')=>({id:'fixture-verifier',version:'1.0.0',digest:'a'.repeat(64),authority});
 
@@ -41,7 +41,7 @@ test('capture receipts preserve provenance without manufacturing technical PASS'
   const {app}=setup(t);const b=await baseline(app);
   const source=(await update(app,b.source,{approval:'approved',purpose:'Owned local capture fixture'})).entity;
   const scenario=await b.create('scenario',{release_id:b.release.id,name:'Open owned fixture',source_id:source.id,target_id:b.target.id,steps:[{action:'navigate',anchor:'root'}],anchors:[{name:'root',role:'main',label:'Owned fixture',expected_count:1}],readiness:'declared',version_label:'1',reset_strategy:'isolated-context'});
-  const receipt={release_id:b.release.id,target_id:b.target.id,source_id:source.id,scenario_id:scenario.id,name:'Owned capture receipt',build:'build-A',classification:'demo',rights:'owned',started_at:'2026-10-04T20:00:00.000Z',finished_at:'2026-10-04T20:00:01.000Z',receipt:{authority:'semwright-native-driver',provider:'browser',provider_version:'fixture',operation_id:'op-1',profile:'owned-browser',build_observation:'build-A',outcome:'SUCCEEDED'},observations:[{kind:'anchor',key:'root',value:'1 match',source:'accessible'}]};
+  const receipt=captureInput(b,source,scenario);
   const evidence=(await execute(app,'capture.ingest',receipt)).entity;
   assert.equal(evidence.data.evidence_type,'capture');
   assert.equal(evidence.data.capture_state,'SUCCEEDED');
@@ -54,7 +54,7 @@ test('capture receipts preserve provenance without manufacturing technical PASS'
 test('capture execution requires an explicitly approved source', async t => {
   const {app}=setup(t);const b=await baseline(app);
   const scenario=await b.create('scenario',{release_id:b.release.id,name:'Declared only',source_id:b.source.id,target_id:b.target.id,steps:[],anchors:[],readiness:'declared'});
-  await assert.rejects(execute(app,'capture.ingest',{release_id:b.release.id,target_id:b.target.id,source_id:b.source.id,scenario_id:scenario.id,name:'Not authorized',build:'build-A',classification:'demo',rights:'owned',started_at:'2026-10-04T20:00:00.000Z',finished_at:'2026-10-04T20:00:01.000Z',receipt:{authority:'semwright-native-driver',provider:'browser',provider_version:'fixture',operation_id:'op-2',profile:'owned-browser',outcome:'SUCCEEDED'},observations:[]}),{code:'PermissionDenied'});
+  await assert.rejects(execute(app,'capture.ingest',captureInput(b,b.source,scenario,{name:'Not authorized'})),{code:'PermissionDenied'});
 });
 
 test('heuristic PASS remains UNKNOWN and a waiver preserves a recorded failure', async t => {

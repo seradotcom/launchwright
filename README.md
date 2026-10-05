@@ -35,7 +35,7 @@ Synthetic data is never described as a real product capture.
 - immutable Markdown, safe HTML, JSON, email-draft and VTT artifacts with SHA-256-addressed bytes;
 - explicit relation provenance, impact projections, immutable impact proposals and exact-base document change proposals that cannot force-overwrite newer edits;
 - exact candidate manifests that pin artifact bytes, target context, ReleaseContract, localization/glossary revisions, channel profiles and declared rights, with input freshness and review-race isolation;
-- Semwright/native capture **receipt ingestion** tied to source + build + target + scenario while technical state stays UNKNOWN;
+- capture contract v2 tied to source + build + target + scenario, with Platform/native receipt correlation, readiness checks, anchor cardinality, build-drift detection, isolation/cleanup bounds, provenance classes and derived-material lineage while technical state stays UNKNOWN;
 - immutable verifier identity/version/digest, coverage, omissions and findings;
 - waivers that annotate failures without changing verifier truth;
 - versioned channel profiles, exact package generation, authenticated deterministic private ZIP bundles, and receipt/recovery state without performing the external send;
@@ -61,7 +61,7 @@ The optional Platform adapter consumes an owner-supplied byte-pinned package. Th
 
 Launchwright keeps **production, verification, review and delivery** separate.
 
-A successful capture receipt says that an execution receipt was recorded; it does not establish semantic correctness. A heuristic/model/local PASS remains effective UNKNOWN unless admitted by canonical verifier authority. A waiver records an exception but never turns FAIL into PASS. A channel package says bytes are ready; it does not mean they were uploaded or published. Public activation requires a canonical Publish receipt.
+A successful capture contract can establish that an authorized receipt, readiness conditions, unique anchors and provenance were recorded; it does not establish semantic correctness or Driver Host acceptance. Generated/editorial/imported material is never eligible to stand in for observed product state, and a sanitized derivative only preserves that eligibility when its exact parent capture did and every declared transformation preserves observed state. A heuristic/model/local PASS remains effective UNKNOWN unless admitted by canonical verifier authority. A waiver records an exception but never turns FAIL into PASS. A channel package says bytes are ready; it does not mean they were uploaded or published. Public activation requires a canonical Publish receipt.
 
 Local input-pin comparisons are not Project Graph completeness. Scenario effect declarations are not canonical effects. VTT timing is not Composition rendering. Private editorial approval is not Host acceptance.
 

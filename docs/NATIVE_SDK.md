@@ -11,7 +11,7 @@ The canonical `NodeBridge` limits an owner-pinned executable bundle to 48 KiB an
 | Profile | Operations | Purpose |
 | --- | ---: | --- |
 | `core` | 13 | workspace/entity/history reads, entity CRUD, change proposals and template instantiation |
-| `production` | 9 | coverage/impact, relations, evidence, capture receipt ingestion and text rendering |
+| `production` | 9 | coverage/impact, relations, evidence, capture-contract ingestion and text rendering |
 | `review` | 10 | candidate, verification, waiver and channel-package lifecycle |
 | `integrations` | 11 | localization, source-profile preflight, extension descriptors and compatibility locks |
 | `work` | 6 | snapshot summary and Platform-intent custody/recovery |

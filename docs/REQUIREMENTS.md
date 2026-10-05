@@ -13,7 +13,7 @@ The private specification text is intentionally not redistributed in this AGPL r
 - Immutable text artifacts, exact candidate manifests and freshness invalidation.
 - Explicit relation provenance and impact proposals with no execution authority.
 - Application-local document change proposals for CopyBlocks and deliverables: proposal creation never mutates content, application requires an exact base revision, stale proposals fail closed, and human-owned/whole-document content requires explicit acknowledgement.
-- Capture receipt ingestion that stays technical UNKNOWN.
+- Capture contract v2 covering receipt correlation, readiness, anchor uniqueness, build drift, demo-data labeling, derivative lineage, isolation, bounded cleanup, ordered segments and no-fake-UI eligibility; technical state remains UNKNOWN.
 - Immutable verifier records, coverage/omissions/findings and non-state-changing waivers.
 - Versioned channel packages plus authenticated deterministic private bundles containing the exact channel manifest, candidate manifest and pinned artifact bytes.
 - Versioned channel profiles, exact package generation and external receipt/recovery state.
