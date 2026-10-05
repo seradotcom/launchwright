@@ -81,8 +81,10 @@ test('canonical verifier PASS is only admitted behind the explicit owner capabil
 });
 
 test('channel packaging freezes exact bytes separately from external delivery state', async t => {
-  const {app}=setup(t);const b=await baseline(app),{candidate:c}=await candidate(app,b);
+  const {app}=setup(t);const b=await baseline(app),{artifact,candidate:unpinned}=await candidate(app,b);
   const profile=await b.create('channel_profile',{product_id:b.product.id,name:'Docs review portal',channel:'docs-review',profile_version:'2026-10-04',destination_class:'external-draft',requirements:{format:'json'},source:'operator-contract:docs-review',effective_at:'2026-10-04T00:00:00.000Z',idempotency:'recover-first'});
+  await assert.rejects(execute(app,'channel.package',{candidate_id:unpinned.id,profile_id:profile.id,participant:'reviewer-a',locale:'en-US',allow_partial:false,omissions:[]}),{code:'StaleReference'});
+  const c=(await execute(app,'candidate.freeze',{release_id:b.release.id,name:'Channel-pinned review',artifact_ids:[artifact.id],destination:'release-draft',channel_profile_ids:[profile.id],contract:{version:'v2',required_reviewers:1,require_claims_verified:false}})).entity;
   const packaged=(await execute(app,'channel.package',{candidate_id:c.id,profile_id:profile.id,participant:'reviewer-a',locale:'en-US',allow_partial:false,omissions:[]})).entity;
   assert.equal(packaged.data.state,'PACKAGE_READY');assert.equal(packaged.data.external_state,'NOT_SENT');
   const bytes=app.store.readBlob(packaged.data.package_sha256).bytes;

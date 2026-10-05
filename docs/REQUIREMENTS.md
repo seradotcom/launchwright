@@ -2,7 +2,7 @@
 
 The private product specification used to start Launchwright contains 196 requirement records across domain model, SDK, sources, capture, process, claims, graph, verification, media, docs, localization, channels, review, publishing, UX, API, security, data, operations, extensions, QA and go-to-market concerns.
 
-The private specification text is intentionally not redistributed in this AGPL repository. This file records implementation status without copying that source.
+The private specification text is intentionally not redistributed in this AGPL repository. This file records implementation status without copying that source. `requirements-index.json` preserves all 196 requirement IDs, acceptance-test IDs, scenario IDs, scope and priority so implementation evidence can be attached without republishing the private prose.
 
 ## Current implemented foundations
 

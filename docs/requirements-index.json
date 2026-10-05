@@ -1,0 +1,1966 @@
+{
+  "schema_version": "launchwright-requirements-index/1",
+  "source_edition": "Semwright Release Studio 0.1.0 (2026-10-02)",
+  "requirements": [
+    {
+      "id": "RS-DOM-01",
+      "module": "DOM",
+      "test_id": "RS-AT-DOM-01",
+      "scenario_ids": [
+        "RS-E2E-01"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-DOM-02",
+      "module": "DOM",
+      "test_id": "RS-AT-DOM-02",
+      "scenario_ids": [
+        "RS-E2E-01"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-DOM-03",
+      "module": "DOM",
+      "test_id": "RS-AT-DOM-03",
+      "scenario_ids": [
+        "RS-E2E-01"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-DOM-04",
+      "module": "DOM",
+      "test_id": "RS-AT-DOM-04",
+      "scenario_ids": [
+        "RS-E2E-01"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-DOM-05",
+      "module": "DOM",
+      "test_id": "RS-AT-DOM-05",
+      "scenario_ids": [
+        "RS-E2E-01"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-DOM-06",
+      "module": "DOM",
+      "test_id": "RS-AT-DOM-06",
+      "scenario_ids": [
+        "RS-E2E-01"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-DOM-07",
+      "module": "DOM",
+      "test_id": "RS-AT-DOM-07",
+      "scenario_ids": [
+        "RS-E2E-01"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-DOM-08",
+      "module": "DOM",
+      "test_id": "RS-AT-DOM-08",
+      "scenario_ids": [
+        "RS-E2E-01"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SDK-01",
+      "module": "SDK",
+      "test_id": "RS-AT-SDK-01",
+      "scenario_ids": [
+        "RS-E2E-02"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SDK-02",
+      "module": "SDK",
+      "test_id": "RS-AT-SDK-02",
+      "scenario_ids": [
+        "RS-E2E-02"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SDK-03",
+      "module": "SDK",
+      "test_id": "RS-AT-SDK-03",
+      "scenario_ids": [
+        "RS-E2E-02"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SDK-04",
+      "module": "SDK",
+      "test_id": "RS-AT-SDK-04",
+      "scenario_ids": [
+        "RS-E2E-02"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SDK-05",
+      "module": "SDK",
+      "test_id": "RS-AT-SDK-05",
+      "scenario_ids": [
+        "RS-E2E-02"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SDK-06",
+      "module": "SDK",
+      "test_id": "RS-AT-SDK-06",
+      "scenario_ids": [
+        "RS-E2E-02"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SDK-07",
+      "module": "SDK",
+      "test_id": "RS-AT-SDK-07",
+      "scenario_ids": [
+        "RS-E2E-02"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SDK-08",
+      "module": "SDK",
+      "test_id": "RS-AT-SDK-08",
+      "scenario_ids": [
+        "RS-E2E-02"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SRC-01",
+      "module": "SRC",
+      "test_id": "RS-AT-SRC-01",
+      "scenario_ids": [
+        "RS-E2E-03"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SRC-02",
+      "module": "SRC",
+      "test_id": "RS-AT-SRC-02",
+      "scenario_ids": [
+        "RS-E2E-03"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SRC-03",
+      "module": "SRC",
+      "test_id": "RS-AT-SRC-03",
+      "scenario_ids": [
+        "RS-E2E-03"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SRC-04",
+      "module": "SRC",
+      "test_id": "RS-AT-SRC-04",
+      "scenario_ids": [
+        "RS-E2E-03"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SRC-05",
+      "module": "SRC",
+      "test_id": "RS-AT-SRC-05",
+      "scenario_ids": [
+        "RS-E2E-03"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SRC-06",
+      "module": "SRC",
+      "test_id": "RS-AT-SRC-06",
+      "scenario_ids": [
+        "RS-E2E-03"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SRC-07",
+      "module": "SRC",
+      "test_id": "RS-AT-SRC-07",
+      "scenario_ids": [
+        "RS-E2E-03"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SRC-08",
+      "module": "SRC",
+      "test_id": "RS-AT-SRC-08",
+      "scenario_ids": [
+        "RS-E2E-03"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CAP-01",
+      "module": "CAP",
+      "test_id": "RS-AT-CAP-01",
+      "scenario_ids": [
+        "RS-E2E-03"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CAP-02",
+      "module": "CAP",
+      "test_id": "RS-AT-CAP-02",
+      "scenario_ids": [
+        "RS-E2E-03"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CAP-03",
+      "module": "CAP",
+      "test_id": "RS-AT-CAP-03",
+      "scenario_ids": [
+        "RS-E2E-03"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CAP-04",
+      "module": "CAP",
+      "test_id": "RS-AT-CAP-04",
+      "scenario_ids": [
+        "RS-E2E-03"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CAP-05",
+      "module": "CAP",
+      "test_id": "RS-AT-CAP-05",
+      "scenario_ids": [
+        "RS-E2E-03"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CAP-06",
+      "module": "CAP",
+      "test_id": "RS-AT-CAP-06",
+      "scenario_ids": [
+        "RS-E2E-03"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CAP-07",
+      "module": "CAP",
+      "test_id": "RS-AT-CAP-07",
+      "scenario_ids": [
+        "RS-E2E-03"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CAP-08",
+      "module": "CAP",
+      "test_id": "RS-AT-CAP-08",
+      "scenario_ids": [
+        "RS-E2E-03"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CAP-09",
+      "module": "CAP",
+      "test_id": "RS-AT-CAP-09",
+      "scenario_ids": [
+        "RS-E2E-03"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CAP-10",
+      "module": "CAP",
+      "test_id": "RS-AT-CAP-10",
+      "scenario_ids": [
+        "RS-E2E-03"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-PRO-01",
+      "module": "PRO",
+      "test_id": "RS-AT-PRO-01",
+      "scenario_ids": [
+        "RS-E2E-18"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-PRO-02",
+      "module": "PRO",
+      "test_id": "RS-AT-PRO-02",
+      "scenario_ids": [
+        "RS-E2E-18"
+      ],
+      "scope": "PROFILE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-PRO-03",
+      "module": "PRO",
+      "test_id": "RS-AT-PRO-03",
+      "scenario_ids": [
+        "RS-E2E-18"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-PRO-04",
+      "module": "PRO",
+      "test_id": "RS-AT-PRO-04",
+      "scenario_ids": [
+        "RS-E2E-18"
+      ],
+      "scope": "PROFILE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-PRO-05",
+      "module": "PRO",
+      "test_id": "RS-AT-PRO-05",
+      "scenario_ids": [
+        "RS-E2E-18"
+      ],
+      "scope": "PROFILE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-PRO-06",
+      "module": "PRO",
+      "test_id": "RS-AT-PRO-06",
+      "scenario_ids": [
+        "RS-E2E-18"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-PRO-07",
+      "module": "PRO",
+      "test_id": "RS-AT-PRO-07",
+      "scenario_ids": [
+        "RS-E2E-18"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-PRO-08",
+      "module": "PRO",
+      "test_id": "RS-AT-PRO-08",
+      "scenario_ids": [
+        "RS-E2E-18"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CLM-01",
+      "module": "CLM",
+      "test_id": "RS-AT-CLM-01",
+      "scenario_ids": [
+        "RS-E2E-05"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CLM-02",
+      "module": "CLM",
+      "test_id": "RS-AT-CLM-02",
+      "scenario_ids": [
+        "RS-E2E-05"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CLM-03",
+      "module": "CLM",
+      "test_id": "RS-AT-CLM-03",
+      "scenario_ids": [
+        "RS-E2E-05"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CLM-04",
+      "module": "CLM",
+      "test_id": "RS-AT-CLM-04",
+      "scenario_ids": [
+        "RS-E2E-05"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CLM-05",
+      "module": "CLM",
+      "test_id": "RS-AT-CLM-05",
+      "scenario_ids": [
+        "RS-E2E-05"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CLM-06",
+      "module": "CLM",
+      "test_id": "RS-AT-CLM-06",
+      "scenario_ids": [
+        "RS-E2E-05"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CLM-07",
+      "module": "CLM",
+      "test_id": "RS-AT-CLM-07",
+      "scenario_ids": [
+        "RS-E2E-05"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CLM-08",
+      "module": "CLM",
+      "test_id": "RS-AT-CLM-08",
+      "scenario_ids": [
+        "RS-E2E-05"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CLM-09",
+      "module": "CLM",
+      "test_id": "RS-AT-CLM-09",
+      "scenario_ids": [
+        "RS-E2E-05"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CLM-10",
+      "module": "CLM",
+      "test_id": "RS-AT-CLM-10",
+      "scenario_ids": [
+        "RS-E2E-05"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-GRF-01",
+      "module": "GRF",
+      "test_id": "RS-AT-GRF-01",
+      "scenario_ids": [
+        "RS-E2E-04"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-GRF-02",
+      "module": "GRF",
+      "test_id": "RS-AT-GRF-02",
+      "scenario_ids": [
+        "RS-E2E-04"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-GRF-03",
+      "module": "GRF",
+      "test_id": "RS-AT-GRF-03",
+      "scenario_ids": [
+        "RS-E2E-04"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-GRF-04",
+      "module": "GRF",
+      "test_id": "RS-AT-GRF-04",
+      "scenario_ids": [
+        "RS-E2E-04"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-GRF-05",
+      "module": "GRF",
+      "test_id": "RS-AT-GRF-05",
+      "scenario_ids": [
+        "RS-E2E-04"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-GRF-06",
+      "module": "GRF",
+      "test_id": "RS-AT-GRF-06",
+      "scenario_ids": [
+        "RS-E2E-04"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-GRF-07",
+      "module": "GRF",
+      "test_id": "RS-AT-GRF-07",
+      "scenario_ids": [
+        "RS-E2E-04"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-GRF-08",
+      "module": "GRF",
+      "test_id": "RS-AT-GRF-08",
+      "scenario_ids": [
+        "RS-E2E-04"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-GRF-09",
+      "module": "GRF",
+      "test_id": "RS-AT-GRF-09",
+      "scenario_ids": [
+        "RS-E2E-04"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-GRF-10",
+      "module": "GRF",
+      "test_id": "RS-AT-GRF-10",
+      "scenario_ids": [
+        "RS-E2E-04"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-VER-01",
+      "module": "VER",
+      "test_id": "RS-AT-VER-01",
+      "scenario_ids": [
+        "RS-E2E-20"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-VER-02",
+      "module": "VER",
+      "test_id": "RS-AT-VER-02",
+      "scenario_ids": [
+        "RS-E2E-20"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-VER-03",
+      "module": "VER",
+      "test_id": "RS-AT-VER-03",
+      "scenario_ids": [
+        "RS-E2E-20"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-VER-04",
+      "module": "VER",
+      "test_id": "RS-AT-VER-04",
+      "scenario_ids": [
+        "RS-E2E-20"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-VER-05",
+      "module": "VER",
+      "test_id": "RS-AT-VER-05",
+      "scenario_ids": [
+        "RS-E2E-20"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-VER-06",
+      "module": "VER",
+      "test_id": "RS-AT-VER-06",
+      "scenario_ids": [
+        "RS-E2E-20"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-VER-07",
+      "module": "VER",
+      "test_id": "RS-AT-VER-07",
+      "scenario_ids": [
+        "RS-E2E-20"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-VER-08",
+      "module": "VER",
+      "test_id": "RS-AT-VER-08",
+      "scenario_ids": [
+        "RS-E2E-20"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-VER-09",
+      "module": "VER",
+      "test_id": "RS-AT-VER-09",
+      "scenario_ids": [
+        "RS-E2E-20"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-VER-10",
+      "module": "VER",
+      "test_id": "RS-AT-VER-10",
+      "scenario_ids": [
+        "RS-E2E-20"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-MED-01",
+      "module": "MED",
+      "test_id": "RS-AT-MED-01",
+      "scenario_ids": [
+        "RS-E2E-07"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-MED-02",
+      "module": "MED",
+      "test_id": "RS-AT-MED-02",
+      "scenario_ids": [
+        "RS-E2E-07"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-MED-03",
+      "module": "MED",
+      "test_id": "RS-AT-MED-03",
+      "scenario_ids": [
+        "RS-E2E-07"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-MED-04",
+      "module": "MED",
+      "test_id": "RS-AT-MED-04",
+      "scenario_ids": [
+        "RS-E2E-07"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-MED-05",
+      "module": "MED",
+      "test_id": "RS-AT-MED-05",
+      "scenario_ids": [
+        "RS-E2E-07"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-MED-06",
+      "module": "MED",
+      "test_id": "RS-AT-MED-06",
+      "scenario_ids": [
+        "RS-E2E-07"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-MED-07",
+      "module": "MED",
+      "test_id": "RS-AT-MED-07",
+      "scenario_ids": [
+        "RS-E2E-07"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-MED-08",
+      "module": "MED",
+      "test_id": "RS-AT-MED-08",
+      "scenario_ids": [
+        "RS-E2E-07"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-MED-09",
+      "module": "MED",
+      "test_id": "RS-AT-MED-09",
+      "scenario_ids": [
+        "RS-E2E-07"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-MED-10",
+      "module": "MED",
+      "test_id": "RS-AT-MED-10",
+      "scenario_ids": [
+        "RS-E2E-07"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-DOC-01",
+      "module": "DOC",
+      "test_id": "RS-AT-DOC-01",
+      "scenario_ids": [
+        "RS-E2E-15"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-DOC-02",
+      "module": "DOC",
+      "test_id": "RS-AT-DOC-02",
+      "scenario_ids": [
+        "RS-E2E-15"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-DOC-03",
+      "module": "DOC",
+      "test_id": "RS-AT-DOC-03",
+      "scenario_ids": [
+        "RS-E2E-15"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-DOC-04",
+      "module": "DOC",
+      "test_id": "RS-AT-DOC-04",
+      "scenario_ids": [
+        "RS-E2E-15"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-DOC-05",
+      "module": "DOC",
+      "test_id": "RS-AT-DOC-05",
+      "scenario_ids": [
+        "RS-E2E-15"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-DOC-06",
+      "module": "DOC",
+      "test_id": "RS-AT-DOC-06",
+      "scenario_ids": [
+        "RS-E2E-15"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-DOC-07",
+      "module": "DOC",
+      "test_id": "RS-AT-DOC-07",
+      "scenario_ids": [
+        "RS-E2E-15"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-DOC-08",
+      "module": "DOC",
+      "test_id": "RS-AT-DOC-08",
+      "scenario_ids": [
+        "RS-E2E-15"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-LOC-01",
+      "module": "LOC",
+      "test_id": "RS-AT-LOC-01",
+      "scenario_ids": [
+        "RS-E2E-21"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-LOC-02",
+      "module": "LOC",
+      "test_id": "RS-AT-LOC-02",
+      "scenario_ids": [
+        "RS-E2E-21"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-LOC-03",
+      "module": "LOC",
+      "test_id": "RS-AT-LOC-03",
+      "scenario_ids": [
+        "RS-E2E-21"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-LOC-04",
+      "module": "LOC",
+      "test_id": "RS-AT-LOC-04",
+      "scenario_ids": [
+        "RS-E2E-21"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-LOC-05",
+      "module": "LOC",
+      "test_id": "RS-AT-LOC-05",
+      "scenario_ids": [
+        "RS-E2E-21"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-LOC-06",
+      "module": "LOC",
+      "test_id": "RS-AT-LOC-06",
+      "scenario_ids": [
+        "RS-E2E-21"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-LOC-07",
+      "module": "LOC",
+      "test_id": "RS-AT-LOC-07",
+      "scenario_ids": [
+        "RS-E2E-21"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-LOC-08",
+      "module": "LOC",
+      "test_id": "RS-AT-LOC-08",
+      "scenario_ids": [
+        "RS-E2E-21"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CHN-01",
+      "module": "CHN",
+      "test_id": "RS-AT-CHN-01",
+      "scenario_ids": [
+        "RS-E2E-14"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CHN-02",
+      "module": "CHN",
+      "test_id": "RS-AT-CHN-02",
+      "scenario_ids": [
+        "RS-E2E-14"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CHN-03",
+      "module": "CHN",
+      "test_id": "RS-AT-CHN-03",
+      "scenario_ids": [
+        "RS-E2E-14"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CHN-04",
+      "module": "CHN",
+      "test_id": "RS-AT-CHN-04",
+      "scenario_ids": [
+        "RS-E2E-14"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CHN-05",
+      "module": "CHN",
+      "test_id": "RS-AT-CHN-05",
+      "scenario_ids": [
+        "RS-E2E-14"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CHN-06",
+      "module": "CHN",
+      "test_id": "RS-AT-CHN-06",
+      "scenario_ids": [
+        "RS-E2E-14"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CHN-07",
+      "module": "CHN",
+      "test_id": "RS-AT-CHN-07",
+      "scenario_ids": [
+        "RS-E2E-14"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CHN-08",
+      "module": "CHN",
+      "test_id": "RS-AT-CHN-08",
+      "scenario_ids": [
+        "RS-E2E-14"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CHN-09",
+      "module": "CHN",
+      "test_id": "RS-AT-CHN-09",
+      "scenario_ids": [
+        "RS-E2E-14"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-CHN-10",
+      "module": "CHN",
+      "test_id": "RS-AT-CHN-10",
+      "scenario_ids": [
+        "RS-E2E-14"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-REV-01",
+      "module": "REV",
+      "test_id": "RS-AT-REV-01",
+      "scenario_ids": [
+        "RS-E2E-13"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-REV-02",
+      "module": "REV",
+      "test_id": "RS-AT-REV-02",
+      "scenario_ids": [
+        "RS-E2E-13"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-REV-03",
+      "module": "REV",
+      "test_id": "RS-AT-REV-03",
+      "scenario_ids": [
+        "RS-E2E-13"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-REV-04",
+      "module": "REV",
+      "test_id": "RS-AT-REV-04",
+      "scenario_ids": [
+        "RS-E2E-13"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-REV-05",
+      "module": "REV",
+      "test_id": "RS-AT-REV-05",
+      "scenario_ids": [
+        "RS-E2E-13"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-REV-06",
+      "module": "REV",
+      "test_id": "RS-AT-REV-06",
+      "scenario_ids": [
+        "RS-E2E-13"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-REV-07",
+      "module": "REV",
+      "test_id": "RS-AT-REV-07",
+      "scenario_ids": [
+        "RS-E2E-13"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-REV-08",
+      "module": "REV",
+      "test_id": "RS-AT-REV-08",
+      "scenario_ids": [
+        "RS-E2E-13"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-REV-09",
+      "module": "REV",
+      "test_id": "RS-AT-REV-09",
+      "scenario_ids": [
+        "RS-E2E-13"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-REV-10",
+      "module": "REV",
+      "test_id": "RS-AT-REV-10",
+      "scenario_ids": [
+        "RS-E2E-13"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-PUB-01",
+      "module": "PUB",
+      "test_id": "RS-AT-PUB-01",
+      "scenario_ids": [
+        "RS-E2E-23"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-PUB-02",
+      "module": "PUB",
+      "test_id": "RS-AT-PUB-02",
+      "scenario_ids": [
+        "RS-E2E-23"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-PUB-03",
+      "module": "PUB",
+      "test_id": "RS-AT-PUB-03",
+      "scenario_ids": [
+        "RS-E2E-23"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-PUB-04",
+      "module": "PUB",
+      "test_id": "RS-AT-PUB-04",
+      "scenario_ids": [
+        "RS-E2E-23"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-PUB-05",
+      "module": "PUB",
+      "test_id": "RS-AT-PUB-05",
+      "scenario_ids": [
+        "RS-E2E-23"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-PUB-06",
+      "module": "PUB",
+      "test_id": "RS-AT-PUB-06",
+      "scenario_ids": [
+        "RS-E2E-23"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-PUB-07",
+      "module": "PUB",
+      "test_id": "RS-AT-PUB-07",
+      "scenario_ids": [
+        "RS-E2E-23"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-PUB-08",
+      "module": "PUB",
+      "test_id": "RS-AT-PUB-08",
+      "scenario_ids": [
+        "RS-E2E-23"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-UX-01",
+      "module": "UX",
+      "test_id": "RS-AT-UX-01",
+      "scenario_ids": [
+        "RS-E2E-22"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-UX-02",
+      "module": "UX",
+      "test_id": "RS-AT-UX-02",
+      "scenario_ids": [
+        "RS-E2E-22"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-UX-03",
+      "module": "UX",
+      "test_id": "RS-AT-UX-03",
+      "scenario_ids": [
+        "RS-E2E-22"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-UX-04",
+      "module": "UX",
+      "test_id": "RS-AT-UX-04",
+      "scenario_ids": [
+        "RS-E2E-22"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-UX-05",
+      "module": "UX",
+      "test_id": "RS-AT-UX-05",
+      "scenario_ids": [
+        "RS-E2E-22"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-UX-06",
+      "module": "UX",
+      "test_id": "RS-AT-UX-06",
+      "scenario_ids": [
+        "RS-E2E-22"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-UX-07",
+      "module": "UX",
+      "test_id": "RS-AT-UX-07",
+      "scenario_ids": [
+        "RS-E2E-22"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-UX-08",
+      "module": "UX",
+      "test_id": "RS-AT-UX-08",
+      "scenario_ids": [
+        "RS-E2E-22"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-UX-09",
+      "module": "UX",
+      "test_id": "RS-AT-UX-09",
+      "scenario_ids": [
+        "RS-E2E-22"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-UX-10",
+      "module": "UX",
+      "test_id": "RS-AT-UX-10",
+      "scenario_ids": [
+        "RS-E2E-22"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-API-01",
+      "module": "API",
+      "test_id": "RS-AT-API-01",
+      "scenario_ids": [
+        "RS-E2E-10"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-API-02",
+      "module": "API",
+      "test_id": "RS-AT-API-02",
+      "scenario_ids": [
+        "RS-E2E-10"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-API-03",
+      "module": "API",
+      "test_id": "RS-AT-API-03",
+      "scenario_ids": [
+        "RS-E2E-10"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-API-04",
+      "module": "API",
+      "test_id": "RS-AT-API-04",
+      "scenario_ids": [
+        "RS-E2E-10"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-API-05",
+      "module": "API",
+      "test_id": "RS-AT-API-05",
+      "scenario_ids": [
+        "RS-E2E-10"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-API-06",
+      "module": "API",
+      "test_id": "RS-AT-API-06",
+      "scenario_ids": [
+        "RS-E2E-10"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-API-07",
+      "module": "API",
+      "test_id": "RS-AT-API-07",
+      "scenario_ids": [
+        "RS-E2E-10"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-API-08",
+      "module": "API",
+      "test_id": "RS-AT-API-08",
+      "scenario_ids": [
+        "RS-E2E-10"
+      ],
+      "scope": "EXTERNAL_ACCEPTANCE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SEC-01",
+      "module": "SEC",
+      "test_id": "RS-AT-SEC-01",
+      "scenario_ids": [
+        "RS-E2E-12"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SEC-02",
+      "module": "SEC",
+      "test_id": "RS-AT-SEC-02",
+      "scenario_ids": [
+        "RS-E2E-12"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SEC-03",
+      "module": "SEC",
+      "test_id": "RS-AT-SEC-03",
+      "scenario_ids": [
+        "RS-E2E-12"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SEC-04",
+      "module": "SEC",
+      "test_id": "RS-AT-SEC-04",
+      "scenario_ids": [
+        "RS-E2E-12"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SEC-05",
+      "module": "SEC",
+      "test_id": "RS-AT-SEC-05",
+      "scenario_ids": [
+        "RS-E2E-12"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SEC-06",
+      "module": "SEC",
+      "test_id": "RS-AT-SEC-06",
+      "scenario_ids": [
+        "RS-E2E-12"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SEC-07",
+      "module": "SEC",
+      "test_id": "RS-AT-SEC-07",
+      "scenario_ids": [
+        "RS-E2E-12"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SEC-08",
+      "module": "SEC",
+      "test_id": "RS-AT-SEC-08",
+      "scenario_ids": [
+        "RS-E2E-12"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SEC-09",
+      "module": "SEC",
+      "test_id": "RS-AT-SEC-09",
+      "scenario_ids": [
+        "RS-E2E-12"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SEC-10",
+      "module": "SEC",
+      "test_id": "RS-AT-SEC-10",
+      "scenario_ids": [
+        "RS-E2E-12"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SEC-11",
+      "module": "SEC",
+      "test_id": "RS-AT-SEC-11",
+      "scenario_ids": [
+        "RS-E2E-12"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-SEC-12",
+      "module": "SEC",
+      "test_id": "RS-AT-SEC-12",
+      "scenario_ids": [
+        "RS-E2E-12"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-DAT-01",
+      "module": "DAT",
+      "test_id": "RS-AT-DAT-01",
+      "scenario_ids": [
+        "RS-E2E-34"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-DAT-02",
+      "module": "DAT",
+      "test_id": "RS-AT-DAT-02",
+      "scenario_ids": [
+        "RS-E2E-34"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-DAT-03",
+      "module": "DAT",
+      "test_id": "RS-AT-DAT-03",
+      "scenario_ids": [
+        "RS-E2E-34"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-DAT-04",
+      "module": "DAT",
+      "test_id": "RS-AT-DAT-04",
+      "scenario_ids": [
+        "RS-E2E-34"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-DAT-05",
+      "module": "DAT",
+      "test_id": "RS-AT-DAT-05",
+      "scenario_ids": [
+        "RS-E2E-34"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-DAT-06",
+      "module": "DAT",
+      "test_id": "RS-AT-DAT-06",
+      "scenario_ids": [
+        "RS-E2E-34"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-DAT-07",
+      "module": "DAT",
+      "test_id": "RS-AT-DAT-07",
+      "scenario_ids": [
+        "RS-E2E-34"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-DAT-08",
+      "module": "DAT",
+      "test_id": "RS-AT-DAT-08",
+      "scenario_ids": [
+        "RS-E2E-34"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-OPS-01",
+      "module": "OPS",
+      "test_id": "RS-AT-OPS-01",
+      "scenario_ids": [
+        "RS-E2E-28"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-OPS-02",
+      "module": "OPS",
+      "test_id": "RS-AT-OPS-02",
+      "scenario_ids": [
+        "RS-E2E-28"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-OPS-03",
+      "module": "OPS",
+      "test_id": "RS-AT-OPS-03",
+      "scenario_ids": [
+        "RS-E2E-28"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-OPS-04",
+      "module": "OPS",
+      "test_id": "RS-AT-OPS-04",
+      "scenario_ids": [
+        "RS-E2E-28"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-OPS-05",
+      "module": "OPS",
+      "test_id": "RS-AT-OPS-05",
+      "scenario_ids": [
+        "RS-E2E-28"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-OPS-06",
+      "module": "OPS",
+      "test_id": "RS-AT-OPS-06",
+      "scenario_ids": [
+        "RS-E2E-28"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-OPS-07",
+      "module": "OPS",
+      "test_id": "RS-AT-OPS-07",
+      "scenario_ids": [
+        "RS-E2E-28"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-OPS-08",
+      "module": "OPS",
+      "test_id": "RS-AT-OPS-08",
+      "scenario_ids": [
+        "RS-E2E-28"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-OPS-09",
+      "module": "OPS",
+      "test_id": "RS-AT-OPS-09",
+      "scenario_ids": [
+        "RS-E2E-28"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-OPS-10",
+      "module": "OPS",
+      "test_id": "RS-AT-OPS-10",
+      "scenario_ids": [
+        "RS-E2E-28"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-EXT-01",
+      "module": "EXT",
+      "test_id": "RS-AT-EXT-01",
+      "scenario_ids": [
+        "RS-E2E-32"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-EXT-02",
+      "module": "EXT",
+      "test_id": "RS-AT-EXT-02",
+      "scenario_ids": [
+        "RS-E2E-32"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-EXT-03",
+      "module": "EXT",
+      "test_id": "RS-AT-EXT-03",
+      "scenario_ids": [
+        "RS-E2E-32"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-EXT-04",
+      "module": "EXT",
+      "test_id": "RS-AT-EXT-04",
+      "scenario_ids": [
+        "RS-E2E-32"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-EXT-05",
+      "module": "EXT",
+      "test_id": "RS-AT-EXT-05",
+      "scenario_ids": [
+        "RS-E2E-32"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-EXT-06",
+      "module": "EXT",
+      "test_id": "RS-AT-EXT-06",
+      "scenario_ids": [
+        "RS-E2E-32"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-EXT-07",
+      "module": "EXT",
+      "test_id": "RS-AT-EXT-07",
+      "scenario_ids": [
+        "RS-E2E-32"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-EXT-08",
+      "module": "EXT",
+      "test_id": "RS-AT-EXT-08",
+      "scenario_ids": [
+        "RS-E2E-32"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-QA-01",
+      "module": "QA",
+      "test_id": "RS-AT-QA-01",
+      "scenario_ids": [
+        "RS-E2E-30"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-QA-02",
+      "module": "QA",
+      "test_id": "RS-AT-QA-02",
+      "scenario_ids": [
+        "RS-E2E-30"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-QA-03",
+      "module": "QA",
+      "test_id": "RS-AT-QA-03",
+      "scenario_ids": [
+        "RS-E2E-30"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-QA-04",
+      "module": "QA",
+      "test_id": "RS-AT-QA-04",
+      "scenario_ids": [
+        "RS-E2E-30"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-QA-05",
+      "module": "QA",
+      "test_id": "RS-AT-QA-05",
+      "scenario_ids": [
+        "RS-E2E-30"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-QA-06",
+      "module": "QA",
+      "test_id": "RS-AT-QA-06",
+      "scenario_ids": [
+        "RS-E2E-30"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-QA-07",
+      "module": "QA",
+      "test_id": "RS-AT-QA-07",
+      "scenario_ids": [
+        "RS-E2E-30"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-QA-08",
+      "module": "QA",
+      "test_id": "RS-AT-QA-08",
+      "scenario_ids": [
+        "RS-E2E-30"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-GTM-01",
+      "module": "GTM",
+      "test_id": "RS-AT-GTM-01",
+      "scenario_ids": [
+        "RS-E2E-36"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-GTM-02",
+      "module": "GTM",
+      "test_id": "RS-AT-GTM-02",
+      "scenario_ids": [
+        "RS-E2E-36"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-GTM-03",
+      "module": "GTM",
+      "test_id": "RS-AT-GTM-03",
+      "scenario_ids": [
+        "RS-E2E-36"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-GTM-04",
+      "module": "GTM",
+      "test_id": "RS-AT-GTM-04",
+      "scenario_ids": [
+        "RS-E2E-36"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-GTM-05",
+      "module": "GTM",
+      "test_id": "RS-AT-GTM-05",
+      "scenario_ids": [
+        "RS-E2E-36"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    },
+    {
+      "id": "RS-GTM-06",
+      "module": "GTM",
+      "test_id": "RS-AT-GTM-06",
+      "scenario_ids": [
+        "RS-E2E-36"
+      ],
+      "scope": "CORE",
+      "priority": "REQUIRED"
+    }
+  ]
+}
