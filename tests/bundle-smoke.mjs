@@ -12,6 +12,20 @@ const app=new LaunchwrightApplication(state,{initialize:true});
 const product=(await execute(app,'entity.create',{kind:'product',data:{name:'Native bundle smoke',description:'Synthetic local fixture'}})).entity;
 const release=(await execute(app,'entity.create',{kind:'release',data:{product_id:product.id,name:'0.0-smoke',build:'smoke-build',status:'draft'}})).entity;
 const candidate=app.store.create('candidate',{release_id:release.id,name:'Synthetic bundle smoke candidate'});
+const source=(await execute(app,'entity.create',{kind:'source',data:{product_id:product.id,name:'Synthetic publish source',type:'web',locator:'http://127.0.0.1:4320/build/smoke',build:'smoke-build',coverage:'declared'}})).entity;
+const target=(await execute(app,'entity.create',{kind:'target',data:{release_id:release.id,name:'Synthetic publish target',ui_locale:'en-US',editorial_locale:'en-US',role:'viewer',plan:'basic',region:'MX',flags:{},viewport:{width:1280,height:720,scale_milli:1000}}})).entity;
+const scenario=(await execute(app,'entity.create',{kind:'scenario',data:{release_id:release.id,name:'Synthetic publish flow',source_id:source.id,target_id:target.id,readiness:'declared',anchors:[{name:'root',role:'main',label:'Workspace',expected_count:1}],steps:[{action:'assert',anchor:'root'}]}})).entity;
+const claim=(await execute(app,'entity.create',{kind:'claim',data:{release_id:release.id,name:'Synthetic publish claim',text:'Synthetic bounded claim',target_id:target.id,category:'editorial',evidence_ids:[]}})).entity;
+const template=(await execute(app,'publish.template_create',{data:{
+  product_id:product.id,release_id:release.id,name:'Synthetic publish product',description:'Bundle smoke publication contract',
+  source_types:['web'],source_ids:[source.id],scenario_ids:[scenario.id],protected_scenario_ids:[scenario.id],claim_ids:[claim.id],
+  locales:['en-US'],destinations:['private-download'],outputs:['artifact'],
+  parameters:[{name:'brand',type:'text',required:true,max_length:80}],
+  verification_dimensions:['format'],budget:{max_cost_microunits:1000,currency:'USD',max_runtime_seconds:60},
+  audience:'private',external_disclosures:['Synthetic smoke only'],export_resource_ids:[source.id,scenario.id,claim.id],result_retention:{mode:'preserve'}
+}})).entity;
+const productVersion=(await execute(app,'publish.version_freeze',{template_id:template.id,template_version:template.version,version_label:'smoke-1'})).entity;
+const deployment=(await execute(app,'publish.deployment_create',{product_version_id:productVersion.id,name:'Synthetic smoke deployment'})).entity;
 app.close();
 
 const manifest=JSON.parse(readFileSync('dist/native-bundle.json','utf8'));
@@ -21,7 +35,8 @@ const reads={
   review:['verification-summary',{candidate_id:candidate.id}],
   integrations:['channel-status',{release_id:release.id}],
   work:['workspace-snapshot',{}],
-  media:['media-inspect',{}]
+  media:['media-inspect',{}],
+  publish:['publish-inspect',{deployment_id:deployment.id}]
 };
 const results={};
 

@@ -17,11 +17,12 @@ The private specification text is intentionally not redistributed in this AGPL r
 - Immutable verifier records, coverage/omissions/findings and non-state-changing waivers.
 - Versioned channel packages plus authenticated deterministic private bundles containing the exact channel manifest, candidate manifest and pinned artifact bytes.
 - Versioned channel profiles, exact package generation and external receipt/recovery state.
+- Publish-side application contracts for RS-PUB-01..08: editable ReleaseTemplate drafts, immutable ProductVersion pins, bounded consumer parameters/budgets, exact deployment lifecycle, per-consumer invocation isolation/idempotency and export/import without transferring authority. Actual external Platform acceptance remains separate.
 - Portable snapshot/restore v2 with exact stored revision history, migration provenance, epoch/generation rotation, uncertain-intent suspension and backward-compatible v1 restore without historical reconstruction.
 - Loopback HTTP/UI security, bounded payloads and session-cookie authentication.
 
 ## Integration-dependent / not accepted
 
-Real product capture across target applications; canonical Project Graph/effects; Composition video rendering; real Platform job execution; canonical verifier runtime admission; remote teams; public/cross-account Publish; mobile/Godot target acceptance; ChatGPT Plugin host acceptance; production deployment.
+Real product capture across target applications; canonical Project Graph/effects; Composition video rendering; real Platform job execution; canonical verifier runtime admission; remote teams; real cross-account Platform Publish execution/output ACLs/external activation; mobile/Godot target acceptance; ChatGPT Plugin host acceptance; production deployment.
 
 Requirement completion is therefore not represented as a single vanity percentage. Evidence is tracked by exact behavior, SHA and acceptance lane in `ACCEPTANCE.md`.

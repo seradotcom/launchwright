@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { randomBytes, timingSafeEqual, randomUUID } from 'node:crypto';
 import { NativeError, dispatchApplication, applicationContext, requireCondition as ensure, object, validateValue } from '@semwright/native-sdk';
-import { OPERATION_SCOPES, makeRequest, str, idText } from './contracts.mjs';
+import { OPERATION_SCOPES, READ_OPERATIONS, makeRequest, str, idText } from './contracts.mjs';
 import { buildPrivateChannelBundle } from './channel-bundle.mjs';
 const CODE=dirname(dirname(fileURLToPath(import.meta.url)));
 const statusFor={InvalidArgument:400,PermissionDenied:403,PolicyDenied:403,ConsentRequired:403,NotFound:404,StaleReference:409,Conflict:409,ResourceExhausted:413,Unavailable:503,Unsupported:501};
@@ -51,11 +51,11 @@ export function createAppServer(app,{token=localToken(app.store.root),port=4317}
         res.writeHead(200,{'Content-Type':bundle.mime,'Content-Disposition':`attachment; filename="${bundle.filename}"`,'Content-Length':bundle.bytes.length,'Cache-Control':'no-store','ETag':`"${bundle.sha256}"`});res.end(bundle.bytes);return;
       }
       ensure(req.method==='POST','Route not found','NotFound');const data=await body(req);
-      if(path==='/api/v1/read'){object(data,['operation','input'],['operation','input']);ensure(OPERATION_SCOPES[data.operation]==='read','This route accepts only read operations');json(res,200,await call(data.operation,data.input));}
+      if(path==='/api/v1/read'){object(data,['operation','input'],['operation','input']);ensure(READ_OPERATIONS.has(data.operation),'This route accepts only read operations');json(res,200,await call(data.operation,data.input));}
       else if(path==='/api/v1/observe')json(res,200,await dispatchApplication(app,'observe',null,data,applicationContext(randomUUID())));
       else if(path==='/api/v1/recover')json(res,200,await dispatchApplication(app,'lookup',null,data,applicationContext(randomUUID())));
       else if(path==='/api/v1/prepare'){
-        object(data,['operation','input','expected','key'],['operation','input','key']);str(data.key,128);const scope=OPERATION_SCOPES[data.operation];ensure(scope&&scope!=='read','Unknown mutation');app.allow(scope);
+        object(data,['operation','input','expected','key'],['operation','input','key']);str(data.key,128);const scope=OPERATION_SCOPES[data.operation];ensure(scope&&!READ_OPERATIONS.has(data.operation),'Unknown mutation');app.allow(scope);
         const expected=data.expected??app.store.version(),args=makeRequest(data.operation,data.input,expected,app.store.meta().epoch,data.key);
         // Preparation has no durable effects and is NOT authorization to bypass the dispatcher's checks.
         json(res,200,{schema_version:'launchwright-prepared/1',operation:data.operation,expected,args});

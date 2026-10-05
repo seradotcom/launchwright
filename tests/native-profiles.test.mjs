@@ -10,6 +10,7 @@ import { ReviewNativeApplication } from '../src/native-review-app.mjs';
 import { IntegrationsNativeApplication } from '../src/native-integrations-app.mjs';
 import { WorkNativeApplication } from '../src/native-work-app.mjs';
 import { MediaNativeApplication } from '../src/native-media-app.mjs';
+import { PublishNativeApplication } from '../src/native-publish-app.mjs';
 import { setup, baseline } from './helpers.mjs';
 
 async function invokeProfile(Profile,root,operation,input){
@@ -38,6 +39,8 @@ async function readProfile(Profile,root,operation,input){
 
 test('split native profiles preserve canonical mutation transactions across one workspace',async t=>{
   const seeded=setup(t),b=await baseline(seeded.app);
+  const publishScenario=await b.create('scenario',{release_id:b.release.id,name:'Native publish flow',source_id:b.source.id,target_id:b.target.id,readiness:'declared',anchors:[{name:'root',role:'main',label:'Workspace',expected_count:1}],steps:[{action:'assert',anchor:'root'}]});
+  const publishClaim=await b.create('claim',{release_id:b.release.id,name:'Native publish claim',text:'Synthetic bounded claim',target_id:b.target.id,category:'editorial',evidence_ids:[]});
   seeded.app.close();
 
   const core=await invokeProfile(CoreNativeApplication,seeded.root,'entity.create',{kind:'product',data:{name:'Native profile product',description:'Synthetic profile test'}});
@@ -69,4 +72,15 @@ test('split native profiles preserve canonical mutation transactions across one 
   assert.equal(media.composition_contract,'semwright-composition/C0');
   assert.equal(media.media_time_authority,'semwright-media-time');
   assert.equal(media.execution_authority,false);
+
+  const publish=await invokeProfile(PublishNativeApplication,seeded.root,'publish.template_create',{data:{
+    product_id:b.product.id,release_id:b.release.id,name:'Native profile publish',description:'Synthetic bounded publication template',
+    source_types:['web'],source_ids:[b.source.id],scenario_ids:[publishScenario.id],protected_scenario_ids:[publishScenario.id],claim_ids:[publishClaim.id],
+    locales:['en-US'],destinations:['private-download'],outputs:['artifact'],
+    parameters:[{name:'brand',type:'text',required:true,max_length:80}],verification_dimensions:['format'],
+    budget:{max_cost_microunits:1000,currency:'USD',max_runtime_seconds:60},audience:'private',
+    external_disclosures:['Synthetic profile only'],export_resource_ids:[b.source.id,publishScenario.id,publishClaim.id],result_retention:{mode:'preserve'}
+  }});
+  assert.equal(publish.entity.kind,'release_template');
+  assert.equal(publish.entity.data.state,'DRAFT');
 });

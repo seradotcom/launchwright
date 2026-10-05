@@ -4,14 +4,13 @@ import { NativeProfileApplication } from './native-profile-base.mjs';
 import { inputObject, str, choice, noSecrets } from './contracts.mjs';
 import { digest } from './base.mjs';
 import { snapshotSummary } from './snapshot.mjs';
+import { PLATFORM_ACTIONS, PUBLICATION_ACTIONS, preparePublicationWork } from './publish-work.mjs';
 
 export const WORK_NATIVE_READS=Object.freeze(['workspace.snapshot']);
 export const WORK_NATIVE_MUTATIONS=Object.freeze([
   'work.prepare','work.claim','work.complete','work.mark_unknown','workspace.rotate_epoch'
 ]);
 export const WORK_NATIVE_OPERATIONS=Object.freeze([...WORK_NATIVE_READS,...WORK_NATIVE_MUTATIONS]);
-const PLATFORM_ACTIONS=['recipes.prepare','recipes.execute','jobs.get','jobs.cancel','jobs.reconcile','evidence.get','artifacts.get','graph.observe','graph.observation','publish.preflight','publish.define','publish.version','publish.deploy','publish.invoke','publish.result'];
-const PUBLICATION_ACTIONS=new Set(['publish.define','publish.version','publish.deploy','publish.invoke']);
 
 export class WorkNativeApplication extends NativeProfileApplication {
   constructor(root,options={}){super(root,{...options,readOperations:WORK_NATIVE_READS,operations:WORK_NATIVE_OPERATIONS});}
@@ -26,8 +25,9 @@ export class WorkNativeApplication extends NativeProfileApplication {
         this.get(input.release_id,'release');str(input.name,160);choice(input.action,PLATFORM_ACTIONS);object(input.arguments);noSecrets(input.arguments);
         object(input.budget,['max_cost_microunits','currency','max_runtime_seconds'],['max_cost_microunits','currency','max_runtime_seconds']);
         integer(input.budget.max_cost_microunits,0,1000000000);str(input.budget.currency,8);integer(input.budget.max_runtime_seconds,1,3600);
-        if(PUBLICATION_ACTIONS.has(input.action))ensure(input.authorization==='explicit-publication','External publication requires explicit per-intent authorization','ConsentRequired');
-        return{entity:this.store.create('work',{...input,state:'PREPARED',authority:'platform-required',budget_enforced:false,platform_job_id:null,pending_digest:null})};
+        let argumentsRecord=input.arguments,publicationBinding=null;
+        if(input.action.startsWith('publish.')){if(PUBLICATION_ACTIONS.has(input.action))ensure(input.authorization==='explicit-publication','External publication requires explicit per-intent authorization','ConsentRequired');const bound=preparePublicationWork(this,input.action,input.arguments);argumentsRecord=bound.arguments;publicationBinding=bound.publication_binding;}
+        return{entity:this.store.create('work',{...input,arguments:argumentsRecord,...(publicationBinding?{publication_binding:publicationBinding}:{}),state:'PREPARED',authority:'platform-required',budget_enforced:false,platform_job_id:null,pending_digest:null})};
       }
       case'work.claim':{
         inputObject(input,['id','prepared_record']);const w=this.get(input.id,'work');ensure(w.data.state==='PREPARED','Work has already been claimed; recover rather than resend','Conflict');object(input.prepared_record);noSecrets(input.prepared_record);

@@ -19,6 +19,7 @@ const INTEGRATIONS_BUNDLE: Option<&str> =
     option_env!("LAUNCHWRIGHT_NATIVE_INTEGRATIONS_BUNDLE_SHA256");
 const WORK_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_WORK_BUNDLE_SHA256");
 const MEDIA_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_MEDIA_BUNDLE_SHA256");
+const PUBLISH_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_PUBLISH_BUNDLE_SHA256");
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd)]
 enum Profile {
@@ -28,6 +29,7 @@ enum Profile {
     Integrations,
     Work,
     Media,
+    Publish,
 }
 #[derive(Clone, Copy)]
 struct Operation {
@@ -362,6 +364,66 @@ const OPERATIONS: &[Operation] = &[
         consent: false,
         profile: Profile::Media,
     },
+    Operation {
+        suffix: "publish-inspect",
+        read: true,
+        consent: false,
+        profile: Profile::Publish,
+    },
+    Operation {
+        suffix: "publish-template_create",
+        read: false,
+        consent: false,
+        profile: Profile::Publish,
+    },
+    Operation {
+        suffix: "publish-template_update",
+        read: false,
+        consent: false,
+        profile: Profile::Publish,
+    },
+    Operation {
+        suffix: "publish-version_freeze",
+        read: false,
+        consent: true,
+        profile: Profile::Publish,
+    },
+    Operation {
+        suffix: "publish-deployment_create",
+        read: false,
+        consent: true,
+        profile: Profile::Publish,
+    },
+    Operation {
+        suffix: "publish-deployment_transition",
+        read: false,
+        consent: true,
+        profile: Profile::Publish,
+    },
+    Operation {
+        suffix: "publish-invoke_prepare",
+        read: false,
+        consent: true,
+        profile: Profile::Publish,
+    },
+    Operation {
+        suffix: "publish-export",
+        read: false,
+        consent: true,
+        profile: Profile::Publish,
+    },
+    Operation {
+        suffix: "publish-import",
+        read: false,
+        consent: false,
+        profile: Profile::Publish,
+    },
+    Operation {
+        suffix: "publish-import_rebind",
+        read: false,
+        consent: true,
+        profile: Profile::Publish,
+    },
 ];
 
 fn operation(spec: Operation) -> OperationContract {
@@ -442,6 +504,7 @@ async fn main() -> Result<()> {
     let integrations = bridge("launchwright-integrations.cjs", INTEGRATIONS_BUNDLE)?;
     let work = bridge("launchwright-work.cjs", WORK_BUNDLE)?;
     let media = bridge("launchwright-media.cjs", MEDIA_BUNDLE)?;
+    let publish = bridge("launchwright-publish.cjs", PUBLISH_BUNDLE)?;
     let mut app = Application::new("launchwright", VERSION)?
         .require_host_tools()
         .with_observer(core.clone())
@@ -456,6 +519,7 @@ async fn main() -> Result<()> {
             Profile::Integrations => integrations.clone(),
             Profile::Work => work.clone(),
             Profile::Media => media.clone(),
+            Profile::Publish => publish.clone(),
         };
         app = app.register(contract, provider.operation(name))?;
     }
@@ -480,7 +544,7 @@ mod tests {
         for spec in OPERATIONS {
             assert!(names.insert(spec.suffix));
         }
-        assert_eq!(names.len(), 54);
+        assert_eq!(names.len(), 64);
     }
     #[test]
     fn profile_partition_counts_are_stable() {
@@ -494,5 +558,6 @@ mod tests {
         assert_eq!(counts.get(&Profile::Integrations), Some(&12));
         assert_eq!(counts.get(&Profile::Work), Some(&6));
         assert_eq!(counts.get(&Profile::Media), Some(&5));
+        assert_eq!(counts.get(&Profile::Publish), Some(&10));
     }
 }
