@@ -36,11 +36,10 @@ test('portable snapshot v2 preserves exact revision history and keeps old receip
   assert.ok(snapshot.history.some(h=>h.id===product.id&&h.revision==='1'));
   assert.ok(snapshot.history.some(h=>h.id===product.id&&h.revision==='2'));
   const restored=join(dirname(root),'launchwright-history-restore-'+randomUUID());
-  t.after(()=>rmSync(restored,{recursive:true,force:true}));
   const result=restoreSnapshot(restored,snapshot);
   assert.ok(result.history_rows>=snapshot.entities.length);
   const reopened=new LaunchwrightApplication(restored,{readOnly:true});
-  t.after(()=>reopened.close());
+  t.after(()=>{try{reopened.close();}finally{rmSync(restored,{recursive:true,force:true,maxRetries:8,retryDelay:50});}});
   const history=await execute(reopened,'history.list',{id:product.id});
   assert.deepEqual(history.items.map(v=>v.entity.version.revision),['1','2']);
   assert.equal(reopened.store.db.prepare('SELECT count(*) AS n FROM receipts').get().n,0);
@@ -54,10 +53,9 @@ test('snapshot v1 restore keeps only known current revisions and never fabricate
   const payload={schema_version:'launchwright-portable-snapshot/1',exported_at:v2.exported_at,source_workspace:v2.source_workspace,entities:v2.entities,blobs:v2.blobs,aliases:v2.aliases,pending:v2.pending,events:v2.events,historical_receipts:v2.historical_receipts,restore_policy};
   const snapshot={...payload,digest:createHash('sha256').update(JSON.stringify(payload)).digest('hex')};
   const restored=join(dirname(root),'launchwright-v1-restore-'+randomUUID());
-  t.after(()=>rmSync(restored,{recursive:true,force:true}));
   restoreSnapshot(restored,snapshot);
   const reopened=new LaunchwrightApplication(restored,{readOnly:true});
-  t.after(()=>reopened.close());
+  t.after(()=>{try{reopened.close();}finally{rmSync(restored,{recursive:true,force:true,maxRetries:8,retryDelay:50});}});
   const history=await execute(reopened,'history.list',{id:product.id});
   assert.deepEqual(history.items.map(v=>v.entity.version.revision),['2']);
   assert.ok(reopened.store.db.prepare("SELECT name FROM schema_migrations WHERE name='history-v1-restore-current'").get());
