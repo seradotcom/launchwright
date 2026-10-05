@@ -6,22 +6,23 @@ The JavaScript application imports the real `@semwright/native-sdk` package for 
 
 ## Host bridge profiles
 
-The canonical `NodeBridge` limits an owner-pinned executable bundle to 48 KiB and limits bundle plus invocation stdin to 64 KiB. Launchwright does not raise or bypass those limits. Its 66 public application operations are partitioned, without overlap, across eight owner-pinned bridge profiles:
+The canonical `NodeBridge` limits an owner-pinned executable bundle to 48 KiB and limits bundle plus invocation stdin to 64 KiB. Launchwright does not raise or bypass those limits. Its 68 public application operations are partitioned, without overlap, across nine owner-pinned bridge profiles:
 
 | Profile | Operations | Local compacted bytes | Headroom to 48 KiB | Purpose |
 | --- | ---: | ---: | ---: | --- |
-| `core` | 13 | 44,597 | 4,555 | workspace/entity/history/event reads, entity CRUD, change proposals and template instantiation |
+| `core` | 13 | 44,617 | 4,535 | workspace/entity/history/event reads, entity CRUD, change proposals and template instantiation |
 | `sources` | 2 | 25,312 | 23,840 | source-profile matrix/preflight, including exact browser/Godot runtime compatibility |
-| `production` | 9 | 44,001 | 5,151 | coverage/impact, relations, evidence, capture-contract ingestion and text rendering |
+| `graph` | 2 | 26,175 | 22,977 | immutable Project Graph response inspection/recording; no admission authority of its own |
+| `production` | 9 | 47,573 | 1,579 | coverage/impact, relations, evidence, capture ingestion and text rendering |
 | `review` | 9 | 47,553 | 1,599 | candidate, verification, waiver and channel-package lifecycle |
-| `integrations` | 12 | 47,271 | 1,881 | localization, extension descriptors, compatibility locks, mobile import/inspection and channel status |
-| `work` | 6 | 30,126 | 19,026 | snapshot summary and Platform-intent custody/recovery |
-| `media` | 5 | 38,048 | 11,104 | media-plan inspection/revision and Composition output/editorial receipt custody |
-| `publish` | 10 | 46,552 | 2,600 | ReleaseTemplate/ProductVersion/deployment/invocation contracts and authority-free export/import |
+| `integrations` | 12 | 47,336 | 1,816 | localization, extension descriptors, compatibility locks, mobile import/inspection and channel status |
+| `work` | 6 | 35,421 | 13,731 | snapshot summary and Platform-intent custody/recovery, including Graph preparation |
+| `media` | 5 | 38,048 | 11,104 | media-plan and Composition receipt custody |
+| `publish` | 10 | 46,944 | 2,208 | publish-product contracts and authority-free export/import |
 
-The byte counts above are workstation build evidence, not Driver Host acceptance. The narrowest current headroom is 1,599 bytes in `review`. Source-profile matrix/preflight now live in their own `sources` bridge: this recovers 4,555 bytes of `core` headroom and lets browser/Godot compatibility evolve without weakening the canonical limit. The public operation names and application protocol did not change. Operation metadata remains isolated in `src/operations.mjs`.
+The byte counts above are workstation build evidence, not Driver Host acceptance. The narrowest headroom is 1,579 bytes in `production`. Project Graph custody is isolated in `graph`. The public protocol contains 68 operations, with `graph.inspect` and `graph.record` occupying that dedicated profile.
 
-`scripts/build-native-bundle.mjs` refuses to build if an operation is missing, duplicated or if any compacted profile exceeds the canonical 48 KiB maximum. It emits a manifest containing the exact SHA-256 and byte count of every profile. The Rust driver pins all eight hashes at build time and maps each `driver.launchwright.*` operation to exactly one `NodeBridge`.
+`scripts/build-native-bundle.mjs` rejects missing/duplicate operations and any profile above the canonical 48 KiB maximum. The Rust driver pins all nine hashes and maps each `driver.launchwright.*` operation to exactly one `NodeBridge`. Its `graph` feature comes from the exact Semwright Native SDK pin; Launchwright does not expose Host admission authority to application callers.
 
 The split is an installation profile, not a second application protocol. Every profile still uses the same SQLite workspace transaction model and canonical bridge schema. `core` still supplies the observation and recovery providers; `sources` is read-only and contains no alternate execution kernel.
 

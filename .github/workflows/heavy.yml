@@ -63,6 +63,7 @@ jobs:
           rustup override set stable
           export LAUNCHWRIGHT_NATIVE_CORE_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.core.sha256')"
           export LAUNCHWRIGHT_NATIVE_SOURCES_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.sources.sha256')"
+          export LAUNCHWRIGHT_NATIVE_GRAPH_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.graph.sha256')"
           export LAUNCHWRIGHT_NATIVE_PRODUCTION_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.production.sha256')"
           export LAUNCHWRIGHT_NATIVE_REVIEW_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.review.sha256')"
           export LAUNCHWRIGHT_NATIVE_INTEGRATIONS_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.integrations.sha256')"

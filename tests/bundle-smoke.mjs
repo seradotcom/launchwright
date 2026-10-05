@@ -32,6 +32,7 @@ const manifest=JSON.parse(readFileSync('dist/native-bundle.json','utf8'));
 const reads={
   core:['workspace-describe',{}],
   sources:['profile-matrix',{}],
+  graph:['graph-inspect',{release_id:release.id}],
   production:['release-coverage',{release_id:release.id}],
   review:['verification-summary',{candidate_id:candidate.id}],
   integrations:['channel-status',{release_id:release.id}],

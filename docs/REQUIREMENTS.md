@@ -12,6 +12,7 @@ The private specification text is intentionally not redistributed in this AGPL r
 - Claims, CopyBlocks, availability and ReleaseContract denominators without fabricated coverage.
 - Immutable text artifacts, exact candidate manifests and freshness invalidation.
 - Explicit relation provenance and impact proposals with no execution authority.
+- RS-GRF application-side canonical Project Graph custody: exact `project.*` preparation, bounded traversal/visibility, exact resource-revision bindings, immutable response digests, UNKNOWN-by-default admission, stale-binding invalidation, provenance-gated observed relations, authority-free impact coalescing and principal-scoped reuse keys. Live Host/Broker admission remains a separate acceptance gate.
 - Application-local document change proposals for CopyBlocks and deliverables: proposal creation never mutates content, application requires an exact base revision, stale proposals fail closed, and human-owned/whole-document content requires explicit acknowledgement.
 - Capture contract v2 covering receipt correlation, readiness, anchor uniqueness, build drift, demo-data labeling, derivative lineage, isolation, bounded cleanup, ordered segments and no-fake-UI eligibility; technical state remains UNKNOWN.
 - Immutable verifier records, coverage/omissions/findings and non-state-changing waivers.
@@ -27,6 +28,6 @@ The private specification text is intentionally not redistributed in this AGPL r
 
 ## Integration-dependent / not accepted
 
-Platform-admitted product capture across target applications (the owned DeltaDesk Semwright Chromium interoperability lane is narrower evidence only); canonical Project Graph/effects; Composition video rendering; real Platform job execution; canonical verifier runtime admission; remote teams; real cross-account Platform Publish execution/output ACLs/external activation; real Android/iOS runner/device acceptance (including Fastlane-style execution), admitted Launchwright Godot product capture/Platform receipt/Driver Host isolation; ChatGPT Plugin host acceptance; production deployment.
+Platform-admitted product capture across target applications (the owned DeltaDesk Semwright Chromium interoperability lane is narrower evidence only); live Host/Broker admission and end-to-end Project Graph acceptance; canonical effects; Composition video rendering; real Platform job execution; canonical verifier runtime admission; remote teams; real cross-account Platform Publish execution/output ACLs/external activation; real Android/iOS runner/device acceptance (including Fastlane-style execution), admitted Launchwright Godot product capture/Platform receipt/Driver Host isolation; ChatGPT Plugin host acceptance; production deployment.
 
 Requirement completion is therefore not represented as a single vanity percentage. Evidence is tracked by exact behavior, SHA and acceptance lane in `ACCEPTANCE.md`.

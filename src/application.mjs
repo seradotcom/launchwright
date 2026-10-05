@@ -19,6 +19,7 @@ import { createReleaseTemplate, updateReleaseTemplate, freezeProductVersion, cre
 import { PLATFORM_ACTIONS, PUBLICATION_ACTIONS, PLATFORM_READ_ACTIONS, preparePublicationWork } from './publish-work.mjs';
 import { listEvents } from './events.mjs';
 import { inspectMobileImport, registerMobileImport } from './mobile-import.mjs';
+import { CANONICAL_GRAPH_ACTIONS, CANONICAL_GRAPH_MUTATIONS, prepareGraphWork, inspectGraph, recordGraphObservation } from './graph.mjs';
 
 export class LaunchwrightApplication {
   constructor(root, { initialize = false, readOnly = false, principal = 'local-owner', scopes = ['read','edit','capture','review','publish','consume','admin'], capabilities = {} } = {}) {
@@ -83,7 +84,7 @@ export class LaunchwrightApplication {
   }
   describe(){return{app:'Launchwright',version:APP_VERSION,schema_version:'launchwright/1',workspace_version:this.store.version(),request_epoch:this.store.meta().epoch,
     scope_mode:'local-single-owner',principal:this.principal,scopes:[...this.scopes],native_sdk:'0.9.0-dev.1',operations:Object.entries(OPERATION_SCOPES).map(([name,scope])=>({name,scope,read_only:READ_OPERATIONS.has(name)})),
-    capabilities:{editorial_text_exports:'available',durable_entity_history:this.store.hasHistory?'available':'migration-required',private_draft_delivery:'available',portable_snapshot_restore:'available-local-admin',declared_release_contracts:'available',localization_ledger:'available-layout-quality-not-inferred',extension_descriptors:'available-no-remote-code',compatibility_negotiation:'available',profile_preflight:'available-contract-only',state_anchors:'contract-and-assessment-only',impact_proposals:'available-no-execution-authority',document_change_proposals:'available-application-local-no-auto-merge',capture_receipts:'available-provenance-only',verification_ledger:'available-canonical-pass-requires-admission',waivers:'available-never-overwrite-verifier-state',channel_packages:'available-no-send',native_driver_host:'requires-owner-pinned-bundle-and-broker',platform:this.capabilities.platform??'not-connected',canonical_graph:'requires-platform-observation',browser_capture:'requires-canonical-driver-recipe',media_render:'requires-composition-recipe',mobile:'provenance-import-only',public_delivery:'requires-canonical-publish-receipt',...this.capabilities},
+    capabilities:{editorial_text_exports:'available',durable_entity_history:this.store.hasHistory?'available':'migration-required',private_draft_delivery:'available',portable_snapshot_restore:'available-local-admin',declared_release_contracts:'available',localization_ledger:'available-layout-quality-not-inferred',extension_descriptors:'available-no-remote-code',compatibility_negotiation:'available',profile_preflight:'available-contract-only',state_anchors:'contract-and-assessment-only',impact_proposals:'available-no-execution-authority',document_change_proposals:'available-application-local-no-auto-merge',capture_receipts:'available-provenance-only',verification_ledger:'available-canonical-pass-requires-admission',waivers:'available-never-overwrite-verifier-state',channel_packages:'available-no-send',native_driver_host:'requires-owner-pinned-bundle-and-broker',platform:this.capabilities.platform??'not-connected',canonical_graph:'canonical-project-contracts-available-live-admission-required',browser_capture:'requires-canonical-driver-recipe',media_render:'requires-composition-recipe',mobile:'provenance-import-only',public_delivery:'requires-canonical-publish-receipt',...this.capabilities},
     limits:{page_items:128,reply_bytes:256*1024,artifact_bytes:1024*1024,receipt_epoch_items:20000},disclosure:'Local editorial checks are not Platform approvals or canonical effect verification.'};}
   profilePreflight(input){return runProfilePreflight(this,input);}
   extensionDiscovery(input){
@@ -131,6 +132,7 @@ export class LaunchwrightApplication {
       case'history.diff':return diffHistory(this,input);
       case'release.coverage':inputObject(input,['release_id']);return this.coverage(input.release_id);
       case'release.impact':inputObject(input,['release_id']);return this.impact(input.release_id);
+      case'graph.inspect':return inspectGraph(this,input);
       case'anchor.assess':{
         inputObject(input,['id','observed_matches']);const anchor=this.get(input.id,'anchor');const observed=integer(input.observed_matches,0,1000);
         const expected=anchor.data.expected_count,state=observed===expected?'PASS':'FAIL';
@@ -199,13 +201,18 @@ export class LaunchwrightApplication {
       scenarios:scenarios.map(s=>({id:s.id,status:'UNKNOWN',reason:'canonical-execution-not-observed'})),inventory_scope:'registered-only',unknown_frontier:true,canonical_graph_authority:false};
   }
   impact(releaseId){
-    this.get(releaseId,'release');const items=[];
-    for(const a of this.list('artifact',releaseId)){const changed=this.freshness(a.data.inputs);if(changed.length)items.push({artifact_id:a.id,deliverable_id:a.data.deliverable_id,state:'INPUTS_CHANGED',changed});}
+    this.get(releaseId,'release');const graph=inspectGraph(this,{release_id:releaseId}),items=[];
+    const scope=digest('release-reuse-scope',{workspace_generation:this.store.version().generation,principal:this.principal,release_id:releaseId});
+    for(const a of this.list('artifact',releaseId)){
+      const changed=this.freshness(a.data.inputs);
+      const reuse={scope_sha256:scope,input_sha256:digest('release-reuse-input',{artifact_sha256:a.data.sha256,producer:a.data.producer,target_id:a.data.target_id,inputs:a.data.inputs}),cross_principal_reuse:false,final_verification_required:true,state:changed.length?'RECOMPUTE':graph.canonical_graph_authority?'REVALIDATE_FINAL':'UNKNOWN'};
+      if(changed.length)items.push({artifact_id:a.id,deliverable_id:a.data.deliverable_id,state:'INPUTS_CHANGED',changed,reuse});
+    }
     const bindings=this.list('binding',releaseId).map(b=>({binding_id:b.id,mode:b.data.mode,action:b.data.mode==='rolling'?'revalidate-if-inputs-changed':'retain-pinned-history',pinned_artifact_id:b.data.pinned_artifact_id??null}));
     const contracts=this.coverage(releaseId).contracts;
     const contract_blockers=contracts.flatMap(c=>c.obligations.filter(o=>o.state!=='PASS').map(o=>({contract_id:c.id,...o})));
-    const relations=this.list('relation',releaseId).map(r=>({id:r.id,from_id:r.data.from_id,to_id:r.data.to_id,kind:r.data.relation_kind,provenance:r.data.provenance,completeness:r.data.completeness,admission:r.data.admission}));
-    return{release_id:releaseId,items,bindings,contract_blockers,relations,coverage:'DECLARED_DEPENDENCIES_ONLY',canonical_graph_authority:false,unknown_frontier:true,note:'This is an app input-revision comparison, explicit relation inventory and release-contract projection, not a Project Graph freshness verdict.'};
+    const relations=this.list('relation',releaseId).map(r=>({id:r.id,from_id:r.data.from_id,to_id:r.data.to_id,kind:r.data.relation_kind,provenance:r.data.provenance,completeness:r.data.completeness,admission:r.data.admission,graph_observation_id:r.data.graph_observation_id??null}));
+    return{release_id:releaseId,items,bindings,contract_blockers,relations,graph,coverage:graph.coverage,canonical_graph_authority:graph.canonical_graph_authority,unknown_frontier:graph.unknown_frontier,note:graph.canonical_graph_authority?'Canonical Project Graph output is preserved verbatim; local checks add release meaning but do not recompute Graph freshness.':'Local revision comparisons remain advisory until a current admitted Project Graph impact observation is bound.'};
   }
   verificationSummary(candidateId){
     const candidate=this.get(candidateId,'candidate');
@@ -247,21 +254,29 @@ export class LaunchwrightApplication {
         if(['product','release'].includes(e.kind)){const children=this.store.all().filter(x=>x.kind!=='tombstone'&&(x.data.product_id===e.id||x.data.release_id===e.id));ensure(children.length===0,'Retire active children before their parent','Conflict');}
         return{entity:this.store.retire(e.id,{subject_id:e.id,original_kind:e.kind,retired_at:iso(),reason:input.reason,content_revoked:true})};
       }
+      case'graph.record':return recordGraphObservation(this,input);
       case'relation.record':{
-        inputObject(input,['release_id','name','from_id','to_id','relation_kind','provenance','completeness','evidence_ids'],['release_id','name','from_id','to_id','relation_kind','provenance','completeness']);
+        inputObject(input,['release_id','name','from_id','to_id','relation_kind','provenance','completeness','evidence_ids','graph_observation_id'],['release_id','name','from_id','to_id','relation_kind','provenance','completeness']);
         const release=this.get(input.release_id,'release'),from=this.get(input.from_id),to=this.get(input.to_id);str(input.name,160);str(input.relation_kind,128);ensure(/^[a-z][a-z0-9_.-]{0,127}$/.test(input.relation_kind),'Invalid relation kind');
         ensure(this.productOf(from)===release.data.product_id&&this.productOf(to)===release.data.product_id,'Relation crosses product boundary','PermissionDenied');choice(input.provenance,['declared','imported','heuristic','observed']);choice(input.completeness,['complete','partial','unknown']);
         if(input.provenance==='heuristic')ensure(input.completeness!=='complete','Heuristic relation cannot claim complete coverage');
         const evidenceIds=input.evidence_ids??[];array(evidenceIds,32);ensure(new Set(evidenceIds).size===evidenceIds.length,'Duplicate relation evidence');for(const id of evidenceIds){const evidence=this.get(id,'evidence');ensure(evidence.data.release_id===release.id,'Relation evidence belongs to another release');}
-        if(input.provenance==='observed'){ensure(this.capabilities.canonical_graph_admission===true,'Observed relation requires canonical Graph admission','PolicyDenied');ensure(evidenceIds.length>0,'Observed relation requires admitted evidence');}
-        return{entity:this.store.create('relation',{release_id:release.id,name:input.name,from_id:from.id,to_id:to.id,relation_kind:input.relation_kind,provenance:input.provenance,completeness:input.completeness,evidence_ids:evidenceIds,from_version:from.version,to_version:to.version,admission:input.provenance==='observed'?'canonical-owner-admitted':'local-explicit-record',created_at:iso()})};
+        let graphObservation=null;
+        if(input.provenance==='observed'){
+          ensure(!!input.graph_observation_id,'Observed relation requires an admitted Project Graph observation','PolicyDenied');graphObservation=this.get(input.graph_observation_id,'graph_observation');
+          ensure(graphObservation.data.release_id===release.id,'Graph observation belongs to another release','PermissionDenied');ensure(graphObservation.data.admission==='canonical-owner-admitted','Graph observation is not canonically admitted','PolicyDenied');
+          ensure(['project.query','project.asset.inspect','project.asset.provenance','project.revisions','project.impact'].includes(graphObservation.data.action),'Graph edge declaration alone does not prove an observed relation','PolicyDenied');
+        }else ensure(!input.graph_observation_id,'Only observed relations may bind canonical Graph observation evidence');
+        return{entity:this.store.create('relation',{release_id:release.id,name:input.name,from_id:from.id,to_id:to.id,relation_kind:input.relation_kind,provenance:input.provenance,completeness:input.completeness,evidence_ids:evidenceIds,graph_observation_id:graphObservation?.id??null,from_version:from.version,to_version:to.version,admission:graphObservation?'canonical-owner-admitted':'local-explicit-record',created_at:iso()})};
       }
       case'impact.plan':{
-        inputObject(input,['release_id','cause_ids','note'],['release_id','cause_ids']);const release=this.get(input.release_id,'release');array(input.cause_ids,64);ensure(new Set(input.cause_ids).size===input.cause_ids.length,'Duplicate impact causes');
-        for(const id of input.cause_ids){const cause=this.get(id);ensure(this.productOf(cause)===release.data.product_id,'Impact cause belongs to another product','PermissionDenied');}
+        inputObject(input,['release_id','cause_ids','note','coalesce_with'],['release_id','cause_ids']);const release=this.get(input.release_id,'release');array(input.cause_ids,64);ensure(new Set(input.cause_ids).size===input.cause_ids.length,'Duplicate impact causes');
+        const coalesced=array(input.coalesce_with??[],16);ensure(new Set(coalesced).size===coalesced.length,'Duplicate impact proposals in coalescing request');const causes=new Set(input.cause_ids);
+        for(const proposalId of coalesced){const prior=this.get(proposalId,'impact_proposal');ensure(prior.data.release_id===release.id,'Cannot coalesce impact across releases','PermissionDenied');for(const id of prior.data.cause_ids)causes.add(id);}
+        for(const id of causes){const cause=this.get(id);ensure(this.productOf(cause)===release.data.product_id,'Impact cause belongs to another product','PermissionDenied');}
         if(input.note)lines(input.note,8000);
-        const impact=this.impact(release.id),causes=[...input.cause_ids].sort();
-        return{entity:this.store.create('impact_proposal',{release_id:release.id,name:'Impact proposal · '+release.data.name,cause_ids:causes,note:input.note??'',source_workspace_version:this.store.version(),impact,state:'PROPOSED',authority:'NONE',jobs_created:0,created_at:iso()})};
+        const impact=this.impact(release.id);
+        return{entity:this.store.create('impact_proposal',{release_id:release.id,name:'Impact proposal · '+release.data.name,cause_ids:[...causes].sort(),coalesced_from:[...coalesced].sort(),note:input.note??'',source_workspace_version:this.store.version(),impact,state:'PROPOSED',authority:'NONE',jobs_created:0,created_at:iso()})};
       }
       case'evidence.import':{
         inputObject(input,['release_id','target_id','source_id','name','build','classification','rights','description','origin_digest','job_id'],['release_id','target_id','source_id','name','build','classification','rights','description','origin_digest']);
@@ -377,12 +392,13 @@ export class LaunchwrightApplication {
       }
       case'work.prepare':{
         inputObject(input,['release_id','name','action','arguments','budget','authorization'],['release_id','name','action','arguments','budget']);this.get(input.release_id,'release');str(input.name,160);choice(input.action,PLATFORM_ACTIONS);object(input.arguments);noSecrets(input.arguments);object(input.budget,['max_cost_microunits','currency','max_runtime_seconds'],['max_cost_microunits','currency','max_runtime_seconds']);integer(input.budget.max_cost_microunits,0,1000000000);str(input.budget.currency,8);integer(input.budget.max_runtime_seconds,1,3600);
-        let argumentsRecord=input.arguments,publicationBinding=null;
+        let argumentsRecord=input.arguments,publicationBinding=null,graphBinding=null;
+        if(CANONICAL_GRAPH_ACTIONS.includes(input.action)){if(CANONICAL_GRAPH_MUTATIONS.has(input.action))ensure(input.authorization==='explicit-graph-mutation','Canonical Project Graph mutation requires explicit per-intent authorization','ConsentRequired');const bound=prepareGraphWork(this,input.release_id,input.action,input.arguments);argumentsRecord=bound.arguments;graphBinding=bound.graph_binding;}
         if(input.action.startsWith('publish.')){
           if(PUBLICATION_ACTIONS.has(input.action)){this.allow('publish');ensure(input.authorization==='explicit-publication','External publication requires explicit per-intent authorization','ConsentRequired');}
           const bound=preparePublicationWork(this,input.action,input.arguments);argumentsRecord=bound.arguments;publicationBinding=bound.publication_binding;
         }
-        return{entity:this.store.create('work',{...input,arguments:argumentsRecord,...(publicationBinding?{publication_binding:publicationBinding}:{}),state:'PREPARED',authority:'platform-required',budget_enforced:false,platform_job_id:null,pending_digest:null})};
+        return{entity:this.store.create('work',{...input,arguments:argumentsRecord,...(publicationBinding?{publication_binding:publicationBinding}:{}),...(graphBinding?{graph_binding:graphBinding}:{}),state:'PREPARED',authority:'platform-required',budget_enforced:false,platform_job_id:null,pending_digest:null})};
       }
       case'work.claim':{
         inputObject(input,['id','prepared_record']);const w=this.get(input.id,'work');ensure(w.data.state==='PREPARED','Work has already been claimed; recover rather than resend','Conflict');object(input.prepared_record);noSecrets(input.prepared_record);
@@ -390,7 +406,7 @@ export class LaunchwrightApplication {
         return{entity:this.store.update(w.id,{...w.data,state:'CLAIMED',pending_digest:pending}),pending_digest:pending};
       }
       case'work.complete':{
-        inputObject(input,['id','result','pending_digest']);const w=this.get(input.id,'work');ensure(['CLAIMED','OUTCOME_UNKNOWN'].includes(w.data.state),'Work is not awaiting an outcome','Conflict');ensure(w.data.pending_digest===input.pending_digest,'Pending request binding differs','Conflict');object(input.result);
+        inputObject(input,['id','result','pending_digest']);const w=this.get(input.id,'work');ensure(['CLAIMED','OUTCOME_UNKNOWN'].includes(w.data.state),'Work is not awaiting an outcome','Conflict');ensure(w.data.pending_digest===input.pending_digest,'Pending request binding differs','Conflict');object(input.result);noSecrets(input.result);ensure(Buffer.byteLength(JSON.stringify(input.result))<=192000,'Platform result exceeds bounded storage contract','ResourceExhausted');
         const job=input.result.job_id??null;if(job)str(job,96);
         // Saved SDK response is a projection, not promotion into technical evidence or effect PASS.
         return{entity:this.store.update(w.id,{...w.data,state:'RESPONSE_RECORDED',platform_job_id:job,result:input.result,evidence_trust:'NOT_ADMITTED'})};

@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 import { requireCondition as ensure, object } from '@semwright/native-sdk';
 import { inputObject, noSecrets, digest } from './contracts.mjs';
+import { CANONICAL_GRAPH_ACTIONS, CANONICAL_GRAPH_READ_ACTIONS } from './graph.mjs';
 
 export const PLATFORM_ACTIONS=Object.freeze([
   'recipes.prepare','recipes.execute','jobs.get','jobs.cancel','jobs.reconcile','evidence.get','artifacts.get','graph.observe','graph.observation',
+  ...CANONICAL_GRAPH_ACTIONS,
   'publish.preflight','publish.define','publish.version','publish.deploy','publish.invoke','publish.result'
 ]);
 export const PUBLICATION_ACTIONS=Object.freeze(new Set(['publish.define','publish.version','publish.deploy','publish.invoke']));
-export const PLATFORM_READ_ACTIONS=Object.freeze(new Set(['jobs.get','evidence.get','artifacts.get','graph.observation','publish.result']));
+export const PLATFORM_READ_ACTIONS=Object.freeze(new Set(['jobs.get','evidence.get','artifacts.get','graph.observation',...CANONICAL_GRAPH_READ_ACTIONS,'publish.result']));
 
 function exactArgs(raw,fields){
   object(raw,fields,fields);noSecrets(raw);return raw;
