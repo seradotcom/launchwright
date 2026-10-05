@@ -26,6 +26,14 @@ Immutable outputs include artifacts, candidates, verification records, waivers, 
 
 Artifacts store exact SHA-256-addressed bytes. Candidate v2 freezes artifact hashes plus media metadata, target fingerprints, protected input revisions, claims, ReleaseContract, selected localization/glossary revisions, channel profiles, declared rights, destination and review policy. A protected change makes the old candidate stale rather than silently updating it.
 
+## Project Graph custody
+
+Launchwright does not implement a parallel dependency graph. `work.prepare` accepts canonical Semwright reads `project.query`, `project.asset.inspect`, `project.asset.provenance`, `project.revisions`, `project.impact` and `project.manifest.export`, plus explicit `project.edge.declare`. Launchwright-only resource bindings are removed from outgoing canonical arguments and retained separately as a digest-bound map from exact local revisions to opaque Graph assets. Named grants, page sizes, visible assets and traversal budgets are bounded before a Platform intent can exist.
+
+A Platform payload must first pass through durable pending/recovery custody. `graph.record` then stores an immutable `graph_observation` bound to the exact work revision, action, project, result digest and local revision set. Serialized JSON remains `platform-response-not-admitted` unless the runtime is explicitly provisioned with canonical Graph admission. If a bound local revision or source-work revision changes, `graph.inspect` reports the observation stale and `release.impact` returns to an unknown frontier rather than inheriting a prior CURRENT verdict.
+
+`release.impact` preserves admitted Graph output verbatim and never recomputes Project Graph freshness. Local reuse hints are scoped to workspace generation, principal and release, bind exact artifact/producer/target/input identity, prohibit cross-principal reuse and still require final verification. `impact.plan` remains an authority-free proposal; coalescing creates a new immutable proposal and unions every cause without dispatching jobs. An observed local relation must cite an exact admitted Graph observation.
+
 ## Capture and verification
 
 `capture.ingest` records a versioned Launchwright capture contract against an approved source, exact build, target and scenario. Observed capture classes require Platform-job correlation plus a native receipt digest, successful runs require READY checks and exact scenario-anchor cardinality, mutable scenarios require scoped isolation, cleanup cannot remove resources outside the run-owned set, and before/after build observations fail on drift. Sanitized derivatives retain an exact parent-capture relation; generated/editorial/imported material is explicitly ineligible to represent observed product state. This is still provenance, not Host acceptance: technical state remains UNKNOWN until a verifier with the required authority establishes otherwise.

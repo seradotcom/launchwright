@@ -4,7 +4,7 @@
 
 Launchwright keeps product/build context, scenarios, claims, immutable release materials, verifier evidence, exact-candidate review, channel packages and recovery history in one application-owned workspace.
 
-> **Developer preview.** The repository deliberately does not claim that the complete private product specification has passed acceptance. The owned DeltaDesk laboratory now has an exact Semwright Chromium interoperability lane, but Platform-admitted product capture, canonical Project Graph/effects, Composition media rendering, remote teams and public Publish remain external Semwright integration boundaries until exact receipts prove otherwise.
+> **Developer preview.** The repository deliberately does not claim that the complete private product specification has passed acceptance. The owned DeltaDesk laboratory has an exact Semwright Chromium interoperability lane and Launchwright now prepares/records the canonical Semwright `project.*` Project Graph contracts with exact local revision bindings. Platform-admitted product capture, live Host/Broker admission of those Graph observations, canonical effects, Composition media rendering, remote teams and public Publish remain external Semwright integration boundaries until exact receipts prove otherwise.
 
 ## Run locally
 
@@ -58,7 +58,7 @@ The public `@semwright/native-sdk` source is vendored unchanged under its upstre
 - Native SDK `0.9.0-dev.1`
 - exact SHA-256 hashes for the redistributed SDK files/archive
 
-The canonical `NodeBridge` allows at most 48 KiB per owner-pinned executable bundle. Launchwright therefore maps all 66 public operations exactly once across eight bounded profiles (`core`, `sources`, `production`, `review`, `integrations`, `work`, `media`, `publish`) instead of weakening that upstream limit. Source-profile reads have their own `sources` bundle so browser/Godot compatibility growth does not consume the main CRUD bridge headroom. `scripts/build-native-bundle.mjs` hashes each exact bundle and rejects missing/duplicate operations or oversized output. `crates/launchwright-native` pins all eight hashes at build time. The caller cannot choose arbitrary executable code, mounts or runtime paths.
+The canonical `NodeBridge` allows at most 48 KiB per owner-pinned executable bundle. Launchwright therefore maps all 68 public operations exactly once across nine bounded profiles (`core`, `sources`, `graph`, `production`, `review`, `integrations`, `work`, `media`, `publish`) instead of weakening that upstream limit. Project Graph custody has its own `graph` bundle and source-profile reads have their own `sources` bundle. `scripts/build-native-bundle.mjs` hashes every exact bundle and rejects missing/duplicate operations or oversized output. `crates/launchwright-native` pins all nine hashes at build time.
 
 The optional Platform adapter consumes an owner-supplied byte-pinned package. The inspected Platform source is not licensed for redistribution, so it is not copied into this public repository.
 
@@ -68,7 +68,7 @@ Launchwright keeps **production, verification, review and delivery** separate.
 
 A successful capture contract can establish that an authorized receipt, readiness conditions, unique anchors and provenance were recorded; it does not establish semantic correctness or Driver Host acceptance. Generated/editorial/imported material is never eligible to stand in for observed product state, and a sanitized derivative only preserves that eligibility when its exact parent capture did and every declared transformation preserves observed state. A heuristic/model/local PASS remains effective UNKNOWN unless admitted by canonical verifier authority. A waiver records an exception but never turns FAIL into PASS. A channel package says bytes are ready; it does not mean they were uploaded or published. A local ReleaseTemplate/ProductVersion/deployment contract likewise does not prove a remote consumer job ran. Public activation requires a canonical Publish receipt.
 
-Local input-pin comparisons are not Project Graph completeness. Scenario effect declarations are not canonical effects. Real execution of the reviewed Semwright Chromium adapter against owned DeltaDesk proves that interoperability path only; it is not a Platform job or admitted `capture.ingest` receipt. A `media_plan` and its Composition receipt ledger preserve handoff intent and provenance but are not a local AV renderer; VTT timing is not Composition rendering. Private editorial approval is not Host acceptance.
+Launchwright local input-pin comparisons are not Project Graph completeness. A current owner-admitted `project.impact` response may be preserved and surfaced as canonical Graph authority, but Launchwright never recomputes that verdict and invalidates the local binding when any pinned application revision changes. Scenario effect declarations are not canonical effects. Real execution of the reviewed Semwright Chromium adapter against owned DeltaDesk proves that interoperability path only; it is not a Platform job or admitted `capture.ingest` receipt. A `media_plan` and its Composition receipt ledger preserve handoff intent and provenance but are not a local AV renderer; VTT timing is not Composition rendering. Private editorial approval is not Host acceptance.
 
 ## Backup and recovery
 

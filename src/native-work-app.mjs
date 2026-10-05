@@ -5,6 +5,7 @@ import { inputObject, str, choice, noSecrets } from './contracts.mjs';
 import { digest } from './base.mjs';
 import { snapshotSummary } from './snapshot.mjs';
 import { PLATFORM_ACTIONS, PUBLICATION_ACTIONS, preparePublicationWork } from './publish-work.mjs';
+import { CANONICAL_GRAPH_ACTIONS, CANONICAL_GRAPH_MUTATIONS, prepareGraphWork } from './graph.mjs';
 
 export const WORK_NATIVE_READS=Object.freeze(['workspace.snapshot']);
 export const WORK_NATIVE_MUTATIONS=Object.freeze([
@@ -25,9 +26,10 @@ export class WorkNativeApplication extends NativeProfileApplication {
         this.get(input.release_id,'release');str(input.name,160);choice(input.action,PLATFORM_ACTIONS);object(input.arguments);noSecrets(input.arguments);
         object(input.budget,['max_cost_microunits','currency','max_runtime_seconds'],['max_cost_microunits','currency','max_runtime_seconds']);
         integer(input.budget.max_cost_microunits,0,1000000000);str(input.budget.currency,8);integer(input.budget.max_runtime_seconds,1,3600);
-        let argumentsRecord=input.arguments,publicationBinding=null;
+        let argumentsRecord=input.arguments,publicationBinding=null,graphBinding=null;
+        if(CANONICAL_GRAPH_ACTIONS.includes(input.action)){if(CANONICAL_GRAPH_MUTATIONS.has(input.action))ensure(input.authorization==='explicit-graph-mutation','Canonical Project Graph mutation requires explicit per-intent authorization','ConsentRequired');const bound=prepareGraphWork(this,input.release_id,input.action,input.arguments);argumentsRecord=bound.arguments;graphBinding=bound.graph_binding;}
         if(input.action.startsWith('publish.')){if(PUBLICATION_ACTIONS.has(input.action))ensure(input.authorization==='explicit-publication','External publication requires explicit per-intent authorization','ConsentRequired');const bound=preparePublicationWork(this,input.action,input.arguments);argumentsRecord=bound.arguments;publicationBinding=bound.publication_binding;}
-        return{entity:this.store.create('work',{...input,arguments:argumentsRecord,...(publicationBinding?{publication_binding:publicationBinding}:{}),state:'PREPARED',authority:'platform-required',budget_enforced:false,platform_job_id:null,pending_digest:null})};
+        return{entity:this.store.create('work',{...input,arguments:argumentsRecord,...(publicationBinding?{publication_binding:publicationBinding}:{}),...(graphBinding?{graph_binding:graphBinding}:{}),state:'PREPARED',authority:'platform-required',budget_enforced:false,platform_job_id:null,pending_digest:null})};
       }
       case'work.claim':{
         inputObject(input,['id','prepared_record']);const w=this.get(input.id,'work');ensure(w.data.state==='PREPARED','Work has already been claimed; recover rather than resend','Conflict');object(input.prepared_record);noSecrets(input.prepared_record);
@@ -35,7 +37,7 @@ export class WorkNativeApplication extends NativeProfileApplication {
         return{entity:this.store.update(w.id,{...w.data,state:'CLAIMED',pending_digest:pending}),pending_digest:pending};
       }
       case'work.complete':{
-        inputObject(input,['id','result','pending_digest']);const w=this.get(input.id,'work');ensure(['CLAIMED','OUTCOME_UNKNOWN'].includes(w.data.state),'Work is not awaiting an outcome','Conflict');ensure(w.data.pending_digest===input.pending_digest,'Pending request binding differs','Conflict');object(input.result);
+        inputObject(input,['id','result','pending_digest']);const w=this.get(input.id,'work');ensure(['CLAIMED','OUTCOME_UNKNOWN'].includes(w.data.state),'Work is not awaiting an outcome','Conflict');ensure(w.data.pending_digest===input.pending_digest,'Pending request binding differs','Conflict');object(input.result);noSecrets(input.result);ensure(Buffer.byteLength(JSON.stringify(input.result))<=192000,'Platform result exceeds bounded storage contract','ResourceExhausted');
         const job=input.result.job_id??null;if(job)str(job,96);
         return{entity:this.store.update(w.id,{...w.data,state:'RESPONSE_RECORDED',platform_job_id:job,result:input.result,evidence_trust:'NOT_ADMITTED'})};
       }

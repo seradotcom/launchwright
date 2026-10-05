@@ -5,6 +5,8 @@ import { CLASSES, RIGHTS, inputObject, array, choice, str, lines, sha } from './
 import { iso } from './base.mjs';
 import { recordCapture } from './capture.mjs';
 import { renderText } from './render.mjs';
+import { inspectGraph } from './graph.mjs';
+import { digest } from './base.mjs';
 
 export const PRODUCTION_NATIVE_READS=Object.freeze([
   'release.coverage','release.impact','anchor.assess','artifact.read'
@@ -63,12 +65,13 @@ export class ProductionNativeApplication extends NativeProfileApplication {
     return{release_id:releaseId,claims,obligations:claims.length,pass:claims.filter(c=>c.status==='PASS').length,fail:claims.filter(c=>c.status==='FAIL').length,unknown:claims.filter(c=>c.status==='UNKNOWN').length,contracts,scenarios:scenarios.map(s=>({id:s.id,status:'UNKNOWN',reason:'canonical-execution-not-observed'})),inventory_scope:'registered-only',unknown_frontier:true,canonical_graph_authority:false};
   }
   impact(releaseId){
-    this.get(releaseId,'release');const items=[];
-    for(const a of this.list('artifact',releaseId)){const changed=this.freshness(a.data.inputs);if(changed.length)items.push({artifact_id:a.id,deliverable_id:a.data.deliverable_id,state:'INPUTS_CHANGED',changed});}
+    this.get(releaseId,'release');const graph=inspectGraph(this,{release_id:releaseId}),items=[];
+    const scope=digest('release-reuse-scope',{workspace_generation:this.store.version().generation,principal:this.principal,release_id:releaseId});
+    for(const a of this.list('artifact',releaseId)){const changed=this.freshness(a.data.inputs),reuse={scope_sha256:scope,input_sha256:digest('release-reuse-input',{artifact_sha256:a.data.sha256,producer:a.data.producer,target_id:a.data.target_id,inputs:a.data.inputs}),cross_principal_reuse:false,final_verification_required:true,state:changed.length?'RECOMPUTE':graph.canonical_graph_authority?'REVALIDATE_FINAL':'UNKNOWN'};if(changed.length)items.push({artifact_id:a.id,deliverable_id:a.data.deliverable_id,state:'INPUTS_CHANGED',changed,reuse});}
     const bindings=this.list('binding',releaseId).map(b=>({binding_id:b.id,mode:b.data.mode,action:b.data.mode==='rolling'?'revalidate-if-inputs-changed':'retain-pinned-history',pinned_artifact_id:b.data.pinned_artifact_id??null}));
     const contract_blockers=this.coverage(releaseId).contracts.flatMap(c=>c.obligations.filter(o=>o.state!=='PASS').map(o=>({contract_id:c.id,...o})));
-    const relations=this.list('relation',releaseId).map(r=>({id:r.id,from_id:r.data.from_id,to_id:r.data.to_id,kind:r.data.relation_kind,provenance:r.data.provenance,completeness:r.data.completeness,admission:r.data.admission}));
-    return{release_id:releaseId,items,bindings,contract_blockers,relations,coverage:'DECLARED_DEPENDENCIES_ONLY',canonical_graph_authority:false,unknown_frontier:true,note:'This is an app input-revision comparison, explicit relation inventory and release-contract projection, not a Project Graph freshness verdict.'};
+    const relations=this.list('relation',releaseId).map(r=>({id:r.id,from_id:r.data.from_id,to_id:r.data.to_id,kind:r.data.relation_kind,provenance:r.data.provenance,completeness:r.data.completeness,admission:r.data.admission,graph_observation_id:r.data.graph_observation_id??null}));
+    return{release_id:releaseId,items,bindings,contract_blockers,relations,graph,coverage:graph.coverage,canonical_graph_authority:graph.canonical_graph_authority,unknown_frontier:graph.unknown_frontier,note:graph.canonical_graph_authority?'Canonical Project Graph output is preserved verbatim; local checks add release meaning but do not recompute Graph freshness.':'Local revision comparisons remain advisory until a current admitted Project Graph impact observation is bound.'};
   }
   read(operation,input){
     switch(operation){
@@ -89,7 +92,7 @@ export class ProductionNativeApplication extends NativeProfileApplication {
   mutate(operation,input){
     switch(operation){
       case'relation.record':{
-        inputObject(input,['release_id','name','from_id','to_id','relation_kind','provenance','completeness','evidence_ids'],['release_id','name','from_id','to_id','relation_kind','provenance','completeness']);
+        inputObject(input,['release_id','name','from_id','to_id','relation_kind','provenance','completeness','evidence_ids','graph_observation_id'],['release_id','name','from_id','to_id','relation_kind','provenance','completeness']);
         const release=this.get(input.release_id,'release'),from=this.get(input.from_id),to=this.get(input.to_id);
         str(input.name,160);str(input.relation_kind,128);ensure(/^[a-z][a-z0-9_.-]{0,127}$/.test(input.relation_kind),'Invalid relation kind');
         ensure(this.productOf(from)===release.data.product_id&&this.productOf(to)===release.data.product_id,'Relation crosses product boundary','PermissionDenied');
@@ -97,14 +100,14 @@ export class ProductionNativeApplication extends NativeProfileApplication {
         if(input.provenance==='heuristic')ensure(input.completeness!=='complete','Heuristic relation cannot claim complete coverage');
         const evidenceIds=input.evidence_ids??[];array(evidenceIds,32);ensure(new Set(evidenceIds).size===evidenceIds.length,'Duplicate relation evidence');
         for(const id of evidenceIds){const evidence=this.get(id,'evidence');ensure(evidence.data.release_id===release.id,'Relation evidence belongs to another release');}
-        if(input.provenance==='observed'){ensure(this.capabilities.canonical_graph_admission===true,'Observed relation requires canonical Graph admission','PolicyDenied');ensure(evidenceIds.length>0,'Observed relation requires admitted evidence');}
-        return{entity:this.store.create('relation',{release_id:release.id,name:input.name,from_id:from.id,to_id:to.id,relation_kind:input.relation_kind,provenance:input.provenance,completeness:input.completeness,evidence_ids:evidenceIds,from_version:from.version,to_version:to.version,admission:input.provenance==='observed'?'canonical-owner-admitted':'local-explicit-record',created_at:iso()})};
+        let graphObservation=null;if(input.provenance==='observed'){ensure(!!input.graph_observation_id,'Observed relation requires an admitted Project Graph observation','PolicyDenied');graphObservation=this.get(input.graph_observation_id,'graph_observation');ensure(graphObservation.data.release_id===release.id,'Graph observation belongs to another release','PermissionDenied');ensure(graphObservation.data.admission==='canonical-owner-admitted','Graph observation is not canonically admitted','PolicyDenied');ensure(['project.query','project.asset.inspect','project.asset.provenance','project.revisions','project.impact'].includes(graphObservation.data.action),'Graph edge declaration alone does not prove an observed relation','PolicyDenied');}else ensure(!input.graph_observation_id,'Only observed relations may bind canonical Graph observation evidence');
+        return{entity:this.store.create('relation',{release_id:release.id,name:input.name,from_id:from.id,to_id:to.id,relation_kind:input.relation_kind,provenance:input.provenance,completeness:input.completeness,evidence_ids:evidenceIds,graph_observation_id:graphObservation?.id??null,from_version:from.version,to_version:to.version,admission:graphObservation?'canonical-owner-admitted':'local-explicit-record',created_at:iso()})};
       }
       case'impact.plan':{
-        inputObject(input,['release_id','cause_ids','note'],['release_id','cause_ids']);const release=this.get(input.release_id,'release');array(input.cause_ids,64);ensure(new Set(input.cause_ids).size===input.cause_ids.length,'Duplicate impact causes');
-        for(const id of input.cause_ids){const cause=this.get(id);ensure(this.productOf(cause)===release.data.product_id,'Impact cause belongs to another product','PermissionDenied');}
+        inputObject(input,['release_id','cause_ids','note','coalesce_with'],['release_id','cause_ids']);const release=this.get(input.release_id,'release');array(input.cause_ids,64);ensure(new Set(input.cause_ids).size===input.cause_ids.length,'Duplicate impact causes');
+        const coalesced=array(input.coalesce_with??[],16);ensure(new Set(coalesced).size===coalesced.length,'Duplicate impact proposals in coalescing request');const causes=new Set(input.cause_ids);for(const proposalId of coalesced){const prior=this.get(proposalId,'impact_proposal');ensure(prior.data.release_id===release.id,'Cannot coalesce impact across releases','PermissionDenied');for(const id of prior.data.cause_ids)causes.add(id);}for(const id of causes){const cause=this.get(id);ensure(this.productOf(cause)===release.data.product_id,'Impact cause belongs to another product','PermissionDenied');}
         if(input.note)lines(input.note,8000);
-        return{entity:this.store.create('impact_proposal',{release_id:release.id,name:'Impact proposal · '+release.data.name,cause_ids:[...input.cause_ids].sort(),note:input.note??'',source_workspace_version:this.store.version(),impact:this.impact(release.id),state:'PROPOSED',authority:'NONE',jobs_created:0,created_at:iso()})};
+        return{entity:this.store.create('impact_proposal',{release_id:release.id,name:'Impact proposal · '+release.data.name,cause_ids:[...causes].sort(),coalesced_from:[...coalesced].sort(),note:input.note??'',source_workspace_version:this.store.version(),impact:this.impact(release.id),state:'PROPOSED',authority:'NONE',jobs_created:0,created_at:iso()})};
       }
       case'evidence.import':{
         inputObject(input,['release_id','target_id','source_id','name','build','classification','rights','description','origin_digest','job_id'],['release_id','target_id','source_id','name','build','classification','rights','description','origin_digest']);
