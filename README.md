@@ -29,6 +29,7 @@ Synthetic data is never described as a real product capture.
 ## What works today
 
 - stable resource IDs, opaque generations, monotonic string revisions and optimistic concurrency;
+- durable exact entity revision history with bounded get/list/diff operations, explicit legacy migration, and no invented pre-migration revisions;
 - build/source/target/feature/scenario/anchor modeling with explicit source authorization;
 - claims, CopyBlocks, availability rules and ReleaseContract readiness denominators;
 - immutable Markdown, safe HTML, JSON, email-draft and VTT artifacts with SHA-256-addressed bytes;
@@ -41,7 +42,7 @@ Synthetic data is never described as a real product capture.
 - source-linked localization with glossary revision pins, explicit rebase, RTL/font-rights/critical-term blockers and no invented language/layout PASS;
 - bounded extension descriptors, discovery, retirement, source-profile preflight and compatibility locks without executing remote extension code;
 - private-draft alias delivery with compare-and-swap;
-- portable snapshot/restore that rotates workspace generation and request epoch and suspends uncertain intents;
+- portable snapshot/restore v2 that preserves exact stored revision history, rotates workspace generation/request epoch, suspends uncertain intents, and accepts older snapshots without fabricating historical revisions;
 - public HTTP client, browser UI, CLI and Native Application bridge sharing the same dispatcher and SQLite transaction model.
 
 ## Semwright Native SDK
@@ -52,7 +53,7 @@ The public `@semwright/native-sdk` source is vendored unchanged under its upstre
 - Native SDK `0.9.0-dev.1`
 - exact SHA-256 hashes for the redistributed SDK files/archive
 
-The canonical `NodeBridge` allows at most 48 KiB per owner-pinned executable bundle. Launchwright therefore maps all 43 public operations exactly once across five bounded profiles (`core`, `production`, `review`, `integrations`, `work`) instead of weakening that upstream limit. `scripts/build-native-bundle.mjs` hashes each exact bundle and rejects missing/duplicate operations or oversized output. `crates/launchwright-native` pins those five hashes at build time. The caller cannot choose arbitrary executable code, mounts or runtime paths.
+The canonical `NodeBridge` allows at most 48 KiB per owner-pinned executable bundle. Launchwright therefore maps all 49 public operations exactly once across five bounded profiles (`core`, `production`, `review`, `integrations`, `work`) instead of weakening that upstream limit. `scripts/build-native-bundle.mjs` hashes each exact bundle and rejects missing/duplicate operations or oversized output. `crates/launchwright-native` pins those five hashes at build time. The caller cannot choose arbitrary executable code, mounts or runtime paths.
 
 The optional Platform adapter consumes an owner-supplied byte-pinned package. The inspected Platform source is not licensed for redistribution, so it is not copied into this public repository.
 
@@ -71,7 +72,9 @@ node src/main.mjs snapshot --state .state --out launchwright-snapshot.json
 node src/main.mjs restore --snapshot launchwright-snapshot.json --state .state-restored
 ```
 
-Restore preserves domain identities and content hashes but creates a new workspace generation, advances the request epoch, leaves old mutation receipts inactive and marks uncertain pending work for explicit reconciliation.
+Restore preserves domain identities, content hashes and exact stored entity history but creates a new workspace generation, advances the request epoch, leaves old mutation receipts inactive and marks uncertain pending work for explicit reconciliation.
+
+Workspaces created before schema v2 remain readable but reject new mutations until the explicit history migration is run with node src/main.mjs migrate-history --state .state. That migration backfills only the current revision actually present for each entity. Earlier revisions are marked as not reconstructed rather than inferred from events or receipts.
 
 ## Verification
 

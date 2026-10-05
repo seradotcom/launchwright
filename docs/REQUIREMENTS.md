@@ -6,7 +6,7 @@ The private specification text is intentionally not redistributed in this AGPL r
 
 ## Current implemented foundations
 
-- Durable resource identity, revisions, optimistic concurrency, tombstones and append-only audit events.
+- Durable resource identity, optimistic concurrency, tombstones and append-only audit events, plus exact entity revision history in schema v2 with bounded history reads/diffs and explicit legacy migration that never invents missing revisions.
 - Native SDK dispatcher/bridge, exact digests, cancellation, recovery and bounded observation.
 - Build/source/target/scenario/anchor contracts with explicit authorization and provenance.
 - Claims, CopyBlocks, availability and ReleaseContract denominators without fabricated coverage.
@@ -17,7 +17,7 @@ The private specification text is intentionally not redistributed in this AGPL r
 - Immutable verifier records, coverage/omissions/findings and non-state-changing waivers.
 - Versioned channel packages plus authenticated deterministic private bundles containing the exact channel manifest, candidate manifest and pinned artifact bytes.
 - Versioned channel profiles, exact package generation and external receipt/recovery state.
-- Portable snapshot/restore with epoch/generation rotation and uncertain-intent suspension.
+- Portable snapshot/restore v2 with exact stored revision history, migration provenance, epoch/generation rotation, uncertain-intent suspension and backward-compatible v1 restore without historical reconstruction.
 - Loopback HTTP/UI security, bounded payloads and session-cookie authentication.
 
 ## Integration-dependent / not accepted

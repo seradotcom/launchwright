@@ -10,6 +10,7 @@ import { validateLocalization, assessLocalization } from './localization.mjs';
 import { PROFILE_MATRIX, validateExtensionManifest, validateCompatibilityLock } from './extensions.mjs';
 import { freezeCandidate, buildCandidateGates, inspectCandidateState, recordCandidateReview, assertPrivateDeliveryReady, assertChannelPinned, assertPartialDeliveryPolicy } from './candidate.mjs';
 import { proposeChange, inspectChange, applyChange } from './change-proposal.mjs';
+import { getHistory, listHistory, diffHistory } from './history.mjs';
 export const PLATFORM_ACTIONS = ['recipes.prepare','recipes.execute','jobs.get','jobs.cancel','jobs.reconcile','evidence.get','artifacts.get','graph.observe','graph.observation','publish.preflight','publish.define','publish.version','publish.deploy','publish.invoke','publish.result'];
 const PUBLICATION_ACTIONS = new Set(['publish.define','publish.version','publish.deploy','publish.invoke']);
 const READ_ACTIONS = new Set(['jobs.get','evidence.get','artifacts.get','graph.observation','publish.result']);
@@ -77,7 +78,7 @@ export class LaunchwrightApplication {
   }
   describe(){return{app:'Launchwright',version:APP_VERSION,schema_version:'launchwright/1',workspace_version:this.store.version(),request_epoch:this.store.meta().epoch,
     scope_mode:'local-single-owner',principal:this.principal,scopes:[...this.scopes],native_sdk:'0.9.0-dev.1',operations:Object.entries(OPERATION_SCOPES).map(([name,scope])=>({name,scope,read_only:scope==='read'})),
-    capabilities:{editorial_text_exports:'available',private_draft_delivery:'available',portable_snapshot_restore:'available-local-admin',declared_release_contracts:'available',localization_ledger:'available-layout-quality-not-inferred',extension_descriptors:'available-no-remote-code',compatibility_negotiation:'available',profile_preflight:'available-contract-only',state_anchors:'contract-and-assessment-only',impact_proposals:'available-no-execution-authority',document_change_proposals:'available-application-local-no-auto-merge',capture_receipts:'available-provenance-only',verification_ledger:'available-canonical-pass-requires-admission',waivers:'available-never-overwrite-verifier-state',channel_packages:'available-no-send',native_driver_host:'requires-owner-pinned-bundle-and-broker',platform:this.capabilities.platform??'not-connected',canonical_graph:'requires-platform-observation',browser_capture:'requires-canonical-driver-recipe',media_render:'requires-composition-recipe',mobile:'provenance-import-only',public_delivery:'requires-canonical-publish-receipt',...this.capabilities},
+    capabilities:{editorial_text_exports:'available',durable_entity_history:this.store.hasHistory?'available':'migration-required',private_draft_delivery:'available',portable_snapshot_restore:'available-local-admin',declared_release_contracts:'available',localization_ledger:'available-layout-quality-not-inferred',extension_descriptors:'available-no-remote-code',compatibility_negotiation:'available',profile_preflight:'available-contract-only',state_anchors:'contract-and-assessment-only',impact_proposals:'available-no-execution-authority',document_change_proposals:'available-application-local-no-auto-merge',capture_receipts:'available-provenance-only',verification_ledger:'available-canonical-pass-requires-admission',waivers:'available-never-overwrite-verifier-state',channel_packages:'available-no-send',native_driver_host:'requires-owner-pinned-bundle-and-broker',platform:this.capabilities.platform??'not-connected',canonical_graph:'requires-platform-observation',browser_capture:'requires-canonical-driver-recipe',media_render:'requires-composition-recipe',mobile:'provenance-import-only',public_delivery:'requires-canonical-publish-receipt',...this.capabilities},
     limits:{page_items:128,reply_bytes:256*1024,artifact_bytes:1024*1024,receipt_epoch_items:20000},disclosure:'Local editorial checks are not Platform approvals or canonical effect verification.'};}
   profilePreflight(input){
     inputObject(input,['profile','source_id','target_id'],['profile','source_id']);str(input.profile,64);
@@ -101,7 +102,7 @@ export class LaunchwrightApplication {
     inputObject(input,['schema_major','operations','kinds'],['schema_major']);integer(input.schema_major,1,32);
     const operations=input.operations??[],kinds=input.kinds??[];array(operations,128).forEach(v=>str(v,160));array(kinds,128).forEach(v=>str(v,160));
     const supportedOps=new Set(this.operations.keys()),supportedKinds=new Set(KINDS);
-    return{schema_major:1,requested_schema_major:input.schema_major,compatible:input.schema_major===1,unsupported_operations:operations.filter(v=>!supportedOps.has(v)),unsupported_kinds:kinds.filter(v=>!supportedKinds.has(v)),supported_optional:{extensions:true,localization:true,channel_packages:true,portable_snapshots:true},major_mismatch_behavior:'reject'};
+    return{schema_major:1,requested_schema_major:input.schema_major,compatible:input.schema_major===1,unsupported_operations:operations.filter(v=>!supportedOps.has(v)),unsupported_kinds:kinds.filter(v=>!supportedKinds.has(v)),supported_optional:{extensions:true,localization:true,channel_packages:true,portable_snapshots:true,durable_history:this.store.hasHistory},major_mismatch_behavior:'reject'};
   }
   compatibilityInspect(id){
     const lock=this.get(id,'compatibility_lock');
@@ -137,6 +138,9 @@ export class LaunchwrightApplication {
         const items=rows.slice(0,limit).map(e=>({...e,payload:JSON.parse(e.payload),schema_version:'launchwright-event/1'}));
         return{items,next_after:more?items.at(-1).seq:null,watermark:this.store.db.prepare('SELECT coalesce(max(seq),0) AS n FROM events').get().n,complete:!more};
       }
+      case'history.get':return getHistory(this,input);
+      case'history.list':return listHistory(this,input);
+      case'history.diff':return diffHistory(this,input);
       case'release.coverage':inputObject(input,['release_id']);return this.coverage(input.release_id);
       case'release.impact':inputObject(input,['release_id']);return this.impact(input.release_id);
       case'anchor.assess':{

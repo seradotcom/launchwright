@@ -6,11 +6,11 @@ The JavaScript application imports the real `@semwright/native-sdk` package for 
 
 ## Host bridge profiles
 
-The canonical `NodeBridge` limits an owner-pinned executable bundle to 48 KiB and limits bundle plus invocation stdin to 64 KiB. Launchwright does not raise or bypass those limits. Its 43 public application operations are partitioned, without overlap, across five owner-pinned bridge profiles:
+The canonical `NodeBridge` limits an owner-pinned executable bundle to 48 KiB and limits bundle plus invocation stdin to 64 KiB. Launchwright does not raise or bypass those limits. Its 49 public application operations are partitioned, without overlap, across five owner-pinned bridge profiles:
 
 | Profile | Operations | Purpose |
 | --- | ---: | --- |
-| `core` | 7 | workspace reads, entity CRUD and template instantiation |
+| `core` | 13 | workspace/entity/history reads, entity CRUD, change proposals and template instantiation |
 | `production` | 9 | coverage/impact, relations, evidence, capture receipt ingestion and text rendering |
 | `review` | 10 | candidate, verification, waiver and channel-package lifecycle |
 | `integrations` | 11 | localization, source-profile preflight, extension descriptors and compatibility locks |

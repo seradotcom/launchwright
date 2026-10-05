@@ -35,6 +35,12 @@ Do not issue a replacement mutation. Recover the original request identity. In t
 
 If a channel receipt is UNKNOWN and its profile is `recover-first` or `unsafe`, do not retry automatically. Query/reconcile the destination using its provider-defined recovery path, then record a new immutable outcome receipt.
 
+## Legacy workspace history migration
+
+Doctor reports the local schema and whether durable history is ready. A schema-v1 workspace stays readable, but mutations fail closed until the operator explicitly migrates it. Before migration, create an independent filesystem/snapshot backup appropriate to the existing version. Then run node src/main.mjs migrate-history --state .state followed by doctor.
+
+The migration stores the current known revision for every entity and records NOT_RECONSTRUCTED for all earlier history. Do not infer missing revisions from audit events, receipts or external repositories.
+
 ## Backup/restore drill
 
 Export a snapshot, restore into a fresh directory, confirm a new workspace generation/epoch, inspect `RESTORE_RECONCILE_REQUIRED` items, and only then resume normal mutations. Old request receipts are intentionally inactive.
