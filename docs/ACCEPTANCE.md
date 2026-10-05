@@ -4,7 +4,7 @@ This ledger separates implemented behavior from execution evidence. It does not 
 
 ## Current local evidence
 
-On the workstation with Node **22.22.0**, the complete light suite passes **83/83** with zero failures. This engine is outside the Native SDK's declared Node 24.21 range, so the result is supplemental rather than supported-engine acceptance.
+On the workstation with Node **22.22.0**, the complete light suite passes **90/90** with zero failures. This engine is outside the Native SDK's declared Node 24.21 range, so the result is supplemental rather than supported-engine acceptance.
 
 The current light suite covers, among other boundaries:
 
@@ -27,6 +27,11 @@ The current light suite covers, among other boundaries:
 - lost-acknowledgement UNKNOWN/reconcile flow with no automatic resend and an explicit, reconciled retry chain
 - publication claims requiring independent destination observation/fingerprint
 - bounded withdrawal plans that never claim all downstream copies were removed
+- durable per-entity revision history with explicit legacy migration that never invents old revisions
+- structured documents with human/managed block ownership, exact-base proposals, external revision pins and immutable renders
+- localization records with source/target/glossary/font pins, RTL-safe HTML and required human semantic review for lexical risk
+- declarative extension contracts with semantic-version negotiation, generic metadata views and retirement without descriptor code execution
+- workspace schema negotiation and read-only doctor endpoints that fail explicitly on incompatible majors
 
 A real CLI portability smoke exported **27 entities and 4 blobs**, previewed the restore, committed it into a new workspace and confirmed a new workspace generation. That run restored zero receipts and zero pending dispatch records.
 

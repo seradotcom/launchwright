@@ -4,8 +4,8 @@ import { object, text, integer, requireCondition as ensure, exactRequestDigest, 
 export const APP_VERSION = '0.2.0-dev.2';
 export const RESOURCE = 'launchwright:workspace';
 const words=s=>s.split(' ');
-export const KINDS = words('product build release source target feature availability anchor scenario claim copy_block release_contract relation evidence deliverable artifact bundle candidate review delivery channel_attempt withdrawal binding template channel_profile impact_proposal work tombstone');
-export const EDITABLE = words('product build release source target feature availability anchor scenario claim copy_block release_contract deliverable binding template channel_profile');
+export const KINDS = words('product build release source target feature availability anchor scenario claim copy_block release_contract relation evidence deliverable document proposal glossary font_profile translation extension_contract artifact bundle candidate review delivery channel_attempt withdrawal binding template channel_profile impact_proposal work tombstone');
+export const EDITABLE = words('product build release source target feature availability anchor scenario claim copy_block release_contract deliverable binding template channel_profile glossary font_profile');
 export const CLASSES = words('actual demo sanitized editorial generated imported');
 export const FORMATS = words('markdown html json email vtt');
 export const RIGHTS = words('owned licensed unknown restricted');
@@ -55,6 +55,8 @@ export function validateEntity(kind, raw) {
     binding:'release_id name mode deliverable_id pinned_artifact_id?',
     template:'product_id name format content parameters',
     channel_profile:'product_id name profile_version channel delivery_mode formats locales max_artifact_bytes idempotency withdrawal provenance reviewed_at',
+    glossary:'product_id name source_locale target_locale terms fallback_policy reviewed_at',
+    font_profile:'product_id name profile_version locales font_family_ref coverage rights license_ref asset_included reviewed_at',
   }[kind].split(' ');
   const allowed=encoded.map(k=>k.endsWith('?')?k.slice(0,-1):k),required=encoded.filter(k=>!k.endsWith('?'));
   object(d, allowed, required);
@@ -123,6 +125,13 @@ export function validateEntity(kind, raw) {
     array(d.locales,64).forEach(locale); ensure(new Set(d.locales).size===d.locales.length,'Duplicate channel locale'); integer(d.max_artifact_bytes,1,1024*1024*1024);
     choice(d.idempotency,['native','reconcile','none']); choice(d.withdrawal,['supported','corrective-only','unknown']); lines(d.provenance,4000); timestamp(d.reviewed_at);
   }
+  if(kind==='glossary'){
+    locale(d.source_locale);locale(d.target_locale);choice(d.fallback_policy,['block','manual-only','source-with-warning']);timestamp(d.reviewed_at);array(d.terms,128);
+    const seen=new Set();for(const term of d.terms){object(term,['source','target','case_sensitive'],['source','target']);str(term.source,160);str(term.target,160);if(term.case_sensitive!==undefined)ensure(typeof term.case_sensitive==='boolean','Glossary case_sensitive must be boolean');const key=(term.case_sensitive?term.source:term.source.toLocaleLowerCase())+'\u0000'+term.target;ensure(!seen.has(key),'Duplicate glossary term');seen.add(key);}
+  }
+  if(kind==='font_profile'){
+    str(d.profile_version,64);array(d.locales,64).forEach(locale);ensure(new Set(d.locales).size===d.locales.length,'Duplicate font locale');str(d.font_family_ref,256);choice(d.coverage,['declared','subset-known','unknown']);choice(d.rights,RIGHTS);str(d.license_ref,512);ensure(d.asset_included===false,'Font binaries are never embedded by FontProfile');timestamp(d.reviewed_at);
+  }
   if (d.captions !== undefined) validateCaptions(d.captions);
   return d;
 }
@@ -131,8 +140,8 @@ export function validateCaptions(cues) {
   array(cues,128).forEach(c => { object(c, ['start_ms','end_ms','text'], ['start_ms','end_ms','text']); integer(c.start_ms,0,86400000); integer(c.end_ms,1,86400000); ensure(c.start_ms >= end && c.end_ms > c.start_ms, 'Invalid caption timing'); str(c.text,1000); ensure(!c.text.includes('-->'), 'Invalid caption text'); end = c.end_ms; });
 }
 const scopeGroups={
-  read:'workspace.describe resource.get events.list release.coverage release.impact release.channels channel.inspect anchor.assess artifact.read candidate.inspect',
-  edit:'entity.create entity.update entity.retire relation.record impact.plan evidence.import deliverable.render candidate.freeze candidate.export_bundle channel.prepare channel.withdraw_plan template.instantiate work.prepare work.claim work.complete work.mark_unknown',
-  review:'candidate.review',publish:'candidate.deliver_private channel.claim channel.mark_unknown channel.complete channel.reconcile',admin:'workspace.rotate_epoch',
+  read:'workspace.describe workspace.doctor workspace.negotiate resource.get events.list history.get history.list history.diff release.coverage release.impact release.channels channel.inspect anchor.assess artifact.read candidate.inspect document.inspect translation.inspect extension.describe extension.negotiate',
+  edit:'entity.create entity.update entity.retire relation.record impact.plan evidence.import deliverable.render candidate.freeze candidate.export_bundle channel.prepare channel.withdraw_plan template.instantiate document.create document.propose document.edit_human document.render translation.create translation.edit_human translation.rebase translation.render extension.register extension.retire work.prepare work.claim work.complete work.mark_unknown',
+  review:'candidate.review document.resolve translation.review',publish:'candidate.deliver_private channel.claim channel.mark_unknown channel.complete channel.reconcile',admin:'workspace.rotate_epoch',
 };
 export const OPERATION_SCOPES = Object.freeze(Object.fromEntries(Object.entries(scopeGroups).flatMap(([scope,names])=>words(names).map(name=>[name,scope]))));

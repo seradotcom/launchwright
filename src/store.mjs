@@ -12,8 +12,9 @@ export class Store {
     ensure(existsSync(this.root), 'Workspace not initialized', 'Unavailable');
     ensure(!lstatSync(this.root).isSymbolicLink(), 'Symlink denied');
     const file = join(this.root, 'launchwright.sqlite3');
-    if (existsSync(file)) ensure(!lstatSync(file).isSymbolicLink(), 'Database symlink denied');
-    ensure(initialize || existsSync(file), 'Workspace not initialized', 'Unavailable');
+    const databaseExisted=existsSync(file);
+    if (databaseExisted) ensure(!lstatSync(file).isSymbolicLink(), 'Database symlink denied');
+    ensure(initialize || databaseExisted, 'Workspace not initialized', 'Unavailable');
     this.db = new DatabaseSync(file, { readOnly, timeout:5000 });
     this.db.exec('PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000;');
     if (initialize) {
@@ -22,6 +23,20 @@ export class Store {
       try { chmodSync(file,0o600); } catch { /* ACL differs on Windows; doctor reports platform. */ }
     }
     ensure(this.db.prepare('SELECT schema_version FROM meta WHERE singleton=1').get()?.schema_version === 1, 'Unsupported schema', 'ProtocolMismatch');
+    this.hasHistory=!!this.db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='entity_history'").get();
+    if(initialize&&!databaseExisted)this.installHistory();
+  }
+  installHistory(){
+    ensure(!this.readOnly,'History migration requires a writable workspace','PermissionDenied');
+    if(this.hasHistory)return{installed:false,history_version:1,pre_migration_history:'NOT_RECONSTRUCTED'};
+    this.db.exec(`BEGIN IMMEDIATE;
+      CREATE TABLE entity_history(id TEXT NOT NULL,generation TEXT NOT NULL,revision TEXT NOT NULL,kind TEXT NOT NULL,data TEXT NOT NULL,created TEXT NOT NULL,updated TEXT NOT NULL,PRIMARY KEY(id,generation,revision));
+      INSERT INTO entity_history SELECT id,generation,revision,kind,data,created,updated FROM entities;
+      CREATE TABLE IF NOT EXISTS app_extensions(name TEXT PRIMARY KEY,version INTEGER NOT NULL,installed_at TEXT NOT NULL,metadata TEXT NOT NULL);
+      INSERT INTO app_extensions(name,version,installed_at,metadata) VALUES('history',1,strftime('%Y-%m-%dT%H:%M:%fZ','now'),'{"pre_migration_history":"NOT_RECONSTRUCTED"}');
+      COMMIT;`);
+    this.hasHistory=true;
+    return{installed:true,history_version:1,pre_migration_history:'NOT_RECONSTRUCTED',current_entities_backfilled:this.db.prepare('SELECT count(*) AS n FROM entity_history').get().n};
   }
   close() { this.db.close(); }
   meta() { return this.db.prepare('SELECT * FROM meta WHERE singleton=1').get(); }
@@ -29,13 +44,16 @@ export class Store {
   get(id) { const r = this.db.prepare('SELECT * FROM entities WHERE id=?').get(id); ensure(r, 'Resource not found', 'NotFound'); return this.decode(r); }
   decode(r) { return { id:r.id, kind:r.kind, version:{resource:r.id,generation:r.generation,revision:r.revision},data:JSON.parse(r.data),created:r.created,updated:r.updated }; }
   all(kind = 'all') { return (kind === 'all' ? this.db.prepare('SELECT * FROM entities ORDER BY id').all() : this.db.prepare('SELECT * FROM entities WHERE kind=? ORDER BY id').all(kind)).map(r => this.decode(r)); }
-  create(kind,data) { const id = `${kind}_${randomUUID()}`; const now=iso(); validateValue(data); this.db.prepare('INSERT INTO entities VALUES(?,?,?,?,?,?,?)').run(id,kind,randomUUID(),'1',JSON.stringify(data),now,now); return this.get(id); }
-  update(id,data) { const old = this.get(id); validateValue(data); this.db.prepare('UPDATE entities SET data=?,revision=?,updated=? WHERE id=?').run(JSON.stringify(data),(BigInt(old.version.revision)+1n).toString(),iso(),id); return this.get(id); }
-  retire(id,data) { const old=this.get(id); validateValue(data); this.db.prepare('UPDATE entities SET kind=?,data=?,revision=?,updated=? WHERE id=?').run('tombstone',JSON.stringify(data),(BigInt(old.version.revision)+1n).toString(),iso(),id); return this.get(id); }
+  readSnapshot(read){this.db.exec('BEGIN');try{const result=read();ensure(!(result instanceof Promise),'Read snapshot must remain synchronous');this.db.exec('COMMIT');return result;}catch(err){try{this.db.exec('ROLLBACK');}catch{}throw err;}}
+  saveHistory(id){if(this.hasHistory)this.db.prepare('INSERT INTO entity_history SELECT id,generation,revision,kind,data,created,updated FROM entities WHERE id=?').run(id);}
+  create(kind,data) { const id = `${kind}_${randomUUID()}`; const now=iso(); validateValue(data); this.db.prepare('INSERT INTO entities VALUES(?,?,?,?,?,?,?)').run(id,kind,randomUUID(),'1',JSON.stringify(data),now,now); this.saveHistory(id); return this.get(id); }
+  update(id,data) { const old = this.get(id); validateValue(data); this.db.prepare('UPDATE entities SET data=?,revision=?,updated=? WHERE id=?').run(JSON.stringify(data),(BigInt(old.version.revision)+1n).toString(),iso(),id); this.saveHistory(id); return this.get(id); }
+  retire(id,data) { const old=this.get(id); validateValue(data); this.db.prepare('UPDATE entities SET kind=?,data=?,revision=?,updated=? WHERE id=?').run('tombstone',JSON.stringify(data),(BigInt(old.version.revision)+1n).toString(),iso(),id); this.saveHistory(id); return this.get(id); }
   blob(bytes,mime) { ensure(bytes.length <= 1024*1024, 'Artifact too large','ResourceExhausted'); const hash=createHash('sha256').update(bytes).digest('hex'); this.db.prepare('INSERT OR IGNORE INTO blobs VALUES(?,?,?)').run(hash,mime,bytes); return hash; }
   readBlob(hash) { const r=this.db.prepare('SELECT mime,content FROM blobs WHERE sha256=?').get(hash); ensure(r,'Artifact missing','NotFound'); const bytes=Buffer.from(r.content); ensure(createHash('sha256').update(bytes).digest('hex')===hash,'Artifact hash mismatch','Conflict'); return {bytes,mime:r.mime}; }
   transaction(operation,principal,request,expected,mutate) {
     ensure(!this.readOnly,'Read-only workspace','PermissionDenied');
+    ensure(this.hasHistory,'Run the explicit migrate-history command before mutating this workspace','ProtocolMismatch');
     this.db.exec('BEGIN IMMEDIATE');
     try {
       const m=this.meta();

@@ -18,6 +18,16 @@ The local model includes Product, Build, Release, Source, Target, Feature, Avail
 
 Local Relation and Impact records are explicitly incomplete unless admitted by canonical Graph authority. Imported evidence never manufactures technical PASS.
 
+## History, authoring and extension boundaries
+
+Entity revision history is stored separately from current entity rows. New workspaces install history support at initialization; legacy workspaces require the explicit migrate-history command. Migration backfills only the current known state and labels earlier history NOT_RECONSTRUCTED instead of fabricating prior revisions.
+
+Structured documents model sections and blocks with explicit human, managed or imported ownership. Managed proposals pin the exact document version and, when configured, an external Git/docs revision. A stale proposal cannot overwrite later human edits. Rendered document artifacts pin the document revision and therefore become stale when the source document changes.
+
+Translations pin the exact source, target, glossary and font-profile versions. Lexical checks for protected numbers/units and negation are advisory only; they can require human semantic review but never manufacture semantic PASS. RTL output escapes imported markup before rendering.
+
+Extension contracts are declarative metadata: package identity/hash/license/source, permissions, input/output kinds, compatibility and limits. Generic views never execute HTML/JavaScript or package code from descriptors. Retirement preserves history and blocks future negotiation/use.
+
 ## Candidate and channel boundary
 
 A Candidate freezes exact artifact hashes, input versions, destination, review contract and selected ChannelProfile versions. Editing a pinned input makes the candidate stale.

@@ -55,6 +55,15 @@ A transport acknowledgement is not proof of publication. `OBSERVED_PUBLISHED` re
 
 Create a `channel.withdraw_plan` before a future adapter performs any withdrawal. The current implementation records scope/reason/replacement and the pinned channel capability only. It never claims that downstream caches, recipients or copies were deleted.
 
+## Legacy history migration
+
+A workspace created before the history extension must be migrated before the next mutation:
+
+    node src/main.mjs migrate-history --state .state
+    node src/main.mjs doctor --state .state
+
+The migration records only the current entity revisions that actually exist. It does **not** reconstruct or infer older revisions. Run backup/export before migration when operating on valuable state.
+
 ## Workspace backup and restore
 
 ```sh
