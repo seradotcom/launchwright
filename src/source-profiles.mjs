@@ -11,13 +11,48 @@ export const GODOT_RUNTIME_CONTRACT=Object.freeze({
   engine_sha256:'8d106cbe6144c2dc7e881d61d2429c1a8a76e6b22ef48bd5e48dcf934953f71e'
 });
 
+export const BROWSER_RUNTIME_CONTRACT=Object.freeze({
+  semwright_sha:'4d291de26724810017ce7b6d185326514cb79fa6',
+  provider_id:'chromium',
+  execution_model:'owned-disposable-browser',
+  authority:'semantic-adapter'
+});
+
 export const PROFILE_MATRIX=Object.freeze({
-  browser:{source_types:['web'],execution:'canonical-driver-required',capture:'requires-authorized-driver',readback:'provider-dependent'},
+  browser:{source_types:['web'],execution:'canonical-driver-required',capture:'requires-authorized-driver',readback:'provider-dependent',driver:BROWSER_RUNTIME_CONTRACT,native_available:true},
   cli:{source_types:['cli'],execution:'reviewed-driver-unavailable',capture:'no-shell-fallback',readback:'provider-required',native_available:false},
   'mobile-import':{source_types:['mobile-import'],execution:'import-only',capture:'bounded-manifest-hash-dimension-validation',readback:'content-addressed-assets-with-imported-provenance',native_capture:false,max_assets:8,max_asset_bytes:2097152,max_total_bytes:8388608},
   godot:{source_types:['godot'],execution:'canonical-driver-required',capture:'engine-receipt-required',readback:'driver-only',driver:GODOT_RUNTIME_CONTRACT,native_available:true},
   document:{source_types:['document'],execution:'parse-only',capture:'not-applicable',readback:'bounded-structured-import'}
 });
+
+function browserRuntimeChecks(app){
+  const runtime=app.capabilities.profile_runtime?.browser;
+  if(!runtime)return[
+    {name:'runtime-pin',state:'UNKNOWN',detail:'not-declared'},
+    {name:'runtime-executable-digest',state:'UNKNOWN',detail:'not-declared'}
+  ];
+  return[
+    {
+      name:'runtime-pin',
+      state:runtime.semwright_sha===BROWSER_RUNTIME_CONTRACT.semwright_sha&&runtime.provider_id===BROWSER_RUNTIME_CONTRACT.provider_id?'PASS':'FAIL',
+      detail:{semwright_sha:runtime.semwright_sha,provider_id:runtime.provider_id}
+    },
+    {
+      name:'runtime-executable-digest',
+      state:/^[0-9a-f]{64}$/.test(runtime.executable_sha256??'')?'PASS':'FAIL',
+      detail:runtime.executable_sha256??'missing'
+    }
+  ];
+}
+
+function browserLocatorCheck(locator){
+  try{
+    const parsed=new URL(locator);
+    const ok=['http:','https:'].includes(parsed.protocol)&&parsed.username===''&&parsed.password==='';
+    return{state:ok?'PASS':'FAIL',detail:locator};
+  }catch{return{state:'FAIL',detail:locator};}
+}
 
 function godotRuntimeCheck(app){
   const runtime=app.capabilities.profile_runtime?.godot;
@@ -48,6 +83,10 @@ export function profilePreflight(app,input){
     {name:'execution-authority',state:app.capabilities.profile_execution?.[input.profile]==='available'?'PASS':'UNKNOWN',detail:profile.execution}
   ];
   if(profile.native_available===false)checks.push({name:'canonical-runtime',state:'FAIL',detail:'no-reviewed-driver'});
+  if(input.profile==='browser'){
+    checks.push({name:'source-locator',...browserLocatorCheck(source.data.locator)});
+    checks.push(...browserRuntimeChecks(app));
+  }
   if(input.profile==='godot'){
     checks.push({name:'logical-project-locator',state:/^godot:\/\/project\/[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/.test(source.data.locator)?'PASS':'FAIL',detail:source.data.locator});
     checks.push({name:'runtime-pin',...godotRuntimeCheck(app)});

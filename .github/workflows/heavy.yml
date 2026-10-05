@@ -5,7 +5,7 @@ on:
       lane:
         description: Select only the lane affected by the change
         type: choice
-        options: [all, native, browser, godot, stress]
+        options: [all, native, browser, godot, deltadesk, stress]
         default: all
         required: true
 permissions:
@@ -62,6 +62,7 @@ jobs:
           rustup toolchain install stable --profile minimal
           rustup override set stable
           export LAUNCHWRIGHT_NATIVE_CORE_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.core.sha256')"
+          export LAUNCHWRIGHT_NATIVE_SOURCES_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.sources.sha256')"
           export LAUNCHWRIGHT_NATIVE_PRODUCTION_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.production.sha256')"
           export LAUNCHWRIGHT_NATIVE_REVIEW_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.review.sha256')"
           export LAUNCHWRIGHT_NATIVE_INTEGRATIONS_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.integrations.sha256')"
@@ -153,6 +154,86 @@ jobs:
         with:
           name: launchwright-godot-${{ github.sha }}
           path: evidence/godot/
+          if-no-files-found: error
+          retention-days: 14
+
+  deltadesk:
+    if: inputs.lane == 'all' || inputs.lane == 'deltadesk'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      SEMWRIGHT_SHA: 4d291de26724810017ce7b6d185326514cb79fa6
+      CARGO_INCREMENTAL: '0'
+      CARGO_TERM_COLOR: never
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Checkout exact reviewed Semwright source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: seradotcom/semwright
+          ref: ${{ env.SEMWRIGHT_SHA }}
+          path: .ci-semwright
+          persist-credentials: false
+      - name: Pin Rust compiler
+        run: |
+          rustup toolchain install 1.98.1 --profile minimal
+          (cd .ci-semwright && rustup override set 1.98.1)
+      - name: Install disposable Chromium runtime
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/deltadesk
+          npm install --prefix .ci-tools --no-audit --no-fund --ignore-scripts playwright@1.58.2
+          .ci-tools/node_modules/.bin/playwright install --with-deps chromium
+          CHROMIUM="$(node -e "const {chromium}=require('./.ci-tools/node_modules/playwright');process.stdout.write(chromium.executablePath())")"
+          CHROMIUM="$(readlink -f "$CHROMIUM")"
+          test -x "$CHROMIUM"
+          echo "SEMWRIGHT_TEST_CHROMIUM=$CHROMIUM" >> "$GITHUB_ENV"
+          sha256sum "$CHROMIUM" | tee evidence/deltadesk/chromium.sha256
+      - name: Start owned DeltaDesk A/B fixture
+        run: |
+          set -euo pipefail
+          PORT=4399 node lab/deltadesk/server.mjs 4399 > evidence/deltadesk/server.log 2>&1 &
+          echo "DELTADESK_PID=$!" >> "$GITHUB_ENV"
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:4399/health > evidence/deltadesk/health.json; then
+              break
+            fi
+            sleep 0.2
+          done
+          curl -fsS http://127.0.0.1:4399/health
+          curl -fsS -X POST http://127.0.0.1:4399/lab/reset > evidence/deltadesk/reset.json
+      - name: Execute DeltaDesk through real Semwright Chromium adapter
+        env:
+          LAUNCHWRIGHT_DELTADESK_ORIGIN: http://127.0.0.1:4399
+          LAUNCHWRIGHT_EVIDENCE_DIR: ${{ github.workspace }}/evidence/deltadesk
+        run: |
+          set -euo pipefail
+          cp acceptance/chromium_deltadesk.rs .ci-semwright/crates/adapters/tests/launchwright_deltadesk.rs
+          (
+            cd .ci-semwright
+            cargo test --locked -p semwright-adapters --test launchwright_deltadesk -- --ignored --nocapture
+          ) 2>&1 | tee evidence/deltadesk/semwright-browser.log
+          grep -q '^REAL_DELTADESK_BROWSER_ACCEPTANCE_PASS ' evidence/deltadesk/semwright-browser.log
+      - name: Bind real browser evidence to Launchwright
+        env:
+          SEMWRIGHT_CHECKOUT: ${{ github.workspace }}/.ci-semwright
+          DELTADESK_DRIVER_RECEIPT: ${{ github.workspace }}/evidence/deltadesk/semwright-deltadesk-driver.json
+        run: node scripts/verify-deltadesk-browser.mjs | tee evidence/deltadesk/launchwright-verifier.log
+      - name: Stop owned DeltaDesk fixture
+        if: always()
+        run: |
+          if [ -n "${DELTADESK_PID:-}" ]; then kill "$DELTADESK_PID" 2>/dev/null || true; fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: launchwright-deltadesk-${{ github.sha }}
+          path: evidence/deltadesk/
           if-no-files-found: error
           retention-days: 14
 

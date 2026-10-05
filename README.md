@@ -4,7 +4,7 @@
 
 Launchwright keeps product/build context, scenarios, claims, immutable release materials, verifier evidence, exact-candidate review, channel packages and recovery history in one application-owned workspace.
 
-> **Developer preview.** The repository deliberately does not claim that the complete private product specification has passed acceptance. Real product capture, canonical Project Graph/effects, Composition media rendering, Platform execution, remote teams and public Publish remain external Semwright integration boundaries until exact receipts prove otherwise.
+> **Developer preview.** The repository deliberately does not claim that the complete private product specification has passed acceptance. The owned DeltaDesk laboratory now has an exact Semwright Chromium interoperability lane, but Platform-admitted product capture, canonical Project Graph/effects, Composition media rendering, remote teams and public Publish remain external Semwright integration boundaries until exact receipts prove otherwise.
 
 ## Run locally
 
@@ -43,6 +43,7 @@ Synthetic data is never described as a real product capture.
 - bounded extension descriptors, discovery, retirement, source-profile preflight and compatibility locks without executing remote extension code;
 - bounded mobile import packages for PNG/JPEG screenshots and MP4 screen recordings with non-symlink package roots, path containment, exact SHA-256, container/dimension checks, build/device/OS/locale/origin/rights provenance, immutable asset artifacts and candidate/channel packaging while admission remains `imported-unverified` and technical state remains `UNKNOWN`;
 - a pinned Godot source profile bound to Semwright commit `4d291de…`, the canonical `semwright-godot-driver` and Godot 4.7.2, with logical project locators and exact runtime-pin preflight; generic CLI execution remains unavailable rather than falling back to an arbitrary shell;
+- an owned two-build DeltaDesk web laboratory with en-US/es-MX demo surfaces, role/plan availability changes and checkout-copy/layout drift, plus a fail-closed browser runtime contract pinned to the reviewed Semwright `chromium` provider and executable digest; the heavy `deltadesk` lane exercises that provider for real without inventing a Platform capture receipt;
 - versioned media plans with exact rational timing, source/claim pins, video/screenshot/interactive variants, per-variant reuse detection, sanitized interactive-source policy and independent technical/editorial state while canonical Composition remains the rendering authority;
 - bounded Publish product contracts: editable ReleaseTemplate drafts, immutable ProductVersion pins, deployment lifecycle, isolated consumer invocations, idempotent attempt keys and authority-free export/import with explicit local rebind/recheck; external activation still belongs to Platform Publish;
 - private-draft alias delivery with compare-and-swap;
@@ -57,7 +58,7 @@ The public `@semwright/native-sdk` source is vendored unchanged under its upstre
 - Native SDK `0.9.0-dev.1`
 - exact SHA-256 hashes for the redistributed SDK files/archive
 
-The canonical `NodeBridge` allows at most 48 KiB per owner-pinned executable bundle. Launchwright therefore maps all 66 public operations exactly once across seven bounded profiles (`core`, `production`, `review`, `integrations`, `work`, `media`, `publish`) instead of weakening that upstream limit. `scripts/build-native-bundle.mjs` hashes each exact bundle and rejects missing/duplicate operations or oversized output. `crates/launchwright-native` pins those seven hashes at build time. The caller cannot choose arbitrary executable code, mounts or runtime paths.
+The canonical `NodeBridge` allows at most 48 KiB per owner-pinned executable bundle. Launchwright therefore maps all 66 public operations exactly once across eight bounded profiles (`core`, `sources`, `production`, `review`, `integrations`, `work`, `media`, `publish`) instead of weakening that upstream limit. Source-profile reads have their own `sources` bundle so browser/Godot compatibility growth does not consume the main CRUD bridge headroom. `scripts/build-native-bundle.mjs` hashes each exact bundle and rejects missing/duplicate operations or oversized output. `crates/launchwright-native` pins all eight hashes at build time. The caller cannot choose arbitrary executable code, mounts or runtime paths.
 
 The optional Platform adapter consumes an owner-supplied byte-pinned package. The inspected Platform source is not licensed for redistribution, so it is not copied into this public repository.
 
@@ -67,7 +68,7 @@ Launchwright keeps **production, verification, review and delivery** separate.
 
 A successful capture contract can establish that an authorized receipt, readiness conditions, unique anchors and provenance were recorded; it does not establish semantic correctness or Driver Host acceptance. Generated/editorial/imported material is never eligible to stand in for observed product state, and a sanitized derivative only preserves that eligibility when its exact parent capture did and every declared transformation preserves observed state. A heuristic/model/local PASS remains effective UNKNOWN unless admitted by canonical verifier authority. A waiver records an exception but never turns FAIL into PASS. A channel package says bytes are ready; it does not mean they were uploaded or published. A local ReleaseTemplate/ProductVersion/deployment contract likewise does not prove a remote consumer job ran. Public activation requires a canonical Publish receipt.
 
-Local input-pin comparisons are not Project Graph completeness. Scenario effect declarations are not canonical effects. A `media_plan` and its Composition receipt ledger preserve handoff intent and provenance but are not a local AV renderer; VTT timing is not Composition rendering. Private editorial approval is not Host acceptance.
+Local input-pin comparisons are not Project Graph completeness. Scenario effect declarations are not canonical effects. Real execution of the reviewed Semwright Chromium adapter against owned DeltaDesk proves that interoperability path only; it is not a Platform job or admitted `capture.ingest` receipt. A `media_plan` and its Composition receipt ledger preserve handoff intent and provenance but are not a local AV renderer; VTT timing is not Composition rendering. Private editorial approval is not Host acceptance.
 
 ## Backup and recovery
 
@@ -90,11 +91,12 @@ node scripts/verify.mjs
 node src/main.mjs doctor --state .state
 ```
 
-GitHub Actions runs the supported Node 24.21 runtime on Linux, Windows and macOS. The manual heavy workflow has four independently selectable lanes:
+GitHub Actions runs the supported Node 24.21 runtime on Linux, Windows and macOS. The manual heavy workflow has five independently selectable lanes:
 
 - **native** — builds the pinned TypeScript SDK, native bundle and real Rust NativeDriver;
 - **browser** — installs Chromium on the runner and exercises the real Launchwright UI;
 - **godot** — checks out the exact reviewed Semwright SHA, verifies the pinned Godot 4.7.2 binary, runs the production Godot driver against the real engine, and binds that trace to Launchwright source-profile preflight without inventing Platform/Host authority;
+- **deltadesk** — starts the owned DeltaDesk A/B product, installs a disposable Chromium runtime, drives the real reviewed Semwright Chromium semantic adapter, retains exact PNG/receipt evidence and binds the observed runtime to Launchwright without claiming Platform capture admission;
 - **stress** — bounded high-volume persistence, observation and portable-restore acceptance.
 
 Run expensive dependencies on GitHub Actions rather than the development workstation.
@@ -107,6 +109,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [Native SDK integration](docs/NATIVE_SDK.md)
 - [Mobile import contract](docs/MOBILE_IMPORT.md)
 - [Godot source profile and real-engine lane](docs/GODOT_SOURCE.md)
+- [DeltaDesk owned browser laboratory](docs/DELTADESK_LAB.md)
 - [Known SDK/platform gaps](docs/SDK_GAPS.md)
 - [Storage and portability](docs/PORTABILITY.md)
 - [Operator runbook](docs/RUNBOOK.md)
