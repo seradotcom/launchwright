@@ -1,0 +1,18 @@
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: review: {"code":"Unsupported","message":"Operation is not exposed","outcome_known":true}
+
+false !== true
+
+    at file:///home/sergio/Documents/Projects/Launchwright/tests/bundle-smoke.mjs:46:10 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v22.22.0

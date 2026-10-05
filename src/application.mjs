@@ -12,6 +12,7 @@ import { PROFILE_MATRIX, validateExtensionManifest, validateCompatibilityLock } 
 import { freezeCandidate, buildCandidateGates, inspectCandidateState, recordCandidateReview, assertPrivateDeliveryReady, assertChannelPinned, assertPartialDeliveryPolicy } from './candidate.mjs';
 import { proposeChange, inspectChange, applyChange } from './change-proposal.mjs';
 import { getHistory, listHistory, diffHistory } from './history.mjs';
+import { createMediaPlan, reviseMediaPlan, inspectMediaPlan, recordMediaOutput, recordMediaReview } from './media.mjs';
 export const PLATFORM_ACTIONS = ['recipes.prepare','recipes.execute','jobs.get','jobs.cancel','jobs.reconcile','evidence.get','artifacts.get','graph.observe','graph.observation','publish.preflight','publish.define','publish.version','publish.deploy','publish.invoke','publish.result'];
 const PUBLICATION_ACTIONS = new Set(['publish.define','publish.version','publish.deploy','publish.invoke']);
 const READ_ACTIONS = new Set(['jobs.get','evidence.get','artifacts.get','graph.observation','publish.result']);
@@ -159,6 +160,7 @@ export class LaunchwrightApplication {
       case'compatibility.negotiate':return this.compatibilityNegotiate(input);
       case'compatibility.inspect':inputObject(input,['id']);return this.compatibilityInspect(input.id);
       case'change.inspect':inputObject(input,['id']);return inspectChange(this,input.id);
+      case'media.inspect':return inspectMediaPlan(this,input);
       case'artifact.read':{
         inputObject(input,['id']);const a=this.get(input.id,'artifact');const b=this.store.readBlob(a.data.sha256);
         ensure(b.bytes.length<=160000,'Use authenticated artifact download for this output','ResourceExhausted');return{artifact:a,text:b.bytes.toString('utf8')};
@@ -282,6 +284,10 @@ export class LaunchwrightApplication {
         return{entity:this.store.create('evidence',{...input,target_version:target.version,source_version:source.version,admission:'imported-declaration',technical:'UNKNOWN',host_acceptance:'NOT_ESTABLISHED',rights_basis:'operator-declaration',observed_at:iso()})};
       }
       case'capture.ingest':return recordCapture(this,input);
+      case'media.plan':return createMediaPlan(this,input);
+      case'media.revise':return reviseMediaPlan(this,input);
+      case'media.output_record':return recordMediaOutput(this,input);
+      case'media.review_record':return recordMediaReview(this,input);
       case'verification.record':{
         const data=validateVerification(input),candidate=this.get(data.candidate_id,'candidate');
         const artifactSet=new Set(candidate.data.manifest.artifact_ids);

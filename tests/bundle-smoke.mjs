@@ -11,15 +11,17 @@ const state=mkdtempSync(join(tmpdir(),'launchwright-bundle-'));
 const app=new LaunchwrightApplication(state,{initialize:true});
 const product=(await execute(app,'entity.create',{kind:'product',data:{name:'Native bundle smoke',description:'Synthetic local fixture'}})).entity;
 const release=(await execute(app,'entity.create',{kind:'release',data:{product_id:product.id,name:'0.0-smoke',build:'smoke-build',status:'draft'}})).entity;
+const candidate=app.store.create('candidate',{release_id:release.id,name:'Synthetic bundle smoke candidate'});
 app.close();
 
 const manifest=JSON.parse(readFileSync('dist/native-bundle.json','utf8'));
 const reads={
   core:['workspace-describe',{}],
   production:['release-coverage',{release_id:release.id}],
-  review:['channel-status',{release_id:release.id}],
-  integrations:['profile-matrix',{}],
-  work:['workspace-snapshot',{}]
+  review:['verification-summary',{candidate_id:candidate.id}],
+  integrations:['channel-status',{release_id:release.id}],
+  work:['workspace-snapshot',{}],
+  media:['media-inspect',{}]
 };
 const results={};
 
