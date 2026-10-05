@@ -18,7 +18,7 @@ Lost replies are recovered by request identity. Reusing an idempotency key with 
 
 ## Data model
 
-Mutable application resources have stable IDs, opaque generations and monotonic string revisions. Immutable outputs include artifacts, candidates, verification records, waivers, delivery receipts and impact proposals. Retirement preserves identity as a redacted tombstone instead of silently deleting history.
+Mutable application resources have stable IDs, opaque generations and monotonic string revisions. Immutable outputs include artifacts, candidates, verification records, waivers, delivery receipts, impact proposals, document change proposals and their application receipts. A document proposal is bound to the exact resource revision and payload digest it was created from; newer edits make it stale instead of being force-overwritten. Human-owned CopyBlocks and whole-document proposals require explicit human acknowledgement before application. Retirement preserves identity as a redacted tombstone instead of silently deleting history.
 
 Artifacts store exact SHA-256-addressed bytes. Candidate v2 freezes artifact hashes plus media metadata, target fingerprints, protected input revisions, claims, ReleaseContract, selected localization/glossary revisions, channel profiles, declared rights, destination and review policy. A protected change makes the old candidate stale rather than silently updating it.
 
