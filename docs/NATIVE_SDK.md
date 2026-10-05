@@ -1,6 +1,6 @@
 # Canonical Semwright Native SDK integration
 
-Launchwright pins Semwright commit `4d291de26724810017ce7b6d185326514cb79fa6` and Native SDK `0.9.0-dev.1`. Exact public SDK source hashes are in `../SOURCE_LOCK.json`. The pin was rechecked against `origin/main` on 2026-10-04 and matched the current Semwright main SHA.
+Launchwright pins Semwright commit `4d291de26724810017ce7b6d185326514cb79fa6` and Native SDK `0.9.0-dev.1`. Exact public SDK source hashes are in `../SOURCE_LOCK.json`. The pin was rechecked against Semwright `main` on 2026-10-05 and matched the current remote main SHA.
 
 The JavaScript application imports the real `@semwright/native-sdk` package for application contexts, exact request digests, JSON budgets, cancellation, observations, recovery and dispatch. The vendored SDK keeps its upstream MIT OR Apache-2.0 licensing.
 
@@ -10,15 +10,15 @@ The canonical `NodeBridge` limits an owner-pinned executable bundle to 48 KiB an
 
 | Profile | Operations | Local compacted bytes | Purpose |
 | --- | ---: | ---: | --- |
-| `core` | 13 | 45,304 | workspace/entity/history reads, entity CRUD, change proposals and template instantiation |
-| `production` | 9 | 45,504 | coverage/impact, relations, evidence, capture-contract ingestion and text rendering |
-| `review` | 9 | 49,056 | candidate, verification, waiver and channel-package lifecycle |
-| `integrations` | 12 | 38,684 | localization, source-profile preflight, extension descriptors, compatibility locks and channel status |
-| `work` | 6 | 31,627 | snapshot summary and Platform-intent custody/recovery |
-| `media` | 5 | 39,558 | media-plan inspection/revision and Composition output/editorial receipt custody |
-| `publish` | 10 | 48,058 | ReleaseTemplate/ProductVersion/deployment/invocation contracts and authority-free export/import |
+| `core` | 13 | 46,064 | workspace/entity/history/event reads, entity CRUD, change proposals and template instantiation |
+| `production` | 9 | 45,505 | coverage/impact, relations, evidence, capture-contract ingestion and text rendering |
+| `review` | 9 | 49,057 | candidate, verification, waiver and channel-package lifecycle |
+| `integrations` | 12 | 38,685 | localization, source-profile preflight, extension descriptors, compatibility locks and channel status |
+| `work` | 6 | 31,628 | snapshot summary and Platform-intent custody/recovery |
+| `media` | 5 | 39,559 | media-plan inspection/revision and Composition output/editorial receipt custody |
+| `publish` | 10 | 48,059 | ReleaseTemplate/ProductVersion/deployment/invocation contracts and authority-free export/import |
 
-The byte counts above are workstation build evidence, not Driver Host acceptance. The review bundle has only 96 bytes of workstation headroom and must not grow without repartitioning/minification; the new Publish surface is isolated in its own profile rather than weakening or bypassing the limit.
+The byte counts above are workstation build evidence, not Driver Host acceptance. The review bundle has only 95 bytes of workstation headroom and must not grow without repartitioning/minification; the Publish surface remains isolated in its own profile and the event contract fits in `core` without weakening or bypassing the limit.
 
 `scripts/build-native-bundle.mjs` refuses to build if an operation is missing, duplicated or if any compacted profile exceeds the canonical 48 KiB maximum. It emits a manifest containing the exact SHA-256 and byte count of every profile. The Rust driver pins all seven hashes at build time and maps each `driver.launchwright.*` operation to exactly one `NodeBridge`.
 

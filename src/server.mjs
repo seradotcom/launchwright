@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { randomBytes, timingSafeEqual, randomUUID } from 'node:crypto';
 import { NativeError, dispatchApplication, applicationContext, requireCondition as ensure, object, validateValue } from '@semwright/native-sdk';
-import { OPERATION_SCOPES, READ_OPERATIONS, makeRequest, str, idText } from './contracts.mjs';
+import { OPERATION_SCOPES, READ_OPERATIONS, RESOURCE, makeRequest, str, idText } from './contracts.mjs';
 import { buildPrivateChannelBundle } from './channel-bundle.mjs';
 const CODE=dirname(dirname(fileURLToPath(import.meta.url)));
 const statusFor={InvalidArgument:400,PermissionDenied:403,PolicyDenied:403,ConsentRequired:403,NotFound:404,StaleReference:409,Conflict:409,ResourceExhausted:413,Unavailable:503,Unsupported:501};
@@ -42,6 +42,10 @@ export function createAppServer(app,{token=localToken(app.store.root),port=4317}
       ensure(equal(bearer,token)||equal(cookie,token),'Unlock this local workspace with its session token','PermissionDenied');
       const call=(operation,input)=>dispatchApplication(app,'invoke',operation,input,applicationContext(randomUUID(),null));
       if(path==='/api/v1/describe'&&req.method==='GET'){json(res,200,await call('workspace.describe',{}));return;}
+      if(path==='/api/v1/discovery'&&req.method==='GET'){
+        const d=await call('workspace.describe',{});
+        json(res,200,{schema_version:'launchwright-http-discovery/1',app:d.app,version:d.version,native_sdk:d.native_sdk,workspace_version:d.workspace_version,operations:d.operations,limits:d.limits,routes:{describe:'/api/v1/describe',discovery:'/api/v1/discovery',read:'/api/v1/read',observe:'/api/v1/observe',events:'/api/v1/events',prepare:'/api/v1/prepare',invoke:'/api/v1/invoke',recover:'/api/v1/recover'},observation:{resource:RESOURCE,snapshot_bound:true},events:{schema_version:'launchwright-event-page/2',snapshot_watermark:true,dedupe_key:'id'},authority:{domain:'launchwright-application',native_host_acceptance:false,platform_execution:false}});return;
+      }
       if(req.method==='GET'&&/^\/api\/v1\/artifacts\/[a-z0-9_-]+\/download$/.test(path)){
         app.allow('read');const id=path.split('/')[4];idText(id);const artifact=app.get(id,'artifact');const bytes=app.store.readBlob(artifact.data.sha256);
         res.writeHead(200,{'Content-Type':bytes.mime,'Content-Disposition':`attachment; filename="${artifact.id}.${artifact.data.extension}"`,'Content-Length':bytes.bytes.length,'Cache-Control':'no-store','ETag':`"${artifact.data.sha256}"`});res.end(bytes.bytes);return;
@@ -52,6 +56,7 @@ export function createAppServer(app,{token=localToken(app.store.root),port=4317}
       }
       ensure(req.method==='POST','Route not found','NotFound');const data=await body(req);
       if(path==='/api/v1/read'){object(data,['operation','input'],['operation','input']);ensure(READ_OPERATIONS.has(data.operation),'This route accepts only read operations');json(res,200,await call(data.operation,data.input));}
+      else if(path==='/api/v1/events')json(res,200,await call('events.list',data));
       else if(path==='/api/v1/observe')json(res,200,await dispatchApplication(app,'observe',null,data,applicationContext(randomUUID())));
       else if(path==='/api/v1/recover')json(res,200,await dispatchApplication(app,'lookup',null,data,applicationContext(randomUUID())));
       else if(path==='/api/v1/prepare'){

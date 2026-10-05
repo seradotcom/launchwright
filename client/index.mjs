@@ -16,6 +16,7 @@ export class LaunchwrightClient {
     finally{clearTimeout(timer);}
   }
   describe(){return this.request('/api/v1/describe',undefined,'GET');}
+  discovery(){return this.request('/api/v1/discovery',undefined,'GET');}
   get(id){return this.request('/api/v1/read',{operation:'resource.get',input:{id}});}
   read(operation,input={}){return this.request('/api/v1/read',{operation,input});}
   snapshotSummary(){return this.read('workspace.snapshot');}
@@ -30,6 +31,8 @@ export class LaunchwrightClient {
   negotiateCompatibility(input){return this.read('compatibility.negotiate',input);}
   compatibilityInspect(id){return this.read('compatibility.inspect',{id});}
   publishInspect(input){return this.read('publish.inspect',input);}
+  events({after=0,limit=50,watermark}={}){return this.request('/api/v1/events',{after,limit,...(watermark===undefined?{}:{watermark})});}
+  async *eventPages({after=0,limit=50,watermark,maxPages=100}={}){let cursor=after,snapshot=watermark;for(let n=0;n<maxPages;n++){const page=await this.events({after:cursor,limit,...(snapshot===undefined?{}:{watermark:snapshot})});if(snapshot===undefined)snapshot=page.watermark;yield page;if(page.complete)return;if(page.next_after===null)throw new LaunchwrightError({code:'ProtocolMismatch',message:'Incomplete event page has no cursor',outcome_known:true});cursor=page.next_after;}throw new LaunchwrightError({code:'ResourceExhausted',message:'Event page budget reached; resume explicitly',outcome_known:true});}
   observe(scope='all',cursor=null,limit=64){return this.request('/api/v1/observe',{resource:'launchwright:workspace',scope,cursor,limit});}
   async *pages(scope='all',{limit=64,maxPages=100}={}){let cursor=null;for(let n=0;n<maxPages;n++){const p=await this.observe(scope,cursor,limit);yield p;if(p.complete)return;if(!p.next)throw new LaunchwrightError({code:'ProtocolMismatch',message:'Incomplete observation has no cursor',outcome_known:true});cursor=p.next;}throw new LaunchwrightError({code:'ResourceExhausted',message:'Observation page budget reached; resume explicitly',outcome_known:true});}
   async inventory(){const entities=[];let version=null;for await(const page of this.pages()){version=page.version;entities.push(...page.items);}return{entities,version};}
@@ -45,4 +48,5 @@ export class LaunchwrightClient {
   async recover(prepared){return this.request('/api/v1/recover',prepared.args.request);}
   artifactUrl(id){return this.baseUrl+'/api/v1/artifacts/'+encodeURIComponent(id)+'/download';}
   channelBundleUrl(id){return this.baseUrl+'/api/v1/channel-deliveries/'+encodeURIComponent(id)+'/bundle.zip';}
+  deepLink(section,id=null){const part=String(section??'');if(!/^[a-z][a-z0-9-]{0,31}$/.test(part))throw new LaunchwrightError({code:'InvalidArgument',message:'Invalid Launchwright section',outcome_known:true});const base=this.baseUrl||(globalThis.location?.origin??'');if(!base)throw new LaunchwrightError({code:'InvalidArgument',message:'Deep links require an absolute base URL outside the browser',outcome_known:true});const url=new URL(base.endsWith('/')?base:base+'/');url.hash=part+(id?'/'+encodeURIComponent(String(id)):'');return url.toString();}
 }
