@@ -4,7 +4,8 @@ import { NativeError, applicationContext, dispatchApplication, requireCondition 
 import { Store } from './store.mjs';
 import { APP_VERSION, RESOURCE, KINDS, EDITABLE, RIGHTS, CLASSES, OPERATION_SCOPES, validateEntity, inputObject, idText, str, lines, array, choice, sha, digest, makeRequest, iso, noSecrets } from './contracts.mjs';
 import { renderText } from './render.mjs';
-import { validateCapture, validateVerification, validateWaiver, validateChannelPackage, validateChannelOutcome } from './records.mjs';
+import { validateVerification, validateWaiver, validateChannelPackage, validateChannelOutcome } from './records.mjs';
+import { recordCapture } from './capture.mjs';
 import { snapshotSummary } from './snapshot.mjs';
 import { validateLocalization, assessLocalization } from './localization.mjs';
 import { PROFILE_MATRIX, validateExtensionManifest, validateCompatibilityLock } from './extensions.mjs';
@@ -280,17 +281,7 @@ export class LaunchwrightApplication {
         if(input.job_id)str(input.job_id,96);
         return{entity:this.store.create('evidence',{...input,target_version:target.version,source_version:source.version,admission:'imported-declaration',technical:'UNKNOWN',host_acceptance:'NOT_ESTABLISHED',rights_basis:'operator-declaration',observed_at:iso()})};
       }
-      case'capture.ingest':{
-        const data=validateCapture(input);
-        const release=this.get(data.release_id,'release'),target=this.get(data.target_id,'target'),source=this.get(data.source_id,'source'),scenario=this.get(data.scenario_id,'scenario');
-        ensure(target.data.release_id===release.id&&scenario.data.release_id===release.id,'Capture target or scenario belongs to another release','PermissionDenied');
-        ensure(source.data.product_id===release.data.product_id&&scenario.data.source_id===source.id&&scenario.data.target_id===target.id,'Capture source/scenario binding mismatch','PermissionDenied');
-        ensure(source.data.approval==='approved','Capture source is not approved for execution','PermissionDenied');
-        ensure(data.build===release.data.build,'Capture build differs from the release build','Conflict');
-        if(data.receipt.build_observation!==undefined)ensure(data.receipt.build_observation===data.build,'Capture receipt observed another build','Conflict');
-        const admission=data.receipt.authority==='imported'?'imported-declaration':'semwright-receipt-recorded';
-        return{entity:this.store.create('evidence',{release_id:release.id,target_id:target.id,source_id:source.id,scenario_id:scenario.id,name:data.name,build:data.build,classification:data.classification,rights:data.rights,description:'Capture receipt for '+scenario.data.name,origin_digest:digest('capture-receipt',data.receipt),evidence_type:'capture',capture_state:data.receipt.outcome,receipt:data.receipt,observations:data.observations,segments:data.segments??[],target_version:target.version,source_version:source.version,scenario_version:scenario.version,admission,technical:'UNKNOWN',host_acceptance:'NOT_ESTABLISHED',rights_basis:'operator-declaration',started_at:data.started_at,finished_at:data.finished_at,observed_at:data.finished_at})};
-      }
+      case'capture.ingest':return recordCapture(this,input);
       case'verification.record':{
         const data=validateVerification(input),candidate=this.get(data.candidate_id,'candidate');
         const artifactSet=new Set(candidate.data.manifest.artifact_ids);

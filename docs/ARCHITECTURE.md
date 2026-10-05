@@ -26,7 +26,7 @@ Artifacts store exact SHA-256-addressed bytes. Candidate v2 freezes artifact has
 
 ## Capture and verification
 
-`capture.ingest` records a Semwright/native/imported execution receipt against an approved source, exact build, target and scenario. It is provenance. Its technical state remains UNKNOWN until a verifier with the required authority establishes otherwise.
+`capture.ingest` records a versioned Launchwright capture contract against an approved source, exact build, target and scenario. Observed capture classes require Platform-job correlation plus a native receipt digest, successful runs require READY checks and exact scenario-anchor cardinality, mutable scenarios require scoped isolation, cleanup cannot remove resources outside the run-owned set, and before/after build observations fail on drift. Sanitized derivatives retain an exact parent-capture relation; generated/editorial/imported material is explicitly ineligible to represent observed product state. This is still provenance, not Host acceptance: technical state remains UNKNOWN until a verifier with the required authority establishes otherwise.
 
 `verification.record` stores verifier identity/version/digest, dimension, coverage, omissions and findings. A PASS is effective only when the caller was provisioned with canonical verifier admission and the record is admitted as canonical. FAIL/ERROR remain failures. A waiver annotates a failure and never rewrites its state.
 
