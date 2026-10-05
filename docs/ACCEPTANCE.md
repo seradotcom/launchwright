@@ -7,12 +7,13 @@ This ledger separates implemented behavior from execution evidence. A PASS belon
 Current pass, before commit:
 
 - Node: 22.22.0 — **outside** the Native SDK supported engine.
-- `npm test`: **144 passed, 0 failed, 0 skipped**. Exact TAP output is retained in `evidence/workstation-mobile-import-pass.tap`.
-- `node scripts/verify.mjs`: source-lock integrity, public-client isolation and syntax PASS; **72 JavaScript modules and 66 Native driver operations** checked. Output is retained in `evidence/workstation-mobile-import-verify.json`.
-- Native profile build: **66/66 public operations assigned exactly once** across seven compacted canonical bridge bundles. Exact local sizes are core **44,559**, production **44,001**, review **47,553**, integrations **48,283**, work **30,126**, media **38,048**, publish **46,552** bytes. The canonical 49,152-byte NodeBridge limit was not raised or bypassed; the narrowest current headroom is 869 bytes in `integrations`.
-- Multi-profile canonical bridge smoke: **PASS** for `core`, `production`, `review`, `integrations`, `work`, `media` and `publish`; exact bundle SHA-256 values were rechecked before execution and all seven invocation frames stayed within the canonical combined-input budget. Output is retained in `evidence/workstation-mobile-import-bundle-smoke.json`. This is not Driver Host isolation acceptance.
+- `npm test`: **148 passed, 0 failed, 0 skipped**. Exact TAP output is retained in `evidence/workstation-godot-profile-pass.tap`.
+- `node scripts/verify.mjs`: source-lock integrity, application/public-client version alignment, public-client isolation and syntax PASS; **75 JavaScript modules and 66 Native driver operations** checked. Output is retained in `evidence/workstation-godot-profile-verify.json`.
+- Native profile build: **66/66 public operations assigned exactly once** across seven compacted canonical bridge bundles. Exact local sizes are core **47,758**, production **44,001**, review **47,553**, integrations **47,068**, work **30,126**, media **38,048**, publish **46,552** bytes. The canonical 49,152-byte NodeBridge limit was not raised or bypassed; the narrowest current headroom is 1,394 bytes in `core`. Source-profile matrix/preflight now live in `core`, leaving 2,084 bytes of headroom in `integrations`.
+- Multi-profile canonical bridge smoke: **PASS** for `core`, `production`, `review`, `integrations`, `work`, `media` and `publish`; exact bundle SHA-256 values were rechecked before execution and all seven invocation frames stayed within the canonical combined-input budget. Output is retained in `evidence/workstation-godot-profile-bundle-smoke.json`. This is not Driver Host isolation acceptance.
 - Public-client clean-room: **PASS**. `client/` was packed as `@launchwright/client`, installed into a fresh temporary project containing no Launchwright application modules, then used to negotiate discovery and create/read a Product through the public HTTP surface. Unsupported discovery/API versions and absent required operations fail with `Unsupported`. This is package-boundary evidence only; no registry publication or external host acceptance is claimed.
 - Mobile import/application profile: **PASS** on synthetic owned fixtures. The local ingestor rejects traversal and digest/build mismatches, validates bounded PNG/JPEG/MP4 metadata, stages exact content-addressed bytes, records `imported-unverified` evidence plus immutable artifacts, and packages those artifacts through a pinned ChannelProfile while technical/native-capture state remains `UNKNOWN`/false. Rights `unknown` remains `PENDING_RIGHTS`. This does not establish a real Android/iOS runner or device capture.
+- Godot source-profile contract: **PASS** on application fixtures. Exact Semwright SHA, driver version, Godot 4.7.2 binary digest, logical `godot://project/<id>` locator, source approval and build match are required before `ready_for_native_execution` can become true. The generic CLI profile remains fail-closed even if a caller declares local execution authority. This local PASS does **not** establish real Godot execution; the separate heavy `godot` lane must do that on a disposable runner.
 - Clean CLI drill: init → synthetic demo → portable snapshot → restore to a new state directory → doctor PASS.
 - Restore drill confirmed a new workspace generation, advanced request epoch and no activation of historical mutation receipts.
 - Independent `unzip -t` validation of a generated private bundle: **PASS**; exact channel manifest, candidate manifest, artifact bytes and review notice were all readable.
@@ -28,6 +29,7 @@ The manual heavy workflow provides independent lanes:
 
 - **native**: build the pinned canonical TypeScript SDK, generate/hash all seven bounded bridge profiles, compile/test the real Rust NativeDriver, and run a bridge smoke against each profile.
 - **browser**: install Chromium on a disposable GitHub runner and exercise the real Launchwright UI.
+- **godot**: check out exact Semwright `4d291de26724810017ce7b6d185326514cb79fa6`, verify the official Godot 4.7.2 Linux binary digest, build the production Semwright Godot driver, run its real-editor E2E harness and bind the resulting trace to Launchwright preflight while keeping Platform/capture/Host claims false.
 - **stress**: create a bounded high-volume workspace, page observations, export a portable snapshot, restore it and verify row continuity.
 
 Exact run IDs and SHA are recorded here only after completion.
@@ -41,7 +43,7 @@ Durable identity/revisions; exact archived entity history with get/list/diff; ex
 - canonical Driver Host isolation/acceptance of Launchwright;
 - live production Platform execution, budgets or billing;
 - canonical Project Graph/effects coverage;
-- real browser capture, real Android/iOS runner/device capture, or real Godot product capture;
+- real browser capture, real Android/iOS runner/device capture, or admitted real Godot product capture (the heavy Godot interoperability lane is a separate prerequisite, not capture admission);
 - Composition video/audio rendering and final-media verification;
 - remote tenant/team authentication and canonical shared approvals;
 - external public/cross-account Platform Publish execution, consumer job/output ACL acceptance, metering and destination activation;

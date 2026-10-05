@@ -10,6 +10,7 @@ import { recordCapture } from './capture.mjs';
 import { snapshotSummary } from './snapshot.mjs';
 import { validateLocalization, assessLocalization } from './localization.mjs';
 import { PROFILE_MATRIX, validateExtensionManifest, validateCompatibilityLock } from './extensions.mjs';
+import { profilePreflight as runProfilePreflight } from './source-profiles.mjs';
 import { freezeCandidate, buildCandidateGates, inspectCandidateState, recordCandidateReview, assertPrivateDeliveryReady, assertChannelPinned, assertPartialDeliveryPolicy } from './candidate.mjs';
 import { proposeChange, inspectChange, applyChange } from './change-proposal.mjs';
 import { getHistory, listHistory, diffHistory } from './history.mjs';
@@ -84,19 +85,7 @@ export class LaunchwrightApplication {
     scope_mode:'local-single-owner',principal:this.principal,scopes:[...this.scopes],native_sdk:'0.9.0-dev.1',operations:Object.entries(OPERATION_SCOPES).map(([name,scope])=>({name,scope,read_only:READ_OPERATIONS.has(name)})),
     capabilities:{editorial_text_exports:'available',durable_entity_history:this.store.hasHistory?'available':'migration-required',private_draft_delivery:'available',portable_snapshot_restore:'available-local-admin',declared_release_contracts:'available',localization_ledger:'available-layout-quality-not-inferred',extension_descriptors:'available-no-remote-code',compatibility_negotiation:'available',profile_preflight:'available-contract-only',state_anchors:'contract-and-assessment-only',impact_proposals:'available-no-execution-authority',document_change_proposals:'available-application-local-no-auto-merge',capture_receipts:'available-provenance-only',verification_ledger:'available-canonical-pass-requires-admission',waivers:'available-never-overwrite-verifier-state',channel_packages:'available-no-send',native_driver_host:'requires-owner-pinned-bundle-and-broker',platform:this.capabilities.platform??'not-connected',canonical_graph:'requires-platform-observation',browser_capture:'requires-canonical-driver-recipe',media_render:'requires-composition-recipe',mobile:'provenance-import-only',public_delivery:'requires-canonical-publish-receipt',...this.capabilities},
     limits:{page_items:128,reply_bytes:256*1024,artifact_bytes:1024*1024,receipt_epoch_items:20000},disclosure:'Local editorial checks are not Platform approvals or canonical effect verification.'};}
-  profilePreflight(input){
-    inputObject(input,['profile','source_id','target_id'],['profile','source_id']);str(input.profile,64);
-    const profile=PROFILE_MATRIX[input.profile];ensure(profile,'Unknown source profile','NotFound');
-    const source=this.get(input.source_id,'source');let target=null,release=null;
-    if(input.target_id){target=this.get(input.target_id,'target');release=this.get(target.data.release_id,'release');ensure(release.data.product_id===source.data.product_id,'Source and target belong to different products','PermissionDenied');}
-    const checks=[
-      {name:'source-type',state:profile.source_types.includes(source.data.type)?'PASS':'FAIL',detail:source.data.type},
-      {name:'source-purpose',state:source.data.approval==='approved'?'PASS':input.profile==='mobile-import'||input.profile==='document'?'UNKNOWN':'FAIL',detail:source.data.approval??'undeclared'},
-      {name:'build-match',state:release?source.data.build===release.data.build?'PASS':'FAIL':'UNKNOWN',detail:release?{source:source.data.build,release:release.data.build}:'target-not-supplied'},
-      {name:'execution-authority',state:this.capabilities.profile_execution?.[input.profile]==='available'?'PASS':'UNKNOWN',detail:profile.execution}
-    ];
-    return{profile:input.profile,contract:profile,source_id:source.id,target_id:target?.id??null,checks,ready_for_native_execution:checks.every(c=>c.state==='PASS')&&profile.execution!=='import-only',import_only:profile.execution==='import-only',note:'Preflight validates Launchwright contracts only; tool presence, permissions and Host isolation require the owning runtime.'};
-  }
+  profilePreflight(input){return runProfilePreflight(this,input);}
   extensionDiscovery(input){
     inputObject(input,['type','include_retired'],[]);if(input.type!==undefined)choice(input.type,['source_adapter','deliverable_renderer','channel_adapter','verifier_profile']);if(input.include_retired!==undefined)ensure(typeof input.include_retired==='boolean','include_retired must be boolean');
     const items=this.list('extension_package').filter(e=>(!input.type||e.data.type===input.type)&&(input.include_retired||e.data.status==='active')).map(e=>({id:e.id,version:e.version,name:e.data.name,type:e.data.type,package_version:e.data.package_version,schema_major:e.data.schema_major,digest:e.data.digest,license:e.data.license,permissions:e.data.permissions,inputs:e.data.inputs,outputs:e.data.outputs,preconditions:e.data.preconditions,evidence:e.data.evidence,limits:e.data.limits,status:e.data.status,admission:e.data.admission}));

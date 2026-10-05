@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "source_sha": null,
+  "schema_version": "launchwright-native-bundles/2",
+  "profiles": {
+    "core": {
+      "sha256": "e6944587e907258fb3cca560589d8b2ae81a6f88f370be966dda5f831df64e24",
+      "bytes": 47758,
+      "operation": "driver.launchwright.workspace-describe"
+    },
+    "production": {
+      "sha256": "f9e53953c077efcbb497f9cb3d7aff625074bb11f32d9d3753a67e92768163de",
+      "bytes": 44001,
+      "operation": "driver.launchwright.release-coverage"
+    },
+    "review": {
+      "sha256": "bbb265d83e01e2c2399765bbe4ba39044016b3879c4742f7f1f6eea8d18e5cd4",
+      "bytes": 47553,
+      "operation": "driver.launchwright.verification-summary"
+    },
+    "integrations": {
+      "sha256": "40c9720d3deb7db019976413db51673eb924934ca463a22a48f038bfb5dc313b",
+      "bytes": 47068,
+      "operation": "driver.launchwright.channel-status"
+    },
+    "work": {
+      "sha256": "62bf7cb01b026b595f3b609bd4cea167b7d86e59b5191883187da2283dae7d93",
+      "bytes": 30126,
+      "operation": "driver.launchwright.workspace-snapshot"
+    },
+    "media": {
+      "sha256": "f12da7a7ed9f63cd74f5bf3a2c63beb4c7757dbedb1c53a1135e002331903b56",
+      "bytes": 38048,
+      "operation": "driver.launchwright.media-inspect"
+    },
+    "publish": {
+      "sha256": "2d753a5b250d846291cfafb39e64b9ce243869b855ae84bb827faa7f06711876",
+      "bytes": 46552,
+      "operation": "driver.launchwright.publish-inspect"
+    }
+  },
+  "canonical_bridge_reply": "semwright-native-app-bridge/1",
+  "driver_host_isolation_accepted": false
+}

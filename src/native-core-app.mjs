@@ -6,17 +6,18 @@ import { KINDS, EDITABLE, validateEntity, inputObject, idText, str, lines, choic
 import { proposeChange, inspectChange, applyChange } from './change-proposal.mjs';
 import { getHistory, listHistory, diffHistory } from './history.mjs';
 import { listEvents } from './events.mjs';
+import { PROFILE_MATRIX, profilePreflight as runProfilePreflight } from './source-profiles.mjs';
 
 export const CORE_NATIVE_OPERATIONS=Object.freeze([
-  'workspace.describe','resource.get','events.list','history.get','history.list','history.diff','change.inspect',
+  'workspace.describe','resource.get','events.list','history.get','history.list','history.diff','change.inspect','profile.matrix','profile.preflight',
   'entity.create','entity.update','entity.retire','change.propose','change.apply','template.instantiate'
 ]);
-const CORE_NATIVE_READS=new Set(['workspace.describe','resource.get','events.list','history.get','history.list','history.diff','change.inspect']);
+const CORE_NATIVE_READS=new Set(['workspace.describe','resource.get','events.list','history.get','history.list','history.diff','change.inspect','profile.matrix','profile.preflight']);
 const driverName=operation=>'driver.launchwright.'+operation.replaceAll('.','-');
 
 export class CoreNativeApplication {
-  constructor(root,{readOnly=false,principal='native-host-delegate'}={}) {
-    this.store=new Store(root,{readOnly});this.principal=str(principal,128);
+  constructor(root,{readOnly=false,principal='native-host-delegate',capabilities={}}={}) {
+    this.store=new Store(root,{readOnly});this.principal=str(principal,128);this.capabilities=capabilities;
     this.operations=new Map(CORE_NATIVE_OPERATIONS.map(operation=>[driverName(operation),(raw,context)=>{
       const read=CORE_NATIVE_READS.has(operation);
       object(raw,read?['ref','input']:['ref','request','input'],read?['ref','input']:['ref','request','input']);text(raw.ref,4096,'canonical reference');
@@ -61,6 +62,8 @@ export class CoreNativeApplication {
     if(op==='history.list')return listHistory(this,input);
     if(op==='history.diff')return diffHistory(this,input);
     if(op==='change.inspect'){inputObject(input,['id']);return inspectChange(this,input.id);}
+    if(op==='profile.matrix'){inputObject(input,[]);return{profiles:PROFILE_MATRIX,execution_proof:false};}
+    if(op==='profile.preflight')return runProfilePreflight(this,input);
     throw new NativeError('Unsupported','Operation is outside this native profile');
   }
   mutate(op,input){

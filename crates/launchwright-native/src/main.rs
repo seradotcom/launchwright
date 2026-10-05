@@ -242,13 +242,13 @@ const OPERATIONS: &[Operation] = &[
         suffix: "profile-matrix",
         read: true,
         consent: false,
-        profile: Profile::Integrations,
+        profile: Profile::Core,
     },
     Operation {
         suffix: "profile-preflight",
         read: true,
         consent: false,
-        profile: Profile::Integrations,
+        profile: Profile::Core,
     },
     Operation {
         suffix: "extension-discovery",
@@ -556,7 +556,7 @@ mod tests {
         for spec in OPERATIONS {
             assert!(names.insert(spec.suffix));
         }
-        assert_eq!(names.len(), 64);
+        assert_eq!(names.len(), 66);
     }
     #[test]
     fn profile_partition_counts_are_stable() {
@@ -564,7 +564,7 @@ mod tests {
         for spec in OPERATIONS {
             *counts.entry(spec.profile).or_insert(0usize) += 1;
         }
-        assert_eq!(counts.get(&Profile::Core), Some(&13));
+        assert_eq!(counts.get(&Profile::Core), Some(&15));
         assert_eq!(counts.get(&Profile::Production), Some(&9));
         assert_eq!(counts.get(&Profile::Review), Some(&9));
         assert_eq!(counts.get(&Profile::Integrations), Some(&12));

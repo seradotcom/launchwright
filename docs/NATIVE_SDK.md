@@ -10,15 +10,15 @@ The canonical `NodeBridge` limits an owner-pinned executable bundle to 48 KiB an
 
 | Profile | Operations | Local compacted bytes | Purpose |
 | --- | ---: | ---: | --- |
-| `core` | 13 | 44,559 | workspace/entity/history/event reads, entity CRUD, change proposals and template instantiation |
+| `core` | 15 | 47,758 | workspace/entity/history/event reads, source-profile matrix/preflight, entity CRUD, change proposals and template instantiation |
 | `production` | 9 | 44,001 | coverage/impact, relations, evidence, capture-contract ingestion and text rendering |
 | `review` | 9 | 47,553 | candidate, verification, waiver and channel-package lifecycle |
-| `integrations` | 14 | 48,283 | localization, source-profile preflight, extension descriptors, compatibility locks, mobile import/inspection and channel status |
+| `integrations` | 12 | 47,068 | localization, extension descriptors, compatibility locks, mobile import/inspection and channel status |
 | `work` | 6 | 30,126 | snapshot summary and Platform-intent custody/recovery |
 | `media` | 5 | 38,048 | media-plan inspection/revision and Composition output/editorial receipt custody |
 | `publish` | 10 | 46,552 | ReleaseTemplate/ProductVersion/deployment/invocation contracts and authority-free export/import |
 
-The byte counts above are workstation build evidence, not Driver Host acceptance. The narrowest current workstation headroom is 869 bytes in `integrations`. Operation metadata is isolated in `src/operations.mjs` so validation-heavy profiles do not pull the full operation table through `contracts.mjs`; this recovered bundle margin without weakening validation or changing the canonical bridge limits.
+The byte counts above are workstation build evidence, not Driver Host acceptance. The narrowest current workstation headroom is 1,394 bytes in `core`. Read-only source-profile matrix/preflight moved from `integrations` to `core` so the mobile/localization bundle retains 2,084 bytes of margin; the public operation names and application protocol did not change. Operation metadata remains isolated in `src/operations.mjs`; no canonical bridge limit was raised or bypassed.
 
 `scripts/build-native-bundle.mjs` refuses to build if an operation is missing, duplicated or if any compacted profile exceeds the canonical 48 KiB maximum. It emits a manifest containing the exact SHA-256 and byte count of every profile. The Rust driver pins all seven hashes at build time and maps each `driver.launchwright.*` operation to exactly one `NodeBridge`.
 
