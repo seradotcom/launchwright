@@ -4,7 +4,7 @@ import { randomUUID, createHash } from 'node:crypto';
 import { mkdirSync, existsSync, lstatSync, chmodSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { NativeError, requireCondition as ensure, sameVersion, validateValue } from '@semwright/native-sdk';
-import { RESOURCE, iso } from './contracts.mjs';
+import { RESOURCE, iso } from './base.mjs';
 export class Store {
   constructor(root, { readOnly = false, initialize = false } = {}) {
     this.root = resolve(root); this.readOnly = readOnly;

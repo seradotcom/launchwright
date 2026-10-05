@@ -6,7 +6,8 @@ import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { dispatchApplication, applicationContext, exactRequestDigest, validateValue, NativeError } from '@semwright/native-sdk';
 import { nativeApplication } from '../src/native-entry.mjs';
-import { makeRequest, RESOURCE } from '../src/contracts.mjs';
+import { makeRequest, RESOURCE, OPERATION_SCOPES } from '../src/contracts.mjs';
+import { NATIVE_PROFILES } from '../src/native-profiles.mjs';
 import { setup } from './helpers.mjs';
 
 test('vendored public Native SDK source files match the canonical archive lock',()=>{const lock=JSON.parse(readFileSync('SOURCE_LOCK.json','utf8'));for(const[name,expected]of Object.entries(lock.native_sdk.files)){const actual=createHash('sha256').update(readFileSync('vendor/semwright-native-sdk/'+name)).digest('hex');assert.equal(actual,expected,name);}assert.equal(lock.native_sdk.sha,'4d291de26724810017ce7b6d185326514cb79fa6');});
@@ -15,3 +16,5 @@ test('actual canonical bridge emits one valid reply frame in a separate Node pro
 test('bridge rejects bad schema before opening an uninitialized data root',()=>{const frame={schema_version:'not-semantic-sdk',id:'bad',method:'observe',operation:null,args:{},expected:null,runtime:{data_root:'/synthetic-do-not-open',output_root:null}};const script=`import {semwrightNativeBridgeMain} from './src/native-entry.mjs'; await semwrightNativeBridgeMain(${JSON.stringify(frame)});`;const r=spawnSync(process.execPath,['--input-type=module','-'],{input:script,encoding:'utf8'});assert.equal(r.status,0);assert.equal(JSON.parse(r.stdout).error.code,'ProtocolMismatch');});
 test('canonical exact digest is key-order invariant and rejects non-integer floats',()=>{assert.equal(exactRequestDigest('test/1',{b:2,a:1}),exactRequestDigest('test/1',{a:1,b:2}));assert.throws(()=>exactRequestDigest('test/1',{scale:1.25}),{code:'InvalidArgument'});});
 test('canonical SDK JSON budgets reject oversized, cyclic and accessor input',()=>{assert.throws(()=>validateValue({text:'x'.repeat(270000)}),{code:'ResourceExhausted'});const a={};a.self=a;assert.throws(()=>validateValue(a),{code:'InvalidArgument'});const accessor={};Object.defineProperty(accessor,'a',{enumerable:true,get(){throw Error('should not execute');}});assert.throws(()=>validateValue(accessor),{code:'InvalidArgument'});});
+
+test('native profiles cover every public application operation exactly once',()=>{const assigned=Object.entries(NATIVE_PROFILES).flatMap(([profile,p])=>p.operations.map(operation=>({profile,operation})));assert.equal(assigned.length,Object.keys(OPERATION_SCOPES).length);assert.equal(new Set(assigned.map(x=>x.operation)).size,assigned.length);assert.deepEqual(assigned.map(x=>x.operation).sort(),Object.keys(OPERATION_SCOPES).sort());assert.deepEqual(Object.fromEntries(Object.entries(NATIVE_PROFILES).map(([name,p])=>[name,p.operations.length])),{core:7,production:9,review:10,integrations:11,work:6});});

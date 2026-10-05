@@ -61,7 +61,11 @@ jobs:
         run: |
           rustup toolchain install stable --profile minimal
           rustup override set stable
-          export LAUNCHWRIGHT_NATIVE_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json")).sha256')"
+          export LAUNCHWRIGHT_NATIVE_CORE_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.core.sha256')"
+          export LAUNCHWRIGHT_NATIVE_PRODUCTION_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.production.sha256')"
+          export LAUNCHWRIGHT_NATIVE_REVIEW_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.review.sha256')"
+          export LAUNCHWRIGHT_NATIVE_INTEGRATIONS_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.integrations.sha256')"
+          export LAUNCHWRIGHT_NATIVE_WORK_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.work.sha256')"
           mkdir -p evidence/native
           rustc -Vv | tee evidence/native/compiler.txt
           cargo test -p launchwright-native 2>&1 | tee evidence/native/cargo-test.log
@@ -75,7 +79,7 @@ jobs:
           path: |
             evidence/native/
             dist/native-bundle.json
-            dist/launchwright.cjs
+            dist/launchwright-*.cjs
             target/release/launchwright-native
             Cargo.lock
           if-no-files-found: error
