@@ -2,7 +2,23 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { LaunchwrightApplication, execute } from '../src/application.mjs';
-export function setup(t,options={}){const root=mkdtempSync(join(tmpdir(),'launchwright-test-'));let app=new LaunchwrightApplication(root,{initialize:true,...options});t.after(()=>{try{app.close();}catch{}rmSync(root,{recursive:true,force:true});});return{app,root};}
+
+const temporaryRoots = new Set();
+process.once('exit',()=>{
+  for(const root of temporaryRoots){
+    try{rmSync(root,{recursive:true,force:true,maxRetries:8,retryDelay:50});}catch{}
+  }
+});
+
+export function setup(t,options={}){
+  const root=mkdtempSync(join(tmpdir(),'launchwright-test-'));
+  temporaryRoots.add(root);
+  const app=new LaunchwrightApplication(root,{initialize:true,...options});
+  // Node's test after hooks are FIFO. Close the primary handle here, but remove the
+  // directory only at process exit so later-registered secondary SQLite handles can close.
+  t.after(()=>{try{app.close();}catch{}});
+  return{app,root};
+}
 export async function baseline(app){
  const create=async(kind,data)=>(await execute(app,'entity.create',{kind,data})).entity;
  const product=await create('product',{name:'Synthetic DeltaDesk',description:'Owned test data'});

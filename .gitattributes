@@ -1,0 +1,5 @@
+# Preserve source-lock byte identity across Windows/macOS/Linux checkouts.
+vendor/semwright-native-sdk/** -text
+vendor/*.tgz -text
+*.png -text
+*.zip -text
