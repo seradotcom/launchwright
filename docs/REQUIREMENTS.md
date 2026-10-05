@@ -21,9 +21,10 @@ The private specification text is intentionally not redistributed in this AGPL r
 - Portable snapshot/restore v2 with exact stored revision history, migration provenance, epoch/generation rotation, uncertain-intent suspension and backward-compatible v1 restore without historical reconstruction.
 - Loopback HTTP/UI security, bounded payloads and session-cookie authentication.
 - API/UX foundations for RS-API/RS-UX: authenticated capability discovery before UI inventory, snapshot-bound resource observation, fixed-watermark event pagination with source/revision/cause metadata, public-client event iteration, reloadable resource deep links that do not mutate state, and a separately packable clean-room client with explicit discovery/API negotiation that fails closed on unsupported contracts.
+- RS-PRO-03 application-side mobile import: bounded manifest plus PNG/JPEG/MP4 assets, exact hashes, container dimensions, build/device/OS/locale/origin/rights provenance, content-addressed immutable artifacts and ChannelProfile-compatible candidate packaging. Admission remains `imported-unverified`; real device/runner execution is not inferred.
 
 ## Integration-dependent / not accepted
 
-Real product capture across target applications; canonical Project Graph/effects; Composition video rendering; real Platform job execution; canonical verifier runtime admission; remote teams; real cross-account Platform Publish execution/output ACLs/external activation; mobile/Godot target acceptance; ChatGPT Plugin host acceptance; production deployment.
+Real product capture across target applications; canonical Project Graph/effects; Composition video rendering; real Platform job execution; canonical verifier runtime admission; remote teams; real cross-account Platform Publish execution/output ACLs/external activation; real Android/iOS runner/device acceptance (including Fastlane-style execution), Godot target acceptance; ChatGPT Plugin host acceptance; production deployment.
 
 Requirement completion is therefore not represented as a single vanity percentage. Evidence is tracked by exact behavior, SHA and acceptance lane in `ACCEPTANCE.md`.

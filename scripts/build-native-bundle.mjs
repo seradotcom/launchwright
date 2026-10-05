@@ -4,7 +4,7 @@ import { mkdirSync, readFileSync, writeFileSync, unlinkSync, existsSync } from '
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { NATIVE_PROFILES } from '../src/native-profiles.mjs';
-import { OPERATION_SCOPES } from '../src/contracts.mjs';
+import { OPERATION_SCOPES } from '../src/operations.mjs';
 
 const MAX_BUNDLE=48*1024,MAX_INPUT=64*1024,FRAME_RESERVE=1024;
 const esbuildVersion='0.28.2',terserVersion='5.44.0',npm=process.platform==='win32'?'npm.cmd':'npm';

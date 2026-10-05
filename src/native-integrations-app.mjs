@@ -1,17 +1,19 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 import { NativeError, requireCondition as ensure, sameVersion, integer } from '@semwright/native-sdk';
 import { NativeProfileApplication } from './native-profile-base.mjs';
-import { KINDS, OPERATION_SCOPES, inputObject, str, choice, array, lines } from './contracts.mjs';
+import { KINDS, inputObject, str, choice, array, lines } from './contracts.mjs';
+import { OPERATION_SCOPES } from './operations.mjs';
 import { iso } from './base.mjs';
 import { validateLocalization, assessLocalization } from './localization.mjs';
 import { PROFILE_MATRIX, validateExtensionManifest, validateCompatibilityLock } from './extensions.mjs';
+import { inspectMobileImport, registerMobileImport } from './mobile-import.mjs';
 
 export const INTEGRATIONS_NATIVE_READS=Object.freeze([
   'localization.assess','profile.matrix','profile.preflight',
-  'extension.discovery','compatibility.negotiate','compatibility.inspect','channel.status'
+  'extension.discovery','compatibility.negotiate','compatibility.inspect','mobile.inspect','channel.status'
 ]);
 export const INTEGRATIONS_NATIVE_MUTATIONS=Object.freeze([
-  'localization.create','localization.update','extension.register','extension.retire','compatibility.lock'
+  'localization.create','localization.update','extension.register','extension.retire','compatibility.lock','mobile.import'
 ]);
 export const INTEGRATIONS_NATIVE_OPERATIONS=Object.freeze([...INTEGRATIONS_NATIVE_READS,...INTEGRATIONS_NATIVE_MUTATIONS]);
 
@@ -71,6 +73,7 @@ export class IntegrationsNativeApplication extends NativeProfileApplication {
       case'extension.discovery':return this.extensionDiscovery(input);
       case'compatibility.negotiate':return this.compatibilityNegotiate(input);
       case'compatibility.inspect':inputObject(input,['id']);return this.compatibilityInspect(input.id);
+      case'mobile.inspect':return inspectMobileImport(this,input);
       case'channel.status':inputObject(input,['release_id']);return this.channelStatus(input.release_id);
       default:throw new NativeError('Unsupported','Read operation is outside integrations profile');
     }
@@ -103,6 +106,7 @@ export class IntegrationsNativeApplication extends NativeProfileApplication {
         inputObject(input,['id','expected','reason']);const ext=this.get(input.id,'extension_package');ensure(sameVersion(ext.version,input.expected),'Extension revision changed','StaleReference');ensure(ext.data.status==='active','Extension is already retired','Conflict');lines(input.reason,4000);
         return{entity:this.store.update(ext.id,{...ext.data,status:'retired',retired_by:this.principal,retired_at:iso(),retire_reason:input.reason,new_use_allowed:false})};
       }
+      case'mobile.import':return registerMobileImport(this,input);
       case'compatibility.lock':{
         const data=validateCompatibilityLock(input),product=this.get(data.product_id,'product');
         const components=data.components.map(c=>{
