@@ -8,7 +8,7 @@ import { PROFILE_MATRIX, validateExtensionManifest, validateCompatibilityLock } 
 
 export const INTEGRATIONS_NATIVE_READS=Object.freeze([
   'localization.assess','profile.matrix','profile.preflight',
-  'extension.discovery','compatibility.negotiate','compatibility.inspect'
+  'extension.discovery','compatibility.negotiate','compatibility.inspect','channel.status'
 ]);
 export const INTEGRATIONS_NATIVE_MUTATIONS=Object.freeze([
   'localization.create','localization.update','extension.register','extension.retire','compatibility.lock'
@@ -57,6 +57,12 @@ export class IntegrationsNativeApplication extends NativeProfileApplication {
     });
     return{lock,components,state:components.some(c=>['MISSING','RETIRED','DRIFT'].includes(c.state))?'DRIFT':'CURRENT',authority:'application-compatibility-lock-only',rehearsal_required_on_change:true};
   }
+  channelStatus(releaseId){
+    this.get(releaseId,'release');
+    const rows=this.list('channel_delivery',releaseId).sort((a,b)=>a.created.localeCompare(b.created)),latest=new Map();
+    for(const row of rows)latest.set(row.data.profile_id+'\0'+row.data.participant,row);
+    return{release_id:releaseId,deliveries:rows,latest:[...latest.values()],profiles:this.list('channel_profile').filter(p=>rows.some(r=>r.data.profile_id===p.id)).map(p=>({id:p.id,name:p.data.name,channel:p.data.channel,profile_version:p.data.profile_version,destination_class:p.data.destination_class,idempotency:p.data.idempotency})),external_send_performed:false};
+  }
   read(operation,input){
     switch(operation){
       case'localization.assess':inputObject(input,['id']);return assessLocalization(this,this.get(input.id,'localized_copy'));
@@ -65,6 +71,7 @@ export class IntegrationsNativeApplication extends NativeProfileApplication {
       case'extension.discovery':return this.extensionDiscovery(input);
       case'compatibility.negotiate':return this.compatibilityNegotiate(input);
       case'compatibility.inspect':inputObject(input,['id']);return this.compatibilityInspect(input.id);
+      case'channel.status':inputObject(input,['release_id']);return this.channelStatus(input.release_id);
       default:throw new NativeError('Unsupported','Read operation is outside integrations profile');
     }
   }
@@ -110,6 +117,7 @@ export class IntegrationsNativeApplication extends NativeProfileApplication {
         });
         return{entity:this.store.create('compatibility_lock',{...data,components,product_version:product.version,created_by:this.principal,created_at:iso(),authority:'application-rehearsal-lock'})};
       }
+
       default:throw new NativeError('Unsupported','Mutation is outside integrations profile');
     }
   }

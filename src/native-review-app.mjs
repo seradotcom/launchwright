@@ -8,7 +8,7 @@ import { validateVerification, validateWaiver, validateChannelPackage, validateC
 import { claimCheck } from './claim-check.mjs';
 import { freezeCandidate, buildCandidateGates, inspectCandidateState, recordCandidateReview, assertPrivateDeliveryReady, assertChannelPinned, assertPartialDeliveryPolicy } from './candidate.mjs';
 
-export const REVIEW_NATIVE_READS=Object.freeze(['candidate.inspect','verification.summary','channel.status']);
+export const REVIEW_NATIVE_READS=Object.freeze(['candidate.inspect','verification.summary']);
 export const REVIEW_NATIVE_MUTATIONS=Object.freeze([
   'verification.record','waiver.record','candidate.freeze','candidate.review',
   'candidate.deliver_private','channel.package','channel.record_outcome'
@@ -30,19 +30,12 @@ export class ReviewNativeApplication extends NativeProfileApplication {
     const state=checks.some(c=>['FAIL','ERROR'].includes(c.effective_state))?'FAIL':checks.length&&checks.every(c=>c.effective_state==='PASS')?'PASS':'UNKNOWN';
     return{candidate_id:candidate.id,state,checks,canonical_passes:checks.filter(c=>c.effective_state==='PASS').length,failures:checks.filter(c=>['FAIL','ERROR'].includes(c.effective_state)).length,unknown:checks.filter(c=>c.effective_state==='UNKNOWN').length,note:'Waivers preserve the underlying verification state; non-canonical PASS reports remain UNKNOWN.'};
   }
-  channelStatus(releaseId){
-    this.get(releaseId,'release');
-    const rows=this.list('channel_delivery',releaseId).sort((a,b)=>a.created.localeCompare(b.created)),latest=new Map();
-    for(const row of rows)latest.set(row.data.profile_id+'\0'+row.data.participant,row);
-    return{release_id:releaseId,deliveries:rows,latest:[...latest.values()],profiles:this.list('channel_profile').filter(p=>rows.some(r=>r.data.profile_id===p.id)).map(p=>({id:p.id,name:p.data.name,channel:p.data.channel,profile_version:p.data.profile_version,destination_class:p.data.destination_class,idempotency:p.data.idempotency})),external_send_performed:false};
-  }
   candidateGates(candidate){return buildCandidateGates(this,candidate);}
   inspectCandidate(candidate){return inspectCandidateState(this,candidate);}
   read(operation,input){
     switch(operation){
       case'candidate.inspect':inputObject(input,['id']);return this.inspectCandidate(this.get(input.id,'candidate'));
       case'verification.summary':inputObject(input,['candidate_id']);return this.verificationSummary(input.candidate_id);
-      case'channel.status':inputObject(input,['release_id']);return this.channelStatus(input.release_id);
       default:throw new NativeError('Unsupported','Read operation is outside review profile');
     }
   }
@@ -76,6 +69,7 @@ export class ReviewNativeApplication extends NativeProfileApplication {
         this.store.db.prepare('INSERT INTO aliases VALUES(?,?,?,?) ON CONFLICT(name) DO UPDATE SET revision=excluded.revision,candidate_id=excluded.candidate_id').run(name,generation,revision,candidate.id);
         return{entity:this.store.create('delivery',{release_id:candidate.data.release_id,name,candidate_id:candidate.id,candidate_sha256:candidate.data.candidate_sha256,state:'PRIVATE_DRAFT_RECORDED',external_state:'NOT_SENT',alias_version:{resource:`alias:${name}`,generation,revision},artifact_ids:candidate.data.manifest.artifact_ids,technical_state:checked.technical_state,delivered_by:this.principal})};
       }
+
       case'channel.package':{
         const data=validateChannelPackage(input),candidate=this.get(data.candidate_id,'candidate'),profile=this.get(data.profile_id,'channel_profile'),release=this.get(candidate.data.release_id,'release');
         ensure(profile.data.product_id===release.data.product_id,'Channel profile belongs to another product','PermissionDenied');

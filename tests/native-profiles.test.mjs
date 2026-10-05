@@ -9,6 +9,7 @@ import { ProductionNativeApplication } from '../src/native-production-app.mjs';
 import { ReviewNativeApplication } from '../src/native-review-app.mjs';
 import { IntegrationsNativeApplication } from '../src/native-integrations-app.mjs';
 import { WorkNativeApplication } from '../src/native-work-app.mjs';
+import { MediaNativeApplication } from '../src/native-media-app.mjs';
 import { setup, baseline } from './helpers.mjs';
 
 async function invokeProfile(Profile,root,operation,input){
@@ -20,6 +21,17 @@ async function invokeProfile(Profile,root,operation,input){
       app,'invoke',nativeDriverName(operation),
       {ref:'synthetic-reference-already-bound-by-host',...args},
       applicationContext(args.request.key,expected)
+    );
+  }finally{app.close();}
+}
+async function readProfile(Profile,root,operation,input){
+  const app=new Profile(root);
+  try{
+    const expected=app.store.version();
+    return await dispatchApplication(
+      app,'invoke',nativeDriverName(operation),
+      {ref:'synthetic-reference-already-bound-by-host',input},
+      applicationContext('native-profile-read',expected)
     );
   }finally{app.close();}
 }
@@ -52,4 +64,9 @@ test('split native profiles preserve canonical mutation transactions across one 
   });
   assert.equal(work.entity.kind,'work');
   assert.equal(work.entity.data.state,'PREPARED');
+
+  const media=await readProfile(MediaNativeApplication,seeded.root,'media.inspect',{});
+  assert.equal(media.composition_contract,'semwright-composition/C0');
+  assert.equal(media.media_time_authority,'semwright-media-time');
+  assert.equal(media.execution_authority,false);
 });

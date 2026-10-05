@@ -18,6 +18,7 @@ const REVIEW_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_REVIEW_BUND
 const INTEGRATIONS_BUNDLE: Option<&str> =
     option_env!("LAUNCHWRIGHT_NATIVE_INTEGRATIONS_BUNDLE_SHA256");
 const WORK_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_WORK_BUNDLE_SHA256");
+const MEDIA_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_MEDIA_BUNDLE_SHA256");
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd)]
 enum Profile {
@@ -26,6 +27,7 @@ enum Profile {
     Review,
     Integrations,
     Work,
+    Media,
 }
 #[derive(Clone, Copy)]
 struct Operation {
@@ -55,6 +57,30 @@ const OPERATIONS: &[Operation] = &[
         profile: Profile::Core,
     },
     Operation {
+        suffix: "history-get",
+        read: true,
+        consent: false,
+        profile: Profile::Core,
+    },
+    Operation {
+        suffix: "history-list",
+        read: true,
+        consent: false,
+        profile: Profile::Core,
+    },
+    Operation {
+        suffix: "history-diff",
+        read: true,
+        consent: false,
+        profile: Profile::Core,
+    },
+    Operation {
+        suffix: "change-inspect",
+        read: true,
+        consent: false,
+        profile: Profile::Core,
+    },
+    Operation {
         suffix: "entity-create",
         read: false,
         consent: false,
@@ -68,6 +94,18 @@ const OPERATIONS: &[Operation] = &[
     },
     Operation {
         suffix: "entity-retire",
+        read: false,
+        consent: false,
+        profile: Profile::Core,
+    },
+    Operation {
+        suffix: "change-propose",
+        read: false,
+        consent: false,
+        profile: Profile::Core,
+    },
+    Operation {
+        suffix: "change-apply",
         read: false,
         consent: false,
         profile: Profile::Core,
@@ -148,7 +186,7 @@ const OPERATIONS: &[Operation] = &[
         suffix: "channel-status",
         read: true,
         consent: false,
-        profile: Profile::Review,
+        profile: Profile::Integrations,
     },
     Operation {
         suffix: "verification-record",
@@ -294,6 +332,36 @@ const OPERATIONS: &[Operation] = &[
         consent: true,
         profile: Profile::Work,
     },
+    Operation {
+        suffix: "media-inspect",
+        read: true,
+        consent: false,
+        profile: Profile::Media,
+    },
+    Operation {
+        suffix: "media-plan",
+        read: false,
+        consent: false,
+        profile: Profile::Media,
+    },
+    Operation {
+        suffix: "media-revise",
+        read: false,
+        consent: false,
+        profile: Profile::Media,
+    },
+    Operation {
+        suffix: "media-output_record",
+        read: false,
+        consent: false,
+        profile: Profile::Media,
+    },
+    Operation {
+        suffix: "media-review_record",
+        read: false,
+        consent: false,
+        profile: Profile::Media,
+    },
 ];
 
 fn operation(spec: Operation) -> OperationContract {
@@ -373,6 +441,7 @@ async fn main() -> Result<()> {
     let review = bridge("launchwright-review.cjs", REVIEW_BUNDLE)?;
     let integrations = bridge("launchwright-integrations.cjs", INTEGRATIONS_BUNDLE)?;
     let work = bridge("launchwright-work.cjs", WORK_BUNDLE)?;
+    let media = bridge("launchwright-media.cjs", MEDIA_BUNDLE)?;
     let mut app = Application::new("launchwright", VERSION)?
         .require_host_tools()
         .with_observer(core.clone())
@@ -386,6 +455,7 @@ async fn main() -> Result<()> {
             Profile::Review => review.clone(),
             Profile::Integrations => integrations.clone(),
             Profile::Work => work.clone(),
+            Profile::Media => media.clone(),
         };
         app = app.register(contract, provider.operation(name))?;
     }
@@ -410,7 +480,7 @@ mod tests {
         for spec in OPERATIONS {
             assert!(names.insert(spec.suffix));
         }
-        assert_eq!(names.len(), 43);
+        assert_eq!(names.len(), 54);
     }
     #[test]
     fn profile_partition_counts_are_stable() {
@@ -418,10 +488,11 @@ mod tests {
         for spec in OPERATIONS {
             *counts.entry(spec.profile).or_insert(0usize) += 1;
         }
-        assert_eq!(counts.get(&Profile::Core), Some(&7));
+        assert_eq!(counts.get(&Profile::Core), Some(&13));
         assert_eq!(counts.get(&Profile::Production), Some(&9));
-        assert_eq!(counts.get(&Profile::Review), Some(&10));
-        assert_eq!(counts.get(&Profile::Integrations), Some(&11));
+        assert_eq!(counts.get(&Profile::Review), Some(&9));
+        assert_eq!(counts.get(&Profile::Integrations), Some(&12));
         assert_eq!(counts.get(&Profile::Work), Some(&6));
+        assert_eq!(counts.get(&Profile::Media), Some(&5));
     }
 }

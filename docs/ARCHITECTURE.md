@@ -30,6 +30,12 @@ Artifacts store exact SHA-256-addressed bytes. Candidate v2 freezes artifact has
 
 `verification.record` stores verifier identity/version/digest, dimension, coverage, omissions and findings. A PASS is effective only when the caller was provisioned with canonical verifier admission and the record is admitted as canonical. FAIL/ERROR remain failures. A waiver annotates a failure and never rewrites its state.
 
+## Media composition custody
+
+`media.plan` records a versioned, source-linked production plan with exact rational duration/frame-rate data, observed capture references, sanitized interactive derivatives, narration/music/caption assets, and independent video/screenshot-series/interactive-demo variants. Plans pin every referenced resource revision and compute per-variant digests so a revision can identify which variants remain reusable instead of invalidating unrelated outputs.
+
+Launchwright deliberately does not implement a second media clock, effects kernel, or renderer. Motion Canvas handoff names the canonical `driver.motion-canvas.composition.plan/apply/verify` operations and records output receipts. A canonical Composition receipt can establish technical output state only when that admission capability is present; editorial review remains a separate decision bound to the exact artifact SHA-256. Imported output declarations never become canonical PASS merely because they were stored.
+
 ## Channels
 
 A `channel_profile` is versioned product-owned configuration. `channel.package` generates an immutable package manifest pinned to candidate and profile versions but performs no network send. The authenticated loopback download route reconstructs a deterministic ZIP from that manifest, the frozen candidate manifest and content-addressed artifact blobs; repeated downloads therefore preserve exact bytes without storing another mutable archive. External outcomes are separate receipt records. UNKNOWN on non-idempotent/recover-first profiles requires recovery before retry. Public activation requires canonical Publish receipt admission.
