@@ -96,7 +96,7 @@ GitHub Actions runs the supported Node 24.21 runtime on Linux, Windows and macOS
 - **native** — builds the pinned TypeScript SDK, native bundle and real Rust NativeDriver;
 - **browser** — installs Chromium on the runner and exercises the real Launchwright UI;
 - **godot** — checks out the exact reviewed Semwright SHA, verifies the pinned Godot 4.7.2 binary, runs the production Godot driver against the real engine, and binds that trace to Launchwright source-profile preflight without inventing Platform/Host authority;
-- **deltadesk** — starts the owned DeltaDesk A/B product, installs a disposable Chromium runtime, drives the real reviewed Semwright Chromium semantic adapter, retains exact PNG/receipt evidence and binds the observed runtime to Launchwright without claiming Platform capture admission;
+- **deltadesk** — starts the owned DeltaDesk A/B product, binds the disposable Ubuntu runner's `/opt/google/chrome/chrome` exactly as Semwright's own Chromium CI does, drives the real reviewed Semwright Chromium semantic adapter, retains exact PNG/receipt evidence and binds the observed runtime to Launchwright without claiming Platform capture admission;
 - **stress** — bounded high-volume persistence, observation and portable-restore acceptance.
 
 Run expensive dependencies on GitHub Actions rather than the development workstation.

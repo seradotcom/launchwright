@@ -184,15 +184,16 @@ jobs:
         run: |
           rustup toolchain install 1.98.1 --profile minimal
           (cd .ci-semwright && rustup override set 1.98.1)
-      - name: Install disposable Chromium runtime
+      - name: Bind runner browser exactly like Semwright Chromium CI
         run: |
           set -euo pipefail
           mkdir -p evidence/deltadesk
-          npm install --prefix .ci-tools --no-audit --no-fund --ignore-scripts playwright@1.58.2
-          .ci-tools/node_modules/.bin/playwright install --with-deps chromium
-          CHROMIUM="$(node -e "const {chromium}=require('./.ci-tools/node_modules/playwright');process.stdout.write(chromium.executablePath())")"
-          CHROMIUM="$(readlink -f "$CHROMIUM")"
-          test -x "$CHROMIUM"
+          command -v google-chrome
+          google-chrome --version | tee evidence/deltadesk/browser-version.log
+          test -x /opt/google/chrome/chrome
+          sudo chmod 0755 /opt/google/chrome/chrome
+          stat -c '%A %a %U:%G %n' /opt/google/chrome/chrome | tee evidence/deltadesk/browser-binary.log
+          CHROMIUM=/opt/google/chrome/chrome
           echo "SEMWRIGHT_TEST_CHROMIUM=$CHROMIUM" >> "$GITHUB_ENV"
           sha256sum "$CHROMIUM" | tee evidence/deltadesk/chromium.sha256
       - name: Start owned DeltaDesk A/B fixture

@@ -41,7 +41,7 @@ The manual `deltadesk` lane in `.github/workflows/heavy.yml` is the cross-system
 
 1. checks out this exact Launchwright SHA;
 2. checks out exact reviewed Semwright `4d291de26724810017ce7b6d185326514cb79fa6`;
-3. installs a disposable Chromium binary and records its SHA-256;
+3. binds the disposable Ubuntu runner's `/opt/google/chrome/chrome` exactly as Semwright's own Chromium CI does, records its version/permissions and SHA-256;
 4. starts the owned DeltaDesk A/B server on loopback and performs an explicit reset;
 5. copies `acceptance/chromium_deltadesk.rs` into that disposable Semwright checkout as an acceptance test only;
 6. executes the real Semwright `Chromium` semantic adapter against DeltaDesk;
@@ -50,7 +50,7 @@ The manual `deltadesk` lane in `.github/workflows/heavy.yml` is the cross-system
 9. verifies the A/B behavior oracle and exact screenshot hashes; and
 10. binds the observed runtime back to Launchwright `profile.preflight`.
 
-Playwright is used only to install a disposable Chromium build. It is not the capture authority and does not drive the acceptance interaction.
+No alternate browser launcher is used. The lane deliberately mirrors Semwright's own Ubuntu Chromium acceptance path (`/opt/google/chrome/chrome`) so the adapter keeps its sandbox policy intact; Launchwright neither adds `--no-sandbox` nor drives Chrome outside the Semwright adapter.
 
 The retained browser receipt explicitly records `agent_javascript: false`, `raw_cdp_exposed: false` and `platform_job_receipt: false`.
 

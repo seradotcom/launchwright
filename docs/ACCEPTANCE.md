@@ -31,7 +31,7 @@ The manual heavy workflow provides independent lanes:
 - **native**: build the pinned canonical TypeScript SDK, generate/hash all eight bounded bridge profiles, compile/test the real Rust NativeDriver, and run a bridge smoke against each profile.
 - **browser**: install Chromium on a disposable GitHub runner and exercise the real Launchwright UI.
 - **godot**: check out exact Semwright `4d291de26724810017ce7b6d185326514cb79fa6`, verify the official Godot 4.7.2 Linux binary digest, build the production Semwright Godot driver, run its real-editor E2E harness and bind the resulting trace to Launchwright preflight while keeping Platform/capture/Host claims false.
-- **deltadesk**: start owned DeltaDesk A/B, install a disposable Chromium binary, execute the real Semwright `Chromium` semantic adapter against those surfaces, retain exact screenshots/receipt hashes and bind the observed runtime to Launchwright while keeping Platform/capture/Host admission false.
+- **deltadesk**: start owned DeltaDesk A/B, bind `/opt/google/chrome/chrome` on the disposable Ubuntu runner exactly like Semwright's own Chromium CI, execute the real Semwright `Chromium` semantic adapter against those surfaces, retain exact screenshots/receipt hashes and bind the observed runtime to Launchwright while keeping Platform/capture/Host admission false.
 - **stress**: create a bounded high-volume workspace, page observations, export a portable snapshot, restore it and verify row continuity.
 
 Exact run IDs and SHA are recorded here only after completion.
