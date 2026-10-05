@@ -1,11 +1,28 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-// Public HTTP consumer. Does not import the application or its database.
+// Public HTTP consumer. It intentionally has no application/database imports.
+export const CLIENT_VERSION='0.2.0-dev.11';
+export const SUPPORTED_DISCOVERY_SCHEMAS=Object.freeze(['launchwright-http-discovery/1']);
+export const SUPPORTED_APP_APIS=Object.freeze(['0.2']);
+
 export class LaunchwrightError extends Error {
   constructor(record,status=0){super(record.message);this.name='LaunchwrightError';this.code=record.code;this.outcomeKnown=record.outcome_known;this.status=status;}
 }
+const unsupported=message=>new LaunchwrightError({code:'Unsupported',message,outcome_known:true});
+export function validateDiscovery(record,{requiredOperations=[],supportedDiscoverySchemas=SUPPORTED_DISCOVERY_SCHEMAS,supportedAppApis=SUPPORTED_APP_APIS}={}){
+  if(!record||typeof record!=='object'||Array.isArray(record))throw unsupported('Discovery reply is not an object');
+  if(!supportedDiscoverySchemas.includes(record.schema_version))throw unsupported('Unsupported Launchwright discovery schema: '+String(record.schema_version));
+  if(record.app!=='Launchwright')throw unsupported('Discovery reply is not from Launchwright');
+  if(!record.api||typeof record.api!=='object'||!supportedAppApis.includes(record.api.version))throw unsupported('Unsupported Launchwright application API: '+String(record.api?.version));
+  if(record.api.discovery_schema!==record.schema_version)throw unsupported('Discovery schema and API contract disagree');
+  if(!Array.isArray(record.operations))throw unsupported('Discovery reply does not enumerate operations');
+  const names=new Set(record.operations.map(operation=>operation?.name).filter(Boolean));
+  for(const operation of requiredOperations)if(!names.has(operation))throw unsupported('Required operation is unavailable: '+operation);
+  return record;
+}
+
 export class LaunchwrightClient {
-  constructor({baseUrl='http://127.0.0.1:4317',token=null,fetchImpl=globalThis.fetch,timeoutMs=15000,pendingStore=null}={}){
-    this.baseUrl=baseUrl.replace(/\/$/,'');this.token=token;this.fetch=fetchImpl===globalThis.fetch?globalThis.fetch.bind(globalThis):fetchImpl;this.timeoutMs=timeoutMs;this.pendingStore=pendingStore;
+  constructor({baseUrl='http://127.0.0.1:4317',token=null,fetchImpl=globalThis.fetch,timeoutMs=15000,pendingStore=null,supportedDiscoverySchemas=SUPPORTED_DISCOVERY_SCHEMAS,supportedAppApis=SUPPORTED_APP_APIS}={}){
+    this.baseUrl=baseUrl.replace(/\/$/,'');this.token=token;this.fetch=fetchImpl===globalThis.fetch?globalThis.fetch.bind(globalThis):fetchImpl;this.timeoutMs=timeoutMs;this.pendingStore=pendingStore;this.supportedDiscoverySchemas=[...supportedDiscoverySchemas];this.supportedAppApis=[...supportedAppApis];
   }
   async request(path,body,method='POST'){
     const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),this.timeoutMs);
@@ -16,7 +33,8 @@ export class LaunchwrightClient {
     finally{clearTimeout(timer);}
   }
   describe(){return this.request('/api/v1/describe',undefined,'GET');}
-  discovery(){return this.request('/api/v1/discovery',undefined,'GET');}
+  async discovery({requiredOperations=[]}={}){const record=await this.request('/api/v1/discovery',undefined,'GET');return validateDiscovery(record,{requiredOperations,supportedDiscoverySchemas:this.supportedDiscoverySchemas,supportedAppApis:this.supportedAppApis});}
+  connect(options){return this.discovery(options);}
   get(id){return this.request('/api/v1/read',{operation:'resource.get',input:{id}});}
   read(operation,input={}){return this.request('/api/v1/read',{operation,input});}
   snapshotSummary(){return this.read('workspace.snapshot');}

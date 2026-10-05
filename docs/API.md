@@ -14,6 +14,12 @@ The response identifies the Launchwright and Native SDK versions, current worksp
 
 The browser client performs discovery before inventory observation on every fresh/reloaded session. The exported `LaunchwrightClient` provides `discovery()` for other clients.
 
+## Public client package and compatibility
+
+`client/` is independently packable as `@launchwright/client`. Its package contains only `index.mjs` plus package metadata; it has no application, SQLite, Native SDK, or private repository imports. A clean-room regression packs that directory, installs the tarball in a fresh temporary project and uses only the documented HTTP contract to discover, create and read a Product.
+
+Discovery now carries an explicit `api.version`, discovery schema, prepared-request schema and event-page schema. The client validates those values before use and can require named operations. A client that supports another discovery schema/API or asks for an unavailable operation receives `Unsupported`; it must not reinterpret newer data as an older contract. This is local public-client compatibility evidence, not publication to a package registry or external host acceptance.
+
 ## Resource observation
 
 `POST /api/v1/observe` uses the canonical application observation provider. Its cursor is bound to the exact workspace version observed on the first page. A workspace mutation makes a prior observation cursor stale; the client must restart instead of mixing revisions.
