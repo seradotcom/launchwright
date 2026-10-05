@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { applicationContext, dispatchApplication } from '@semwright/native-sdk';
 import { execute } from '../src/application.mjs';
 import { GODOT_RUNTIME_CONTRACT } from '../src/source-profiles.mjs';
-import { CoreNativeApplication } from '../src/native-core-app.mjs';
+import { SourcesNativeApplication } from '../src/native-sources-app.mjs';
 import { nativeDriverName } from '../src/native-profile-base.mjs';
 import { setup, baseline } from './helpers.mjs';
 
@@ -49,10 +49,10 @@ test('Godot preflight requires exact Semwright and engine pins and a logical pro
   assert.equal(preflight.ready_for_native_execution,false);
 });
 
-test('Native SDK core profile returns the same pinned Godot preflight contract',async t=>{
+test('Native SDK sources profile returns the same pinned Godot preflight contract',async t=>{
   const seeded=setup(t),b=await baseline(seeded.app),source=await godotSource(b);
   seeded.app.close();
-  const native=new CoreNativeApplication(seeded.root,{capabilities:{profile_execution:{godot:'available'},profile_runtime:{godot:runtime()}}});
+  const native=new SourcesNativeApplication(seeded.root,{capabilities:{profile_execution:{godot:'available'},profile_runtime:{godot:runtime()}}});
   try{
     const result=await dispatchApplication(
       native,'invoke',nativeDriverName('profile.preflight'),

@@ -11,6 +11,7 @@ import { IntegrationsNativeApplication } from '../src/native-integrations-app.mj
 import { WorkNativeApplication } from '../src/native-work-app.mjs';
 import { MediaNativeApplication } from '../src/native-media-app.mjs';
 import { PublishNativeApplication } from '../src/native-publish-app.mjs';
+import { SourcesNativeApplication } from '../src/native-sources-app.mjs';
 import { setup, baseline } from './helpers.mjs';
 
 async function invokeProfile(Profile,root,operation,input){
@@ -45,6 +46,11 @@ test('split native profiles preserve canonical mutation transactions across one 
 
   const core=await invokeProfile(CoreNativeApplication,seeded.root,'entity.create',{kind:'product',data:{name:'Native profile product',description:'Synthetic profile test'}});
   assert.equal(core.entity.kind,'product');
+
+  const sources=await readProfile(SourcesNativeApplication,seeded.root,'profile.matrix',{});
+  assert.equal(sources.execution_proof,false);
+  assert.equal(sources.profiles.browser.driver.provider_id,'chromium');
+  assert.equal(sources.profiles.godot.driver.driver_id,'godot');
 
   const production=await invokeProfile(ProductionNativeApplication,seeded.root,'deliverable.render',{id:b.deliverable.id});
   assert.equal(production.entity.kind,'artifact');

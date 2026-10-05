@@ -2,6 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execute } from '../src/application.mjs';
+import { BROWSER_RUNTIME_CONTRACT } from '../src/source-profiles.mjs';
 import { setup, baseline, update } from './helpers.mjs';
 
 async function localeFixture(app){
@@ -71,7 +72,7 @@ test('profile preflight is contract-only and requires explicit execution capabil
   assert.equal(p.checks.find(c=>c.name==='build-match').state,'PASS');
   assert.equal(p.checks.find(c=>c.name==='execution-authority').state,'UNKNOWN');
   assert.equal(p.ready_for_native_execution,false);
-  const {app:authorized}=setup(t,{capabilities:{profile_execution:{browser:'available'}}});b=await baseline(authorized);
+  const {app:authorized}=setup(t,{capabilities:{profile_execution:{browser:'available'},profile_runtime:{browser:{semwright_sha:BROWSER_RUNTIME_CONTRACT.semwright_sha,provider_id:BROWSER_RUNTIME_CONTRACT.provider_id,executable_sha256:'b'.repeat(64)}}}});b=await baseline(authorized);
   const source=(await update(authorized,b.source,{purpose:'Owned product capture',approval:'approved'})).entity;
   p=await execute(authorized,'profile.preflight',{profile:'browser',source_id:source.id,target_id:b.target.id});
   assert.equal(p.ready_for_native_execution,true);

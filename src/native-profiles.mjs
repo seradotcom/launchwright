@@ -6,9 +6,11 @@ import { INTEGRATIONS_NATIVE_OPERATIONS } from './native-integrations-app.mjs';
 import { WORK_NATIVE_OPERATIONS } from './native-work-app.mjs';
 import { MEDIA_NATIVE_OPERATIONS } from './native-media-app.mjs';
 import { PUBLISH_NATIVE_OPERATIONS } from './native-publish-app.mjs';
+import { SOURCES_NATIVE_OPERATIONS } from './native-sources-app.mjs';
 
 export const NATIVE_PROFILES=Object.freeze({
   core:Object.freeze({entry:'src/native-core-entry.mjs',file:'launchwright-core.cjs',operations:CORE_NATIVE_OPERATIONS}),
+  sources:Object.freeze({entry:'src/native-sources-entry.mjs',file:'launchwright-sources.cjs',operations:SOURCES_NATIVE_OPERATIONS}),
   production:Object.freeze({entry:'src/native-production-entry.mjs',file:'launchwright-production.cjs',operations:PRODUCTION_NATIVE_OPERATIONS}),
   review:Object.freeze({entry:'src/native-review-entry.mjs',file:'launchwright-review.cjs',operations:REVIEW_NATIVE_OPERATIONS}),
   integrations:Object.freeze({entry:'src/native-integrations-entry.mjs',file:'launchwright-integrations.cjs',operations:INTEGRATIONS_NATIVE_OPERATIONS}),

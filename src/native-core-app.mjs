@@ -6,13 +6,12 @@ import { KINDS, EDITABLE, validateEntity, inputObject, idText, str, lines, choic
 import { proposeChange, inspectChange, applyChange } from './change-proposal.mjs';
 import { getHistory, listHistory, diffHistory } from './history.mjs';
 import { listEvents } from './events.mjs';
-import { PROFILE_MATRIX, profilePreflight as runProfilePreflight } from './source-profiles.mjs';
 
 export const CORE_NATIVE_OPERATIONS=Object.freeze([
-  'workspace.describe','resource.get','events.list','history.get','history.list','history.diff','change.inspect','profile.matrix','profile.preflight',
+  'workspace.describe','resource.get','events.list','history.get','history.list','history.diff','change.inspect',
   'entity.create','entity.update','entity.retire','change.propose','change.apply','template.instantiate'
 ]);
-const CORE_NATIVE_READS=new Set(['workspace.describe','resource.get','events.list','history.get','history.list','history.diff','change.inspect','profile.matrix','profile.preflight']);
+const CORE_NATIVE_READS=new Set(['workspace.describe','resource.get','events.list','history.get','history.list','history.diff','change.inspect']);
 const driverName=operation=>'driver.launchwright.'+operation.replaceAll('.','-');
 
 export class CoreNativeApplication {
@@ -62,8 +61,6 @@ export class CoreNativeApplication {
     if(op==='history.list')return listHistory(this,input);
     if(op==='history.diff')return diffHistory(this,input);
     if(op==='change.inspect'){inputObject(input,['id']);return inspectChange(this,input.id);}
-    if(op==='profile.matrix'){inputObject(input,[]);return{profiles:PROFILE_MATRIX,execution_proof:false};}
-    if(op==='profile.preflight')return runProfilePreflight(this,input);
     throw new NativeError('Unsupported','Operation is outside this native profile');
   }
   mutate(op,input){

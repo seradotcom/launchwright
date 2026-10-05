@@ -1,0 +1,33 @@
+{
+  "schema_version": "launchwright-deltadesk-lab/1",
+  "owned_fixture": true,
+  "synthetic_data": true,
+  "external_customer_data": false,
+  "builds": {
+    "a": {
+      "id": "deltadesk-a-2026.10.02.1",
+      "label": "A",
+      "advanced_export_rule": "operator",
+      "checkout_cta": "Start Pro trial",
+      "checkout_selector_position": "before-cta"
+    },
+    "b": {
+      "id": "deltadesk-b-2026.10.05.1",
+      "label": "B",
+      "advanced_export_rule": "operator-and-pro",
+      "checkout_cta": "Continue with Pro",
+      "checkout_selector_position": "after-cta"
+    }
+  },
+  "locales": ["en-US", "es-MX"],
+  "roles": ["operator", "viewer"],
+  "plans": ["basic", "pro"],
+  "surfaces": ["login", "dashboard", "request-detail", "checkout"],
+  "source_rights": "Launchwright-owned AGPL laboratory fixture",
+  "unobservable_fixture": "https://unobservable.invalid/example",
+  "notes": [
+    "Build B intentionally changes checkout CTA and selector placement.",
+    "Build B changes advanced export availability for a basic operator without changing the pro-operator presentation.",
+    "No payment, email, customer credential, or production data path exists."
+  ]
+}
