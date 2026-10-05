@@ -7,9 +7,9 @@ This ledger separates implemented behavior from execution evidence. A PASS belon
 Current pass, before commit:
 
 - Node: 22.22.0 — **outside** the Native SDK supported engine.
-- `npm test`: **97 passed, 0 failed, 0 skipped**.
-- `node scripts/verify.mjs`: source-lock integrity and syntax PASS; 50 JavaScript modules checked.
-- Native profile build: **43/43 public operations assigned exactly once** across five compacted canonical bridge bundles; largest local bundle was `review` at 45,271 bytes under the 48 KiB NodeBridge limit.
+- `npm test`: **102 passed, 0 failed, 0 skipped**.
+- `node scripts/verify.mjs`: source-lock integrity and syntax PASS; 52 JavaScript modules checked.
+- Native profile build: **46/46 public operations assigned exactly once** across five compacted canonical bridge bundles; largest local bundle was `review` at 45,341 bytes under the 48 KiB NodeBridge limit (`core` is 38,540 bytes).
 - Multi-profile canonical bridge smoke: **PASS** for `core`, `production`, `review`, `integrations` and `work`; exact bundle SHA-256 values were rechecked before execution. This is not Driver Host isolation acceptance.
 - Clean CLI drill: init → synthetic demo → portable snapshot → restore to a new state directory → doctor PASS.
 - Restore drill confirmed a new workspace generation, advanced request epoch and no activation of historical mutation receipts.
@@ -32,7 +32,7 @@ Exact run IDs and SHA are recorded here only after completion.
 
 ## Behavior covered by the current local suite
 
-Durable identity/revisions; stale CAS; request-digest idempotency and conflict; lost-reply recovery; cursor snapshot binding; source authorization; build/target separation; claims and ReleaseContracts; safe text/VTT output; immutable artifacts/candidates; candidate-v2 pins for target context, ReleaseContract, localization/glossary, channel profile and declared rights; review-race isolation and distinct-reviewer quorum; explicit partial-package policy; LTS pinning; relation provenance; impact proposals; Platform-intent custody; Native SDK bridge; HTTP/client security; capture receipt provenance; verifier authority and waivers; channel package/receipt state; deterministic authenticated private ZIP bundles with exact manifests/artifact bytes; portable snapshot/restore.
+Durable identity/revisions; stale CAS; request-digest idempotency and conflict; lost-reply recovery; cursor snapshot binding; source authorization; build/target separation; claims and ReleaseContracts; safe text/VTT output; immutable artifacts/candidates; candidate-v2 pins for target context, ReleaseContract, localization/glossary, channel profile and declared rights; review-race isolation and distinct-reviewer quorum; explicit partial-package policy; LTS pinning; relation provenance; impact proposals; immutable document change proposals with exact-base stale protection and explicit human-content acknowledgement; Platform-intent custody; Native SDK bridge; HTTP/client security; capture receipt provenance; verifier authority and waivers; channel package/receipt state; deterministic authenticated private ZIP bundles with exact manifests/artifact bytes; portable snapshot/restore.
 
 ## Explicitly not established
 

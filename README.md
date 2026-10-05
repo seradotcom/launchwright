@@ -32,7 +32,7 @@ Synthetic data is never described as a real product capture.
 - build/source/target/feature/scenario/anchor modeling with explicit source authorization;
 - claims, CopyBlocks, availability rules and ReleaseContract readiness denominators;
 - immutable Markdown, safe HTML, JSON, email-draft and VTT artifacts with SHA-256-addressed bytes;
-- explicit relation provenance, impact projections and immutable impact proposals;
+- explicit relation provenance, impact projections, immutable impact proposals and exact-base document change proposals that cannot force-overwrite newer edits;
 - exact candidate manifests that pin artifact bytes, target context, ReleaseContract, localization/glossary revisions, channel profiles and declared rights, with input freshness and review-race isolation;
 - Semwright/native capture **receipt ingestion** tied to source + build + target + scenario while technical state stays UNKNOWN;
 - immutable verifier identity/version/digest, coverage, omissions and findings;

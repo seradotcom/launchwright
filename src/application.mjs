@@ -9,6 +9,7 @@ import { snapshotSummary } from './snapshot.mjs';
 import { validateLocalization, assessLocalization } from './localization.mjs';
 import { PROFILE_MATRIX, validateExtensionManifest, validateCompatibilityLock } from './extensions.mjs';
 import { freezeCandidate, buildCandidateGates, inspectCandidateState, recordCandidateReview, assertPrivateDeliveryReady, assertChannelPinned, assertPartialDeliveryPolicy } from './candidate.mjs';
+import { proposeChange, inspectChange, applyChange } from './change-proposal.mjs';
 export const PLATFORM_ACTIONS = ['recipes.prepare','recipes.execute','jobs.get','jobs.cancel','jobs.reconcile','evidence.get','artifacts.get','graph.observe','graph.observation','publish.preflight','publish.define','publish.version','publish.deploy','publish.invoke','publish.result'];
 const PUBLICATION_ACTIONS = new Set(['publish.define','publish.version','publish.deploy','publish.invoke']);
 const READ_ACTIONS = new Set(['jobs.get','evidence.get','artifacts.get','graph.observation','publish.result']);
@@ -76,7 +77,7 @@ export class LaunchwrightApplication {
   }
   describe(){return{app:'Launchwright',version:APP_VERSION,schema_version:'launchwright/1',workspace_version:this.store.version(),request_epoch:this.store.meta().epoch,
     scope_mode:'local-single-owner',principal:this.principal,scopes:[...this.scopes],native_sdk:'0.9.0-dev.1',operations:Object.entries(OPERATION_SCOPES).map(([name,scope])=>({name,scope,read_only:scope==='read'})),
-    capabilities:{editorial_text_exports:'available',private_draft_delivery:'available',portable_snapshot_restore:'available-local-admin',declared_release_contracts:'available',localization_ledger:'available-layout-quality-not-inferred',extension_descriptors:'available-no-remote-code',compatibility_negotiation:'available',profile_preflight:'available-contract-only',state_anchors:'contract-and-assessment-only',impact_proposals:'available-no-execution-authority',capture_receipts:'available-provenance-only',verification_ledger:'available-canonical-pass-requires-admission',waivers:'available-never-overwrite-verifier-state',channel_packages:'available-no-send',native_driver_host:'requires-owner-pinned-bundle-and-broker',platform:this.capabilities.platform??'not-connected',canonical_graph:'requires-platform-observation',browser_capture:'requires-canonical-driver-recipe',media_render:'requires-composition-recipe',mobile:'provenance-import-only',public_delivery:'requires-canonical-publish-receipt',...this.capabilities},
+    capabilities:{editorial_text_exports:'available',private_draft_delivery:'available',portable_snapshot_restore:'available-local-admin',declared_release_contracts:'available',localization_ledger:'available-layout-quality-not-inferred',extension_descriptors:'available-no-remote-code',compatibility_negotiation:'available',profile_preflight:'available-contract-only',state_anchors:'contract-and-assessment-only',impact_proposals:'available-no-execution-authority',document_change_proposals:'available-application-local-no-auto-merge',capture_receipts:'available-provenance-only',verification_ledger:'available-canonical-pass-requires-admission',waivers:'available-never-overwrite-verifier-state',channel_packages:'available-no-send',native_driver_host:'requires-owner-pinned-bundle-and-broker',platform:this.capabilities.platform??'not-connected',canonical_graph:'requires-platform-observation',browser_capture:'requires-canonical-driver-recipe',media_render:'requires-composition-recipe',mobile:'provenance-import-only',public_delivery:'requires-canonical-publish-receipt',...this.capabilities},
     limits:{page_items:128,reply_bytes:256*1024,artifact_bytes:1024*1024,receipt_epoch_items:20000},disclosure:'Local editorial checks are not Platform approvals or canonical effect verification.'};}
   profilePreflight(input){
     inputObject(input,['profile','source_id','target_id'],['profile','source_id']);str(input.profile,64);
@@ -152,6 +153,7 @@ export class LaunchwrightApplication {
       case'extension.discovery':return this.extensionDiscovery(input);
       case'compatibility.negotiate':return this.compatibilityNegotiate(input);
       case'compatibility.inspect':inputObject(input,['id']);return this.compatibilityInspect(input.id);
+      case'change.inspect':inputObject(input,['id']);return inspectChange(this,input.id);
       case'artifact.read':{
         inputObject(input,['id']);const a=this.get(input.id,'artifact');const b=this.store.readBlob(a.data.sha256);
         ensure(b.bytes.length<=160000,'Use authenticated artifact download for this output','ResourceExhausted');return{artifact:a,text:b.bytes.toString('utf8')};
@@ -242,6 +244,8 @@ export class LaunchwrightApplication {
         for(const parent of ['product_id','release_id'])ensure(e.data[parent]===data[parent],'Resource parent is immutable');this.assertReferences(e.kind,data);
         return{entity:this.store.update(e.id,e.data.template_origin?{...data,template_origin:e.data.template_origin}:data)};
       }
+      case'change.propose':return proposeChange(this,input);
+      case'change.apply':return applyChange(this,input);
       case'entity.retire':{
         inputObject(input,['id','expected','reason']);const e=this.get(input.id);ensure(EDITABLE.includes(e.kind),'Only editable domain resources can be retired','PermissionDenied');
         ensure(sameVersion(e.version,input.expected),'Entity revision changed','StaleReference');lines(input.reason,4000);

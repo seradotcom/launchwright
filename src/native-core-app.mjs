@@ -3,12 +3,13 @@ import { NativeError, object, integer, requestIdentity, sameVersion, checkCancel
 import { Store } from './store.mjs';
 import { APP_VERSION, RESOURCE, makeRequest, iso, digest } from './base.mjs';
 import { KINDS, EDITABLE, validateEntity, inputObject, idText, str, lines, choice } from './contracts.mjs';
+import { proposeChange, inspectChange, applyChange } from './change-proposal.mjs';
 
 export const CORE_NATIVE_OPERATIONS=Object.freeze([
-  'workspace.describe','resource.get','events.list',
-  'entity.create','entity.update','entity.retire','template.instantiate'
+  'workspace.describe','resource.get','events.list','change.inspect',
+  'entity.create','entity.update','entity.retire','change.propose','change.apply','template.instantiate'
 ]);
-const CORE_NATIVE_READS=new Set(['workspace.describe','resource.get','events.list']);
+const CORE_NATIVE_READS=new Set(['workspace.describe','resource.get','events.list','change.inspect']);
 const driverName=operation=>'driver.launchwright.'+operation.replaceAll('.','-');
 
 export class CoreNativeApplication {
@@ -54,18 +55,21 @@ export class CoreNativeApplication {
     if(op==='workspace.describe'){inputObject(input,[]);return this.describe();}
     if(op==='resource.get'){inputObject(input,['id']);return this.get(input.id);}
     if(op==='events.list'){inputObject(input,['after','limit'],[]);const after=integer(input.after??0,0,Number.MAX_SAFE_INTEGER),limit=integer(input.limit??50,1,128);const rows=this.store.db.prepare('SELECT * FROM events WHERE seq>? ORDER BY seq LIMIT ?').all(after,limit+1),more=rows.length>limit,items=rows.slice(0,limit).map(e=>({...e,payload:JSON.parse(e.payload),schema_version:'launchwright-event/1'}));return{items,next_after:more?items.at(-1).seq:null,watermark:this.store.db.prepare('SELECT coalesce(max(seq),0) AS n FROM events').get().n,complete:!more};}
+    if(op==='change.inspect'){inputObject(input,['id']);return inspectChange(this,input.id);}
     throw new NativeError('Unsupported','Operation is outside this native profile');
   }
   mutate(op,input){
     if(op==='entity.create'){inputObject(input,['kind','data']);choice(input.kind,EDITABLE);const data=validateEntity(input.kind,input.data);this.assertReferences(input.kind,data);return{entity:this.store.create(input.kind,data)};}
     if(op==='entity.update'){inputObject(input,['id','expected','data']);const e=this.get(input.id);ensure(EDITABLE.includes(e.kind),'Immutable resource cannot be edited','PermissionDenied');ensure(sameVersion(e.version,input.expected),'Entity revision changed','StaleReference');const data=validateEntity(e.kind,input.data);for(const parent of ['product_id','release_id'])ensure(e.data[parent]===data[parent],'Resource parent is immutable');this.assertReferences(e.kind,data);return{entity:this.store.update(e.id,e.data.template_origin?{...data,template_origin:e.data.template_origin}:data)};}
+    if(op==='change.propose')return proposeChange(this,input);
+    if(op==='change.apply')return applyChange(this,input);
     if(op==='entity.retire'){inputObject(input,['id','expected','reason']);const e=this.get(input.id);ensure(EDITABLE.includes(e.kind),'Only editable domain resources can be retired','PermissionDenied');ensure(sameVersion(e.version,input.expected),'Entity revision changed','StaleReference');lines(input.reason,4000);if(['product','release'].includes(e.kind)){const children=this.store.all().filter(x=>x.kind!=='tombstone'&&(x.data.product_id===e.id||x.data.release_id===e.id));ensure(children.length===0,'Retire active children before their parent','Conflict');}return{entity:this.store.retire(e.id,{subject_id:e.id,original_kind:e.kind,retired_at:iso(),reason:input.reason,content_revoked:true})};}
     if(op==='template.instantiate'){inputObject(input,['id','release_id','target_id','parameters','name']);const template=this.get(input.id,'template');object(input.parameters,template.data.parameters,template.data.parameters);for(const value of Object.values(input.parameters))str(value,4000);const data={release_id:input.release_id,target_id:input.target_id,name:str(input.name,160),format:template.data.format,content:template.data.content.replace(/\{\{([a-z][a-z0-9_]*)\}\}/g,(_,key)=>{ensure(Object.hasOwn(input.parameters,key),'Template contains an undeclared parameter');return input.parameters[key];}),claim_ids:[],source_ids:[]};validateEntity('deliverable',data);this.assertReferences('deliverable',data);return{entity:this.store.create('deliverable',{...data,template_origin:{id:template.id,version:template.version,parameters_sha256:digest('template-parameters',input.parameters)}}),template_pin:template.version};}
     throw new NativeError('Unsupported','Operation is outside this native profile');
   }
   invoke(op,args,context){
     checkCancelled(context);
-    if(['workspace.describe','resource.get','events.list'].includes(op))return this.read(op,args);
+    if(CORE_NATIVE_READS.has(op))return this.read(op,args);
     object(args,['request','input'],['request','input']);const request=requestIdentity(args.request);ensure(request.resource===RESOURCE,'Request is bound to a different workspace');
     const prepared=makeRequest(op,args.input,context.expected,request.epoch,request.key);ensure(prepared.request.request_sha256===request.request_sha256,'Request digest does not match command, input, revision and identity','Conflict');
     return this.store.transaction(op,this.principal,request,context.expected,()=>{checkCancelled(context);return this.mutate(op,args.input);});
