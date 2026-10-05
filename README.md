@@ -1,59 +1,107 @@
 # Launchwright
 
-**A source-linked release workspace built on the canonical Semwright Native SDK.**
+**Source-linked release production built on the canonical Semwright Native SDK.**
 
-Launchwright keeps release briefs, target contexts, scenarios, claims, immutable editorial outputs, exact-candidate reviews and private draft delivery in one application-owned record.
+Launchwright keeps product/build context, scenarios, claims, immutable release materials, verifier evidence, exact-candidate review, channel packages and recovery history in one application-owned workspace.
 
-This is a **developer preview**, not a claim that the full Release Studio specification has passed acceptance. The current local implementation is useful for editorial release preparation. Browser/product capture, Composition video rendering, canonical effects admission, multi-user Platform approvals and external publishing are not represented as completed capabilities.
+> **Developer preview.** The repository deliberately does not claim that the complete private product specification has passed acceptance. Real product capture, canonical Project Graph/effects, Composition media rendering, Platform execution, remote teams and public Publish remain external Semwright integration boundaries until exact receipts prove otherwise.
 
-## Run
+## Run locally
 
-Use Node **24.21.0** (the Native SDK's declared supported engine) and npm. No Rust compilation, browser installation, renderer or runtime build is needed for the local text workspace.
+Use Node **24.21.x**.
 
 ```sh
 npm ci --ignore-scripts --no-audit --no-fund
-node src/main.mjs init
-node src/main.mjs serve
+node src/main.mjs init --state .state
+node src/main.mjs serve --state .state --port 4317
 ```
 
-Open `http://127.0.0.1:4317`. Unlock with the contents of `.state/session-token`; keep that file private. The service binds loopback only, does not accept query-string credentials, and rejects unexpected Host and Origin headers.
+Open `http://127.0.0.1:4317` and unlock it with the local `.state/session-token`. The service is loopback-only, rejects query-string credentials and unexpected Host/Origin values, and uses an HttpOnly SameSite session cookie.
 
-An empty workspace is the default. To add **explicitly synthetic editorial examples**, not fabricated captures:
+For explicitly synthetic sample data:
 
 ```sh
-node src/main.mjs demo
+node src/main.mjs demo --state .state
 ```
 
-## Implemented local workflow
+Synthetic data is never described as a real product capture.
 
-Create a product and build-pinned release. Define separate UI/editorial/audio locales, plan, role, flags and viewport. Declare sources and scenarios; import provenance without turning producer assertions into technical PASS. Write a deliverable and generate immutable Markdown, safe HTML, JSON, email-draft or VTT output. Freeze its exact artifact hashes, source versions, destination and review contract. Record an editorial decision, revalidate inputs, and record a private draft under a compare-and-swap alias. Nothing is sent to an external service by this workflow.
+## What works today
 
-The UI, public HTTP client, CLI and native bridge share the same application dispatcher and SQLite transactions. Durable request receipts, events and business writes commit together. Large revisions remain strings. A changed request under an old idempotency key conflicts. A lost reply is recovered, never silently replaced with another mutation.
+- stable resource IDs, opaque generations, monotonic string revisions and optimistic concurrency;
+- build/source/target/feature/scenario/anchor modeling with explicit source authorization;
+- claims, CopyBlocks, availability rules and ReleaseContract readiness denominators;
+- immutable Markdown, safe HTML, JSON, email-draft and VTT artifacts with SHA-256-addressed bytes;
+- explicit relation provenance, impact projections and immutable impact proposals;
+- exact candidate manifests with input/version freshness checks and editorial decisions;
+- Semwright/native capture **receipt ingestion** tied to source + build + target + scenario while technical state stays UNKNOWN;
+- immutable verifier identity/version/digest, coverage, omissions and findings;
+- waivers that annotate failures without changing verifier truth;
+- versioned channel profiles, exact package generation and receipt/recovery state without performing the external send;
+- private-draft alias delivery with compare-and-swap;
+- portable snapshot/restore that rotates workspace generation and request epoch and suspends uncertain intents;
+- public HTTP client, browser UI, CLI and Native Application bridge sharing the same dispatcher and SQLite transaction model.
 
-## Actual Semwright integration
+## Semwright Native SDK
 
-The **unmodified** `@semwright/native-sdk` source is vendored under its original MIT OR Apache-2.0 license, pinned by hashes in `SOURCE_LOCK.json`. Current pin: Semwright commit `4d291de26724810017ce7b6d185326514cb79fa6`, SDK `0.9.0-dev.1`. This was checked through the authenticated GitHub API; the native SDK subtree is unchanged from the earlier `04cf0ef…` source archive used to begin implementation.
+The public `@semwright/native-sdk` source is vendored unchanged under its upstream **MIT OR Apache-2.0** license. `SOURCE_LOCK.json` pins:
 
-`src/native-entry.mjs` implements the public `NativeApplication` interfaces and uses `bridgeEntrypoint`, `dispatchApplication`, version-bound observations, exact request digests and recovery. `crates/launchwright-native` is a thin **real Rust NativeDriver + NodeBridge** adapter. Its JS bundle hash is fixed at build time; callers cannot select executable code, mounts or the Node runtime. Rust, browser and Host builds belong to the heavy GitHub Actions lane.
+- Semwright commit `4d291de26724810017ce7b6d185326514cb79fa6`
+- Native SDK `0.9.0-dev.1`
+- exact SHA-256 hashes for the redistributed SDK files/archive
 
-The optional Platform integration loads an **owner-provided, byte-pinned** `@semwright/platform-client` package; its current source snapshot is UNLICENSED and is therefore **not redistributed here**. The adapter negotiates actual actions, stores the canonical exported pending request before its one permitted send, and uses canonical recovery. It is not another scheduler, authentication system, Graph authority or publication backend.
+`src/native-entry.mjs` uses the real canonical bridge and dispatcher. `crates/launchwright-native` is a thin Rust `NativeDriver + NodeBridge` adapter with a build-time-pinned JavaScript bundle hash. The caller cannot choose arbitrary executable code, mounts or runtime paths.
+
+The optional Platform adapter consumes an owner-supplied byte-pinned package. The inspected Platform source is not licensed for redistribution, so it is not copied into this public repository.
+
+## Trust model
+
+Launchwright keeps **production, verification, review and delivery** separate.
+
+A successful capture receipt says that an execution receipt was recorded; it does not establish semantic correctness. A heuristic/model/local PASS remains effective UNKNOWN unless admitted by canonical verifier authority. A waiver records an exception but never turns FAIL into PASS. A channel package says bytes are ready; it does not mean they were uploaded or published. Public activation requires a canonical Publish receipt.
+
+Local input-pin comparisons are not Project Graph completeness. Scenario effect declarations are not canonical effects. VTT timing is not Composition rendering. Private editorial approval is not Host acceptance.
+
+## Backup and recovery
+
+```sh
+node src/main.mjs snapshot --state .state --out launchwright-snapshot.json
+node src/main.mjs restore --snapshot launchwright-snapshot.json --state .state-restored
+```
+
+Restore preserves domain identities and content hashes but creates a new workspace generation, advances the request epoch, leaves old mutation receipts inactive and marks uncertain pending work for explicit reconciliation.
 
 ## Verification
 
+Lightweight:
+
 ```sh
-npm test                 # Small isolated application / HTTP / SDK tests
-node scripts/verify.mjs   # Source locks and syntax
-node src/main.mjs doctor  # Actual local capability and engine report
+npm test
+node scripts/verify.mjs
+node src/main.mjs doctor --state .state
 ```
 
-GitHub Actions runs the application checks on Linux, Windows and macOS. Dispatch **Native and browser acceptance** with `lane=native`, `browser` or `all` for the expensive work. Browser tests exercise the real Launchwright interface, not product-capture acceptance. Bundle tests do not by themselves establish Driver Host isolation. See `evidence/` and `docs/ACCEPTANCE.md` for precisely recorded execution status.
+GitHub Actions runs the supported Node 24.21 runtime on Linux, Windows and macOS. The manual heavy workflow has three independently selectable lanes:
 
-## Safety and support boundaries
+- **native** — builds the pinned TypeScript SDK, native bundle and real Rust NativeDriver;
+- **browser** — installs Chromium on the runner and exercises the real Launchwright UI;
+- **stress** — bounded high-volume persistence, observation and portable-restore acceptance.
 
-One local owner, one workspace. No remote access, SaaS tenant isolation or team role claim is implied. Imported evidence remains unverified. Local editorial approval never overwrites technical verification. Text formatting is not Composition rendering. Input-pin comparisons are not canonical Project Graph verdicts. Historical LTS bindings retain their artifact versions. Direct public-channel delivery is blocked.
+Run expensive dependencies on GitHub Actions rather than the development workstation.
 
-See `docs/INSTALL.md`, `docs/ARCHITECTURE.md`, `docs/NATIVE_SDK.md`, `docs/SDK_GAPS.md`, `docs/RUNBOOK.md` and `docs/ACCEPTANCE.md`.
+## Documentation
+
+- [Install](docs/INSTALL.md)
+- [Architecture and authority boundaries](docs/ARCHITECTURE.md)
+- [Native SDK integration](docs/NATIVE_SDK.md)
+- [Known SDK/platform gaps](docs/SDK_GAPS.md)
+- [Storage and portability](docs/PORTABILITY.md)
+- [Operator runbook](docs/RUNBOOK.md)
+- [Requirements traceability](docs/REQUIREMENTS.md)
+- [Acceptance ledger](docs/ACCEPTANCE.md)
 
 ## License
 
-New Launchwright code: **AGPL-3.0-only**. Canonical Semwright SDK files retain **MIT OR Apache-2.0** and their original notices. The private source specification and Platform source are not part of this public repository. No font binaries, credentials, private runtime state, browser profiles or source captures are included.
+New Launchwright code is **AGPL-3.0-only**. Canonical Semwright SDK files retain **MIT OR Apache-2.0** and their original notices.
+
+The private source specification, credentials, private runtime state, browser profiles, product captures and unlicensed Platform source are not part of this public repository.

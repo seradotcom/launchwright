@@ -27,8 +27,11 @@ jobs:
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npm test
       - run: node scripts/verify.mjs
-      - name: Smoke the clean CLI
+      - name: Smoke the clean CLI and portable recovery
         run: |
           node src/main.mjs init --state .state-ci
           node src/main.mjs demo --state .state-ci
           node src/main.mjs doctor --state .state-ci
+          node src/main.mjs snapshot --state .state-ci --out snapshot-ci.json
+          node src/main.mjs restore --snapshot snapshot-ci.json --state .state-restored-ci
+          node src/main.mjs doctor --state .state-restored-ci
