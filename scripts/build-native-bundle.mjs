@@ -10,7 +10,7 @@ const npm=process.platform==='win32'?'npm.cmd':'npm',intermediate='dist/launchwr
 const args=['exec','--yes','--package',`esbuild@${esbuildVersion}`,'--','esbuild','src/native-entry.mjs','--bundle','--platform=node','--format=cjs','--target=node24','--minify','--legal-comments=none',`--outfile=${intermediate}`];
 const result=spawnSync(npm,args,{stdio:'inherit',shell:false});
 if(result.status!==0)throw Error('Native bundle build failed. Run this dependency/build step in the heavy GitHub Actions lane.');
-const compact=spawnSync(npm,['exec','--yes','--package',`terser@${terserVersion}`,'--','terser',intermediate,'--compress','passes=3','--mangle','--ecma','2022','--output',output],{stdio:'inherit',shell:false});
+const compact=spawnSync(npm,['exec','--yes','--package',`terser@${terserVersion}`,'--','terser',intermediate,'--compress','passes=5,toplevel=true','--mangle','toplevel=true','--toplevel','--ecma','2022','--output',output],{stdio:'inherit',shell:false});
 if(compact.status!==0)throw Error('Native bundle compaction failed.');
 unlinkSync(intermediate);
 const bytes=readFileSync(output);

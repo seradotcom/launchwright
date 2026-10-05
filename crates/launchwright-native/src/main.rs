@@ -10,7 +10,7 @@ const BUNDLE:Option<&str>=option_env!("LAUNCHWRIGHT_NATIVE_BUNDLE_SHA256");
 const OPERATIONS:&[(&str,bool,bool)]=&[
  ("workspace-describe",true,false),("resource-get",true,false),("events-list",true,false),
  ("release-coverage",true,false),("release-impact",true,false),("anchor-assess",true,false),("artifact-read",true,false),("candidate-inspect",true,false),
- ("entity-create",false,false),("entity-update",false,false),("impact-plan",false,false),("evidence-import",false,false),("deliverable-render",false,false),
+ ("entity-create",false,false),("entity-update",false,false),("entity-retire",false,false),("relation-record",false,false),("impact-plan",false,false),("evidence-import",false,false),("deliverable-render",false,false),
  ("candidate-freeze",false,false),("candidate-review",false,false),("candidate-deliver_private",false,true),
  ("template-instantiate",false,false),("work-prepare",false,false),("work-claim",false,false),("work-complete",false,false),
  ("work-mark_unknown",false,false),("workspace-rotate_epoch",false,true),

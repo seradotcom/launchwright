@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { object, text, integer, requireCondition as ensure, exactRequestDigest, validateValue } from '@semwright/native-sdk';
 export const APP_VERSION = '0.2.0-dev.2';
 export const RESOURCE = 'launchwright:workspace';
-export const KINDS = ['product','build','release','source','target','feature','availability','anchor','scenario','claim','copy_block','release_contract','evidence','deliverable','artifact','candidate','review','delivery','binding','template','impact_proposal','work'];
+export const KINDS = ['product','build','release','source','target','feature','availability','anchor','scenario','claim','copy_block','release_contract','relation','evidence','deliverable','artifact','candidate','review','delivery','binding','template','impact_proposal','work','tombstone'];
 export const EDITABLE = ['product','build','release','source','target','feature','availability','anchor','scenario','claim','copy_block','release_contract','deliverable','binding','template'];
 export const CLASSES = ['actual','demo','sanitized','editorial','generated','imported'];
 export const FORMATS = ['markdown','html','json','email','vtt'];
@@ -123,6 +123,6 @@ export function validateCaptions(cues) {
 }
 export const OPERATION_SCOPES = Object.freeze({
   'workspace.describe':'read','resource.get':'read','events.list':'read','release.coverage':'read','release.impact':'read','anchor.assess':'read','artifact.read':'read','candidate.inspect':'read',
-  'entity.create':'edit','entity.update':'edit','impact.plan':'edit','evidence.import':'edit','deliverable.render':'edit','candidate.freeze':'edit','candidate.review':'review','candidate.deliver_private':'publish',
+  'entity.create':'edit','entity.update':'edit','entity.retire':'edit','relation.record':'edit','impact.plan':'edit','evidence.import':'edit','deliverable.render':'edit','candidate.freeze':'edit','candidate.review':'review','candidate.deliver_private':'publish',
   'template.instantiate':'edit','work.prepare':'edit','work.claim':'edit','work.complete':'edit','work.mark_unknown':'edit','workspace.rotate_epoch':'admin',
 });

@@ -155,7 +155,8 @@ export class LaunchwrightApplication {
     const bindings=this.list('binding',releaseId).map(b=>({binding_id:b.id,mode:b.data.mode,action:b.data.mode==='rolling'?'revalidate-if-inputs-changed':'retain-pinned-history',pinned_artifact_id:b.data.pinned_artifact_id??null}));
     const contracts=this.coverage(releaseId).contracts;
     const contract_blockers=contracts.flatMap(c=>c.obligations.filter(o=>o.state!=='PASS').map(o=>({contract_id:c.id,...o})));
-    return{release_id:releaseId,items,bindings,contract_blockers,coverage:'DECLARED_DEPENDENCIES_ONLY',canonical_graph_authority:false,unknown_frontier:true,note:'This is an app input-revision comparison and release-contract projection, not a Project Graph freshness verdict.'};
+    const relations=this.list('relation',releaseId).map(r=>({id:r.id,from_id:r.data.from_id,to_id:r.data.to_id,kind:r.data.relation_kind,provenance:r.data.provenance,completeness:r.data.completeness,admission:r.data.admission}));
+    return{release_id:releaseId,items,bindings,contract_blockers,relations,coverage:'DECLARED_DEPENDENCIES_ONLY',canonical_graph_authority:false,unknown_frontier:true,note:'This is an app input-revision comparison, explicit relation inventory and release-contract projection, not a Project Graph freshness verdict.'};
   }
   candidateGates(candidate){
     const changed=this.freshness(candidate.data.manifest.inputs);
@@ -176,6 +177,21 @@ export class LaunchwrightApplication {
         ensure(sameVersion(e.version,input.expected),'Entity revision changed','StaleReference');const data=validateEntity(e.kind,input.data);
         for(const parent of ['product_id','release_id'])ensure(e.data[parent]===data[parent],'Resource parent is immutable');this.assertReferences(e.kind,data);
         return{entity:this.store.update(e.id,e.data.template_origin?{...data,template_origin:e.data.template_origin}:data)};
+      }
+      case'entity.retire':{
+        inputObject(input,['id','expected','reason']);const e=this.get(input.id);ensure(EDITABLE.includes(e.kind),'Only editable domain resources can be retired','PermissionDenied');
+        ensure(sameVersion(e.version,input.expected),'Entity revision changed','StaleReference');lines(input.reason,4000);
+        if(['product','release'].includes(e.kind)){const children=this.store.all().filter(x=>x.kind!=='tombstone'&&(x.data.product_id===e.id||x.data.release_id===e.id));ensure(children.length===0,'Retire active children before their parent','Conflict');}
+        return{entity:this.store.retire(e.id,{subject_id:e.id,original_kind:e.kind,retired_at:iso(),reason:input.reason,content_revoked:true})};
+      }
+      case'relation.record':{
+        inputObject(input,['release_id','name','from_id','to_id','relation_kind','provenance','completeness','evidence_ids'],['release_id','name','from_id','to_id','relation_kind','provenance','completeness']);
+        const release=this.get(input.release_id,'release'),from=this.get(input.from_id),to=this.get(input.to_id);str(input.name,160);str(input.relation_kind,128);ensure(/^[a-z][a-z0-9_.-]{0,127}$/.test(input.relation_kind),'Invalid relation kind');
+        ensure(this.productOf(from)===release.data.product_id&&this.productOf(to)===release.data.product_id,'Relation crosses product boundary','PermissionDenied');choice(input.provenance,['declared','imported','heuristic','observed']);choice(input.completeness,['complete','partial','unknown']);
+        if(input.provenance==='heuristic')ensure(input.completeness!=='complete','Heuristic relation cannot claim complete coverage');
+        const evidenceIds=input.evidence_ids??[];array(evidenceIds,32);ensure(new Set(evidenceIds).size===evidenceIds.length,'Duplicate relation evidence');for(const id of evidenceIds){const evidence=this.get(id,'evidence');ensure(evidence.data.release_id===release.id,'Relation evidence belongs to another release');}
+        if(input.provenance==='observed'){ensure(this.capabilities.canonical_graph_admission===true,'Observed relation requires canonical Graph admission','PolicyDenied');ensure(evidenceIds.length>0,'Observed relation requires admitted evidence');}
+        return{entity:this.store.create('relation',{release_id:release.id,name:input.name,from_id:from.id,to_id:to.id,relation_kind:input.relation_kind,provenance:input.provenance,completeness:input.completeness,evidence_ids:evidenceIds,from_version:from.version,to_version:to.version,admission:input.provenance==='observed'?'canonical-owner-admitted':'local-explicit-record',created_at:iso()})};
       }
       case'impact.plan':{
         inputObject(input,['release_id','cause_ids','note'],['release_id','cause_ids']);const release=this.get(input.release_id,'release');array(input.cause_ids,64);ensure(new Set(input.cause_ids).size===input.cause_ids.length,'Duplicate impact causes');

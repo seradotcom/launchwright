@@ -80,3 +80,39 @@ test('impact plan is an immutable proposal and creates no jobs or execution auth
   assert.equal(app.list('work').length,before);
   await assert.rejects(update(app,proposal,{state:'EXECUTED'}),{code:'PermissionDenied'});
 });
+
+test('retiring a resource preserves identity as a redacted tombstone and invalidates pinned outputs', async t => {
+  const {app}=setup(t);const b=await baseline(app);
+  const claim=await b.create('claim',{release_id:b.release.id,name:'Retirable claim',text:'Sensitive claim text',target_id:b.target.id,category:'editorial',evidence_ids:[]});
+  const deliverable=(await update(app,b.deliverable,{claim_ids:[claim.id]})).entity;
+  const artifact=(await execute(app,'deliverable.render',{id:deliverable.id})).entity;
+  const retired=(await execute(app,'entity.retire',{id:claim.id,expected:claim.version,reason:'Synthetic retention test'})).entity;
+  assert.equal(retired.id,claim.id);
+  assert.equal(retired.kind,'tombstone');
+  assert.equal(retired.data.original_kind,'claim');
+  assert.equal(retired.data.content_revoked,true);
+  assert.equal('text' in retired.data,false);
+  assert.equal(app.list('claim',b.release.id).length,0);
+  const impact=app.impact(b.release.id);
+  assert.ok(impact.items.find(i=>i.artifact_id===artifact.id)?.changed.some(c=>c.id===claim.id));
+  await assert.rejects(update(app,retired,{reason:'rewrite history'}),{code:'PermissionDenied'});
+});
+
+test('parent retirement is blocked while active children still reference it', async t => {
+  const {app}=setup(t);const b=await baseline(app);
+  await assert.rejects(execute(app,'entity.retire',{id:b.release.id,expected:b.release.version,reason:'Should not orphan active children'}),{code:'Conflict'});
+  await assert.rejects(execute(app,'entity.retire',{id:b.product.id,expected:b.product.version,reason:'Should not orphan release'}),{code:'Conflict'});
+});
+
+test('explicit relations preserve provenance and heuristic edges cannot become observed or complete by serialization', async t => {
+  const {app}=setup(t);const b=await baseline(app);
+  await assert.rejects(execute(app,'relation.record',{release_id:b.release.id,name:'Bad heuristic',from_id:b.source.id,to_id:b.deliverable.id,relation_kind:'source.supports',provenance:'heuristic',completeness:'complete'}),{code:'InvalidArgument'});
+  await assert.rejects(execute(app,'relation.record',{release_id:b.release.id,name:'Fake observation',from_id:b.source.id,to_id:b.deliverable.id,relation_kind:'source.supports',provenance:'observed',completeness:'partial'}),{code:'PolicyDenied'});
+  const relation=(await execute(app,'relation.record',{release_id:b.release.id,name:'Candidate dependency',from_id:b.source.id,to_id:b.deliverable.id,relation_kind:'source.supports',provenance:'heuristic',completeness:'partial'})).entity;
+  assert.equal(relation.data.provenance,'heuristic');
+  assert.equal(relation.data.completeness,'partial');
+  assert.equal(relation.data.admission,'local-explicit-record');
+  const impact=app.impact(b.release.id);
+  assert.deepEqual(impact.relations.map(r=>({id:r.id,provenance:r.provenance,completeness:r.completeness})),[{id:relation.id,provenance:'heuristic',completeness:'partial'}]);
+  await assert.rejects(update(app,relation,{provenance:'observed'}),{code:'PermissionDenied'});
+});

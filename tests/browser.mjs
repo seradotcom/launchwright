@@ -31,7 +31,7 @@ try{
  await page.getByRole('button',{name:'Create product',exact:true}).click();
  await fill('Product name','DeltaDesk');await fill('Description','Owned UI test fixture');await save();
  await page.getByRole('button',{name:'Create release',exact:true}).first().click();
- await fill('Release name','1.0 launch');await fill('Immutable build identity','browser-build-A');await save();
+ await fill('Release name','1.0 launch');await fill('Build identity label','browser-build-A');await save();
  await page.getByRole('link',{name:'Targets & sources',exact:false}).click();
  await page.getByRole('button',{name:'Add target',exact:true}).first().click();await fill('Target name','English basic viewer');await save();
  await page.getByRole('link',{name:'Deliverables',exact:false}).click();
