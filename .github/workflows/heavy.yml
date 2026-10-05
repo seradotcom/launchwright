@@ -76,6 +76,7 @@ jobs:
             evidence/native/
             dist/native-bundle.json
             dist/launchwright.cjs
+            dist/launchwright.payload.cjs
             target/release/launchwright-native
             Cargo.lock
           if-no-files-found: error

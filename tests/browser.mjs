@@ -44,9 +44,14 @@ try{
  await page.getByRole('link',{name:'Review room',exact:false}).click();
  await page.getByRole('button',{name:'Freeze candidate',exact:true}).first().click();await save('Freeze exact candidate');
  await page.getByRole('button',{name:'Inspect gates',exact:true}).click();
- await page.getByRole('button',{name:'Record editorial decision',exact:true}).click();
- await dialog.getByLabel('Decision',{exact:true}).selectOption('approve-editorial');
- await fill('Reason or requested change','UI test decision on exact candidate');await save('Record decision');
+ for(const dimension of ['technical','editorial','permissions']){
+   await page.getByRole('button',{name:'Record review decision',exact:true}).click();
+   await dialog.getByLabel('Review dimension',{exact:true}).selectOption(dimension);
+   await dialog.getByLabel('Decision',{exact:true}).selectOption('approve');
+   await fill('Reason or requested change',`UI test ${dimension} decision on exact candidate`);
+   await save('Record decision');
+ }
+ await page.getByRole('button',{name:'Export exact ZIP',exact:true}).click();
  await page.getByRole('button',{name:'Record private draft',exact:true}).click();
  await dialog.getByRole('checkbox').check();await save('Record private draft');
  await page.getByRole('link',{name:'Delivery',exact:false}).click();await page.getByText('NOT SENT',{exact:true}).waitFor();

@@ -26,7 +26,9 @@ Launchwright uses the canonical SDK for:
 - application context
 - bridge entrypoint behavior
 
-The Rust adapter uses the actual NativeDriver/NodeBridge path and binds the generated Launchwright bundle hash at build time.
+The Rust adapter uses the actual NativeDriver/NodeBridge path and binds the generated Launchwright bundle hash at build time. Because the canonical NodeBridge limits a pinned bundle file to 48 KiB, the build retains the minified uncompressed payload as CI evidence and materializes a deterministic Brotli wrapper. The wrapper is itself SHA-256 pinned by Rust and verifies the uncompressed payload SHA-256 before executing it; no runtime caller can replace either digest or inject source.
+
+`dist/native-bundle.json` records wrapper bytes/hash, uncompressed payload bytes/hash, packaging method and remaining canonical stdin-frame budget. The raw `dist/launchwright.payload.cjs` is uploaded with the wrapper so the executed payload remains auditable instead of being hidden by compression.
 
 ## What this does not prove
 
