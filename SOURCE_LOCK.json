@@ -1,0 +1,36 @@
+{
+  "schema_version": "launchwright-source-lock/1",
+  "native_sdk": {
+    "repository": "https://github.com/seradotcom/semwright",
+    "sha": "4d291de26724810017ce7b6d185326514cb79fa6",
+    "version": "0.9.0-dev.1",
+    "observed_via": "Authenticated gh API read through Remote Desktop Commander; TypeScript source and package byte equality confirmed",
+    "live_main_verified": true,
+    "archive_sha256": "0e846aa7646cb8b431008daabaf8d4c163eba9e72c9b7a6204f0df12f69199a1",
+    "files": {
+      "LICENSE-APACHE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "tsconfig.json": "de3b36bb52f84b4b08cf87436e6111c621a2364038b3e953f7b8bae49e889faa",
+      "package-lock.json": "0b6dfff1f6c24a717ee2762287d982200423b4988881527621fd0eaf89726b5b",
+      "package.json": "95269157400d0f44c61d2e774a07341bd711a12400e1ccc4d94145b13c306dae",
+      "LICENSE-MIT": "ad56b5c3e274c6d82e1424447211bfb4e5b2c22c86e6cf8aa8120458aa7347ef",
+      "README.md": "1fb6b30ccd2b93588116d301ae8e33bbfda7db2b34db9f069dee5b4145b0ea7b",
+      "src/index.ts": "b6515daa335e5b6851104ed72f804b798477a513c1f47b2048dab8fcaf5ee1e6"
+    },
+    "prior_archive_sha": "04cf0ef7062d134b71206d832375be9545553bb4",
+    "live_observed_at": "2026-10-05T00:33:00Z"
+  },
+  "platform_client": {
+    "version": "0.3.5-dev.1",
+    "source_snapshot": "2026-10-05T00:04:10.725056+00:00",
+    "license": "UNLICENSED",
+    "public_redistribution": false,
+    "integration": "operator-supplied public package export, not copied into repository"
+  },
+  "app_baseline": "Empty directory observed /home/sergio/Documents/Projects/Launchwright on 2026-10-05T00:32Z",
+  "remote_worktree_inspected": true,
+  "specification_sha256": "587663d1de9672c8c6aaa7b93592acf8aa72ec2599126ebbd044cd3ed21245d6",
+  "node_required": ">=24.21.0 <25",
+  "local_validation_node": "22.16.0 (outside upstream supported engine; supplemental only)",
+  "heavy_tests": "GitHub Actions lanes configured; initial dispatch follows repository creation",
+  "workstation_validation_node": "22.22.0 (supplemental, outside supported engine)"
+}

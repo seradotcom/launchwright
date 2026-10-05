@@ -1,0 +1,82 @@
+name: Native and browser acceptance
+on:
+  workflow_dispatch:
+    inputs:
+      lane:
+        description: Select only the lane affected by the change
+        type: choice
+        options: [all, native, browser]
+        default: all
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: heavy-${{ inputs.lane }}-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  browser:
+    if: inputs.lane == 'all' || inputs.lane == 'browser'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm install --prefix .ci-tools --no-audit --no-fund --ignore-scripts playwright@1.58.2
+      - run: .ci-tools/node_modules/.bin/playwright install --with-deps chromium
+      - run: node tests/browser.mjs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: launchwright-browser-${{ github.sha }}
+          path: evidence/browser/
+          if-no-files-found: error
+          retention-days: 14
+  native:
+    if: inputs.lane == 'all' || inputs.lane == 'native'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      CARGO_INCREMENTAL: '0'
+      CARGO_TERM_COLOR: never
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Build canonical TypeScript SDK with its declared compiler
+        run: |
+          cd vendor/semwright-native-sdk
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run build
+      - run: node scripts/build-native-bundle.mjs
+      - name: Pin compiler and build actual Rust NativeDriver
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup override set stable
+          export LAUNCHWRIGHT_NATIVE_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json")).sha256')"
+          mkdir -p evidence/native
+          rustc -Vv | tee evidence/native/compiler.txt
+          cargo test -p launchwright-native 2>&1 | tee evidence/native/cargo-test.log
+          cargo build -p launchwright-native --release 2>&1 | tee evidence/native/cargo-build.log
+          node tests/bundle-smoke.mjs
+      - name: Retain exact bytes and lockfile
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: launchwright-native-${{ github.sha }}
+          path: |
+            evidence/native/
+            dist/native-bundle.json
+            dist/launchwright.cjs
+            target/release/launchwright-native
+            Cargo.lock
+          if-no-files-found: error
+          retention-days: 14

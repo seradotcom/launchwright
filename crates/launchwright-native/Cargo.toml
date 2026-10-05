@@ -1,0 +1,12 @@
+[package]
+name = "launchwright-native"
+version = "0.1.0-dev.1"
+edition = "2024"
+rust-version = "1.88"
+license = "AGPL-3.0-only"
+description = "Launchwright canonical Semwright Native SDK NodeBridge driver"
+publish = false
+
+[dependencies]
+semwright-native-sdk = { git = "https://github.com/seradotcom/semwright", rev = "4d291de26724810017ce7b6d185326514cb79fa6", features = ["driver", "process-bridge", "graph"] }
+tokio = { version = "1", features = ["rt", "macros"] }
