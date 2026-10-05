@@ -41,9 +41,10 @@ export function createAppServer(app,{token=localToken(app.store.root),port=4317}
       ensure(equal(bearer,token)||equal(cookie,token),'Unlock this local workspace with its session token','PermissionDenied');
       const call=(operation,input)=>dispatchApplication(app,'invoke',operation,input,applicationContext(randomUUID(),null));
       if(path==='/api/v1/describe'&&req.method==='GET'){json(res,200,await call('workspace.describe',{}));return;}
-      if(req.method==='GET'&&/^\/api\/v1\/artifacts\/[a-z0-9_-]+\/download$/.test(path)){
-        app.allow('read');const id=path.split('/')[4];idText(id);const artifact=app.get(id,'artifact');const bytes=app.store.readBlob(artifact.data.sha256);
-        res.writeHead(200,{'Content-Type':bytes.mime,'Content-Disposition':`attachment; filename="${artifact.id}.${artifact.data.extension}"`,'Content-Length':bytes.bytes.length,'Cache-Control':'no-store','ETag':`"${artifact.data.sha256}"`});res.end(bytes.bytes);return;
+      const download=path.match(/^\/api\/v1\/(artifacts|bundles)\/([a-z0-9_-]+)\/download$/);
+      if(req.method==='GET'&&download){
+        app.allow('read');const id=download[2];idText(id);const entity=app.get(id,download[1]==='artifacts'?'artifact':'bundle'),bytes=app.store.readBlob(entity.data.sha256);
+        res.writeHead(200,{'Content-Type':bytes.mime,'Content-Disposition':`attachment; filename="${entity.id}.${entity.data.extension}"`,'Content-Length':bytes.bytes.length,'Cache-Control':'no-store','ETag':`"${entity.data.sha256}"`});res.end(bytes.bytes);return;
       }
       ensure(req.method==='POST','Route not found','NotFound');const data=await body(req);
       if(path==='/api/v1/read'){object(data,['operation','input'],['operation','input']);ensure(OPERATION_SCOPES[data.operation]==='read','This route accepts only read operations');json(res,200,await call(data.operation,data.input));}

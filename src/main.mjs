@@ -8,13 +8,14 @@ import { LaunchwrightApplication, execute } from './application.mjs';
 import { createAppServer, localToken } from './server.mjs';
 import { makeRequest, RESOURCE, APP_VERSION } from './contracts.mjs';
 import { applicationContext, dispatchApplication } from '@semwright/native-sdk';
+import { exportWorkspace, restoreWorkspace } from './portable.mjs';
 const here=fileURLToPath(new URL('..',import.meta.url));
 const [command='help',...args]=process.argv.slice(2);
 function option(name,fallback){const i=args.indexOf('--'+name);if(i>=0){if(!args[i+1]||args[i+1].startsWith('--'))throw Error(`Missing --${name} value`);return args[i+1];}return fallback;}
 const root=resolve(option('state',process.env.LAUNCHWRIGHT_STATE??'.state'));
 const print=value=>process.stdout.write(JSON.stringify(value,null,2)+'\n');
 async function main(){
-  if(command==='help'){console.log(`Launchwright ${APP_VERSION} — AGPL-3.0-only\n\nCommands:\n  init [--state DIR]                 Create an empty local workspace\n  serve [--state DIR] [--port 4317]  Serve on loopback only\n  doctor [--state DIR]               Report actual capabilities; no repairs\n  list [--kind KIND] [--state DIR]   Read paginated native observations\n  call --operation NAME --input FILE [--request KEY] [--state DIR]\n  prepare --operation NAME --input FILE --out FILE [--state DIR]\n  send --prepared FILE [--state DIR]  Send exactly one saved native intent\n  recover --prepared FILE [--state DIR]\n  demo [--state DIR]                 Create synthetic editorial examples, NOT captures\n  platform --work ID [--recover] [--state DIR]\n\nHeavy compilation, browser tests and Host conformance belong to GitHub Actions.\n`);return;}
+  if(command==='help'){console.log(`Launchwright ${APP_VERSION} — AGPL-3.0-only\n\nCommands:\n  init [--state DIR]                 Create an empty local workspace\n  serve [--state DIR] [--port 4317]  Serve on loopback only\n  doctor [--state DIR]               Report actual capabilities; no repairs\n  list [--kind KIND] [--state DIR]   Read paginated native observations\n  call --operation NAME --input FILE [--request KEY] [--state DIR]\n  prepare --operation NAME --input FILE --out FILE [--state DIR]\n  send --prepared FILE [--state DIR]  Send exactly one saved native intent\n  recover --prepared FILE [--state DIR]\n  export --out FILE [--state DIR]        Write portable verified workspace ZIP\n  restore --bundle FILE --state DIR      Dry-run restore; add --commit to create workspace\n  demo [--state DIR]                 Create synthetic editorial examples, NOT captures\n  platform --work ID [--recover] [--state DIR]\n\nHeavy compilation, browser tests and Host conformance belong to GitHub Actions.\n`);return;}
   if(command==='init'){const app=new LaunchwrightApplication(root,{initialize:true});app.close();localToken(root);print({state:root,created_or_opened:true,session_token_file:join(root,'session-token')});return;}
   if(command==='doctor'){
     const parts=process.versions.node.split('.').map(Number),supported=parts[0]===24&&(parts[1]>21||(parts[1]===21&&parts[2]>=0));
@@ -27,10 +28,16 @@ async function main(){
     console.log(`Launchwright: ${url}\nUnlock with the token stored in ${join(root,'session-token')}\nLocal-only mode; no external publication or runtime acceptance inferred.`);
     const close=async()=>{await service.close();app.close();process.exit(0);};process.once('SIGINT',close);process.once('SIGTERM',close);return;
   }
+  if(command==='restore'){
+    const bundle=option('bundle',null);if(!bundle)throw Error('--bundle is required');
+    const commit=args.includes('--commit'),report=restoreWorkspace(readFileSync(resolve(bundle)),root,{commit});
+    if(commit)localToken(root);print(report);return;
+  }
   const app=new LaunchwrightApplication(root);try{
     if(command==='list'){
       let cursor=null;do{const page=await dispatchApplication(app,'observe',null,{resource:RESOURCE,scope:option('kind','all'),limit:64,cursor},applicationContext(randomUUID()));print(page);cursor=page.next;}while(cursor);return;
     }
+    if(command==='export'){const out=option('out',null);if(!out)throw Error('--out is required');const exported=exportWorkspace(app);writeFileSync(resolve(out),exported.bytes,{flag:'wx',mode:0o600});print({saved:resolve(out),sha256:exported.sha256,entities:exported.manifest.entities.length,blobs:exported.manifest.blobs.length,receipts_exported:false,pending_dispatch_exported:false});return;}
     if(command==='demo'){const{seedDemo}=await import('../fixtures/seed.mjs');print(await seedDemo(app));return;}
     if(command==='platform'){const{runPlatformWork}=await import('./platform.mjs');print(await runPlatformWork(app,option('work',null),{recover:args.includes('--recover')}));return;}
     if(command==='call'||command==='prepare'){
