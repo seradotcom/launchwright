@@ -4,12 +4,14 @@ import { NativeError, applicationContext, dispatchApplication, requireCondition 
 import { Store } from './store.mjs';
 import { APP_VERSION, RESOURCE, KINDS, EDITABLE, RIGHTS, CLASSES, OPERATION_SCOPES, validateEntity, inputObject, idText, str, lines, array, choice, sha, digest, makeRequest, iso, noSecrets } from './contracts.mjs';
 import { renderText } from './render.mjs';
+import { validateCapture, validateVerification, validateWaiver, validateChannelPackage, validateChannelOutcome } from './records.mjs';
+import { snapshotSummary } from './snapshot.mjs';
 export const PLATFORM_ACTIONS = ['recipes.prepare','recipes.execute','jobs.get','jobs.cancel','jobs.reconcile','evidence.get','artifacts.get','graph.observe','graph.observation','publish.preflight','publish.define','publish.version','publish.deploy','publish.invoke','publish.result'];
 const PUBLICATION_ACTIONS = new Set(['publish.define','publish.version','publish.deploy','publish.invoke']);
 const READ_ACTIONS = new Set(['jobs.get','evidence.get','artifacts.get','graph.observation','publish.result']);
 
 export class LaunchwrightApplication {
-  constructor(root, { initialize = false, readOnly = false, principal = 'local-owner', scopes = ['read','edit','review','publish','admin'], capabilities = {} } = {}) {
+  constructor(root, { initialize = false, readOnly = false, principal = 'local-owner', scopes = ['read','edit','capture','review','publish','admin'], capabilities = {} } = {}) {
     this.store = new Store(root,{initialize,readOnly});
     this.principal=str(principal,128); this.scopes=new Set(scopes); this.capabilities=capabilities;
     this.operations = new Map(Object.keys(OPERATION_SCOPES).map(operation => [operation,(args,context)=>this.invoke(operation,args,context)]));
@@ -71,7 +73,7 @@ export class LaunchwrightApplication {
   }
   describe(){return{app:'Launchwright',version:APP_VERSION,schema_version:'launchwright/1',workspace_version:this.store.version(),request_epoch:this.store.meta().epoch,
     scope_mode:'local-single-owner',principal:this.principal,scopes:[...this.scopes],native_sdk:'0.9.0-dev.1',operations:Object.entries(OPERATION_SCOPES).map(([name,scope])=>({name,scope,read_only:scope==='read'})),
-    capabilities:{editorial_text_exports:'available',private_draft_delivery:'available',declared_release_contracts:'available',state_anchors:'contract-and-assessment-only',impact_proposals:'available-no-execution-authority',native_driver_host:'requires-owner-pinned-bundle-and-broker',platform:this.capabilities.platform??'not-connected',canonical_graph:'requires-platform-observation',browser_capture:'requires-canonical-driver-recipe',media_render:'requires-composition-recipe',mobile:'provenance-import-only',public_delivery:'not-implemented',...this.capabilities},
+    capabilities:{editorial_text_exports:'available',private_draft_delivery:'available',portable_snapshot_restore:'available-local-admin',declared_release_contracts:'available',state_anchors:'contract-and-assessment-only',impact_proposals:'available-no-execution-authority',capture_receipts:'available-provenance-only',verification_ledger:'available-canonical-pass-requires-admission',waivers:'available-never-overwrite-verifier-state',channel_packages:'available-no-send',native_driver_host:'requires-owner-pinned-bundle-and-broker',platform:this.capabilities.platform??'not-connected',canonical_graph:'requires-platform-observation',browser_capture:'requires-canonical-driver-recipe',media_render:'requires-composition-recipe',mobile:'provenance-import-only',public_delivery:'requires-canonical-publish-receipt',...this.capabilities},
     limits:{page_items:128,reply_bytes:256*1024,artifact_bytes:1024*1024,receipt_epoch_items:20000},disclosure:'Local editorial checks are not Platform approvals or canonical effect verification.'};}
   invoke(operation,args,context){
     const scope=OPERATION_SCOPES[operation];this.allow(scope);checkCancelled(context);
@@ -85,6 +87,7 @@ export class LaunchwrightApplication {
   read(operation,input){
     switch(operation){
       case'workspace.describe':inputObject(input,[]);return this.describe();
+      case'workspace.snapshot':inputObject(input,[]);return snapshotSummary(this);
       case'resource.get':inputObject(input,['id']);return this.get(input.id);
       case'events.list':{
         inputObject(input,['after','limit'],[]);const after=integer(input.after??0,0,Number.MAX_SAFE_INTEGER),limit=integer(input.limit??50,1,128);
@@ -100,6 +103,8 @@ export class LaunchwrightApplication {
         return{anchor_id:anchor.id,state,expected_count:expected,observed_matches:observed,unique:state==='PASS',selected:state==='PASS',reason:state==='PASS'?'unique-anchor':'anchor-cardinality-mismatch'};
       }
       case'candidate.inspect':inputObject(input,['id']);return this.inspectCandidate(this.get(input.id,'candidate'));
+      case'verification.summary':inputObject(input,['candidate_id']);return this.verificationSummary(input.candidate_id);
+      case'channel.status':inputObject(input,['release_id']);return this.channelStatus(input.release_id);
       case'artifact.read':{
         inputObject(input,['id']);const a=this.get(input.id,'artifact');const b=this.store.readBlob(a.data.sha256);
         ensure(b.bytes.length<=160000,'Use authenticated artifact download for this output','ResourceExhausted');return{artifact:a,text:b.bytes.toString('utf8')};
@@ -158,17 +163,41 @@ export class LaunchwrightApplication {
     const relations=this.list('relation',releaseId).map(r=>({id:r.id,from_id:r.data.from_id,to_id:r.data.to_id,kind:r.data.relation_kind,provenance:r.data.provenance,completeness:r.data.completeness,admission:r.data.admission}));
     return{release_id:releaseId,items,bindings,contract_blockers,relations,coverage:'DECLARED_DEPENDENCIES_ONLY',canonical_graph_authority:false,unknown_frontier:true,note:'This is an app input-revision comparison, explicit relation inventory and release-contract projection, not a Project Graph freshness verdict.'};
   }
+  verificationSummary(candidateId){
+    const candidate=this.get(candidateId,'candidate');
+    const records=this.list('verification',candidate.data.release_id).filter(v=>v.data.candidate_id===candidate.id);
+    const waivers=this.list('waiver',candidate.data.release_id).filter(w=>w.data.candidate_id===candidate.id);
+    const checks=records.map(v=>{
+      const related=waivers.filter(w=>w.data.verification_id===v.id);
+      const active=related.filter(w=>!w.data.expires_at||Date.parse(w.data.expires_at)>Date.now());
+      const admitted=v.data.admission==='canonical-owner-admitted';
+      const effective=v.data.state==='FAIL'||v.data.state==='ERROR'?v.data.state:(admitted?v.data.state:'UNKNOWN');
+      return{verification_id:v.id,dimension:v.data.dimension,reported_state:v.data.state,effective_state:effective,admission:v.data.admission,verifier:v.data.verifier,coverage:v.data.coverage,omissions:v.data.omissions,findings:v.data.findings,waivers:related.map(w=>({id:w.id,scope:w.data.scope,expires_at:w.data.expires_at??null,active:active.some(a=>a.id===w.id)})),waived:active.length>0};
+    });
+    const state=checks.some(c=>['FAIL','ERROR'].includes(c.effective_state))?'FAIL':checks.length&&checks.every(c=>c.effective_state==='PASS')?'PASS':'UNKNOWN';
+    return{candidate_id:candidate.id,state,checks,canonical_passes:checks.filter(c=>c.effective_state==='PASS').length,failures:checks.filter(c=>['FAIL','ERROR'].includes(c.effective_state)).length,unknown:checks.filter(c=>c.effective_state==='UNKNOWN').length,note:'Waivers preserve the underlying verification state; non-canonical PASS reports remain UNKNOWN.'};
+  }
+  channelStatus(releaseId){
+    this.get(releaseId,'release');
+    const rows=this.list('channel_delivery',releaseId).sort((a,b)=>a.created.localeCompare(b.created));
+    const latest=new Map();
+    for(const row of rows)latest.set(row.data.profile_id+'\0'+row.data.participant,row);
+    return{release_id:releaseId,deliveries:rows,latest:[...latest.values()],profiles:this.list('channel_profile').filter(p=>rows.some(r=>r.data.profile_id===p.id)).map(p=>({id:p.id,name:p.data.name,channel:p.data.channel,profile_version:p.data.profile_version,destination_class:p.data.destination_class,idempotency:p.data.idempotency})),external_send_performed:false};
+  }
   candidateGates(candidate){
     const changed=this.freshness(candidate.data.manifest.inputs);
     const gates=[{name:'input-versions',state:changed.length?'FAIL':'PASS',details:changed},{name:'artifact-bytes',state:'PASS',details:[]}];
     for(const id of candidate.data.manifest.artifact_ids){const a=this.get(id,'artifact');try{this.store.readBlob(a.data.sha256);}catch{gates[1].state='FAIL';gates[1].details.push(id);}}
     const claims=candidate.data.manifest.claim_ids.map(id=>this.claimCheck(this.get(id,'claim')));
     gates.push({name:'technical-claims',state:claims.length?'UNKNOWN':'PASS',details:claims});
-    gates.push({name:'external-capture-coverage',state:'UNKNOWN',details:['Local text generation does not establish capture, media or complete product coverage.']});
+    const verification=this.verificationSummary(candidate.id);
+    gates.push({name:'verification-records',state:verification.state,details:verification.checks});
+    const captures=this.list('evidence',candidate.data.release_id).filter(e=>e.data.evidence_type==='capture');
+    gates.push({name:'external-capture-coverage',state:'UNKNOWN',details:captures.length?captures.map(e=>({id:e.id,capture_state:e.data.capture_state,admission:e.data.admission,host_acceptance:e.data.host_acceptance})):['No admitted capture receipt is registered for this release.']});
     return gates;
   }
   inspectCandidate(candidate){const gates=this.candidateGates(candidate);const reviews=this.list('review',candidate.data.release_id).filter(r=>r.data.candidate_id===candidate.id);
-    return{candidate,gates,reviews,fresh:!gates.some(g=>g.name==='input-versions'&&g.state==='FAIL'),external_publication_allowed:false,private_draft_allowed:!gates.some(g=>g.state==='FAIL'),technical_state:gates.some(g=>g.state==='FAIL')?'FAIL':'UNKNOWN'};}
+    return{candidate,gates,reviews,fresh:!gates.some(g=>g.name==='input-versions'&&g.state==='FAIL'),external_publication_allowed:gates.every(g=>g.state==='PASS')&&this.capabilities.canonical_publish_receipts===true,private_draft_allowed:!gates.some(g=>g.state==='FAIL'),technical_state:gates.some(g=>g.state==='FAIL')?'FAIL':gates.every(g=>g.state==='PASS')?'PASS':'UNKNOWN'};}
   mutate(operation,input){
     switch(operation){
       case'entity.create':{inputObject(input,['kind','data']);choice(input.kind,EDITABLE);const data=validateEntity(input.kind,input.data);this.assertReferences(input.kind,data);return{entity:this.store.create(input.kind,data)};}
@@ -208,6 +237,33 @@ export class LaunchwrightApplication {
         if(input.job_id)str(input.job_id,96);
         return{entity:this.store.create('evidence',{...input,target_version:target.version,source_version:source.version,admission:'imported-declaration',technical:'UNKNOWN',host_acceptance:'NOT_ESTABLISHED',rights_basis:'operator-declaration',observed_at:iso()})};
       }
+      case'capture.ingest':{
+        const data=validateCapture(input);
+        const release=this.get(data.release_id,'release'),target=this.get(data.target_id,'target'),source=this.get(data.source_id,'source'),scenario=this.get(data.scenario_id,'scenario');
+        ensure(target.data.release_id===release.id&&scenario.data.release_id===release.id,'Capture target or scenario belongs to another release','PermissionDenied');
+        ensure(source.data.product_id===release.data.product_id&&scenario.data.source_id===source.id&&scenario.data.target_id===target.id,'Capture source/scenario binding mismatch','PermissionDenied');
+        ensure(source.data.approval==='approved','Capture source is not approved for execution','PermissionDenied');
+        ensure(data.build===release.data.build,'Capture build differs from the release build','Conflict');
+        if(data.receipt.build_observation!==undefined)ensure(data.receipt.build_observation===data.build,'Capture receipt observed another build','Conflict');
+        const admission=data.receipt.authority==='imported'?'imported-declaration':'semwright-receipt-recorded';
+        return{entity:this.store.create('evidence',{release_id:release.id,target_id:target.id,source_id:source.id,scenario_id:scenario.id,name:data.name,build:data.build,classification:data.classification,rights:data.rights,description:'Capture receipt for '+scenario.data.name,origin_digest:digest('capture-receipt',data.receipt),evidence_type:'capture',capture_state:data.receipt.outcome,receipt:data.receipt,observations:data.observations,segments:data.segments??[],target_version:target.version,source_version:source.version,scenario_version:scenario.version,admission,technical:'UNKNOWN',host_acceptance:'NOT_ESTABLISHED',rights_basis:'operator-declaration',started_at:data.started_at,finished_at:data.finished_at,observed_at:data.finished_at})};
+      }
+      case'verification.record':{
+        const data=validateVerification(input),candidate=this.get(data.candidate_id,'candidate');
+        const artifactSet=new Set(candidate.data.manifest.artifact_ids);
+        for(const id of data.artifact_ids)ensure(artifactSet.has(id),'Verification references bytes outside the candidate','PermissionDenied');
+        if(data.target_id){const target=this.get(data.target_id,'target');ensure(target.data.release_id===candidate.data.release_id,'Verification target belongs to another release','PermissionDenied');}
+        if(data.verifier.authority==='canonical')ensure(this.capabilities.canonical_verifier_admission===true,'Canonical verifier admission is unavailable in this session','PolicyDenied');
+        const admission=data.verifier.authority==='canonical'?'canonical-owner-admitted':data.verifier.authority==='heuristic'?'heuristic-report':'local-review-record';
+        return{entity:this.store.create('verification',{release_id:candidate.data.release_id,name:data.dimension+' verification',...data,admission,recorded_by:this.principal,recorded_at:iso()})};
+      }
+      case'waiver.record':{
+        const data=validateWaiver(input),candidate=this.get(data.candidate_id,'candidate'),verification=this.get(data.verification_id,'verification');
+        ensure(verification.data.candidate_id===candidate.id&&verification.data.release_id===candidate.data.release_id,'Waiver verification belongs to another candidate','PermissionDenied');
+        ensure(verification.data.state!=='PASS','A passing verification does not need a waiver','InvalidArgument');
+        if(data.expires_at)ensure(Date.parse(data.expires_at)>Date.now(),'Waiver is already expired','InvalidArgument');
+        return{entity:this.store.create('waiver',{release_id:candidate.data.release_id,name:'Waiver · '+verification.data.dimension,...data,author:this.principal,underlying_state:verification.data.state,created_at:iso(),changes_verification_state:false})};
+      }
       case'deliverable.render':{
         inputObject(input,['id']);const d=this.get(input.id,'deliverable'),r=this.get(d.data.release_id,'release'),t=this.get(d.data.target_id,'target');
         const rendered=renderText(d,t,r);const hash=this.store.blob(rendered.bytes,rendered.mime);
@@ -239,6 +295,24 @@ export class LaunchwrightApplication {
         const generation=row?.generation??randomUUID(),revision=row?(BigInt(row.revision)+1n).toString():'1';
         this.store.db.prepare('INSERT INTO aliases VALUES(?,?,?,?) ON CONFLICT(name) DO UPDATE SET revision=excluded.revision,candidate_id=excluded.candidate_id').run(name,generation,revision,c.id);
         return{entity:this.store.create('delivery',{release_id:c.data.release_id,name,candidate_id:c.id,candidate_sha256:c.data.candidate_sha256,state:'PRIVATE_DRAFT_RECORDED',external_state:'NOT_SENT',alias_version:{resource:`alias:${name}`,generation,revision},artifact_ids:c.data.manifest.artifact_ids,technical_state:checked.technical_state,delivered_by:this.principal})};
+      }
+      case'channel.package':{
+        const data=validateChannelPackage(input),candidate=this.get(data.candidate_id,'candidate'),profile=this.get(data.profile_id,'channel_profile'),release=this.get(candidate.data.release_id,'release');
+        ensure(profile.data.product_id===release.data.product_id,'Channel profile belongs to another product','PermissionDenied');
+        const checked=this.inspectCandidate(candidate);ensure(checked.private_draft_allowed,'Candidate has stale inputs or invalid bytes','StaleReference');
+        if(!data.allow_partial)ensure(data.omissions.length===0,'Package omissions require explicit partial delivery approval','ConsentRequired');
+        const manifest={schema_version:'launchwright-channel-package/1',candidate_id:candidate.id,candidate_sha256:candidate.data.candidate_sha256,release_id:release.id,profile:{id:profile.id,version:profile.version,profile_version:profile.data.profile_version,channel:profile.data.channel,destination_class:profile.data.destination_class},participant:data.participant,locale:data.locale,partial:data.allow_partial,omissions:data.omissions,artifacts:candidate.data.manifest.artifacts};
+        const bytes=Buffer.from(JSON.stringify(manifest,null,2)+'\n'),packageSha=this.store.blob(bytes,'application/json');
+        return{entity:this.store.create('channel_delivery',{release_id:release.id,name:profile.data.channel+' · '+data.participant,profile_id:profile.id,profile_version:profile.version,candidate_id:candidate.id,candidate_sha256:candidate.data.candidate_sha256,participant:data.participant,locale:data.locale,partial:data.allow_partial,omissions:data.omissions,package_sha256:packageSha,package_size_bytes:bytes.length,state:'PACKAGE_READY',external_state:'NOT_SENT',root_delivery_id:null,parent_delivery_id:null,recovery_required:false,created_by:this.principal}),manifest};
+      }
+      case'channel.record_outcome':{
+        const data=validateChannelOutcome(input),base=this.get(data.delivery_id,'channel_delivery'),profile=this.get(base.data.profile_id,'channel_profile');
+        ensure(base.data.release_id&&base.data.candidate_id,'Channel delivery record is incomplete','Conflict');
+        if(['UPLOADED','DRAFT_CREATED','ACTIVATED','PUBLISHED','RETIRED'].includes(data.state))ensure(!!data.receipt_digest,'External success state requires an exact receipt digest','InvalidArgument');
+        if(['ACTIVATED','PUBLISHED','RETIRED'].includes(data.state))ensure(this.capabilities.canonical_publish_receipts===true,'Canonical publish receipt admission is unavailable in this session','PolicyDenied');
+        const root=base.data.root_delivery_id??base.id;
+        const recoveryRequired=data.state==='UNKNOWN'&&profile.data.idempotency!=='safe';
+        return{entity:this.store.create('channel_delivery',{release_id:base.data.release_id,name:base.data.name,profile_id:base.data.profile_id,profile_version:base.data.profile_version,candidate_id:base.data.candidate_id,candidate_sha256:base.data.candidate_sha256,participant:base.data.participant,locale:base.data.locale,partial:base.data.partial,omissions:base.data.omissions,package_sha256:base.data.package_sha256,package_size_bytes:base.data.package_size_bytes,state:data.state,external_state:data.state,external_id:data.external_id??null,receipt_digest:data.receipt_digest??null,message:data.message??'',observed_at:data.observed_at,root_delivery_id:root,parent_delivery_id:base.id,recovery_required:recoveryRequired,retry_policy:recoveryRequired?'RECOVER_BEFORE_RETRY':profile.data.idempotency==='safe'?'IDEMPOTENT_RETRY_ALLOWED':'NO_AUTOMATIC_RETRY',recorded_by:this.principal})};
       }
       case'template.instantiate':{
         inputObject(input,['id','release_id','target_id','parameters','name']);const template=this.get(input.id,'template');object(input.parameters,template.data.parameters,template.data.parameters);for(const value of Object.values(input.parameters))str(value,4000);

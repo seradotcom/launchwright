@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 import { randomUUID } from 'node:crypto';
 import { object, text, integer, requireCondition as ensure, exactRequestDigest, validateValue } from '@semwright/native-sdk';
-export const APP_VERSION = '0.2.0-dev.2';
+export const APP_VERSION = '0.2.0-dev.3';
 export const RESOURCE = 'launchwright:workspace';
-export const KINDS = ['product','build','release','source','target','feature','availability','anchor','scenario','claim','copy_block','release_contract','relation','evidence','deliverable','artifact','candidate','review','delivery','binding','template','impact_proposal','work','tombstone'];
-export const EDITABLE = ['product','build','release','source','target','feature','availability','anchor','scenario','claim','copy_block','release_contract','deliverable','binding','template'];
+export const KINDS = ['product','build','release','source','target','feature','availability','anchor','scenario','claim','copy_block','release_contract','relation','evidence','verification','waiver','deliverable','artifact','candidate','review','delivery','channel_profile','channel_delivery','binding','template','impact_proposal','work','tombstone'];
+export const EDITABLE = ['product','build','release','source','target','feature','availability','anchor','scenario','claim','copy_block','release_contract','deliverable','channel_profile','binding','template'];
 export const CLASSES = ['actual','demo','sanitized','editorial','generated','imported'];
 export const FORMATS = ['markdown','html','json','email','vtt'];
 export const RIGHTS = ['owned','licensed','unknown','restricted'];
@@ -49,6 +49,7 @@ export function validateEntity(kind, raw) {
     copy_block: [['release_id','name','target_id','claim_id','locale','content','owner'], ['release_id','name','target_id','claim_id','locale','content','owner']],
     release_contract: [['release_id','name','required_claim_ids','optional_claim_ids','required_deliverable_ids'], ['release_id','name','required_claim_ids','optional_claim_ids','required_deliverable_ids']],
     deliverable: [['release_id','name','target_id','format','content','claim_ids','copy_block_ids','source_ids','captions'], ['release_id','name','target_id','format','content','claim_ids','source_ids']],
+    channel_profile: [['product_id','name','channel','profile_version','destination_class','requirements','source','effective_at','idempotency'], ['product_id','name','channel','profile_version','destination_class','requirements','source','effective_at','idempotency']],
     binding: [['release_id','name','mode','deliverable_id','pinned_artifact_id'], ['release_id','name','mode','deliverable_id']],
     template: [['product_id','name','format','content','parameters'], ['product_id','name','format','content','parameters']],
   };
@@ -108,6 +109,12 @@ export function validateEntity(kind, raw) {
     ensure(d.required_claim_ids.length+d.optional_claim_ids.length+d.required_deliverable_ids.length>0,'Release contract cannot be empty');
   }
   if (kind === 'deliverable' || kind === 'template') choice(d.format, FORMATS);
+  if (kind === 'channel_profile') {
+    str(d.channel,96); str(d.profile_version,96); choice(d.destination_class,['private','external-draft','public']);
+    validateValue(d.requirements); ensure(d.requirements && typeof d.requirements === 'object' && !Array.isArray(d.requirements),'Channel requirements must be an object');
+    str(d.source,2048); str(d.effective_at,64); ensure(Number.isFinite(Date.parse(d.effective_at)),'Channel profile effective_at must be an ISO timestamp');
+    choice(d.idempotency,['safe','recover-first','unsafe']);
+  }
   if (kind === 'binding') { choice(d.mode, ['rolling','pinned','lts']); ensure(d.mode === 'rolling' || !!d.pinned_artifact_id, 'Historical bindings require an immutable artifact'); }
   if (kind === 'template') {
     array(d.parameters,16).forEach(p => { str(p,64); ensure(/^[a-z][a-z0-9_]*$/.test(p), 'Invalid parameter'); });
@@ -122,7 +129,7 @@ export function validateCaptions(cues) {
   array(cues,128).forEach(c => { object(c, ['start_ms','end_ms','text'], ['start_ms','end_ms','text']); integer(c.start_ms,0,86400000); integer(c.end_ms,1,86400000); ensure(c.start_ms >= end && c.end_ms > c.start_ms, 'Captions overlap or have invalid timing'); str(c.text,1000); ensure(!c.text.includes('-->'), 'Caption text contains a timing delimiter'); end = c.end_ms; });
 }
 export const OPERATION_SCOPES = Object.freeze({
-  'workspace.describe':'read','resource.get':'read','events.list':'read','release.coverage':'read','release.impact':'read','anchor.assess':'read','artifact.read':'read','candidate.inspect':'read',
-  'entity.create':'edit','entity.update':'edit','entity.retire':'edit','relation.record':'edit','impact.plan':'edit','evidence.import':'edit','deliverable.render':'edit','candidate.freeze':'edit','candidate.review':'review','candidate.deliver_private':'publish',
+  'workspace.describe':'read','workspace.snapshot':'read','resource.get':'read','events.list':'read','release.coverage':'read','release.impact':'read','anchor.assess':'read','artifact.read':'read','candidate.inspect':'read','verification.summary':'read','channel.status':'read',
+  'entity.create':'edit','entity.update':'edit','entity.retire':'edit','relation.record':'edit','impact.plan':'edit','evidence.import':'edit','capture.ingest':'capture','verification.record':'review','waiver.record':'review','deliverable.render':'edit','candidate.freeze':'edit','candidate.review':'review','candidate.deliver_private':'publish','channel.package':'publish','channel.record_outcome':'publish',
   'template.instantiate':'edit','work.prepare':'edit','work.claim':'edit','work.complete':'edit','work.mark_unknown':'edit','workspace.rotate_epoch':'admin',
 });
