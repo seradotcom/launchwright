@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { LaunchwrightApplication, execute } from './application.mjs';
 import { createAppServer, localToken } from './server.mjs';
-import { makeRequest, RESOURCE } from './contracts.mjs';
+import { makeRequest, RESOURCE, APP_VERSION } from './contracts.mjs';
 import { applicationContext, dispatchApplication } from '@semwright/native-sdk';
 const here=fileURLToPath(new URL('..',import.meta.url));
 const [command='help',...args]=process.argv.slice(2);
@@ -14,7 +14,7 @@ function option(name,fallback){const i=args.indexOf('--'+name);if(i>=0){if(!args
 const root=resolve(option('state',process.env.LAUNCHWRIGHT_STATE??'.state'));
 const print=value=>process.stdout.write(JSON.stringify(value,null,2)+'\n');
 async function main(){
-  if(command==='help'){console.log(`Launchwright 0.1.0-dev.1 — AGPL-3.0-only\n\nCommands:\n  init [--state DIR]                 Create an empty local workspace\n  serve [--state DIR] [--port 4317]  Serve on loopback only\n  doctor [--state DIR]               Report actual capabilities; no repairs\n  list [--kind KIND] [--state DIR]   Read paginated native observations\n  call --operation NAME --input FILE [--request KEY] [--state DIR]\n  prepare --operation NAME --input FILE --out FILE [--state DIR]\n  send --prepared FILE [--state DIR]  Send exactly one saved native intent\n  recover --prepared FILE [--state DIR]\n  demo [--state DIR]                 Create synthetic editorial examples, NOT captures\n  platform --work ID [--recover] [--state DIR]\n\nHeavy compilation, browser tests and Host conformance belong to GitHub Actions.\n`);return;}
+  if(command==='help'){console.log(`Launchwright ${APP_VERSION} — AGPL-3.0-only\n\nCommands:\n  init [--state DIR]                 Create an empty local workspace\n  serve [--state DIR] [--port 4317]  Serve on loopback only\n  doctor [--state DIR]               Report actual capabilities; no repairs\n  list [--kind KIND] [--state DIR]   Read paginated native observations\n  call --operation NAME --input FILE [--request KEY] [--state DIR]\n  prepare --operation NAME --input FILE --out FILE [--state DIR]\n  send --prepared FILE [--state DIR]  Send exactly one saved native intent\n  recover --prepared FILE [--state DIR]\n  demo [--state DIR]                 Create synthetic editorial examples, NOT captures\n  platform --work ID [--recover] [--state DIR]\n\nHeavy compilation, browser tests and Host conformance belong to GitHub Actions.\n`);return;}
   if(command==='init'){const app=new LaunchwrightApplication(root,{initialize:true});app.close();localToken(root);print({state:root,created_or_opened:true,session_token_file:join(root,'session-token')});return;}
   if(command==='doctor'){
     const parts=process.versions.node.split('.').map(Number),supported=parts[0]===24&&(parts[1]>21||(parts[1]===21&&parts[2]>=0));

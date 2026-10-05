@@ -5,7 +5,7 @@ export class LaunchwrightError extends Error {
 }
 export class LaunchwrightClient {
   constructor({baseUrl='http://127.0.0.1:4317',token=null,fetchImpl=globalThis.fetch,timeoutMs=15000,pendingStore=null}={}){
-    this.baseUrl=baseUrl.replace(/\/$/,'');this.token=token;this.fetch=fetchImpl;this.timeoutMs=timeoutMs;this.pendingStore=pendingStore;
+    this.baseUrl=baseUrl.replace(/\/$/,'');this.token=token;this.fetch=fetchImpl===globalThis.fetch?globalThis.fetch.bind(globalThis):fetchImpl;this.timeoutMs=timeoutMs;this.pendingStore=pendingStore;
   }
   async request(path,body,method='POST'){
     const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),this.timeoutMs);
