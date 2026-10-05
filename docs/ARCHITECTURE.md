@@ -20,7 +20,7 @@ Lost replies are recovered by request identity. Reusing an idempotency key with 
 
 Mutable application resources have stable IDs, opaque generations and monotonic string revisions. Immutable outputs include artifacts, candidates, verification records, waivers, delivery receipts and impact proposals. Retirement preserves identity as a redacted tombstone instead of silently deleting history.
 
-Artifacts store exact SHA-256-addressed bytes. Candidates freeze artifact hashes, input revisions, claims, destination and review contract. A changed source pin makes the old candidate stale rather than silently updating it.
+Artifacts store exact SHA-256-addressed bytes. Candidate v2 freezes artifact hashes plus media metadata, target fingerprints, protected input revisions, claims, ReleaseContract, selected localization/glossary revisions, channel profiles, declared rights, destination and review policy. A protected change makes the old candidate stale rather than silently updating it.
 
 ## Capture and verification
 
@@ -30,7 +30,7 @@ Artifacts store exact SHA-256-addressed bytes. Candidates freeze artifact hashes
 
 ## Channels
 
-A `channel_profile` is versioned product-owned configuration. `channel.package` generates immutable package bytes pinned to candidate and profile versions but performs no network send. External outcomes are separate receipt records. UNKNOWN on non-idempotent/recover-first profiles requires recovery before retry. Public activation requires canonical Publish receipt admission.
+A `channel_profile` is versioned product-owned configuration. `channel.package` generates an immutable package manifest pinned to candidate and profile versions but performs no network send. The authenticated loopback download route reconstructs a deterministic ZIP from that manifest, the frozen candidate manifest and content-addressed artifact blobs; repeated downloads therefore preserve exact bytes without storing another mutable archive. External outcomes are separate receipt records. UNKNOWN on non-idempotent/recover-first profiles requires recovery before retry. Public activation requires canonical Publish receipt admission.
 
 ## Portability
 

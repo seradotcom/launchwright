@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
 import { createAppServer } from '../src/server.mjs';
+import { execute } from '../src/application.mjs';
 import { LaunchwrightClient } from '../client/index.mjs';
 import { setup, baseline, candidate } from './helpers.mjs';
 async function server(t){const{app,root}=setup(t);const service=createAppServer(app,{port:0,token:'synthetic-local-test-token'});const baseUrl=await service.listen();t.after(()=>service.close());const client=new LaunchwrightClient({baseUrl,token:service.token});return{app,root,service,baseUrl,client};}
@@ -18,3 +19,18 @@ test('read route cannot be used as a mutation bypass',async t=>{const{client,app
 test('artifact downloads recheck bytes, set attachment and keep strict CSP',async t=>{const{app,baseUrl,service}=await server(t);const b=await baseline(app),{artifact}=await candidate(app,b);const r=await fetch(baseUrl+'/api/v1/artifacts/'+artifact.id+'/download',{headers:{Authorization:'Bearer '+service.token}});assert.equal(r.status,200);assert.ok(r.headers.get('content-disposition').startsWith('attachment;'));assert.ok(r.headers.get('content-security-policy').includes("default-src 'none'"));assert.ok((await r.text()).includes('Owned synthetic'));});
 test('stored pending custody completes before the only outgoing invoke',async t=>{const{baseUrl,service}=await server(t);let saved=false,sends=0;const client=new LaunchwrightClient({baseUrl,token:service.token,pendingStore:{save:async()=>{saved=true;},clear:async()=>{}},fetchImpl:async(url,options)=>{if(url.endsWith('/invoke')){assert.equal(saved,true);sends++;}return fetch(url,options);}});await client.mutate('entity.create',{kind:'product',data:{name:'Stored before send'}});assert.equal(sends,1);});
 test('failed pending persistence aborts before network mutation',async t=>{const{baseUrl,service,app}=await server(t);const client=new LaunchwrightClient({baseUrl,token:service.token,pendingStore:{save:async()=>{throw Error('Disk full synthetic');}}});await assert.rejects(client.mutate('entity.create',{kind:'product',data:{name:'Not sent'}}),/Disk full/);assert.equal(app.list('product').length,0);});
+
+test('private channel bundle download is authenticated, deterministic and cache-addressed',async t=>{
+  const {app,baseUrl,service,client}=await server(t),b=await baseline(app);
+  const artifact=(await execute(app,'deliverable.render',{id:b.deliverable.id})).entity;
+  const profile=await b.create('channel_profile',{product_id:b.product.id,name:'HTTP private bundle',channel:'private-bundle',profile_version:'1',destination_class:'private',requirements:{format:'zip'},source:'launchwright-private-bundle/1',effective_at:'2026-10-05T00:00:00.000Z',idempotency:'safe'});
+  const candidate=(await execute(app,'candidate.freeze',{release_id:b.release.id,name:'HTTP bundle candidate',artifact_ids:[artifact.id],destination:'bundle',channel_profile_ids:[profile.id],contract:{version:'v2',required_reviewers:1,require_claims_verified:false}})).entity;
+  const delivery=(await execute(app,'channel.package',{candidate_id:candidate.id,profile_id:profile.id,participant:'reviewer-http',locale:'en-US',allow_partial:false,omissions:[]})).entity;
+  const url=client.channelBundleUrl(delivery.id);
+  assert.equal((await fetch(url)).status,403);
+  const first=await fetch(url,{headers:{Authorization:'Bearer '+service.token}}),second=await fetch(url,{headers:{Authorization:'Bearer '+service.token}});
+  assert.equal(first.status,200);assert.equal(first.headers.get('content-type'),'application/zip');assert.ok(first.headers.get('content-disposition').includes('.zip'));
+  const a=Buffer.from(await first.arrayBuffer()),c=Buffer.from(await second.arrayBuffer());
+  assert.equal(a.subarray(0,4).toString('hex'),'504b0304');assert.deepEqual(a,c);assert.equal(first.headers.get('etag'),second.headers.get('etag'));
+  assert.equal(first.headers.get('cache-control'),'no-store');assert.ok(first.headers.get('content-security-policy').includes("default-src 'none'"));
+});

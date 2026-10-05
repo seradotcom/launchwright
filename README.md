@@ -37,7 +37,7 @@ Synthetic data is never described as a real product capture.
 - Semwright/native capture **receipt ingestion** tied to source + build + target + scenario while technical state stays UNKNOWN;
 - immutable verifier identity/version/digest, coverage, omissions and findings;
 - waivers that annotate failures without changing verifier truth;
-- versioned channel profiles, exact package generation and receipt/recovery state without performing the external send;
+- versioned channel profiles, exact package generation, authenticated deterministic private ZIP bundles, and receipt/recovery state without performing the external send;
 - source-linked localization with glossary revision pins, explicit rebase, RTL/font-rights/critical-term blockers and no invented language/layout PASS;
 - bounded extension descriptors, discovery, retirement, source-profile preflight and compatibility locks without executing remote extension code;
 - private-draft alias delivery with compare-and-swap;
