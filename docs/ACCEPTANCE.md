@@ -4,13 +4,13 @@ This ledger separates implemented behavior from execution evidence. A PASS belon
 
 ## Supplemental workstation checks
 
-Supplemental workstation pass for this branch:
+Supplemental workstation pass for the current R10 browser-lab branch:
 
 - Node: 22.22.0 — **outside** the Native SDK supported engine.
-- `npm test`: **160 passed, 0 failed, 0 skipped** on the current R9 canonical-graph branch. Exact TAP output is retained in `evidence/r9/local-test.tap`; this local run is supplemental because Node 22.22.0 is outside the supported engine. The 11 new Graph tests cover authority separation, private-node rejection, bounded cycle reports, UNKNOWN frontier preservation, exact observed-edge admission, cache identity dimensions, revision-preserving coalescing and mandatory finalization.
-- `node scripts/verify.mjs`: source-lock integrity and syntax PASS; **84 JavaScript modules and 82 Native driver operations** checked. Current output is retained in `evidence/r9/verify.json`.
-- Native profile build: **82/82 public operations assigned exactly once** across nine compacted canonical bridge bundles. Exact local sizes are core **46,007**, production **42,528**, review **47,219**, integrations **34,179**, extensions **42,597**, work **42,156**, media **39,969**, publish **48,469**, graph **48,166** bytes. Graph authority-sensitive operations were moved out of general production rather than weakening the canonical 48 KiB limit; `publish` is tightest with 683 bytes of headroom and `graph` has 986 bytes. Exact manifest and build log are retained in `evidence/r9/native-bundle.json` and `evidence/r9/native-bundle-build.log`.
-- Multi-profile canonical bridge smoke: **PASS** for all nine profiles (`core`, `production`, `review`, `integrations`, `extensions`, `work`, `media`, `publish`, `graph`); exact bundle SHA-256 and byte counts were rechecked before execution and every invocation stayed within the canonical input budget. Current output is retained in `evidence/r9/bundle-smoke.json`. This direct-process workstation smoke is not supported-engine or Driver Host isolation acceptance; R9 still requires the GitHub `native` lane.
+- `npm test`: **164 passed, 0 failed, 0 skipped**. Exact TAP output is retained in `evidence/r10-local-test.tap`; this local run is supplemental because Node 22.22.0 is outside the supported engine. R10 adds the owned DeltaDesk A/B fixture tests plus a fail-closed capture-contract regression proving imported real-adapter evidence remains UNKNOWN without Platform/Host authority.
+- `node scripts/verify.mjs`: source-lock integrity and syntax PASS; **87 JavaScript modules and 82 Native driver operations** checked. Exact output is retained in `evidence/r10-verify.json`.
+- R9 supplemental Native profile build (source SHA `554e153458d734aea92fb2c56aa6d461324051cd`): **82/82 public operations assigned exactly once** across nine compacted canonical bridge bundles. Exact local sizes are core **46,007**, production **42,528**, review **47,219**, integrations **34,179**, extensions **42,597**, work **42,156**, media **39,969**, publish **48,469**, graph **48,166** bytes. Graph authority-sensitive operations were moved out of general production rather than weakening the canonical 48 KiB limit; `publish` is tightest with 683 bytes of headroom and `graph` has 986 bytes. Exact manifest and build log are retained in `evidence/r9/native-bundle.json` and `evidence/r9/native-bundle-build.log`.
+- R9 supplemental multi-profile canonical bridge smoke: **PASS** for all nine profiles (`core`, `production`, `review`, `integrations`, `extensions`, `work`, `media`, `publish`, `graph`); exact bundle SHA-256 and byte counts were rechecked before execution and every invocation stayed within the canonical input budget. Output is retained in `evidence/r9/bundle-smoke.json`. This direct-process workstation smoke is not Driver Host isolation acceptance; the exact R9 GitHub `native` lane subsequently passed and is recorded below.
 - Clean CLI drill: init → synthetic demo → portable snapshot → restore to a new state directory → doctor PASS.
 - Clean-room operator rehearsal launches those commands in fresh temporary state with only a minimal inherited environment, verifies Native SDK pin integrity, rejects exported session-token/machine-path leakage, and proves the restored workspace rotates generation without reactivating old mutation receipts. Current supplemental output is retained in `evidence/r9/clean-room.json`; GitHub CI repeats this on Linux, Windows and macOS and uploads the exact report per SHA.
 - Restore drill confirmed a new workspace generation, advanced request epoch and no activation of historical mutation receipts.
@@ -28,12 +28,15 @@ These checks are useful regression evidence only. They are not supported-engine,
 
 The repository requires Node 24.21.x. The current branch must pass `Application checks` on Linux, Windows and macOS after its commit is pushed.
 
-Historical R8A evidence for exact source SHA `45f05b959e74dc6861bcdc3b5645014d64ceb4ad`: Application checks run `37432440809` passed on Linux, Windows and macOS; Native/Rust run `37432464643` passed; bounded stress run `37432467712` passed. PR #27 was merged only after those lanes completed. Historical R8B evidence was also green before merge: application checks run `37435456892` passed on Linux, Windows and macOS, with heavy runs `37435493927` and `37435497258` succeeding for the exact R8B source SHA. None of those PASS results are inherited by R9.
+Historical R8A evidence for exact source SHA `45f05b959e74dc6861bcdc3b5645014d64ceb4ad`: Application checks run `37432440809` passed on Linux, Windows and macOS; Native/Rust run `37432464643` passed; bounded stress run `37432467712` passed. PR #27 was merged only after those lanes completed. Historical R8B evidence was also green before merge: application checks run `37435456892` passed on Linux, Windows and macOS, with heavy runs `37435493927` and `37435497258` succeeding for the exact R8B source SHA.
+
+R9 exact-SHA acceptance is complete for `554e153458d734aea92fb2c56aa6d461324051cd`: Application checks run `37517585926` passed on Linux, Windows and macOS; selective heavy Native run `37517606605` passed; selective heavy Stress run `37517610676` passed. PR #29 was merged to `main` as `efdd2d31df50ee555585d1b3fd7b3e3866e6ffc1`. These results are exact to R9 and are not inherited by R10.
 
 The manual heavy workflow provides independent lanes:
 
 - **native**: build the pinned canonical TypeScript SDK, generate/hash all nine bounded bridge profiles, compile/test the real Rust NativeDriver including the compile-time Project Graph contract lock, and run a bridge smoke against each profile.
 - **browser**: install Chromium on a disposable GitHub runner and exercise the real Launchwright UI.
+- **deltadesk**: check out the exact pinned Semwright source, run its real Chromium semantic adapter against the owned DeltaDesk A/B fixture, retain exact screenshots/receipt hashes, and ingest those results into `launchwright-capture/2` as `IMPORTED_UNVERIFIED` without fabricating Platform or Host authority.
 - **stress**: create a bounded high-volume workspace, page observations, export a portable snapshot, restore it and verify row continuity.
 
 Exact run IDs and SHA are recorded here only after completion.
@@ -47,7 +50,7 @@ Durable identity/revisions; exact archived entity history with get/list/diff; ex
 - canonical Driver Host isolation/acceptance of Launchwright; the executable DeltaCLI fixture proves a real non-DOM process path and receipt ingestion only, not Host isolation;
 - live production Platform execution, budgets or billing;
 - live Project Graph traversal/query execution, owner/Host admission and canonical effects evaluation; R9 validates and stores an admitted projection but does not replace those authorities;
-- real browser/mobile/Godot product capture;
+- canonical real customer browser/mobile/Godot product capture; the R10 owned DeltaDesk browser lane is cross-system adapter evidence only and remains imported-unverified until Platform/Host authority exists;
 - Composition video/audio rendering and final-media verification;
 - remote tenant/team authentication and canonical shared approvals;
 - external public/cross-account Platform Publish execution, consumer job/output ACL acceptance, metering and destination activation;
