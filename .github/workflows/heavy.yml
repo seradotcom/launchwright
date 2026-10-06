@@ -169,7 +169,7 @@ jobs:
           set -euo pipefail
           python3 scripts/verify-native-host.py | tee evidence/native-host/acceptance.log
           grep -q '^LAUNCHWRIGHT_NATIVE_HOST_ACCEPTANCE_PASS ' evidence/native-host/acceptance.log
-          jq -e '.passed == true and .authority.driver_host_isolation_accepted == true and .authority.broker_policy_path_observed == true and .authority.host_mediated_node_runtime == true and .authority.platform_external_acceptance == false' evidence/native-host/report.json
+          jq -e '.passed == true and .authority.driver_host_isolation_accepted == true and .authority.broker_policy_path_observed == true and .authority.host_mediated_node_runtime == true and .authority.extension_control_plane_driver_host_accepted == true and .authority.extension_fixture_execution_host_isolation_accepted == false and .authority.platform_external_acceptance == false' evidence/native-host/report.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

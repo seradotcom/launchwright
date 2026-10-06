@@ -4,6 +4,13 @@ This ledger separates implemented behavior from execution evidence. A PASS belon
 
 ## Supplemental workstation checks
 
+R20 pre-Host checkpoint on the workstation:
+
+- Node 22.22.0 remains **outside** the supported Native SDK engine and therefore cannot establish supported-engine or Driver Host acceptance.
+- `npm test`: **176 passed, 0 failed, 0 skipped**. The new R20 regression locks the extension lifecycle Host harness and, critically, locks the non-escalation boundary: Host-mediated extension control-plane operations do not make the separately executed DeltaRender/DeltaCLI fixture processes Host-isolated or technical PASS. Exact TAP is retained in `evidence/r20/local-test.tap`.
+- `node scripts/verify.mjs`: **97 JavaScript modules and 84 Native driver operations** checked; source lock/syntax PASS. Exact JSON is retained in `evidence/r20/verify.json`; `host_acceptance` remains false because this workstation run cannot establish the real Broker/Policy/Driver Host path.
+- The R20 `host` lane is CI-only. It installs/discovers the renderer and second source through the real Host route, records their bounded results, exercises compatibility negotiation and retirement/history preservation, and must retain `extension_fixture_execution_host_isolation_accepted=false` for the external fixture processes.
+
 R19 pre-Host checkpoint on the workstation:
 
 - Node 22.22.0 remains **outside** the supported Native SDK engine and therefore cannot establish supported-engine acceptance.

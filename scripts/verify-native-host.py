@@ -410,6 +410,370 @@ def assert_error(envelope: dict[str, Any], *needles: str) -> None:
         raise AssertionError(f"unexpected error envelope: {json.dumps(envelope, indent=2)}")
 
 
+class HostClient:
+    """Fresh-ref helper for exact-digest Launchwright operations over the real Host."""
+
+    def __init__(self, fixture: HostFixture) -> None:
+        self.fixture = fixture
+        self.counter = 0
+
+    def context(self) -> tuple[str, Any, dict[str, Any]]:
+        observed = self.fixture.invoke(
+            "driver.launchwright.observe",
+            {"resource": RESOURCE, "scope": "all", "limit": 128},
+            ok=True,
+        )["data"]
+        ref = observed["ref"]
+        description = self.fixture.invoke(
+            "driver.launchwright.workspace-describe",
+            {"ref": ref, "input": {}},
+            ok=True,
+        )["data"]
+        return ref, observed["page"]["version"], description
+
+    def read(self, suffix: str, input_value: dict[str, Any]) -> dict[str, Any]:
+        ref, _, _ = self.context()
+        return self.fixture.invoke(
+            f"driver.launchwright.{suffix}",
+            {"ref": ref, "input": input_value},
+            ok=True,
+        )["data"]
+
+    def mutate(
+        self,
+        operation: str,
+        suffix: str,
+        input_value: dict[str, Any],
+        *,
+        key_hint: str,
+    ) -> dict[str, Any]:
+        ref, expected, description = self.context()
+        self.counter += 1
+        key = f"r20-{self.counter:02d}-{key_hint}"[:128]
+        epoch = description["request_epoch"]
+        digest_input = {
+            "app_version": description["version"],
+            "operation": operation,
+            "input": input_value,
+            "expected": expected,
+            "epoch": epoch,
+            "key": key,
+        }
+        request = {
+            "resource": RESOURCE,
+            "epoch": epoch,
+            "key": key,
+            "request_sha256": request_digest(digest_input),
+        }
+        return self.fixture.invoke(
+            f"driver.launchwright.{suffix}",
+            {"ref": ref, "request": request, "input": input_value},
+            ok=True,
+        )["data"]
+
+
+def extension_lifecycle_flow(fixture: HostFixture, product_id: str) -> dict[str, Any]:
+    """Exercise RS-EXT lifecycle through Broker/Policy/Driver Host without elevating fixture execution."""
+    client = HostClient(fixture)
+
+    renderer_path = ROOT / "fixtures" / "deltarender.mjs"
+    cli_path = ROOT / "fixtures" / "deltacli.mjs"
+    renderer_digest = sha256(renderer_path)
+    cli_digest = sha256(cli_path)
+
+    renderer_manifest = {
+        "name": "DeltaRender Host acceptance",
+        "type": "deliverable_renderer",
+        "package_version": "1.0.0",
+        "schema_major": 1,
+        "digest": renderer_digest,
+        "license": "AGPL-3.0-only",
+        "rights": "owned",
+        "source": "repo:fixtures/deltarender.mjs",
+        "permissions": ["read", "capture"],
+        "inputs": ["deltarender-request/1"],
+        "outputs": ["rendered-document/1"],
+        "preconditions": ["approved-fixture"],
+        "evidence": ["process-receipt"],
+        "limits": {"max_input_bytes": 65536, "max_output_bytes": 65536, "timeout_seconds": 10},
+    }
+    cli_manifest = {
+        "name": "DeltaCLI Host acceptance",
+        "type": "source_adapter",
+        "package_version": "1.0.0",
+        "schema_major": 1,
+        "digest": cli_digest,
+        "license": "AGPL-3.0-only",
+        "rights": "owned",
+        "source": "repo:fixtures/deltacli.mjs",
+        "permissions": ["read", "capture"],
+        "inputs": ["cli-source/1"],
+        "outputs": ["cli-observation/1"],
+        "preconditions": ["approved-source"],
+        "evidence": ["process-receipt"],
+        "limits": {"max_input_bytes": 4096, "max_output_bytes": 65536, "timeout_seconds": 10},
+    }
+
+    renderer = client.mutate(
+        "extension.register", "extension-register", renderer_manifest, key_hint="renderer-register"
+    )["entity"]
+    cli_extension = client.mutate(
+        "extension.register", "extension-register", cli_manifest, key_hint="cli-register"
+    )["entity"]
+
+    discovered = client.read("extension-discovery", {"include_retired": False})
+    discovered_ids = {item["id"] for item in discovered["items"]}
+    if renderer["id"] not in discovered_ids or cli_extension["id"] not in discovered_ids:
+        raise AssertionError("Host-mediated extension discovery missed an installed package")
+
+    generic = client.read("extension-generic_view", {"id": renderer["id"]})
+    if generic.get("remote_code_execution") is not False or generic.get("trusted_markup") is not False:
+        raise AssertionError("generic extension view widened authority")
+
+    renderer_prep = client.mutate(
+        "extension.prepare_use",
+        "extension-prepare_use",
+        {
+            "extension_id": renderer["id"],
+            "name": "Render release note",
+            "purpose": "Owned deterministic renderer fixture",
+            "input_type": "deltarender-request/1",
+            "output_type": "rendered-document/1",
+            "client_schema_major": 1,
+        },
+        key_hint="renderer-prepare",
+    )["entity"]
+
+    render_input = {
+        "schema_version": "deltarender-request/1",
+        "title": "Host lifecycle release 1.0",
+        "body": "Owned fixture output recorded through the canonical Launchwright Host path.",
+    }
+    render_stdin = json.dumps(render_input, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    render_process = subprocess.run(
+        [str(fixture.node), str(renderer_path)],
+        cwd=ROOT,
+        env=fixture.env,
+        input=render_stdin,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        timeout=10,
+    )
+    if render_process.returncode != 0:
+        raise AssertionError(render_process.stderr.decode("utf-8", "replace"))
+    render_output = json.loads(render_process.stdout)
+    if render_output.get("format") != "markdown" or render_output.get("rights") != "owned":
+        raise AssertionError("DeltaRender fixture returned an unexpected result")
+
+    renderer_result = client.mutate(
+        "extension.result_record",
+        "extension-result_record",
+        {
+            "preparation_id": renderer_prep["id"],
+            "input_sha256": hashlib.sha256(render_stdin).hexdigest(),
+            "output_type": "rendered-document/1",
+            "outcome": "SUCCESS",
+            "started_at": "2026-10-06T18:00:00.000Z",
+            "finished_at": "2026-10-06T18:00:00.100Z",
+            "output": render_output,
+        },
+        key_hint="renderer-result",
+    )["entity"]
+    renderer_inspect = client.read("extension-result_inspect", {"id": renderer_result["id"]})
+    if renderer_inspect.get("technical_state") != "UNKNOWN":
+        raise AssertionError("external renderer process was incorrectly promoted to technical PASS")
+    if renderer_inspect.get("host_isolation_verified") is not False:
+        raise AssertionError("external renderer process was incorrectly marked Host-isolated")
+    if renderer_inspect.get("verified_execution") is not False:
+        raise AssertionError("external renderer process was incorrectly marked verified")
+
+    release = client.mutate(
+        "entity.create",
+        "entity-create",
+        {
+            "kind": "release",
+            "data": {"product_id": product_id, "name": "R20 synthetic", "build": "build-A", "status": "draft"},
+        },
+        key_hint="release-create",
+    )["entity"]
+    target = client.mutate(
+        "entity.create",
+        "entity-create",
+        {
+            "kind": "target",
+            "data": {
+                "release_id": release["id"],
+                "name": "CLI host lifecycle",
+                "ui_locale": "en-US",
+                "editorial_locale": "en-US",
+                "role": "viewer",
+                "plan": "basic",
+                "region": "MX",
+                "flags": {"advanced_export": False},
+                "viewport": {"width": 1440, "height": 900, "scale_milli": 1000},
+            },
+        },
+        key_hint="target-create",
+    )["entity"]
+    source = client.mutate(
+        "entity.create",
+        "entity-create",
+        {
+            "kind": "source",
+            "data": {
+                "product_id": product_id,
+                "name": "DeltaCLI",
+                "type": "cli",
+                "locator": "repo:fixtures/deltacli.mjs",
+                "build": "build-A",
+                "coverage": "declared",
+                "purpose": "Owned CLI fixture for Host lifecycle acceptance",
+                "approval": "approved",
+            },
+        },
+        key_hint="source-create",
+    )["entity"]
+
+    cli_env = {**fixture.env, "DELTACLI_BUILD": "build-A"}
+    cli_process = subprocess.run(
+        [str(fixture.node), str(cli_path), "status", "--json"],
+        cwd=ROOT,
+        env=cli_env,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        timeout=10,
+    )
+    if cli_process.returncode != 0:
+        raise AssertionError(cli_process.stderr.decode("utf-8", "replace"))
+    cli_facts = json.loads(cli_process.stdout)
+    if cli_facts.get("product") != "DeltaCLI" or cli_facts.get("build") != "build-A":
+        raise AssertionError("DeltaCLI fixture returned an unexpected build")
+
+    cli_observation = client.mutate(
+        "source.cli_ingest",
+        "source-cli_ingest",
+        {
+            "source_id": source["id"],
+            "target_id": target["id"],
+            "extension_id": cli_extension["id"],
+            "command": "node fixtures/deltacli.mjs",
+            "args": ["status", "--json"],
+            "observed_build": "build-A",
+            "started_at": "2026-10-06T18:00:01.000Z",
+            "finished_at": "2026-10-06T18:00:01.100Z",
+            "exit_code": 0,
+            "stdout": cli_process.stdout.decode("utf-8"),
+            "stderr": cli_process.stderr.decode("utf-8"),
+        },
+        key_hint="cli-ingest",
+    )["entity"]
+    cli_inspect = client.read("source-cli_inspect", {"id": cli_observation["id"]})
+    if cli_inspect.get("technical_state") != "UNKNOWN":
+        raise AssertionError("external CLI process was incorrectly promoted to technical PASS")
+    if cli_inspect.get("host_isolation_verified") is not False:
+        raise AssertionError("external CLI process was incorrectly marked Host-isolated")
+
+    compatibility = client.mutate(
+        "compatibility.lock",
+        "compatibility-lock",
+        {
+            "product_id": product_id,
+            "name": "R20 extension rehearsal lock",
+            "components": [
+                {
+                    "kind": "renderer",
+                    "name": renderer["data"]["name"],
+                    "version": renderer["data"]["package_version"],
+                    "digest": renderer["data"]["digest"],
+                    "resource_id": renderer["id"],
+                },
+                {
+                    "kind": "source-adapter",
+                    "name": cli_extension["data"]["name"],
+                    "version": cli_extension["data"]["package_version"],
+                    "digest": cli_extension["data"]["digest"],
+                    "resource_id": cli_extension["id"],
+                },
+            ],
+            "notes": "Owned synthetic extension rehearsal over the exact Host path.",
+        },
+        key_hint="compat-lock",
+    )["entity"]
+    lock_before = client.read("compatibility-inspect", {"id": compatibility["id"]})
+    if lock_before.get("state") != "CURRENT":
+        raise AssertionError("new compatibility lock was not CURRENT")
+
+    old_client = client.read(
+        "compatibility-negotiate",
+        {"schema_major": 2, "operations": ["future.operation"], "kinds": ["extension_package"]},
+    )
+    if old_client.get("compatible") is not False:
+        raise AssertionError("unsupported schema major was accepted")
+    if "future.operation" not in old_client.get("unsupported_operations", []):
+        raise AssertionError("unsupported operation was not diagnosed")
+
+    client.mutate(
+        "extension.retire",
+        "extension-retire",
+        {"id": renderer["id"], "expected": renderer["version"], "reason": "R20 renderer retirement rehearsal"},
+        key_hint="renderer-retire",
+    )
+    renderer_prep_after = client.read("extension-preparation_status", {"id": renderer_prep["id"]})
+    if renderer_prep_after.get("state") != "REVOKED_FOR_NEW_START":
+        raise AssertionError("retired renderer did not revoke prepared new starts")
+    renderer_result_after = client.read("extension-result_inspect", {"id": renderer_result["id"]})
+    if renderer_result_after.get("freshness") != "REVOKED_EXTENSION":
+        raise AssertionError("renderer history was not preserved after retirement")
+    lock_after = client.read("compatibility-inspect", {"id": compatibility["id"]})
+    if lock_after.get("state") != "DRIFT":
+        raise AssertionError("compatibility lock did not surface retirement drift")
+
+    client.mutate(
+        "extension.retire",
+        "extension-retire",
+        {"id": cli_extension["id"], "expected": cli_extension["version"], "reason": "R20 source adapter retirement rehearsal"},
+        key_hint="cli-retire",
+    )
+    cli_after = client.read("source-cli_inspect", {"id": cli_observation["id"]})
+    if cli_after.get("freshness") != "REVOKED_EXTENSION":
+        raise AssertionError("CLI observation history was not preserved after adapter retirement")
+
+    process_report = {
+        "renderer": {
+            "fixture_sha256": renderer_digest,
+            "stdout_sha256": hashlib.sha256(render_process.stdout).hexdigest(),
+            "exit_code": render_process.returncode,
+        },
+        "cli_source": {
+            "fixture_sha256": cli_digest,
+            "stdout_sha256": hashlib.sha256(cli_process.stdout).hexdigest(),
+            "exit_code": cli_process.returncode,
+        },
+        "authority": {
+            "control_plane_driver_host_admitted": True,
+            "fixture_process_driver_host_isolated": False,
+            "technical_state_promoted": False,
+        },
+    }
+    write_private_json(fixture.evidence / "extension-lifecycle.json", process_report)
+
+    return {
+        "renderer_extension_id": renderer["id"],
+        "renderer_result_id": renderer_result["id"],
+        "cli_extension_id": cli_extension["id"],
+        "cli_observation_id": cli_observation["id"],
+        "compatibility_lock_id": compatibility["id"],
+        "discovery_visible": True,
+        "generic_view_safe": True,
+        "unsupported_major_rejected": True,
+        "retirement_preserved_history": True,
+        "compatibility_retirement_drift_visible": True,
+        "control_plane_driver_host_admitted": True,
+        "fixture_process_driver_host_isolated": False,
+        "technical_state_promoted": False,
+    }
+
+
 def allowed_flow() -> dict[str, Any]:
     fixture = HostFixture("allowed", allow_driver=True)
     try:
@@ -546,6 +910,8 @@ def allowed_flow() -> dict[str, Any]:
         if persisted.get("data", {}).get("name") != "Driver Host acceptance product":
             raise AssertionError("workspace state did not persist across Driver Host restart")
 
+        extension_lifecycle = extension_lifecycle_flow(fixture, product_id)
+
         return {
             "product_id": product_id,
             "initial_revision": version,
@@ -553,6 +919,7 @@ def allowed_flow() -> dict[str, Any]:
             "restart_persistence": True,
             "stale_reference_rejected": True,
             "bad_request_rejected": True,
+            "extension_lifecycle": extension_lifecycle,
         }
     finally:
         fixture.close()
@@ -583,7 +950,7 @@ def main() -> None:
     allowed = allowed_flow()
     denied = denied_flow()
     report = {
-        "schema_version": "launchwright-native-host-acceptance/1",
+        "schema_version": "launchwright-native-host-acceptance/2",
         "passed": True,
         "launchwright_sha": os.environ.get("GITHUB_SHA"),
         "semwright_sha": semwright_sha,
@@ -592,6 +959,8 @@ def main() -> None:
             "driver_host_isolation_accepted": True,
             "broker_policy_path_observed": True,
             "host_mediated_node_runtime": True,
+            "extension_control_plane_driver_host_accepted": True,
+            "extension_fixture_execution_host_isolation_accepted": False,
             "platform_external_acceptance": False,
             "chatgpt_host_acceptance": False,
             "public_channel_acceptance": False,
