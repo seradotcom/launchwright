@@ -17,6 +17,7 @@ import { createMediaPlan, reviseMediaPlan, inspectMediaPlan, recordMediaOutput, 
 import { createReleaseTemplate, updateReleaseTemplate, freezeProductVersion, createDeployment, transitionDeployment, prepareInvocation, inspectPublish, exportProductVersion, importProductVersion, rebindImportedTemplate } from './publish.mjs';
 import { PLATFORM_ACTIONS, PUBLICATION_ACTIONS, PLATFORM_READ_ACTIONS, preparePublicationWork } from './publish-work.mjs';
 import { reserveUsage, recordUsage, adjustUsage, inspectUsage, recordBillingTestCallback } from './usage-ledger.mjs';
+import { GRAPH_RELATIONS, graphContract, recordGraphObservation, inspectGraphObservation, latestGraphObservation, assertObservedGraphEdge, cacheIdentity, createImpactProposal, coalesceImpact, recordRebuildReceipt } from './graph.mjs';
 
 export class LaunchwrightApplication {
   constructor(root, { initialize = false, readOnly = false, principal = 'local-owner', scopes = ['read','edit','capture','review','publish','consume','admin'], capabilities = {} } = {}) {
@@ -82,7 +83,7 @@ export class LaunchwrightApplication {
   }
   describe(){return{app:'Launchwright',version:APP_VERSION,schema_version:'launchwright/1',workspace_version:this.store.version(),request_epoch:this.store.meta().epoch,
     scope_mode:this.capabilities.identity_mode??'local-single-owner',principal:this.principal,scopes:[...this.scopes],native_sdk:'0.9.0-dev.1',operations:Object.entries(OPERATION_SCOPES).map(([name,scope])=>({name,scope,read_only:READ_OPERATIONS.has(name)})),
-    capabilities:{editorial_text_exports:'available',durable_entity_history:this.store.hasHistory?'available':'migration-required',private_draft_delivery:'available',portable_snapshot_restore:'available-local-admin',declared_release_contracts:'available',localization_ledger:'available-layout-quality-not-inferred',extension_descriptors:'available-no-remote-code',compatibility_negotiation:'available',profile_preflight:'available-contract-only',state_anchors:'contract-and-assessment-only',impact_proposals:'available-no-execution-authority',document_change_proposals:'available-application-local-no-auto-merge',capture_receipts:'available-provenance-only',verification_ledger:'available-canonical-pass-requires-admission',waivers:'available-never-overwrite-verifier-state',channel_packages:'available-no-send',native_driver_host:'requires-owner-pinned-bundle-and-broker',platform:this.capabilities.platform??'not-connected',canonical_graph:'requires-platform-observation',browser_capture:'requires-canonical-driver-recipe',media_render:'requires-composition-recipe',mobile:'provenance-import-only',public_delivery:'requires-canonical-publish-receipt',...this.capabilities},
+    capabilities:{editorial_text_exports:'available',durable_entity_history:this.store.hasHistory?'available':'migration-required',private_draft_delivery:'available',portable_snapshot_restore:'available-local-admin',declared_release_contracts:'available',localization_ledger:'available-layout-quality-not-inferred',extension_descriptors:'available-no-remote-code',compatibility_negotiation:'available',profile_preflight:'available-contract-only',state_anchors:'contract-and-assessment-only',impact_proposals:'available-no-execution-authority',document_change_proposals:'available-application-local-no-auto-merge',capture_receipts:'available-provenance-only',verification_ledger:'available-canonical-pass-requires-admission',waivers:'available-never-overwrite-verifier-state',channel_packages:'available-no-send',native_driver_host:'requires-owner-pinned-bundle-and-broker',platform:this.capabilities.platform??'not-connected',canonical_graph:this.capabilities.canonical_graph_admission===true?'host-admitted-projection-available':'requires-platform-observation-and-host-admission',browser_capture:'requires-canonical-driver-recipe',media_render:'requires-composition-recipe',mobile:'provenance-import-only',public_delivery:'requires-canonical-publish-receipt',...this.capabilities},
     limits:{page_items:128,reply_bytes:256*1024,artifact_bytes:1024*1024,receipt_epoch_items:20000},disclosure:'Local editorial checks are not Platform approvals or canonical effect verification.'};}
   profilePreflight(input){
     inputObject(input,['profile','source_id','target_id'],['profile','source_id']);str(input.profile,64);
@@ -147,6 +148,9 @@ export class LaunchwrightApplication {
       case'history.diff':return diffHistory(this,input);
       case'release.coverage':inputObject(input,['release_id']);return this.coverage(input.release_id);
       case'release.impact':inputObject(input,['release_id']);return this.impact(input.release_id);
+      case'graph.contract':inputObject(input,[]);return graphContract();
+      case'graph.inspect':return inspectGraphObservation(this,input);
+      case'graph.cache_assess':return cacheIdentity(this,input);
       case'anchor.assess':{
         inputObject(input,['id','observed_matches']);const anchor=this.get(input.id,'anchor');const observed=integer(input.observed_matches,0,1000);
         const expected=anchor.data.expected_count,state=observed===expected?'PASS':'FAIL';
@@ -224,8 +228,13 @@ export class LaunchwrightApplication {
     const bindings=this.list('binding',releaseId).map(b=>({binding_id:b.id,mode:b.data.mode,action:b.data.mode==='rolling'?'revalidate-if-inputs-changed':'retain-pinned-history',pinned_artifact_id:b.data.pinned_artifact_id??null}));
     const contracts=this.coverage(releaseId).contracts;
     const contract_blockers=contracts.flatMap(c=>c.obligations.filter(o=>o.state!=='PASS').map(o=>({contract_id:c.id,...o})));
-    const relations=this.list('relation',releaseId).map(r=>({id:r.id,from_id:r.data.from_id,to_id:r.data.to_id,kind:r.data.relation_kind,provenance:r.data.provenance,completeness:r.data.completeness,admission:r.data.admission}));
-    return{release_id:releaseId,items,bindings,contract_blockers,relations,coverage:'DECLARED_DEPENDENCIES_ONLY',canonical_graph_authority:false,unknown_frontier:true,note:'This is an app input-revision comparison, explicit relation inventory and release-contract projection, not a Project Graph freshness verdict.'};
+    const relations=this.list('relation',releaseId).map(r=>({id:r.id,from_id:r.data.from_id,to_id:r.data.to_id,kind:r.data.relation_kind,provenance:r.data.provenance,completeness:r.data.completeness,admission:r.data.admission,graph_observation_id:r.data.graph_observation_id??null}));
+    const admitted=latestGraphObservation(this,releaseId);
+    if(admitted){
+      const graph=inspectGraphObservation(this,{id:admitted.id});
+      return{release_id:releaseId,items,bindings,contract_blockers,relations,graph,coverage:'CANONICAL_PROJECT_GRAPH_PROJECTION',canonical_graph_authority:true,unknown_frontier:graph.impact.unknown_frontier,note:'Canonical Project Graph freshness and impact are projected from an immutable Host-admitted observation. Local revision comparisons remain supplemental.'};
+    }
+    return{release_id:releaseId,items,bindings,contract_blockers,relations,graph:null,coverage:'DECLARED_DEPENDENCIES_ONLY',canonical_graph_authority:false,unknown_frontier:true,note:'This is an app input-revision comparison, explicit relation inventory and release-contract projection, not a Project Graph freshness verdict.'};
   }
   verificationSummary(candidateId){
     const candidate=this.get(candidateId,'candidate');
@@ -268,21 +277,22 @@ export class LaunchwrightApplication {
         return{entity:this.store.retire(e.id,{subject_id:e.id,original_kind:e.kind,retired_at:iso(),reason:input.reason,content_revoked:true})};
       }
       case'relation.record':{
-        inputObject(input,['release_id','name','from_id','to_id','relation_kind','provenance','completeness','evidence_ids'],['release_id','name','from_id','to_id','relation_kind','provenance','completeness']);
+        inputObject(input,['release_id','name','from_id','to_id','relation_kind','provenance','completeness','evidence_ids','graph_observation_id'],['release_id','name','from_id','to_id','relation_kind','provenance','completeness']);
         const release=this.get(input.release_id,'release'),from=this.get(input.from_id),to=this.get(input.to_id);str(input.name,160);str(input.relation_kind,128);ensure(/^[a-z][a-z0-9_.-]{0,127}$/.test(input.relation_kind),'Invalid relation kind');
         ensure(this.productOf(from)===release.data.product_id&&this.productOf(to)===release.data.product_id,'Relation crosses product boundary','PermissionDenied');choice(input.provenance,['declared','imported','heuristic','observed']);choice(input.completeness,['complete','partial','unknown']);
         if(input.provenance==='heuristic')ensure(input.completeness!=='complete','Heuristic relation cannot claim complete coverage');
         const evidenceIds=input.evidence_ids??[];array(evidenceIds,32);ensure(new Set(evidenceIds).size===evidenceIds.length,'Duplicate relation evidence');for(const id of evidenceIds){const evidence=this.get(id,'evidence');ensure(evidence.data.release_id===release.id,'Relation evidence belongs to another release');}
-        if(input.provenance==='observed'){ensure(this.capabilities.canonical_graph_admission===true,'Observed relation requires canonical Graph admission','PolicyDenied');ensure(evidenceIds.length>0,'Observed relation requires admitted evidence');}
-        return{entity:this.store.create('relation',{release_id:release.id,name:input.name,from_id:from.id,to_id:to.id,relation_kind:input.relation_kind,provenance:input.provenance,completeness:input.completeness,evidence_ids:evidenceIds,from_version:from.version,to_version:to.version,admission:input.provenance==='observed'?'canonical-owner-admitted':'local-explicit-record',created_at:iso()})};
+        let graphObservationId=null;
+        if(input.provenance==='observed'){
+          ensure(this.capabilities.canonical_graph_admission===true,'Observed relation requires canonical Graph admission','PolicyDenied');ensure(input.graph_observation_id,'Observed relation requires an admitted Project Graph observation');choice(input.relation_kind,GRAPH_RELATIONS);
+          const supported=assertObservedGraphEdge(this,input.graph_observation_id,from,to,input.relation_kind);ensure(supported.observation.data.release_id===release.id,'Graph observation belongs to another release','Conflict');graphObservationId=supported.observation.id;
+        }else ensure(input.graph_observation_id===undefined,'Only observed relations may bind canonical Graph observations');
+        return{entity:this.store.create('relation',{release_id:release.id,name:input.name,from_id:from.id,to_id:to.id,relation_kind:input.relation_kind,provenance:input.provenance,completeness:input.completeness,evidence_ids:evidenceIds,graph_observation_id:graphObservationId,from_version:from.version,to_version:to.version,admission:input.provenance==='observed'?'canonical-owner-admitted':'local-explicit-record',created_at:iso()})};
       }
-      case'impact.plan':{
-        inputObject(input,['release_id','cause_ids','note'],['release_id','cause_ids']);const release=this.get(input.release_id,'release');array(input.cause_ids,64);ensure(new Set(input.cause_ids).size===input.cause_ids.length,'Duplicate impact causes');
-        for(const id of input.cause_ids){const cause=this.get(id);ensure(this.productOf(cause)===release.data.product_id,'Impact cause belongs to another product','PermissionDenied');}
-        if(input.note)lines(input.note,8000);
-        const impact=this.impact(release.id),causes=[...input.cause_ids].sort();
-        return{entity:this.store.create('impact_proposal',{release_id:release.id,name:'Impact proposal · '+release.data.name,cause_ids:causes,note:input.note??'',source_workspace_version:this.store.version(),impact,state:'PROPOSED',authority:'NONE',jobs_created:0,created_at:iso()})};
-      }
+      case'impact.plan':return{entity:createImpactProposal(this,input)};
+      case'impact.coalesce':return{entity:coalesceImpact(this,input)};
+      case'graph.observation_record':return recordGraphObservation(this,input);
+      case'impact.receipt_record':return{entity:recordRebuildReceipt(this,input)};
       case'evidence.import':{
         inputObject(input,['release_id','target_id','source_id','name','build','classification','rights','description','origin_digest','job_id'],['release_id','target_id','source_id','name','build','classification','rights','description','origin_digest']);
         const release=this.get(input.release_id,'release'),target=this.get(input.target_id,'target'),source=this.get(input.source_id,'source');

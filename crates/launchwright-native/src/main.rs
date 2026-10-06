@@ -21,6 +21,7 @@ const EXTENSIONS_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_EXTENSI
 const WORK_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_WORK_BUNDLE_SHA256");
 const MEDIA_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_MEDIA_BUNDLE_SHA256");
 const PUBLISH_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_PUBLISH_BUNDLE_SHA256");
+const GRAPH_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_GRAPH_BUNDLE_SHA256");
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd)]
 enum Profile {
@@ -32,6 +33,7 @@ enum Profile {
     Work,
     Media,
     Publish,
+    Graph,
 }
 #[derive(Clone, Copy)]
 struct Operation {
@@ -130,7 +132,7 @@ const OPERATIONS: &[Operation] = &[
         suffix: "release-impact",
         read: true,
         consent: false,
-        profile: Profile::Production,
+        profile: Profile::Graph,
     },
     Operation {
         suffix: "anchor-assess",
@@ -148,13 +150,49 @@ const OPERATIONS: &[Operation] = &[
         suffix: "relation-record",
         read: false,
         consent: false,
-        profile: Profile::Production,
+        profile: Profile::Graph,
     },
     Operation {
         suffix: "impact-plan",
         read: false,
         consent: false,
-        profile: Profile::Production,
+        profile: Profile::Graph,
+    },
+    Operation {
+        suffix: "graph-contract",
+        read: true,
+        consent: false,
+        profile: Profile::Graph,
+    },
+    Operation {
+        suffix: "graph-inspect",
+        read: true,
+        consent: false,
+        profile: Profile::Graph,
+    },
+    Operation {
+        suffix: "graph-cache_assess",
+        read: true,
+        consent: false,
+        profile: Profile::Graph,
+    },
+    Operation {
+        suffix: "graph-observation_record",
+        read: false,
+        consent: false,
+        profile: Profile::Graph,
+    },
+    Operation {
+        suffix: "impact-coalesce",
+        read: false,
+        consent: false,
+        profile: Profile::Graph,
+    },
+    Operation {
+        suffix: "impact-receipt_record",
+        read: false,
+        consent: false,
+        profile: Profile::Graph,
     },
     Operation {
         suffix: "evidence-import",
@@ -580,6 +618,7 @@ async fn main() -> Result<()> {
     let work = bridge("launchwright-work.cjs", WORK_BUNDLE)?;
     let media = bridge("launchwright-media.cjs", MEDIA_BUNDLE)?;
     let publish = bridge("launchwright-publish.cjs", PUBLISH_BUNDLE)?;
+    let graph = bridge("launchwright-graph.cjs", GRAPH_BUNDLE)?;
     let mut app = Application::new("launchwright", VERSION)?
         .require_host_tools()
         .with_observer(core.clone())
@@ -596,6 +635,7 @@ async fn main() -> Result<()> {
             Profile::Work => work.clone(),
             Profile::Media => media.clone(),
             Profile::Publish => publish.clone(),
+            Profile::Graph => graph.clone(),
         };
         app = app.register(contract, provider.operation(name))?;
     }
@@ -620,7 +660,7 @@ mod tests {
         for spec in OPERATIONS {
             assert!(names.insert(spec.suffix));
         }
-        assert_eq!(names.len(), 71);
+        assert_eq!(names.len(), 82);
     }
     #[test]
     fn profile_partition_counts_are_stable() {
@@ -629,12 +669,87 @@ mod tests {
             *counts.entry(spec.profile).or_insert(0usize) += 1;
         }
         assert_eq!(counts.get(&Profile::Core), Some(&13));
-        assert_eq!(counts.get(&Profile::Production), Some(&9));
-        assert_eq!(counts.get(&Profile::Review), Some(&9));
-        assert_eq!(counts.get(&Profile::Integrations), Some(&6));
+        assert_eq!(counts.get(&Profile::Production), Some(&6));
+        assert_eq!(counts.get(&Profile::Review), Some(&8));
+        assert_eq!(counts.get(&Profile::Integrations), Some(&7));
         assert_eq!(counts.get(&Profile::Extensions), Some(&13));
-        assert_eq!(counts.get(&Profile::Work), Some(&6));
+        assert_eq!(counts.get(&Profile::Work), Some(&11));
         assert_eq!(counts.get(&Profile::Media), Some(&5));
         assert_eq!(counts.get(&Profile::Publish), Some(&10));
+        assert_eq!(counts.get(&Profile::Graph), Some(&9));
+    }
+    #[test]
+    fn graph_contract_is_locked_to_canonical_semwright_types() {
+        use semwright_native_sdk::serde_json::{Value, from_str, to_value};
+        use semwright_project_graph::composition::Verdict;
+        use semwright_project_graph::{
+            Coverage, Divergence, Existence, Freshness, Knowledge, MAX_EDGES, MAX_RESOURCES,
+            Relation, TraversalBudget,
+        };
+        let lock: Value = from_str(include_str!(
+            "../../../contracts/project-graph-contract.json"
+        ))
+        .unwrap();
+        assert_eq!(
+            lock["source"]["sha"],
+            "4d291de26724810017ce7b6d185326514cb79fa6"
+        );
+        assert_eq!(
+            lock["source"]["schema_version"].as_u64(),
+            Some(semwright_project_graph::SCHEMA_VERSION as u64)
+        );
+        assert_eq!(
+            lock["query"]["budget"]["nodes"].as_u64(),
+            Some(MAX_RESOURCES as u64)
+        );
+        assert_eq!(
+            lock["query"]["budget"]["edges"].as_u64(),
+            Some(MAX_EDGES as u64)
+        );
+        let budget = TraversalBudget {
+            nodes: MAX_RESOURCES,
+            edges: MAX_EDGES,
+            depth: 256,
+            results: 10_000,
+        };
+        budget.validate().unwrap();
+        assert!(
+            TraversalBudget {
+                depth: 257,
+                ..budget
+            }
+            .validate()
+            .is_err()
+        );
+        let relations = [
+            Relation::Contains,
+            Relation::References,
+            Relation::DerivedFrom,
+            Relation::ProducedBy,
+            Relation::ConsumedBy,
+            Relation::Realizes,
+            Relation::PublishedAs,
+            Relation::VerifiedBy,
+        ]
+        .iter()
+        .map(|value| to_value(value).unwrap())
+        .collect::<Vec<_>>();
+        assert_eq!(lock["edge"]["relations"], Value::Array(relations));
+        let mut knowledge = Knowledge::unknown();
+        assert_eq!(knowledge.label(), "UNKNOWN");
+        knowledge.existence = Existence::Present;
+        knowledge.freshness = Freshness::Current;
+        knowledge.divergence = Divergence::Clean;
+        knowledge.verification = Verdict::Pass;
+        knowledge.coverage = Coverage::complete();
+        knowledge.requires_reconcile = false;
+        assert_eq!(knowledge.label(), "CURRENT");
+        knowledge.freshness = Freshness::Stale;
+        assert_eq!(knowledge.label(), "STALE");
+        knowledge.existence = Existence::Missing;
+        assert_eq!(knowledge.label(), "MISSING");
+        knowledge.existence = Existence::Present;
+        knowledge.divergence = Divergence::Diverged;
+        assert_eq!(knowledge.label(), "DIVERGED");
     }
 }

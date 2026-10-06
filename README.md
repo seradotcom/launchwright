@@ -4,7 +4,7 @@
 
 Launchwright keeps product/build context, scenarios, claims, immutable release materials, verifier evidence, exact-candidate review, channel packages and recovery history in one application-owned workspace.
 
-> **Developer preview.** The repository deliberately does not claim that the complete private product specification has passed acceptance. Real product capture, canonical Project Graph/effects, Composition media rendering, Platform execution, remote teams and public Publish remain external Semwright integration boundaries until exact receipts prove otherwise.
+> **Developer preview.** The repository deliberately does not claim that the complete private product specification has passed acceptance. Real product capture, live Project Graph traversal/admission, canonical effects, Composition media rendering, Platform execution, remote teams and public Publish remain external Semwright integration boundaries until exact receipts prove otherwise.
 
 ## Run locally
 
@@ -35,7 +35,8 @@ Synthetic data is never described as a real product capture.
 - build/source/target/feature/scenario/anchor modeling with explicit source authorization;
 - claims, CopyBlocks, availability rules and ReleaseContract readiness denominators;
 - immutable Markdown, safe HTML, JSON, email-draft and VTT artifacts with SHA-256-addressed bytes;
-- explicit relation provenance, impact projections, immutable impact proposals and exact-base document change proposals that cannot force-overwrite newer edits;
+- explicit relation provenance plus an immutable, owner-admitted Semwright Project Graph projection with bounded visible-node impact, preserved UNKNOWN frontiers, exact-revision impact proposals/coalescing, conservative reuse assessment and rebuild/finalization receipts; local heuristics never promote themselves to Graph authority;
+- exact-base document change proposals that cannot force-overwrite newer edits;
 - exact candidate manifests that pin artifact bytes, target context, ReleaseContract, localization/glossary revisions, channel profiles and declared rights, with input freshness and review-race isolation;
 - capture contract v2 tied to source + build + target + scenario, with Platform/native receipt correlation, readiness checks, anchor cardinality, build-drift detection, isolation/cleanup bounds, provenance classes and derived-material lineage while technical state stays UNKNOWN;
 - immutable verifier identity/version/digest, coverage, omissions and findings;
@@ -60,7 +61,7 @@ The public `@semwright/native-sdk` source is vendored unchanged under its upstre
 - Native SDK `0.9.0-dev.1`
 - exact SHA-256 hashes for the redistributed SDK files/archive
 
-The canonical `NodeBridge` allows at most 48 KiB per owner-pinned executable bundle. Launchwright therefore maps all 76 public operations exactly once across eight bounded profiles (`core`, `production`, `review`, `integrations`, `extensions`, `work`, `media`, `publish`) instead of weakening that upstream limit. `scripts/build-native-bundle.mjs` hashes each exact bundle and rejects missing/duplicate operations or oversized output. `crates/launchwright-native` pins those eight hashes at build time. The caller cannot choose arbitrary executable code, mounts or runtime paths.
+The canonical `NodeBridge` allows at most 48 KiB per owner-pinned executable bundle. Launchwright therefore maps all 82 public operations exactly once across nine bounded profiles (`core`, `production`, `review`, `integrations`, `extensions`, `work`, `media`, `publish`, `graph`) instead of weakening that upstream limit. `scripts/build-native-bundle.mjs` hashes each exact bundle and rejects missing/duplicate operations or oversized output. `crates/launchwright-native` pins all nine hashes at build time. The caller cannot choose arbitrary executable code, mounts or runtime paths; the dedicated `graph` profile is the only Native profile provisioned for owner-admitted Graph projections.
 
 The optional Platform adapter consumes an owner-supplied byte-pinned package. The inspected Platform source is not licensed for redistribution, so it is not copied into this public repository.
 
@@ -70,7 +71,7 @@ Launchwright keeps **production, verification, review and delivery** separate.
 
 A successful capture contract can establish that an authorized receipt, readiness conditions, unique anchors and provenance were recorded; it does not establish semantic correctness or Driver Host acceptance. Generated/editorial/imported material is never eligible to stand in for observed product state, and a sanitized derivative only preserves that eligibility when its exact parent capture did and every declared transformation preserves observed state. A heuristic/model/local PASS remains effective UNKNOWN unless admitted by canonical verifier authority. A waiver records an exception but never turns FAIL into PASS. A channel package says bytes are ready; it does not mean they were uploaded or published. A local ReleaseTemplate/ProductVersion/deployment contract likewise does not prove a remote consumer job ran. Public activation requires a canonical Publish receipt.
 
-Local input-pin comparisons are not Project Graph completeness. Scenario effect declarations are not canonical effects. A `media_plan` and its Composition receipt ledger preserve handoff intent and provenance but are not a local AV renderer; VTT timing is not Composition rendering. Private editorial approval is not Host acceptance.
+An owner-admitted Project Graph observation can project canonical snapshot/impact knowledge into Launchwright, but local input-pin comparisons, declared/imported/heuristic relations and cache hits are not Project Graph completeness or admission. Partial visibility, missing dependencies and truncated/cancelled traversal preserve UNKNOWN frontiers. Scenario effect declarations are not canonical effects. A `media_plan` and its Composition receipt ledger preserve handoff intent and provenance but are not a local AV renderer; VTT timing is not Composition rendering. Private editorial approval is not Host acceptance.
 
 ## Backup and recovery
 
@@ -106,6 +107,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [Install](docs/INSTALL.md)
 - [Architecture and authority boundaries](docs/ARCHITECTURE.md)
 - [Native SDK integration](docs/NATIVE_SDK.md)
+- [Project Graph projection and impact](docs/PROJECT_GRAPH.md)
 - [Known SDK/platform gaps](docs/SDK_GAPS.md)
 - [Storage and portability](docs/PORTABILITY.md)
 - [Operations, metering and cost projection](docs/OPERATIONS_AND_COSTS.md)

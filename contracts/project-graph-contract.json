@@ -1,0 +1,50 @@
+{
+  "schema_version": "launchwright-project-graph-contract/1",
+  "source": {
+    "repository": "seradotcom/semwright",
+    "sha": "4d291de26724810017ce7b6d185326514cb79fa6",
+    "crate": "semwright-project-graph",
+    "schema_version": 1
+  },
+  "query": {
+    "budget": {
+      "nodes": 20000,
+      "edges": 100000,
+      "depth": 256,
+      "results": 10000
+    },
+    "visibility": "authorized-project-view",
+    "cycles": "bounded-not-assumed-dag"
+  },
+  "edge": {
+    "relations": [
+      "contains",
+      "references",
+      "derived_from",
+      "produced_by",
+      "consumed_by",
+      "realizes",
+      "published_as",
+      "verified_by"
+    ],
+    "evidence": [
+      "declared",
+      "observed",
+      "executed"
+    ]
+  },
+  "provenance": [
+    "declared",
+    "observed",
+    "imported",
+    "heuristic"
+  ],
+  "presentation_states": [
+    "CURRENT",
+    "STALE",
+    "UNKNOWN",
+    "MISSING",
+    "DIVERGED"
+  ],
+  "authority": "Semwright Project Graph / trusted Host admission; Launchwright stores projections only"
+}

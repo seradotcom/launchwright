@@ -37,7 +37,8 @@ const reads={
   extensions:['compatibility-negotiate',{schema_major:1}],
   work:['workspace-snapshot',{}],
   media:['media-inspect',{}],
-  publish:['publish-inspect',{deployment_id:deployment.id}]
+  publish:['publish-inspect',{deployment_id:deployment.id}],
+  graph:['graph-contract',{}]
 };
 const results={};
 
