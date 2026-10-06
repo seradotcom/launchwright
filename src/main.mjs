@@ -5,7 +5,7 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { LaunchwrightApplication, execute } from './application.mjs';
-import { createAppServer, localToken } from './server.mjs';
+import { createAppServer, localToken, loadConsumerAuth } from './server.mjs';
 import { makeRequest, RESOURCE, APP_VERSION } from './contracts.mjs';
 import { applicationContext, dispatchApplication } from '@semwright/native-sdk';
 import { exportSnapshot, restoreSnapshot } from './snapshot.mjs';
@@ -15,7 +15,7 @@ function option(name,fallback){const i=args.indexOf('--'+name);if(i>=0){if(!args
 const root=resolve(option('state',process.env.LAUNCHWRIGHT_STATE??'.state'));
 const print=value=>process.stdout.write(JSON.stringify(value,null,2)+'\n');
 async function main(){
-  if(command==='help'){console.log(`Launchwright ${APP_VERSION} — AGPL-3.0-only\n\nCommands:\n  init [--state DIR]                 Create an empty local workspace\n  migrate-history [--state DIR]      Explicitly install durable entity history\n  serve [--state DIR] [--port 4317]  Serve on loopback only\n  doctor [--state DIR]               Report actual capabilities; no repairs\n  snapshot --out FILE [--state DIR]  Export a portable offline recovery snapshot\n  restore --snapshot FILE --state DIR Restore into a new workspace; old request receipts stay inactive\n  list [--kind KIND] [--state DIR]   Read paginated native observations\n  call --operation NAME --input FILE [--request KEY] [--state DIR]\n  prepare --operation NAME --input FILE --out FILE [--state DIR]\n  send --prepared FILE [--state DIR]  Send exactly one saved native intent\n  recover --prepared FILE [--state DIR]\n  demo [--state DIR]                 Create synthetic editorial examples, NOT captures\n  platform --work ID [--recover] [--state DIR]\n\nHeavy compilation, browser tests and Host conformance belong to GitHub Actions.\n`);return;}
+  if(command==='help'){console.log(`Launchwright ${APP_VERSION} — AGPL-3.0-only\n\nCommands:\n  init [--state DIR]                 Create an empty local workspace\n  migrate-history [--state DIR]      Explicitly install durable entity history\n  serve [--state DIR] [--port 4317] [--consumer-auth FILE]\n                                      Serve on loopback; optional bounded consumer identities\n  doctor [--state DIR]               Report actual capabilities; no repairs\n  snapshot --out FILE [--state DIR]  Export a portable offline recovery snapshot\n  restore --snapshot FILE --state DIR Restore into a new workspace; old request receipts stay inactive\n  list [--kind KIND] [--state DIR]   Read paginated native observations\n  call --operation NAME --input FILE [--request KEY] [--state DIR]\n  prepare --operation NAME --input FILE --out FILE [--state DIR]\n  send --prepared FILE [--state DIR]  Send exactly one saved native intent\n  recover --prepared FILE [--state DIR]\n  demo [--state DIR]                 Create synthetic editorial examples, NOT captures\n  platform --work ID [--recover] [--state DIR]\n\nHeavy compilation, browser tests and Host conformance belong to GitHub Actions.\n`);return;}
   if(command==='init'){const app=new LaunchwrightApplication(root,{initialize:true});const schema_version=app.store.meta().schema_version,history_ready=app.store.hasHistory;app.close();localToken(root);print({state:root,created_or_opened:true,schema_version,history_ready,session_token_file:join(root,'session-token')});return;}
   if(command==='migrate-history'){const app=new LaunchwrightApplication(root);try{print({...app.store.installHistory(),state:root});}finally{app.close();}return;}
   if(command==='doctor'){
@@ -32,8 +32,9 @@ async function main(){
   }
   if(command==='serve'){
     const port=Number(option('port','4317'));if(!Number.isInteger(port)||port<1024||port>65535)throw Error('Port must be 1024–65535');
-    const app=new LaunchwrightApplication(root),service=createAppServer(app,{port});const url=await service.listen();
-    console.log(`Launchwright: ${url}\nUnlock with the token stored in ${join(root,'session-token')}\nLocal-only mode; no external publication or runtime acceptance inferred.`);
+    const consumerAuthPath=option('consumer-auth',process.env.LAUNCHWRIGHT_CONSUMER_AUTH??null),bearerPrincipals=consumerAuthPath?loadConsumerAuth(resolve(consumerAuthPath)):[];
+    const app=new LaunchwrightApplication(root,{capabilities:{identity_mode:bearerPrincipals.length?'local-owner-plus-bounded-consumers':'local-single-owner'}}),service=createAppServer(app,{port,bearerPrincipals});const url=await service.listen();
+    console.log(`Launchwright: ${url}\nUnlock with the token stored in ${join(root,'session-token')}\nConfigured consumer identities: ${bearerPrincipals.length}\nLoopback-only mode; consumer credentials do not establish Platform Publish, remote tenant auth or runtime acceptance.`);
     const close=async()=>{await service.close();app.close();process.exit(0);};process.once('SIGINT',close);process.once('SIGTERM',close);return;
   }
   const app=new LaunchwrightApplication(root);try{

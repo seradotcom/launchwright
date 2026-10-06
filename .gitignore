@@ -11,6 +11,7 @@ evidence/native/
 *.db
 *.pem
 *.key
+*.consumer-auth.json
 .cache/
 coverage/
 playwright-report/

@@ -14,6 +14,8 @@ node src/main.mjs serve --state .state --port 4317
 
 The server binds loopback only. Read the generated `.state/session-token` locally and enter it in the login screen. Do not put that token in a URL, git, screenshots, release packages or automation logs.
 
+For a local consumer-identity rehearsal, create a private JSON file outside the repository with mode `0600` on POSIX and schema `launchwright-consumer-auth/1`. Its `principals` array contains `{token, principal, scopes}` records and this consumer-only surface accepts only the `consume` scope. Start with `node src/main.mjs serve --state .state --consumer-auth /private/path/launchwright.consumer-auth.json`. The file is read only at server start, is not stored in SQLite or snapshots, and `*.consumer-auth.json` is ignored by git. This remains a loopback development boundary, not remote tenant authentication.
+
 ## Empty and synthetic workspaces
 
 `init` creates an empty workspace. `demo` adds only synthetic editorial data and does not represent native product capture.

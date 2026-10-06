@@ -1,0 +1,8 @@
+Launchwright R7 upstream Publish surface inspection
+semwright_origin_main_sha=4d291de26724810017ce7b6d185326514cb79fa6
+launchwright_source_lock_native_sdk_sha=4d291de26724810017ce7b6d185326514cb79fa6
+query=@semwright/platform-client|publish.invoke|publish.define|publish.deploy|ProductVersion|Platform Publish
+tracked_matches_begin
+4d291de26724810017ce7b6d185326514cb79fa6:crates/driver-libreoffice/src/uno_bridge.py:55:                if line.startswith("ProductVersion="):
+tracked_matches_end
+interpretation=Identifier search found no Semwright Platform Publish/client surface in the pinned/current main snapshot; the only ProductVersion-style match, if present, is unrelated application metadata. This identifier-based check is evidence for the current integration gap, not proof that no semantically similar code exists under other names.

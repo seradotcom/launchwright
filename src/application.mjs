@@ -72,14 +72,15 @@ export class LaunchwrightApplication {
     return{version:current,scope:query.scope,items,complete,next:complete?null:{version:current,scope:query.scope,token:Buffer.from(JSON.stringify({after:items.at(-1).id,limit:query.limit})).toString('base64url')}};
   }
   lookup(identity,context){
-    this.allow('read');checkCancelled(context);ensure(identity.resource===RESOURCE,'Unknown recovery resource','NotFound');
+    // Recovery is principal-bound by the durable receipt and does not grant workspace read authority.
+    ensure(this.scopes.size>0,'This authenticated application session has no recovery scope','PermissionDenied');checkCancelled(context);ensure(identity.resource===RESOURCE,'Unknown recovery resource','NotFound');
     const row=this.store.db.prepare('SELECT * FROM receipts WHERE epoch=? AND key=?').get(identity.epoch,identity.key);
     if(row){ensure(row.digest===identity.request_sha256&&row.principal===this.principal,'Recovery identity differs from its durable binding','Conflict');return{state:'recorded',identity,result:JSON.parse(row.result)};}
     const epoch=this.store.meta().epoch;
     return identity.epoch<epoch?{state:'retention_expired',identity,current_epoch:epoch}:{state:'outcome_unknown',identity};
   }
   describe(){return{app:'Launchwright',version:APP_VERSION,schema_version:'launchwright/1',workspace_version:this.store.version(),request_epoch:this.store.meta().epoch,
-    scope_mode:'local-single-owner',principal:this.principal,scopes:[...this.scopes],native_sdk:'0.9.0-dev.1',operations:Object.entries(OPERATION_SCOPES).map(([name,scope])=>({name,scope,read_only:READ_OPERATIONS.has(name)})),
+    scope_mode:this.capabilities.identity_mode??'local-single-owner',principal:this.principal,scopes:[...this.scopes],native_sdk:'0.9.0-dev.1',operations:Object.entries(OPERATION_SCOPES).map(([name,scope])=>({name,scope,read_only:READ_OPERATIONS.has(name)})),
     capabilities:{editorial_text_exports:'available',durable_entity_history:this.store.hasHistory?'available':'migration-required',private_draft_delivery:'available',portable_snapshot_restore:'available-local-admin',declared_release_contracts:'available',localization_ledger:'available-layout-quality-not-inferred',extension_descriptors:'available-no-remote-code',compatibility_negotiation:'available',profile_preflight:'available-contract-only',state_anchors:'contract-and-assessment-only',impact_proposals:'available-no-execution-authority',document_change_proposals:'available-application-local-no-auto-merge',capture_receipts:'available-provenance-only',verification_ledger:'available-canonical-pass-requires-admission',waivers:'available-never-overwrite-verifier-state',channel_packages:'available-no-send',native_driver_host:'requires-owner-pinned-bundle-and-broker',platform:this.capabilities.platform??'not-connected',canonical_graph:'requires-platform-observation',browser_capture:'requires-canonical-driver-recipe',media_render:'requires-composition-recipe',mobile:'provenance-import-only',public_delivery:'requires-canonical-publish-receipt',...this.capabilities},
     limits:{page_items:128,reply_bytes:256*1024,artifact_bytes:1024*1024,receipt_epoch_items:20000},disclosure:'Local editorial checks are not Platform approvals or canonical effect verification.'};}
   profilePreflight(input){

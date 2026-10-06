@@ -46,6 +46,8 @@ A `release_template` is an editable application-owned contract over explicitly a
 
 A `publish_deployment` points to one exact ProductVersion and has an explicit ACTIVE → DEPRECATED → RETIRED lifecycle. Consumer invocation preparation accepts only the version's parameter surface, rejects URL/path/secret-style parameter names and out-of-scope resource options, applies a budget ceiling, and deduplicates `(consumer, deployment, invocation_key)` without sharing owner workspace read access. Retiring a deployment blocks new invocations while preserving prior invocation/result custody according to the declared retention contract.
 
+The loopback HTTP server can provision bounded bearer principals for consumer rehearsal. Every request opens the application under that authenticated principal and its exact scopes. Prepared HTTP mutations use a principal-bound v2 envelope; a different principal cannot send it, and durable receipt recovery rechecks the stored principal before returning a result. Consumer credentials never become owner browser cookies. This proves application-side identity/ACL separation on one local workspace, not cross-tenant Platform execution.
+
 Export serializes only the authorized contract/pins and explicitly carries no credentials, grants or permissions. Import requires caller-supplied local resource rebindings and an explicit contract recheck before the imported template may be frozen again. Platform-facing publish work is bound to the exact local template/version/deployment/invocation revision and digest and fails stale before send if that binding changes. These records are preparation/custody only: actual cross-account execution, metering, output ACL enforcement and external activation remain Platform Publish authority.
 
 
