@@ -48,6 +48,13 @@ A `publish_deployment` points to one exact ProductVersion and has an explicit AC
 
 Export serializes only the authorized contract/pins and explicitly carries no credentials, grants or permissions. Import requires caller-supplied local resource rebindings and an explicit contract recheck before the imported template may be frozen again. Platform-facing publish work is bound to the exact local template/version/deployment/invocation revision and digest and fails stale before send if that binding changes. These records are preparation/custody only: actual cross-account execution, metering, output ACL enforcement and external activation remain Platform Publish authority.
 
+
+## Extensibility and non-DOM sources
+
+Extension manifests are bounded descriptors, not executable grants. `extension.prepare_use` freezes the exact extension resource version, package version and digest for one declared input/output contract. Retiring the package blocks new starts and makes existing preparations report `REVOKED_FOR_NEW_START` without deleting historical preparations or observations. Generic views expose typed plain metadata with no trusted markup, remote code execution or capability grant.
+
+The reference second source is an executable CLI fixture. Its process is run outside the application contract, then `source.cli_ingest` records bounded stdout/stderr, exact process timing/exit status, approved source/build pins and optional source-adapter pins. The observation can be inspected for source/target/adapter drift. A successful exit is recorded as process success only; technical state remains `UNKNOWN` because this application does not claim canonical Driver Host isolation or admission from a process receipt.
+
 ## Portability
 
 Portable snapshot v2 contains application entities, exact entity revision history, migration provenance, content-addressed blobs, aliases, pending records and audit events. Historical request receipts are exported for forensic continuity but intentionally not activated during restore. Restored uncertain intents are marked RESTORE_RECONCILE_REQUIRED.

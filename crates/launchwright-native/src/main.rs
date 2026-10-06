@@ -257,6 +257,24 @@ const OPERATIONS: &[Operation] = &[
         profile: Profile::Integrations,
     },
     Operation {
+        suffix: "extension-generic_view",
+        read: true,
+        consent: false,
+        profile: Profile::Integrations,
+    },
+    Operation {
+        suffix: "extension-preparation_status",
+        read: true,
+        consent: false,
+        profile: Profile::Integrations,
+    },
+    Operation {
+        suffix: "source-cli_inspect",
+        read: true,
+        consent: false,
+        profile: Profile::Integrations,
+    },
+    Operation {
         suffix: "compatibility-negotiate",
         read: true,
         consent: false,
@@ -288,6 +306,18 @@ const OPERATIONS: &[Operation] = &[
     },
     Operation {
         suffix: "extension-retire",
+        read: false,
+        consent: false,
+        profile: Profile::Integrations,
+    },
+    Operation {
+        suffix: "extension-prepare_use",
+        read: false,
+        consent: false,
+        profile: Profile::Integrations,
+    },
+    Operation {
+        suffix: "source-cli_ingest",
         read: false,
         consent: false,
         profile: Profile::Integrations,
@@ -544,7 +574,7 @@ mod tests {
         for spec in OPERATIONS {
             assert!(names.insert(spec.suffix));
         }
-        assert_eq!(names.len(), 64);
+        assert_eq!(names.len(), 69);
     }
     #[test]
     fn profile_partition_counts_are_stable() {
@@ -555,7 +585,7 @@ mod tests {
         assert_eq!(counts.get(&Profile::Core), Some(&13));
         assert_eq!(counts.get(&Profile::Production), Some(&9));
         assert_eq!(counts.get(&Profile::Review), Some(&9));
-        assert_eq!(counts.get(&Profile::Integrations), Some(&12));
+        assert_eq!(counts.get(&Profile::Integrations), Some(&17));
         assert_eq!(counts.get(&Profile::Work), Some(&6));
         assert_eq!(counts.get(&Profile::Media), Some(&5));
         assert_eq!(counts.get(&Profile::Publish), Some(&10));
