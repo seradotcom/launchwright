@@ -7,11 +7,14 @@ const COMPOSITION_CONTRACT='semwright-composition/C0';
 const MEDIA_TIME_AUTHORITY='semwright-media-time';
 const OUTPUT_KINDS=Object.freeze(['video','screenshot-series','interactive-demo']);
 const ASSET_KINDS=Object.freeze(['narration','music','captions','transcript']);
-const MOTION_COMMANDS=Object.freeze({
+export const MOTION_COMMANDS=Object.freeze({
   plan:'driver.motion-canvas.composition.plan',
   apply:'driver.motion-canvas.composition.apply',
+  render_plan:'driver.motion-canvas.render.plan',
+  render_execute:'driver.motion-canvas.render.execute',
   verify:'driver.motion-canvas.composition.verify'
 });
+const SEMWRIGHT_COMPOSITION_SNAPSHOT='4d291de26724810017ce7b6d185326514cb79fa6';
 
 function gcd(a,b){
   a=a<0n?-a:a;b=b<0n?-b:b;
@@ -232,6 +235,72 @@ function effectiveOutput(app,data){
   if(data.state==='FAILED'||['FAIL','ERROR'].includes(data.reported_verification))return'FAIL';
   if(data.reported_verification!=='PASS'||data.state!=='SUCCEEDED')return'UNKNOWN';
   return data.authority==='semwright-composition'&&data.admission==='canonical-owner-admitted'?'PASS':'UNKNOWN';
+}
+
+
+export function prepareCompositionManifest(app,input){
+  inputObject(input,['plan_id','variant_id'],['plan_id','variant_id']);
+  const plan=app.get(input.plan_id,'media_plan');
+  ensure(plan.data.backend.profile==='motion-canvas','Composition manifest requires the canonical Motion Canvas backend','Unsupported');
+  ensure(plan.data.backend.fidelity!=='unsupported','Unsupported media fidelity cannot be submitted to Composition','Unsupported');
+  const planDrift=app.freshness(plan.data.source_pins);
+  ensure(planDrift.length===0,'Media plan inputs changed; revise the plan before preparing Composition work','StaleReference');
+  const variant=plan.data.variants.find(v=>v.id===input.variant_id);
+  ensure(variant,'Composition variant is not declared by this plan','NotFound');
+  ensure(variant.kind!=='interactive-demo','Motion Canvas render operations do not produce the interactive-demo variant','Unsupported');
+  const contract=plan.data.variant_contracts.find(v=>v.id===variant.id);
+  ensure(contract,'Media variant contract is missing','Conflict');
+  ensure(app.freshness(contract.pins).length===0,'Media variant inputs changed; revise the plan before preparing Composition work','StaleReference');
+
+  const blockers=[],correlations=[];
+  for(const shotId of variant.shot_ids){
+    const shot=plan.data.shots.find(s=>s.id===shotId);
+    ensure(shot,'Composition variant references an unknown shot','Conflict');
+    const capture=app.get(shot.capture_evidence_id,'evidence');
+    ensure(capture.data.evidence_type==='capture','Composition shot source is not capture evidence','Conflict');
+    const receipt=capture.data.receipt??{};
+    const segments=(capture.data.segments??[]).map(segment=>({
+      start_ms:segment.start_ms,end_ms:segment.end_ms,source_sha256:segment.source_sha256,
+      transform:segment.transform??null
+    }));
+    if(shot.purpose==='demonstrated'){
+      if(!capture.data.observed_state_eligible)blockers.push('observed-state-ineligible:'+shot.id);
+      if(!receipt.platform_job_id||!receipt.native_receipt_sha256)blockers.push('platform-correlation-unavailable:'+shot.id);
+      if(segments.length===0)blockers.push('capture-segments-unavailable:'+shot.id);
+    }
+    correlations.push({
+      shot_id:shot.id,purpose:shot.purpose,capture_evidence_id:capture.id,capture_version:capture.version,
+      capture_class:capture.data.provenance?.capture_class??null,observed_state_eligible:capture.data.observed_state_eligible===true,
+      platform_job_id:receipt.platform_job_id??null,native_receipt_sha256:receipt.native_receipt_sha256??null,
+      segments,host_locator_resolved:false
+    });
+  }
+
+  const trackIds=new Set(variant.track_ids);
+  const assetIds=new Set(plan.data.tracks.filter(track=>trackIds.has(track.id)).map(track=>track.asset_id));
+  const assets=plan.data.assets.filter(asset=>assetIds.has(asset.id)).map(asset=>({
+    id:asset.id,kind:asset.kind,version:asset.version,rights:asset.rights,origin:asset.origin,
+    source_resource_id:asset.source_resource_id??null,source_sha256:asset.source_sha256??null,
+    claim_ids:[...asset.claim_ids],locale:asset.locale??null
+  }));
+  const body={
+    schema_version:'launchwright-composition-handoff/1',
+    semwright_snapshot_sha:SEMWRIGHT_COMPOSITION_SNAPSHOT,
+    composition_contract:COMPOSITION_CONTRACT,media_time_authority:MEDIA_TIME_AUTHORITY,
+    plan_id:plan.id,plan_version:plan.version,plan_digest:plan.data.plan_digest,
+    variant_contract_digest:contract.digest,variant:{
+      id:variant.id,kind:variant.kind,locale:variant.locale,width:variant.width,height:variant.height,
+      safe_area_milli:variant.safe_area_milli,shot_ids:[...variant.shot_ids],track_ids:[...variant.track_ids]
+    },
+    timing:{frame_rate:plan.data.frame_rate,duration:plan.data.duration},
+    backend:{profile:plan.data.backend.profile,fidelity:plan.data.backend.fidelity},
+    required_operations:MOTION_COMMANDS,source_pins:contract.pins,correlations,assets,
+    blockers:[...new Set(blockers)].sort(),
+    ready_for_platform_resolution:blockers.length===0,
+    ready_for_driver_execution:false,execution_authority:false,host_acceptance:false,
+    note:'Launchwright prepares exact provenance/correlation only. Platform/Broker/Driver Host resolve locators, descriptors, grants, effects, clocks and render execution.'
+  };
+  return{...body,manifest_digest:digest('composition-handoff-v1',body)};
 }
 
 export function recordMediaOutput(app,input){

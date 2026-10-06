@@ -383,6 +383,12 @@ const OPERATIONS: &[Operation] = &[
         profile: Profile::Media,
     },
     Operation {
+        suffix: "media-composition_manifest",
+        read: true,
+        consent: false,
+        profile: Profile::Media,
+    },
+    Operation {
         suffix: "media-plan",
         read: false,
         consent: false,
@@ -592,7 +598,7 @@ mod tests {
         for spec in OPERATIONS {
             assert!(names.insert(spec.suffix));
         }
-        assert_eq!(names.len(), 70);
+        assert_eq!(names.len(), 71);
     }
     #[test]
     fn canonical_graph_adapter_is_linked_without_an_admission_surface() {
@@ -630,7 +636,7 @@ mod tests {
         assert_eq!(counts.get(&Profile::Review), Some(&9));
         assert_eq!(counts.get(&Profile::Integrations), Some(&12));
         assert_eq!(counts.get(&Profile::Work), Some(&6));
-        assert_eq!(counts.get(&Profile::Media), Some(&5));
+        assert_eq!(counts.get(&Profile::Media), Some(&6));
         assert_eq!(counts.get(&Profile::Publish), Some(&10));
     }
 }

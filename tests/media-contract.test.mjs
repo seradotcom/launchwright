@@ -13,7 +13,7 @@ async function mediaFixture(t,options={}){
     anchors:[{name:'root',role:'main',label:'Owned fixture',expected_count:1}],
     readiness:'declared',version_label:'1',reset_strategy:'isolated-context',effects:[]
   });
-  const capture=(await execute(app,'capture.ingest',captureInput(b,source,scenario))).entity;
+  const capture=(await execute(app,'capture.ingest',captureInput(b,source,scenario,{segments:[{start_ms:0,end_ms:20000,source_sha256:'9'.repeat(64)}]}))).entity;
   const sanitized=(await execute(app,'capture.ingest',captureInput(b,source,scenario,{
     name:'Sanitized interactive source',classification:'sanitized',
     provenance:{
@@ -80,6 +80,8 @@ test('RS-MED-01 and RS-MED-09 use canonical Composition/media-time contracts wit
   assert.deepEqual(plan.data.composition_handoff.operations,{
     plan:'driver.motion-canvas.composition.plan',
     apply:'driver.motion-canvas.composition.apply',
+    render_plan:'driver.motion-canvas.render.plan',
+    render_execute:'driver.motion-canvas.render.execute',
     verify:'driver.motion-canvas.composition.verify'
   });
   assert.equal(plan.data.composition_handoff.execution_authority,false);
@@ -195,4 +197,28 @@ test('RS-MED-10 video, screenshot series and interactive demo require independen
     artifact_sha256:'e'.repeat(64),mime:'application/zip',observed_at:'2026-10-05T15:21:00.000Z',reported_verification:'FAIL'
   })).entity;
   assert.equal(failed.data.technical_effective,'FAIL');
+});
+
+
+test('RS-MED-11 prepares an exact authority-free Motion Canvas handoff manifest',async t=>{
+  const f=await mediaFixture(t),plan=await createPlan(f);
+  const manifest=await execute(f.app,'media.composition_manifest',{plan_id:plan.id,variant_id:'video_16x9'});
+  assert.equal(manifest.schema_version,'launchwright-composition-handoff/1');
+  assert.equal(manifest.semwright_snapshot_sha,'4d291de26724810017ce7b6d185326514cb79fa6');
+  assert.equal(manifest.plan_digest,plan.data.plan_digest);
+  assert.equal(manifest.variant.id,'video_16x9');
+  assert.equal(manifest.ready_for_platform_resolution,true);
+  assert.equal(manifest.ready_for_driver_execution,false);
+  assert.equal(manifest.execution_authority,false);
+  assert.equal(manifest.host_acceptance,false);
+  assert.deepEqual(manifest.blockers,[]);
+  assert.equal(manifest.correlations.length,1);
+  assert.equal(manifest.correlations[0].platform_job_id,'job-fixture-1');
+  assert.equal(manifest.correlations[0].segments[0].source_sha256,'9'.repeat(64));
+  assert.equal(manifest.correlations[0].host_locator_resolved,false);
+  assert.equal(manifest.required_operations.render_execute,'driver.motion-canvas.render.execute');
+  assert.match(manifest.manifest_digest,/^[0-9a-f]{64}$/);
+  await assert.rejects(execute(f.app,'media.composition_manifest',{plan_id:plan.id,variant_id:'demo_web'}),{code:'Unsupported'});
+  await update(f.app,f.musicSheet,{content:'Drift after plan preparation.'});
+  await assert.rejects(execute(f.app,'media.composition_manifest',{plan_id:plan.id,variant_id:'video_16x9'}),{code:'StaleReference'});
 });
