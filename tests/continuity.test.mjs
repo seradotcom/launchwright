@@ -59,7 +59,7 @@ test('capture execution requires an explicitly approved source', async t => {
 
 test('heuristic PASS remains UNKNOWN and a waiver preserves a recorded failure', async t => {
   const {app}=setup(t);const b=await baseline(app),{artifact,candidate:c}=await candidate(app,b);
-  const common={candidate_id:c.id,dimension:'semantic',artifact_ids:[artifact.id],coverage:{checked:1,total:1},omissions:[],findings:[],observed_at:'2026-10-04T20:00:00.000Z'};
+  const common={candidate_id:c.id,candidate_sha256:c.data.candidate_sha256,dimension:'semantic',artifact_ids:[artifact.id],coverage:{checked:1,total:1},omissions:[],findings:[],observed_at:'2026-10-04T20:00:00.000Z'};
   const heuristic=(await execute(app,'verification.record',{...common,state:'PASS',verifier:verifier('heuristic')})).entity;
   let summary=await execute(app,'verification.summary',{candidate_id:c.id});
   assert.equal(summary.state,'UNKNOWN');assert.equal(summary.checks[0].reported_state,'PASS');assert.equal(summary.checks[0].effective_state,'UNKNOWN');
@@ -75,7 +75,7 @@ test('heuristic PASS remains UNKNOWN and a waiver preserves a recorded failure',
 
 test('canonical verifier PASS is only admitted behind the explicit owner capability', async t => {
   const {app}=setup(t,{capabilities:{canonical_verifier_admission:true}});const b=await baseline(app),{artifact,candidate:c}=await candidate(app,b);
-  await execute(app,'verification.record',{candidate_id:c.id,dimension:'format',state:'PASS',verifier:verifier('canonical'),artifact_ids:[artifact.id],coverage:{checked:1,total:1},omissions:[],findings:[],observed_at:'2026-10-04T20:00:00.000Z'});
+  await execute(app,'verification.record',{candidate_id:c.id,candidate_sha256:c.data.candidate_sha256,dimension:'format',state:'PASS',verifier:verifier('canonical'),artifact_ids:[artifact.id],coverage:{checked:1,total:1},omissions:[],findings:[],observed_at:'2026-10-04T20:00:00.000Z'});
   const summary=await execute(app,'verification.summary',{candidate_id:c.id});
   assert.equal(summary.state,'PASS');assert.equal(summary.canonical_passes,1);
 });

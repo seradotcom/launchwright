@@ -89,16 +89,16 @@ export function validateCapture(raw) {
 export function validateVerification(raw) {
   validateValue(raw); noSecrets(raw); const d=structuredClone(raw);
   object(d,
-    ['candidate_id','dimension','state','verifier','artifact_ids','target_id','coverage','omissions','findings','observed_at'],
-    ['candidate_id','dimension','state','verifier','artifact_ids','coverage','omissions','findings','observed_at']);
-  idText(d.candidate_id); if(d.target_id) idText(d.target_id);
+    ['candidate_id','candidate_sha256','dimension','state','verifier','verifier_profile_id','artifact_ids','target_id','coverage','omissions','findings','observed_at'],
+    ['candidate_id','candidate_sha256','dimension','state','verifier','artifact_ids','coverage','omissions','findings','observed_at']);
+  idText(d.candidate_id); sha(d.candidate_sha256); if(d.verifier_profile_id) idText(d.verifier_profile_id); if(d.target_id) idText(d.target_id);
   choice(d.dimension,['format','semantic','editorial','privacy','rights','accessibility','product-evidence','permissions']);
   choice(d.state,['PASS','FAIL','UNKNOWN','ERROR']);
   object(d.verifier,['id','version','digest','authority','model'],['id','version','digest','authority']);
   str(d.verifier.id,160); str(d.verifier.version,96); sha(d.verifier.digest);
   choice(d.verifier.authority,['canonical','independent','human','heuristic']);
   if(d.verifier.model!==undefined) str(d.verifier.model,160);
-  array(d.artifact_ids,128).forEach(idText);
+  array(d.artifact_ids,128).forEach(idText); ensure(d.artifact_ids.length>0,'Verification must bind at least one frozen candidate artifact'); ensure(new Set(d.artifact_ids).size===d.artifact_ids.length,'Duplicate verification artifact references');
   object(d.coverage,['checked','total','notes'],['checked','total']);
   integer(d.coverage.checked,0,1000000); integer(d.coverage.total,0,1000000);
   ensure(d.coverage.checked<=d.coverage.total,'Verification coverage checked exceeds total');

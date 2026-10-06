@@ -32,7 +32,7 @@ function normalizedReviewPolicy(raw){
 
 export function freezeCandidate(app,input){
   inputObject(input,
-    ['release_id','name','artifact_ids','destination','contract','release_contract_id','localized_copy_ids','channel_profile_ids','rights_evidence_ids'],
+    ['release_id','name','artifact_ids','destination','contract','release_contract_id','localized_copy_ids','channel_profile_ids','rights_evidence_ids','verifier_profile_ids'],
     ['release_id','name','artifact_ids','destination','contract']);
   const release=app.get(input.release_id,'release');str(input.name,160);str(input.destination,96);
   ensure(/^[a-z0-9][a-z0-9_-]{0,95}$/.test(input.destination),'Destination must be a local alias identifier');
@@ -41,6 +41,7 @@ export function freezeCandidate(app,input){
   const localizationIds=uniqueIds(input.localized_copy_ids,64,'candidate localizations');
   const channelProfileIds=uniqueIds(input.channel_profile_ids,32,'candidate channel profiles');
   const explicitRightsIds=uniqueIds(input.rights_evidence_ids,128,'candidate rights evidence');
+  const verifierProfileIds=uniqueIds(input.verifier_profile_ids,16,'candidate verifier profiles');
   const reviewPolicy=normalizedReviewPolicy(input.contract);
 
   const artifacts=artifactIds.map(id=>app.get(id,'artifact'));
@@ -89,6 +90,20 @@ export function freezeCandidate(app,input){
     return{id:profile.id,version:profile.version,profile_version:profile.data.profile_version,channel:profile.data.channel,destination_class:profile.data.destination_class,effective_at:profile.data.effective_at};
   }).sort((a,b)=>a.id.localeCompare(b.id));
 
+  const verifierProfiles=verifierProfileIds.map(id=>{
+    const profile=app.get(id,'extension_package');
+    ensure(profile.data.type==='verifier_profile','Candidate verifier profile must reference a verifier_profile extension','InvalidArgument');
+    ensure(profile.data.status==='active','Candidate cannot pin a retired verifier profile','Conflict');
+    ensure(profile.data.permissions.includes('review'),'Verifier profile lacks review permission','PolicyDenied');
+    inputs.set(profile.id,pin(profile));
+    return{id:profile.id,version:profile.version,name:profile.data.name,package_version:profile.data.package_version,digest:profile.data.digest,
+      authority:profile.data.verifier.authority,dimensions:[...profile.data.verifier.dimensions].sort(),model:profile.data.verifier.model??null,
+      negative_controls:profile.data.verifier.negative_controls,coverage_mode:profile.data.verifier.coverage_mode};
+  }).sort((a,b)=>a.id.localeCompare(b.id));
+  for(const dimension of reviewPolicy.required_verification_dimensions)
+    ensure(verifierProfiles.some(profile=>profile.dimensions.includes(dimension)&&profile.authority==='canonical'&&profile.coverage_mode==='complete'&&profile.negative_controls===true),
+      'Required verification dimension lacks a canonical complete protected verifier with negative controls: '+dimension,'PolicyDenied');
+
   const rights=[...evidenceIds].sort().map(id=>{
     const evidence=app.get(id,'evidence');
     ensure(evidence.data.release_id===release.id,'Rights evidence belongs to another release','PermissionDenied');
@@ -110,6 +125,7 @@ export function freezeCandidate(app,input){
     release_contract:releaseContract,
     localizations,
     channel_profiles:channelProfiles,
+    verifier_profiles:verifierProfiles,
     rights,
     destination:input.destination,
     review_policy:reviewPolicy,
@@ -198,6 +214,21 @@ export function assertPartialDeliveryPolicy(candidate,allowPartial){
     'Candidate review policy does not authorize partial channel delivery','ConsentRequired');
 }
 
+function verificationGateSummary(app,candidate){
+  const required=new Set(candidate.data.manifest.review_policy?.required_verification_dimensions??candidate.data.manifest.contract?.required_verification_dimensions??[]);
+  const pins=candidate.data.manifest.verifier_profiles??[];
+  const records=app.list('verification',candidate.data.release_id).filter(record=>record.data.candidate_id===candidate.id);
+  const checks=records.map(record=>{
+    const profile=record.data.verifier_profile;
+    const profileCurrent=!required.has(record.data.dimension)||!!profile&&pins.some(pin=>pin.id===profile.id&&pin.digest===profile.digest&&pin.version.generation===profile.version.generation&&pin.version.revision===profile.version.revision);
+    const bound=record.data.candidate_sha256===candidate.data.candidate_sha256&&record.data.coverage_state==='COMPLETE'&&profileCurrent;
+    const effective_state=record.data.state==='FAIL'||record.data.state==='ERROR'?record.data.state:record.data.state==='PASS'&&record.data.admission==='canonical-owner-admitted'&&bound?'PASS':'UNKNOWN';
+    return{verification_id:record.id,dimension:record.data.dimension,effective_state};
+  });
+  const state=checks.some(check=>['FAIL','ERROR'].includes(check.effective_state))?'FAIL':checks.length&&checks.every(check=>check.effective_state==='PASS')?'PASS':'UNKNOWN';
+  return{state,checks};
+}
+
 export function buildCandidateGates(app,candidate){
   const changed=app.freshness(candidate.data.manifest.inputs);
   const gates=[{name:'input-versions',state:changed.length?'FAIL':'PASS',details:changed},{name:'artifact-bytes',state:'PASS',details:[]}];
@@ -207,7 +238,7 @@ export function buildCandidateGates(app,candidate){
   }
   const claims=candidate.data.manifest.claim_ids.map(id=>app.claimCheck(app.get(id,'claim')));
   gates.push({name:'technical-claims',state:claims.length?'UNKNOWN':'PASS',details:claims});
-  const verification=app.verificationSummary(candidate.id);
+  const verification=verificationGateSummary(app,candidate);
   const required=candidate.data.manifest.review_policy?.required_verification_dimensions??[];
   const requiredChecks=required.map(dimension=>{
     const matches=verification.checks.filter(check=>check.dimension===dimension);

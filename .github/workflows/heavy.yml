@@ -67,6 +67,7 @@ jobs:
           export LAUNCHWRIGHT_NATIVE_EFFECTS_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.effects.sha256')"
           export LAUNCHWRIGHT_NATIVE_PRODUCTION_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.production.sha256')"
           export LAUNCHWRIGHT_NATIVE_REVIEW_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.review.sha256')"
+          export LAUNCHWRIGHT_NATIVE_VERIFICATION_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.verification.sha256')"
           export LAUNCHWRIGHT_NATIVE_INTEGRATIONS_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.integrations.sha256')"
           export LAUNCHWRIGHT_NATIVE_WORK_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.work.sha256')"
           export LAUNCHWRIGHT_NATIVE_MEDIA_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.media.sha256')"

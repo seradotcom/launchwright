@@ -11,9 +11,11 @@ const state=mkdtempSync(join(tmpdir(),'launchwright-bundle-'));
 const app=new LaunchwrightApplication(state,{initialize:true});
 const product=(await execute(app,'entity.create',{kind:'product',data:{name:'Native bundle smoke',description:'Synthetic local fixture'}})).entity;
 const release=(await execute(app,'entity.create',{kind:'release',data:{product_id:product.id,name:'0.0-smoke',build:'smoke-build',status:'draft'}})).entity;
-const candidate=app.store.create('candidate',{release_id:release.id,name:'Synthetic bundle smoke candidate'});
 const source=(await execute(app,'entity.create',{kind:'source',data:{product_id:product.id,name:'Synthetic publish source',type:'web',locator:'http://127.0.0.1:4320/build/smoke',build:'smoke-build',coverage:'declared'}})).entity;
 const target=(await execute(app,'entity.create',{kind:'target',data:{release_id:release.id,name:'Synthetic publish target',ui_locale:'en-US',editorial_locale:'en-US',role:'viewer',plan:'basic',region:'MX',flags:{},viewport:{width:1280,height:720,scale_milli:1000}}})).entity;
+const deliverable=(await execute(app,'entity.create',{kind:'deliverable',data:{release_id:release.id,name:'Synthetic smoke notes',target_id:target.id,format:'markdown',content:'Synthetic smoke bytes.',claim_ids:[],source_ids:[source.id]}})).entity;
+const artifact=(await execute(app,'deliverable.render',{id:deliverable.id})).entity;
+const candidate=(await execute(app,'candidate.freeze',{release_id:release.id,name:'Synthetic bundle smoke candidate',artifact_ids:[artifact.id],destination:'bundle-smoke',contract:{version:'v1',required_reviewers:1,require_claims_verified:false}})).entity;
 const scenario=(await execute(app,'entity.create',{kind:'scenario',data:{release_id:release.id,name:'Synthetic publish flow',source_id:source.id,target_id:target.id,readiness:'declared',anchors:[{name:'root',role:'main',label:'Workspace',expected_count:1}],steps:[{action:'assert',anchor:'root'}]}})).entity;
 const claim=(await execute(app,'entity.create',{kind:'claim',data:{release_id:release.id,name:'Synthetic publish claim',text:'Synthetic bounded claim',target_id:target.id,category:'editorial',evidence_ids:[]}})).entity;
 const template=(await execute(app,'publish.template_create',{data:{
@@ -33,8 +35,10 @@ const reads={
   core:['workspace-describe',{}],
   sources:['profile-matrix',{}],
   graph:['graph-inspect',{release_id:release.id}],
+  effects:['effects-inspect',{release_id:release.id}],
   production:['release-coverage',{release_id:release.id}],
-  review:['verification-summary',{candidate_id:candidate.id}],
+  review:['candidate-inspect',{id:candidate.id}],
+  verification:['verification-summary',{candidate_id:candidate.id}],
   integrations:['channel-status',{release_id:release.id}],
   work:['workspace-snapshot',{}],
   media:['media-inspect',{}],
