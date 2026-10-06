@@ -1,0 +1,62 @@
+
+> launchwright@0.2.0-dev.15 build:native-bundle
+> node scripts/build-native-bundle.mjs
+
+
+  dist/core.esbuild.cjs  43.9kb
+
+⚡ Done in 8ms
+core: 44655 bytes 6735973e36a502133a9a3de8f8615fe5101def0e3f0ff5f02942e3d3febec177
+
+  dist/sources.esbuild.cjs  25.1kb
+
+⚡ Done in 6ms
+sources: 25312 bytes bb9b0fe5659227b3f3c6810317097072c76d37e78e3f8dc18a67f5152e3110c6
+
+  dist/graph.esbuild.cjs  25.8kb
+
+⚡ Done in 8ms
+graph: 26175 bytes 5b4914eeae4f94e1b5edea372e765f9490174cb55ff5447eb0ad41faecdaeefa
+
+  dist/effects.esbuild.cjs  29.3kb
+
+⚡ Done in 6ms
+effects: 29742 bytes a398115b00db76e8973f358a857c568d8a1b633f161fb56313c54a8a688a17e4
+
+  dist/production.esbuild.cjs  46.7kb
+
+⚡ Done in 13ms
+production: 47573 bytes 424ed9726e0c082f14b939fdc204bab600e9ad1d11e34827a36e38340717b3b0
+
+  dist/review.esbuild.cjs  44.6kb
+
+⚡ Done in 8ms
+review: 45231 bytes befa0b1d96267b5e65b4f7f2a51b9e59a144e4d7843780924e7d71c86a6c2172
+
+  dist/verification.esbuild.cjs  39.8kb
+
+⚡ Done in 8ms
+verification: 40423 bytes f8d1b702c80455334d52f91b7768fd34dd97b8614aeea7591dda0b1c5395a98d
+
+  dist/integrations.esbuild.cjs  48.2kb
+
+⚡ Done in 8ms
+integrations: 49008 bytes 7adef35d96d5d1fdff1ac98925cb3a7d7ce63bdb25cf5b092ec714a2d27db89d
+
+  dist/work.esbuild.cjs  34.9kb
+
+⚡ Done in 8ms
+work: 35421 bytes 2eadef1587bd4170a682bbd805bb9f9164c955ee94647c9544b36712d4069a84
+
+  dist/media.esbuild.cjs  41.0kb
+
+⚡ Done in 6ms
+media: 41599 bytes 3e9bcbe1135adbfe2d8ea2fd4a4c193246cc203bf1382c0a02c6caeb053077d7
+
+  dist/publish.esbuild.cjs  46.2kb
+
+⚡ Done in 8ms
+publish: 46944 bytes eb915377416d35830998a25c13066b0399299b7cb4f2cd2cd9eca453e1291371
+Native profile partition: 73 operations across 11 bundles.
+(node:3427123) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)

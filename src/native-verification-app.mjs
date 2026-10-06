@@ -2,10 +2,10 @@
 import { NativeError } from '@semwright/native-sdk';
 import { NativeProfileApplication } from './native-profile-base.mjs';
 import { inputObject } from './contracts.mjs';
-import { recordVerification, verificationSummary, recordWaiver } from './verification.mjs';
+import { recordVerification, verificationSummary, recordWaiver, prepareVerificationRepair, recordVerificationRepairAttempt } from './verification.mjs';
 
 export const VERIFICATION_NATIVE_READS=Object.freeze(['verification.summary']);
-export const VERIFICATION_NATIVE_MUTATIONS=Object.freeze(['verification.record','waiver.record']);
+export const VERIFICATION_NATIVE_MUTATIONS=Object.freeze(['verification.record','verification.repair_prepare','verification.repair_record','waiver.record']);
 export const VERIFICATION_NATIVE_OPERATIONS=Object.freeze([...VERIFICATION_NATIVE_READS,...VERIFICATION_NATIVE_MUTATIONS]);
 
 export class VerificationNativeApplication extends NativeProfileApplication{
@@ -19,6 +19,8 @@ export class VerificationNativeApplication extends NativeProfileApplication{
   mutate(operation,input){
     switch(operation){
       case'verification.record':return recordVerification(this,input);
+      case'verification.repair_prepare':return prepareVerificationRepair(this,input);
+      case'verification.repair_record':return recordVerificationRepairAttempt(this,input);
       case'waiver.record':return recordWaiver(this,input);
       default:throw new NativeError('Unsupported','Mutation is outside verification profile');
     }

@@ -206,6 +206,18 @@ const OPERATIONS: &[Operation] = &[
         profile: Profile::Verification,
     },
     Operation {
+        suffix: "verification-repair_prepare",
+        read: false,
+        consent: false,
+        profile: Profile::Verification,
+    },
+    Operation {
+        suffix: "verification-repair_record",
+        read: false,
+        consent: false,
+        profile: Profile::Verification,
+    },
+    Operation {
         suffix: "waiver-record",
         read: false,
         consent: false,
@@ -639,7 +651,7 @@ mod tests {
         assert_eq!(counts.get(&Profile::Effects), Some(&2));
         assert_eq!(counts.get(&Profile::Production), Some(&9));
         assert_eq!(counts.get(&Profile::Review), Some(&6));
-        assert_eq!(counts.get(&Profile::Verification), Some(&3));
+        assert_eq!(counts.get(&Profile::Verification), Some(&5));
         assert_eq!(counts.get(&Profile::Integrations), Some(&12));
         assert_eq!(counts.get(&Profile::Work), Some(&6));
         assert_eq!(counts.get(&Profile::Media), Some(&6));

@@ -89,7 +89,7 @@ export function validateCapture(raw) {
 export function validateVerification(raw) {
   validateValue(raw); noSecrets(raw); const d=structuredClone(raw);
   object(d,
-    ['candidate_id','candidate_sha256','dimension','state','verifier','verifier_profile_id','artifact_ids','target_id','coverage','omissions','findings','observed_at'],
+    ['candidate_id','candidate_sha256','dimension','state','verifier','verifier_profile_id','artifact_ids','target_id','coverage','omissions','findings','negative_control_results','observed_at'],
     ['candidate_id','candidate_sha256','dimension','state','verifier','artifact_ids','coverage','omissions','findings','observed_at']);
   idText(d.candidate_id); sha(d.candidate_sha256); if(d.verifier_profile_id) idText(d.verifier_profile_id); if(d.target_id) idText(d.target_id);
   choice(d.dimension,['format','semantic','editorial','privacy','rights','accessibility','product-evidence','permissions']);
@@ -108,6 +108,13 @@ export function validateVerification(raw) {
     object(f,['code','severity','message','resource_id'],['code','severity','message']);
     str(f.code,96); choice(f.severity,['info','warning','error','blocker']); lines(f.message,4000); if(f.resource_id) idText(f.resource_id);
   });
+  d.negative_control_results??=[];
+  array(d.negative_control_results,64).forEach(result=>{
+    object(result,['case_id','fixture_sha256','outcome','evidence_id','detail'],['case_id','fixture_sha256','outcome']);
+    str(result.case_id,96);sha(result.fixture_sha256);choice(result.outcome,['DETECTED','MISSED','NOT_RUN','UNKNOWN']);
+    if(result.evidence_id!==undefined)idText(result.evidence_id);if(result.detail!==undefined)lines(result.detail,2000);
+  });
+  ensure(new Set(d.negative_control_results.map(result=>result.case_id)).size===d.negative_control_results.length,'Duplicate negative-control result');
   timestamp(d.observed_at,'Verification observed_at');
   return d;
 }

@@ -98,11 +98,13 @@ export function freezeCandidate(app,input){
     inputs.set(profile.id,pin(profile));
     return{id:profile.id,version:profile.version,name:profile.data.name,package_version:profile.data.package_version,digest:profile.data.digest,
       authority:profile.data.verifier.authority,dimensions:[...profile.data.verifier.dimensions].sort(),model:profile.data.verifier.model??null,
-      negative_controls:profile.data.verifier.negative_controls,coverage_mode:profile.data.verifier.coverage_mode};
+      negative_controls:profile.data.verifier.negative_controls,
+      negative_control_cases:profile.data.verifier.negative_control_cases.map(control=>structuredClone(control)).sort((a,b)=>a.id.localeCompare(b.id)),
+      coverage_mode:profile.data.verifier.coverage_mode};
   }).sort((a,b)=>a.id.localeCompare(b.id));
   for(const dimension of reviewPolicy.required_verification_dimensions)
-    ensure(verifierProfiles.some(profile=>profile.dimensions.includes(dimension)&&profile.authority==='canonical'&&profile.coverage_mode==='complete'&&profile.negative_controls===true),
-      'Required verification dimension lacks a canonical complete protected verifier with negative controls: '+dimension,'PolicyDenied');
+    ensure(verifierProfiles.some(profile=>profile.dimensions.includes(dimension)&&profile.authority==='canonical'&&profile.coverage_mode==='complete'&&profile.negative_controls===true&&profile.negative_control_cases.some(control=>control.dimension===dimension)),
+      'Required verification dimension lacks a canonical complete protected verifier with a pinned negative-control case: '+dimension,'PolicyDenied');
 
   const rights=[...evidenceIds].sort().map(id=>{
     const evidence=app.get(id,'evidence');
@@ -221,8 +223,9 @@ function verificationGateSummary(app,candidate){
   const checks=records.map(record=>{
     const profile=record.data.verifier_profile;
     const profileCurrent=!required.has(record.data.dimension)||!!profile&&pins.some(pin=>pin.id===profile.id&&pin.digest===profile.digest&&pin.version.generation===profile.version.generation&&pin.version.revision===profile.version.revision);
-    const bound=record.data.candidate_sha256===candidate.data.candidate_sha256&&record.data.coverage_state==='COMPLETE'&&profileCurrent;
-    const effective_state=record.data.state==='FAIL'||record.data.state==='ERROR'?record.data.state:record.data.state==='PASS'&&record.data.admission==='canonical-owner-admitted'&&bound?'PASS':'UNKNOWN';
+    const controls=record.data.negative_control_state??(profile?'INCOMPLETE':'NOT_CONFIGURED');
+    const bound=record.data.candidate_sha256===candidate.data.candidate_sha256&&record.data.coverage_state==='COMPLETE'&&profileCurrent&&(!required.has(record.data.dimension)||controls==='COMPLETE');
+    const effective_state=record.data.state==='FAIL'||record.data.state==='ERROR'?record.data.state:controls==='FAILED'?'ERROR':record.data.state==='PASS'&&record.data.admission==='canonical-owner-admitted'&&bound?'PASS':'UNKNOWN';
     return{verification_id:record.id,dimension:record.data.dimension,effective_state};
   });
   const state=checks.some(check=>['FAIL','ERROR'].includes(check.effective_state))?'FAIL':checks.length&&checks.every(check=>check.effective_state==='PASS')?'PASS':'UNKNOWN';
