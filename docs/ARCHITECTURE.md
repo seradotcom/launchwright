@@ -6,7 +6,7 @@ Launchwright is an application layer over Semwright contracts, not a replacement
 
 **Launchwright owns:** release briefs, target context, local source declarations, scenarios, claims, CopyBlocks, ReleaseContracts, ReleaseTemplate drafts, immutable ProductVersion contracts, local deployment/invocation records, immutable editorial artifacts, exact candidate manifests, editorial decisions, verifier/waiver ledgers, channel package manifests, local audit events, portable snapshots and local recovery state.
 
-**Semwright owners remain authoritative for:** native driver execution and Host isolation, canonical Graph observations, canonical effects, Platform jobs/budgets, Composition/AV rendering, canonical verifier admission and external Publish receipts.
+**Semwright owners remain authoritative for:** native driver execution and Host isolation, canonical Graph observations, Effect evaluation authority (including native mutation/noninterference), Platform jobs/budgets, Composition/AV rendering, canonical verifier admission and external Publish receipts. Launchwright may preserve a result emitted by the exact pinned Native SDK immutable-artifact Effects reader, but that custody does not transfer evaluator or execution authority.
 
 The application never converts an imported declaration, screenshot, capture receipt, model result or waiver into a canonical PASS by serialization.
 
@@ -33,6 +33,12 @@ Launchwright does not implement a parallel dependency graph. `work.prepare` acce
 A Platform payload must first pass through durable pending/recovery custody. `graph.record` then stores an immutable `graph_observation` bound to the exact work revision, action, project, result digest and local revision set. Serialized JSON remains `platform-response-not-admitted` unless the runtime is explicitly provisioned with canonical Graph admission. If a bound local revision or source-work revision changes, `graph.inspect` reports the observation stale and `release.impact` returns to an unknown frontier rather than inheriting a prior CURRENT verdict.
 
 `release.impact` preserves admitted Graph output verbatim and never recomputes Project Graph freshness. Local reuse hints are scoped to workspace generation, principal and release, bind exact artifact/producer/target/input identity, prohibit cross-principal reuse and still require final verification. `impact.plan` remains an authority-free proposal; coalescing creates a new immutable proposal and unions every cause without dispatching jobs. An observed local relation must cite an exact admitted Graph observation.
+
+## Effects readback custody
+
+`effects.record` accepts only the exact `semwright-native-effects-result/1` envelope for the pinned Native SDK immutable-artifact reader. The result bytes are content-addressed, every decisive result must cover the exact bound Launchwright JSON/CSV artifact digests, and optional scenario association pins the exact scenario revision. The result itself always carries `execution_authority: false`.
+
+A canonical-looking serialized PASS is not enough: without explicit owner `canonical_effect_admission`, its effective state remains UNKNOWN. Admitted results become stale when result bytes, artifact bytes, artifact inputs or the optional scenario revision drift. Even an admitted PASS sets `scenario_effects_covered: false`; immutable-artifact property readback is not native application mutation/noninterference verification. The dedicated heavy lane builds and executes the upstream `semwright-native-effects` binary rather than reimplementing its evaluator in Launchwright.
 
 ## Capture and verification
 

@@ -13,6 +13,7 @@ import { MediaNativeApplication } from '../src/native-media-app.mjs';
 import { PublishNativeApplication } from '../src/native-publish-app.mjs';
 import { SourcesNativeApplication } from '../src/native-sources-app.mjs';
 import { GraphNativeApplication } from '../src/native-graph-app.mjs';
+import { EffectsNativeApplication } from '../src/native-effects-app.mjs';
 import { setup, baseline } from './helpers.mjs';
 
 async function invokeProfile(Profile,root,operation,input){
@@ -56,6 +57,10 @@ test('split native profiles preserve canonical mutation transactions across one 
   const graph=await readProfile(GraphNativeApplication,seeded.root,'graph.inspect',{release_id:b.release.id});
   assert.equal(graph.canonical_graph_authority,false);
   assert.equal(graph.unknown_frontier,true);
+
+  const effects=await readProfile(EffectsNativeApplication,seeded.root,'effects.inspect',{release_id:b.release.id});
+  assert.equal(effects.state,'UNKNOWN');
+  assert.equal(effects.scenario_effects_authority,false);
 
   const production=await invokeProfile(ProductionNativeApplication,seeded.root,'deliverable.render',{id:b.deliverable.id});
   assert.equal(production.entity.kind,'artifact');
