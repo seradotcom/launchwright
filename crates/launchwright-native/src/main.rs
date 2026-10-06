@@ -22,6 +22,7 @@ const WORK_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_WORK_BUNDLE_S
 const MEDIA_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_MEDIA_BUNDLE_SHA256");
 const PUBLISH_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_PUBLISH_BUNDLE_SHA256");
 const GRAPH_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_GRAPH_BUNDLE_SHA256");
+const EFFECTS_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_EFFECTS_BUNDLE_SHA256");
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd)]
 enum Profile {
@@ -34,6 +35,7 @@ enum Profile {
     Media,
     Publish,
     Graph,
+    Effects,
 }
 #[derive(Clone, Copy)]
 struct Operation {
@@ -193,6 +195,18 @@ const OPERATIONS: &[Operation] = &[
         read: false,
         consent: false,
         profile: Profile::Graph,
+    },
+    Operation {
+        suffix: "effects-inspect",
+        read: true,
+        consent: false,
+        profile: Profile::Effects,
+    },
+    Operation {
+        suffix: "effects-record",
+        read: false,
+        consent: false,
+        profile: Profile::Effects,
     },
     Operation {
         suffix: "evidence-import",
@@ -619,6 +633,7 @@ async fn main() -> Result<()> {
     let media = bridge("launchwright-media.cjs", MEDIA_BUNDLE)?;
     let publish = bridge("launchwright-publish.cjs", PUBLISH_BUNDLE)?;
     let graph = bridge("launchwright-graph.cjs", GRAPH_BUNDLE)?;
+    let effects = bridge("launchwright-effects.cjs", EFFECTS_BUNDLE)?;
     let mut app = Application::new("launchwright", VERSION)?
         .require_host_tools()
         .with_observer(core.clone())
@@ -636,6 +651,7 @@ async fn main() -> Result<()> {
             Profile::Media => media.clone(),
             Profile::Publish => publish.clone(),
             Profile::Graph => graph.clone(),
+            Profile::Effects => effects.clone(),
         };
         app = app.register(contract, provider.operation(name))?;
     }
@@ -660,7 +676,7 @@ mod tests {
         for spec in OPERATIONS {
             assert!(names.insert(spec.suffix));
         }
-        assert_eq!(names.len(), 82);
+        assert_eq!(names.len(), 84);
     }
     #[test]
     fn profile_partition_counts_are_stable() {
@@ -677,6 +693,18 @@ mod tests {
         assert_eq!(counts.get(&Profile::Media), Some(&5));
         assert_eq!(counts.get(&Profile::Publish), Some(&10));
         assert_eq!(counts.get(&Profile::Graph), Some(&9));
+        assert_eq!(counts.get(&Profile::Effects), Some(&2));
+    }
+    #[test]
+    fn canonical_effects_readback_is_linked_without_execution_authority() {
+        assert_eq!(
+            semwright_native_sdk::effects_readback::SCOPE,
+            "immutable_native_sdk_artifact_properties_only"
+        );
+        assert_eq!(
+            semwright_native_sdk::effects_readback::RESULT_SCHEMA,
+            "semwright-native-effects-result/1"
+        );
     }
     #[test]
     fn graph_contract_is_locked_to_canonical_semwright_types() {

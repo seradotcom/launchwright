@@ -40,6 +40,12 @@ Impact planning remains proposal-first. Plans are bound to exact cause revisions
 
 `verification.record` stores verifier identity/version/digest, dimension, coverage, omissions and findings. A PASS is effective only when the caller was provisioned with canonical verifier admission and the record is admitted as canonical. FAIL/ERROR remain failures. A waiver annotates a failure and never rewrites its state.
 
+## Canonical Effects readback custody
+
+`effects.record` consumes the exact pinned Native SDK immutable-artifact Effects result schema; Launchwright does not implement another evaluator. It stores the protected spec and result bytes by SHA-256, binds exact artifact revisions plus an optional scenario revision, rejects decisive results that do not cover the complete bound artifact set, and recalculates effective state against current bytes/revisions. A canonical PASS is effective only behind explicit `canonical_effect_admission`; a recorded but non-admitted PASS stays UNKNOWN, while canonical FAIL stays FAIL.
+
+This surface is deliberately readback-only. Upstream scope is `immutable_native_sdk_artifact_properties_only` and every receipt retains `execution_authority:false` and `scenario_effects_covered:false`. Native/browser/Godot mutations, noninterference, Broker/Driver Host isolation and authoritative scenario effects remain Semwright-owned gates.
+
 ## Media composition custody
 
 `media.plan` records a versioned, source-linked production plan with exact rational duration/frame-rate data, observed capture references, sanitized interactive derivatives, narration/music/caption assets, and independent video/screenshot-series/interactive-demo variants. Plans pin every referenced resource revision and compute per-variant digests so a revision can identify which variants remain reusable instead of invalidating unrelated outputs.

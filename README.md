@@ -4,7 +4,7 @@
 
 Launchwright keeps product/build context, scenarios, claims, immutable release materials, verifier evidence, exact-candidate review, channel packages and recovery history in one application-owned workspace.
 
-> **Developer preview.** The repository deliberately does not claim that the complete private product specification has passed acceptance. Launchwright has an owned synthetic DeltaDesk A/B lane that executes the exact pinned Semwright Chromium semantic adapter and a selective real-media lane that can turn those retained capture bytes into a 20-second H.264/AAC MP4 through the pinned Semwright MLT Driver Host while separately exercising the canonical Composition + Audio AV E2E at the same Semwright SHA. Those two proofs remain deliberately distinct: a single owner-admitted Composition recipe consuming the real captures, canonical customer-product/Platform admission, live Project Graph traversal, canonical effects, remote teams and public Publish remain external boundaries until exact receipts prove them.
+> **Developer preview.** The repository deliberately does not claim that the complete private product specification has passed acceptance. Launchwright has an owned synthetic DeltaDesk A/B lane that executes the exact pinned Semwright Chromium semantic adapter and a selective real-media lane that can turn those retained capture bytes into a 20-second H.264/AAC MP4 through the pinned Semwright MLT Driver Host while separately exercising the canonical Composition + Audio AV E2E at the same Semwright SHA. Those two proofs remain deliberately distinct. Launchwright also integrates the pinned Native SDK immutable-artifact Effects readback contract, but that reader has no execution authority and does not establish browser/Godot/native mutation effects or noninterference. A single owner-admitted Composition recipe consuming the real captures, canonical customer-product/Platform admission, live Project Graph traversal/Host admission, real execution Effects, remote teams and public Publish remain external boundaries until exact receipts prove them.
 
 ## Run locally
 
@@ -36,6 +36,7 @@ Synthetic data is never described as a real product capture.
 - claims, CopyBlocks, availability rules and ReleaseContract readiness denominators;
 - immutable Markdown, safe HTML, JSON, email-draft and VTT artifacts with SHA-256-addressed bytes;
 - explicit relation provenance plus an immutable, owner-admitted Semwright Project Graph projection with bounded visible-node impact, preserved UNKNOWN frontiers, exact-revision impact proposals/coalescing, conservative reuse assessment and rebuild/finalization receipts; local heuristics never promote themselves to Graph authority;
+- canonical Native SDK Effects readback custody for immutable JSON/CSV artifacts: exact protected-spec/result bytes, source/runtime digests, exact artifact/scenario revision pins, owner-gated PASS admission and drift invalidation; `execution_authority` stays false and scenario mutation effects remain uncovered;
 - exact-base document change proposals that cannot force-overwrite newer edits;
 - exact candidate manifests that pin artifact bytes, target context, ReleaseContract, localization/glossary revisions, channel profiles and declared rights, with input freshness and review-race isolation;
 - capture contract v2 tied to source + build + target + scenario, with Platform/native receipt correlation, readiness checks, anchor cardinality, build-drift detection, isolation/cleanup bounds, provenance classes and derived-material lineage while technical state stays UNKNOWN;
@@ -72,7 +73,7 @@ Launchwright keeps **production, verification, review and delivery** separate.
 
 A successful capture contract can establish that an authorized receipt, readiness conditions, unique anchors and provenance were recorded; it does not establish semantic correctness or Driver Host acceptance. Generated/editorial/imported material is never eligible to stand in for observed product state, and a sanitized derivative only preserves that eligibility when its exact parent capture did and every declared transformation preserves observed state. A heuristic/model/local PASS remains effective UNKNOWN unless admitted by canonical verifier authority. A waiver records an exception but never turns FAIL into PASS. A channel package says bytes are ready; it does not mean they were uploaded or published. A local ReleaseTemplate/ProductVersion/deployment contract likewise does not prove a remote consumer job ran. Public activation requires a canonical Publish receipt.
 
-An owner-admitted Project Graph observation can project canonical snapshot/impact knowledge into Launchwright, but local input-pin comparisons, declared/imported/heuristic relations and cache hits are not Project Graph completeness or admission. Partial visibility, missing dependencies and truncated/cancelled traversal preserve UNKNOWN frontiers. Scenario effect declarations are not canonical effects. A `media_plan` and its Composition receipt ledger preserve handoff intent and provenance but are not a local AV renderer. The selective real-media lane proves exact real-capture lineage through a bounded, explicitly receipted even-canvas derivative and the pinned Semwright MLT Driver Host to MP4, and independently proves the canonical AV coordinator on the same Semwright SHA; until one admitted Composition recipe owns both legs, the combined Launchwright state remains `UNKNOWN` rather than technical PASS. Private editorial approval is not Host acceptance.
+An owner-admitted Project Graph observation can project canonical snapshot/impact knowledge into Launchwright, but local input-pin comparisons, declared/imported/heuristic relations and cache hits are not Project Graph completeness or admission. Partial visibility, missing dependencies and truncated/cancelled traversal preserve UNKNOWN frontiers. Scenario effect declarations are not canonical effects. The integrated Native SDK Effects reader can establish only its narrow immutable-artifact readback verdict; it cannot establish that a product mutation occurred, that unrelated state was unaffected, or that Host isolation was accepted. A `media_plan` and its Composition receipt ledger preserve handoff intent and provenance but are not a local AV renderer. The selective real-media lane proves exact real-capture lineage through a bounded, explicitly receipted even-canvas derivative and the pinned Semwright MLT Driver Host to MP4, and independently proves the canonical AV coordinator on the same Semwright SHA; until one admitted Composition recipe owns both legs, the combined Launchwright state remains `UNKNOWN` rather than technical PASS. Private editorial approval is not Host acceptance.
 
 ## Backup and recovery
 
@@ -95,9 +96,10 @@ node scripts/verify.mjs
 node src/main.mjs doctor --state .state
 ```
 
-GitHub Actions runs the supported Node 24.21 runtime on Linux, Windows and macOS. The manual heavy workflow has five independently selectable lanes:
+GitHub Actions runs the supported Node 24.21 runtime on Linux, Windows and macOS. The manual heavy workflow has six independently selectable lanes:
 
-- **native** — builds the pinned TypeScript SDK, native bundle and real Rust NativeDriver;
+- **native** — builds the pinned TypeScript SDK, all ten owner-pinned bundles and real Rust NativeDriver with Graph + Effects SDK features;
+- **effects** — builds the real pinned `semwright-native-effects` helper, evaluates an exact Launchwright-owned immutable artifact, and rechecks the canonical result through Launchwright without granting execution authority;
 - **browser** — installs Chromium on the runner and exercises the real Launchwright UI;
 - **deltadesk** — executes the owned DeltaDesk A/B fixture through the exact pinned Semwright Chromium semantic adapter, retains screenshots/receipts and ingests them as `IMPORTED_UNVERIFIED` capture evidence without fabricating Platform or Host authority;
 - **composition** — recaptures DeltaDesk A/B with that exact adapter, preserves the original PNG hashes, applies only a receipted 0–1 pixel even-canvas pad with the owner-pinned FFmpeg, then feeds those derived frames into the pinned Semwright MLT driver inside Driver Host to create a 600-frame/20-second MP4; it separately executes Semwright's canonical Composition + Audio AV E2E at the same source SHA and emits a fail-closed cross-system report whose technical state stays `UNKNOWN` until one canonical recipe joins the two proofs;
@@ -111,6 +113,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [Architecture and authority boundaries](docs/ARCHITECTURE.md)
 - [Native SDK integration](docs/NATIVE_SDK.md)
 - [Project Graph projection and impact](docs/PROJECT_GRAPH.md)
+- [Canonical Effects readback custody](docs/EFFECTS.md)
 - [DeltaDesk real-browser laboratory](docs/DELTADESK_LAB.md)
 - [Known SDK/platform gaps](docs/SDK_GAPS.md)
 - [Storage and portability](docs/PORTABILITY.md)
