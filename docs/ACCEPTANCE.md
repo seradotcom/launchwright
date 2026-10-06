@@ -41,6 +41,8 @@ R9 exact-SHA acceptance is complete for `554e153458d734aea92fb2c56aa6d461324051c
 
 R11 exact-SHA acceptance is complete for `71f9c89604a2b244cac12661db3a09493ff7f7d9`: Application checks run `37527185849` passed on Linux, Windows and macOS, and selective heavy Composition run `37527194362` passed the real DeltaDesk capture → even-canvas derivative → Semwright MLT Driver Host MP4 leg plus the independent canonical Composition + Audio AV E2E at the same pinned Semwright SHA. PR #31 was merged to `main` as `8c7d57ac2a90ac003c048bb99da05b430f21b2e3`. Those PASS results belong to R11 only; R12 must earn its own supported-engine and Native/Effects evidence.
 
+R19 Driver Host acceptance is complete for exact source SHA `84618c0d9700ebb0d4e2a774bf02418bbe79ea23`: Application checks run `37545788650` passed on Linux, Windows and macOS, and selective heavy Host run `37545791165` passed job `112549363177`. Artifact `11450612093` records `driver_host_isolation_accepted=true`, `broker_policy_path_observed=true` and `host_mediated_node_runtime=true` against Semwright `4d291de26724810017ce7b6d185326514cb79fa6`; it also proves durable mutation/readback across Host restart, revocation of the old opaque ref, rejection of an invalid request digest without revision advance, and fail-closed denial when `driver:launchwright` is removed from policy. The same report explicitly keeps external Platform, ChatGPT-host and public-channel acceptance false. This PASS belongs to `84618c0…` only; later source revisions must run the Host lane again.
+
 The manual heavy workflow provides independent lanes:
 
 - **native**: build the pinned canonical TypeScript SDK, generate/hash all ten bounded bridge profiles, compile/test the real Rust NativeDriver including Project Graph and Effects SDK feature locks, and run a bridge smoke against each profile.
@@ -59,7 +61,7 @@ Durable identity/revisions; exact archived entity history with get/list/diff; ex
 
 ## Explicitly not established
 
-- canonical Driver Host isolation/acceptance of Launchwright remains unestablished for a source SHA until that exact SHA passes the selective `host` lane; direct-process bundle smoke and the DeltaCLI fixture do not substitute for that run;
+- Driver Host acceptance is exact-SHA scoped: R19 SHA `84618c0d9700ebb0d4e2a774bf02418bbe79ea23` passed the real Host lane, but no later SHA may inherit that result; direct-process bundle smoke and the DeltaCLI fixture never substitute for an exact-SHA Host run;
 - live production Platform execution, budgets or billing;
 - live Project Graph traversal/query execution and owner/Host admission; canonical native/browser/Godot mutation-effect, noninterference and scenario-effect execution/admission beyond the narrower immutable-artifact Effects readback; R9/R12 custody layers do not replace those authorities;
 - canonical real customer browser/mobile/Godot product capture; the R10 owned DeltaDesk browser lane is cross-system adapter evidence only and remains imported-unverified until Platform/Host authority exists;

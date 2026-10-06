@@ -54,6 +54,7 @@ Synthetic data is never described as a real product capture.
 - application-side usage reservations and idempotent usage receipts, with measured/estimated/BYO separation, auditable corrections, explicit overrun visibility and test-only billing callbacks; these records are projections and never claim Platform billing authority;
 - bounded extension runtime receipts for owner-controlled renderer/importer fixtures, with exact preparation pins, rights checks, output budgets, retirement-aware freshness and explicit UNKNOWN technical state until canonical Host admission.
 - public HTTP client, browser UI, CLI and Native Application bridge sharing the same dispatcher and SQLite transaction model.
+- selective exact-SHA Driver Host acceptance that runs the real Launchwright NativeDriver through Semwright daemon/Broker/Policy, a sealed Node runtime and owner-pinned NodeBridge bundles; this establishes the local Host boundary only and does not promote external Platform/Publish/ChatGPT authority.
 
 ## Semwright Native SDK
 
