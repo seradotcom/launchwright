@@ -18,6 +18,7 @@ import { createReleaseTemplate, updateReleaseTemplate, freezeProductVersion, cre
 import { PLATFORM_ACTIONS, PUBLICATION_ACTIONS, PLATFORM_READ_ACTIONS, preparePublicationWork } from './publish-work.mjs';
 import { reserveUsage, recordUsage, adjustUsage, inspectUsage, recordBillingTestCallback } from './usage-ledger.mjs';
 import { GRAPH_RELATIONS, graphContract, recordGraphObservation, inspectGraphObservation, latestGraphObservation, assertObservedGraphEdge, cacheIdentity, createImpactProposal, coalesceImpact, recordRebuildReceipt } from './graph.mjs';
+import { inspectEffects, recordEffectResult } from './effects.mjs';
 
 export class LaunchwrightApplication {
   constructor(root, { initialize = false, readOnly = false, principal = 'local-owner', scopes = ['read','edit','capture','review','publish','consume','admin'], capabilities = {} } = {}) {
@@ -83,7 +84,7 @@ export class LaunchwrightApplication {
   }
   describe(){return{app:'Launchwright',version:APP_VERSION,schema_version:'launchwright/1',workspace_version:this.store.version(),request_epoch:this.store.meta().epoch,
     scope_mode:this.capabilities.identity_mode??'local-single-owner',principal:this.principal,scopes:[...this.scopes],native_sdk:'0.9.0-dev.1',operations:Object.entries(OPERATION_SCOPES).map(([name,scope])=>({name,scope,read_only:READ_OPERATIONS.has(name)})),
-    capabilities:{editorial_text_exports:'available',durable_entity_history:this.store.hasHistory?'available':'migration-required',private_draft_delivery:'available',portable_snapshot_restore:'available-local-admin',declared_release_contracts:'available',localization_ledger:'available-layout-quality-not-inferred',extension_descriptors:'available-no-remote-code',compatibility_negotiation:'available',profile_preflight:'available-contract-only',state_anchors:'contract-and-assessment-only',impact_proposals:'available-no-execution-authority',document_change_proposals:'available-application-local-no-auto-merge',capture_receipts:'available-provenance-only',verification_ledger:'available-canonical-pass-requires-admission',waivers:'available-never-overwrite-verifier-state',channel_packages:'available-no-send',native_driver_host:'requires-owner-pinned-bundle-and-broker',platform:this.capabilities.platform??'not-connected',canonical_graph:this.capabilities.canonical_graph_admission===true?'host-admitted-projection-available':'requires-platform-observation-and-host-admission',browser_capture:'requires-canonical-driver-recipe',media_render:'requires-composition-recipe',mobile:'provenance-import-only',public_delivery:'requires-canonical-publish-receipt',...this.capabilities},
+    capabilities:{editorial_text_exports:'available',durable_entity_history:this.store.hasHistory?'available':'migration-required',private_draft_delivery:'available',portable_snapshot_restore:'available-local-admin',declared_release_contracts:'available',localization_ledger:'available-layout-quality-not-inferred',extension_descriptors:'available-no-remote-code',compatibility_negotiation:'available',profile_preflight:'available-contract-only',state_anchors:'contract-and-assessment-only',impact_proposals:'available-no-execution-authority',document_change_proposals:'available-application-local-no-auto-merge',capture_receipts:'available-provenance-only',verification_ledger:'available-canonical-pass-requires-admission',waivers:'available-never-overwrite-verifier-state',channel_packages:'available-no-send',native_driver_host:'requires-owner-pinned-bundle-and-broker',platform:this.capabilities.platform??'not-connected',canonical_graph:this.capabilities.canonical_graph_admission===true?'host-admitted-projection-available':'requires-platform-observation-and-host-admission',canonical_effects:this.capabilities.canonical_effect_admission===true?'owner-admission-available':'native-sdk-readback-admission-required',browser_capture:'requires-canonical-driver-recipe',media_render:'requires-composition-recipe',mobile:'provenance-import-only',public_delivery:'requires-canonical-publish-receipt',...this.capabilities},
     limits:{page_items:128,reply_bytes:256*1024,artifact_bytes:1024*1024,receipt_epoch_items:20000},disclosure:'Local editorial checks are not Platform approvals or canonical effect verification.'};}
   profilePreflight(input){
     inputObject(input,['profile','source_id','target_id'],['profile','source_id']);str(input.profile,64);
@@ -151,6 +152,7 @@ export class LaunchwrightApplication {
       case'graph.contract':inputObject(input,[]);return graphContract();
       case'graph.inspect':return inspectGraphObservation(this,input);
       case'graph.cache_assess':return cacheIdentity(this,input);
+      case'effects.inspect':return inspectEffects(this,input);
       case'anchor.assess':{
         inputObject(input,['id','observed_matches']);const anchor=this.get(input.id,'anchor');const observed=integer(input.observed_matches,0,1000);
         const expected=anchor.data.expected_count,state=observed===expected?'PASS':'FAIL';
@@ -293,6 +295,7 @@ export class LaunchwrightApplication {
       case'impact.coalesce':return{entity:coalesceImpact(this,input)};
       case'graph.observation_record':return recordGraphObservation(this,input);
       case'impact.receipt_record':return{entity:recordRebuildReceipt(this,input)};
+      case'effects.record':return recordEffectResult(this,input);
       case'evidence.import':{
         inputObject(input,['release_id','target_id','source_id','name','build','classification','rights','description','origin_digest','job_id'],['release_id','target_id','source_id','name','build','classification','rights','description','origin_digest']);
         const release=this.get(input.release_id,'release'),target=this.get(input.target_id,'target'),source=this.get(input.source_id,'source');

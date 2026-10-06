@@ -13,6 +13,7 @@ import { WorkNativeApplication } from '../src/native-work-app.mjs';
 import { MediaNativeApplication } from '../src/native-media-app.mjs';
 import { PublishNativeApplication } from '../src/native-publish-app.mjs';
 import { GraphNativeApplication } from '../src/native-graph-app.mjs';
+import { EffectsNativeApplication } from '../src/native-effects-app.mjs';
 import { setup, baseline } from './helpers.mjs';
 
 async function invokeProfile(Profile,root,operation,input){
@@ -101,4 +102,8 @@ test('split native profiles preserve canonical mutation transactions across one 
   assert.equal(proposal.entity.kind,'impact_proposal');
   assert.equal(proposal.entity.data.authority,'NONE');
   assert.equal(proposal.entity.data.jobs_created,0);
+
+  const effects=await readProfile(EffectsNativeApplication,seeded.root,'effects.inspect',{release_id:b.release.id});
+  assert.equal(effects.state,'UNKNOWN');
+  assert.equal(effects.scenario_effects_authority,false);
 });

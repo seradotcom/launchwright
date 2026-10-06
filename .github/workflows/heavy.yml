@@ -5,7 +5,7 @@ on:
       lane:
         description: Select only the lane affected by the change
         type: choice
-        options: [all, native, browser, deltadesk, composition, stress]
+        options: [all, native, browser, deltadesk, composition, effects, stress]
         default: all
         required: true
 permissions:
@@ -70,6 +70,7 @@ jobs:
           export LAUNCHWRIGHT_NATIVE_MEDIA_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.media.sha256')"
           export LAUNCHWRIGHT_NATIVE_PUBLISH_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.publish.sha256')"
           export LAUNCHWRIGHT_NATIVE_GRAPH_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.graph.sha256')"
+          export LAUNCHWRIGHT_NATIVE_EFFECTS_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.effects.sha256')"
           mkdir -p evidence/native
           rustc -Vv | tee evidence/native/compiler.txt
           cargo test -p launchwright-native 2>&1 | tee evidence/native/cargo-test.log
@@ -86,6 +87,62 @@ jobs:
             dist/launchwright-*.cjs
             target/release/launchwright-native
             Cargo.lock
+          if-no-files-found: error
+          retention-days: 14
+
+  effects:
+    if: inputs.lane == 'all' || inputs.lane == 'effects'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      SEMWRIGHT_SHA: 4d291de26724810017ce7b6d185326514cb79fa6
+      CARGO_INCREMENTAL: '0'
+      CARGO_TERM_COLOR: never
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Checkout exact reviewed Semwright source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: seradotcom/semwright
+          ref: ${{ env.SEMWRIGHT_SHA }}
+          path: .ci-semwright
+          persist-credentials: false
+      - name: Build canonical Native SDK Effects reader
+        run: |
+          rustup toolchain install 1.98.1 --profile minimal
+          (cd .ci-semwright && rustup override set 1.98.1)
+          (cd .ci-semwright && cargo build --locked -p semwright-native-sdk --features effects --bin semwright-native-effects)
+      - name: Prepare exact Launchwright-owned artifact fixture
+        run: |
+          mkdir -p evidence/effects/protected
+          node scripts/prepare-effects-acceptance.mjs | tee evidence/effects/prepare.log
+      - name: Evaluate with the real canonical Effects CLI
+        run: |
+          set -euo pipefail
+          BIN="$GITHUB_WORKSPACE/.ci-semwright/target/debug/semwright-native-effects"
+          "$BIN" --prepare < evidence/effects/definition.json > evidence/effects/protected/spec.json
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('evidence/effects/protected/spec.json')
+          p.write_bytes(p.read_bytes().rstrip(b'\n'))
+          p.chmod(0o600)
+          PY
+          SPEC_SHA="$(sha256sum evidence/effects/protected/spec.json | cut -d' ' -f1)"
+          printf '%s\n' "$SPEC_SHA" > evidence/effects/protected/spec.sha256
+          "$BIN" --spec "$GITHUB_WORKSPACE/evidence/effects/protected/spec.json" --spec-sha256 "$SPEC_SHA" --artifact-root "$GITHUB_WORKSPACE/evidence/effects/artifacts" </dev/null > evidence/effects/result.json
+          jq -e '.schema_version == "semwright-native-effects-result/1" and .verdict == "PASS" and .execution_authority == false and .scope == "immutable_native_sdk_artifact_properties_only"' evidence/effects/result.json
+          node scripts/verify-effects-acceptance.mjs | tee evidence/effects/launchwright-verifier.log
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: launchwright-effects-${{ github.sha }}
+          path: evidence/effects/
           if-no-files-found: error
           retention-days: 14
 
