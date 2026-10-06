@@ -4,6 +4,13 @@ This ledger separates implemented behavior from execution evidence. A PASS belon
 
 ## Supplemental workstation checks
 
+R19 pre-Host checkpoint on the workstation:
+
+- Node 22.22.0 remains **outside** the supported Native SDK engine and therefore cannot establish supported-engine acceptance.
+- `npm test`: **175 passed, 0 failed, 0 skipped**. The three new R19 source regressions lock the exact Semwright SHA, real Host/sandbox requirements and the non-escalation of Driver Host evidence into external Platform authority. Exact TAP is retained in `evidence/r19/local-test.tap`.
+- `node scripts/verify.mjs`: **97 JavaScript modules and 84 Native driver operations** checked; source lock/syntax PASS. Exact output is retained in `evidence/r19/verify.json`, and `host_acceptance` intentionally remains false because workstation/direct-process evidence cannot establish Driver Host isolation.
+- The R19 `host` lane itself is CI-only. Its status belongs to the exact pushed SHA and is recorded only after the real daemon/Broker/Policy/Driver Host route completes.
+
 Supplemental workstation pass for the current R12 Effects-readback branch:
 
 - Node: 22.22.0 — **outside** the Native SDK supported engine.
@@ -34,9 +41,12 @@ R9 exact-SHA acceptance is complete for `554e153458d734aea92fb2c56aa6d461324051c
 
 R11 exact-SHA acceptance is complete for `71f9c89604a2b244cac12661db3a09493ff7f7d9`: Application checks run `37527185849` passed on Linux, Windows and macOS, and selective heavy Composition run `37527194362` passed the real DeltaDesk capture → even-canvas derivative → Semwright MLT Driver Host MP4 leg plus the independent canonical Composition + Audio AV E2E at the same pinned Semwright SHA. PR #31 was merged to `main` as `8c7d57ac2a90ac003c048bb99da05b430f21b2e3`. Those PASS results belong to R11 only; R12 must earn its own supported-engine and Native/Effects evidence.
 
+R19 Driver Host acceptance is complete for exact source SHA `84618c0d9700ebb0d4e2a774bf02418bbe79ea23`: Application checks run `37545788650` passed on Linux, Windows and macOS, and selective heavy Host run `37545791165` passed job `112549363177`. Artifact `11450612093` records `driver_host_isolation_accepted=true`, `broker_policy_path_observed=true` and `host_mediated_node_runtime=true` against Semwright `4d291de26724810017ce7b6d185326514cb79fa6`; it also proves durable mutation/readback across Host restart, revocation of the old opaque ref, rejection of an invalid request digest without revision advance, and fail-closed denial when `driver:launchwright` is removed from policy. The same report explicitly keeps external Platform, ChatGPT-host and public-channel acceptance false. This PASS belongs to `84618c0…` only; later source revisions must run the Host lane again.
+
 The manual heavy workflow provides independent lanes:
 
 - **native**: build the pinned canonical TypeScript SDK, generate/hash all ten bounded bridge profiles, compile/test the real Rust NativeDriver including Project Graph and Effects SDK feature locks, and run a bridge smoke against each profile.
+- **host**: check out the exact pinned Semwright source and exercise Launchwright through the real daemon/Broker/Policy/Driver Host with its sealed Node runtime and ten owner-pinned NodeBridge bundles. The lane requires durable mutation/readback, stale native-ref rejection across Host restart, exact request-digest rejection without state change, provider provenance, and an explicit policy-denied negative control. Only an exact-SHA green run may establish Launchwright Driver Host isolation; it does not establish external Platform, Publish or ChatGPT-host authority.
 - **effects**: build the real pinned `semwright-native-effects` binary, prepare a protected spec for an exact Launchwright-owned JSON artifact, require the canonical immutable-artifact PASS/readback scope with `execution_authority:false`, then record and reinspect that exact result through Launchwright. This does not claim mutation/noninterference or Host acceptance.
 - **browser**: install Chromium on a disposable GitHub runner and exercise the real Launchwright UI.
 - **deltadesk**: check out the exact pinned Semwright source, run its real Chromium semantic adapter against the owned DeltaDesk A/B fixture, retain exact screenshots/receipt hashes, and ingest those results into `launchwright-capture/2` as `IMPORTED_UNVERIFIED` without fabricating Platform or Host authority.
@@ -51,7 +61,7 @@ Durable identity/revisions; exact archived entity history with get/list/diff; ex
 
 ## Explicitly not established
 
-- canonical Driver Host isolation/acceptance of Launchwright; the executable DeltaCLI fixture proves a real non-DOM process path and receipt ingestion only, not Host isolation;
+- Driver Host acceptance is exact-SHA scoped: R19 SHA `84618c0d9700ebb0d4e2a774bf02418bbe79ea23` passed the real Host lane, but no later SHA may inherit that result; direct-process bundle smoke and the DeltaCLI fixture never substitute for an exact-SHA Host run;
 - live production Platform execution, budgets or billing;
 - live Project Graph traversal/query execution and owner/Host admission; canonical native/browser/Godot mutation-effect, noninterference and scenario-effect execution/admission beyond the narrower immutable-artifact Effects readback; R9/R12 custody layers do not replace those authorities;
 - canonical real customer browser/mobile/Godot product capture; the R10 owned DeltaDesk browser lane is cross-system adapter evidence only and remains imported-unverified until Platform/Host authority exists;

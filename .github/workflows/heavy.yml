@@ -5,7 +5,7 @@ on:
       lane:
         description: Select only the lane affected by the change
         type: choice
-        options: [all, native, browser, deltadesk, composition, effects, stress]
+        options: [all, native, host, browser, deltadesk, composition, effects, stress]
         default: all
         required: true
 permissions:
@@ -87,6 +87,96 @@ jobs:
             dist/launchwright-*.cjs
             target/release/launchwright-native
             Cargo.lock
+          if-no-files-found: error
+          retention-days: 14
+
+  host:
+    if: inputs.lane == 'all' || inputs.lane == 'host'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    env:
+      SEMWRIGHT_SHA: 4d291de26724810017ce7b6d185326514cb79fa6
+      CARGO_INCREMENTAL: '0'
+      CARGO_TERM_COLOR: never
+      CARGO_PROFILE_DEV_DEBUG: '0'
+      CARGO_PROFILE_TEST_DEBUG: '0'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Build canonical TypeScript SDK and bounded Launchwright bundles
+        run: |
+          set -euo pipefail
+          (cd vendor/semwright-native-sdk && npm ci --ignore-scripts --no-audit --no-fund && npm run build)
+          node scripts/build-native-bundle.mjs
+      - name: Checkout exact reviewed Semwright source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: seradotcom/semwright
+          ref: ${{ env.SEMWRIGHT_SHA }}
+          path: .ci-semwright
+          persist-credentials: false
+      - name: Pin Rust and prepare canonical disposable-runner sandbox
+        run: |
+          set -euo pipefail
+          rustup toolchain install 1.98.1 --profile minimal
+          rustup override set 1.98.1
+          (cd .ci-semwright && rustup override set 1.98.1)
+          mkdir -p evidence/native-host
+          test "$(git -C .ci-semwright rev-parse HEAD)" = "$SEMWRIGHT_SHA"
+          test "$(sysctl -n kernel.unprivileged_userns_clone)" = 1
+          test "$(cat /proc/sys/kernel/apparmor_restrict_unprivileged_userns)" = 1
+          bash .ci-semwright/scripts/dev/ci-driver-bwrap-profile.sh evidence/native-host/host-sandbox-profile.txt
+      - name: Install canonical daemon build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y libpipewire-0.3-dev pkg-config clang
+      - name: Build exact Launchwright NativeDriver with reviewed bundle pins
+        run: |
+          set -euo pipefail
+          export LAUNCHWRIGHT_NATIVE_CORE_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.core.sha256')"
+          export LAUNCHWRIGHT_NATIVE_PRODUCTION_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.production.sha256')"
+          export LAUNCHWRIGHT_NATIVE_REVIEW_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.review.sha256')"
+          export LAUNCHWRIGHT_NATIVE_INTEGRATIONS_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.integrations.sha256')"
+          export LAUNCHWRIGHT_NATIVE_EXTENSIONS_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.extensions.sha256')"
+          export LAUNCHWRIGHT_NATIVE_WORK_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.work.sha256')"
+          export LAUNCHWRIGHT_NATIVE_MEDIA_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.media.sha256')"
+          export LAUNCHWRIGHT_NATIVE_PUBLISH_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.publish.sha256')"
+          export LAUNCHWRIGHT_NATIVE_GRAPH_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.graph.sha256')"
+          export LAUNCHWRIGHT_NATIVE_EFFECTS_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.effects.sha256')"
+          # Launchwright intentionally follows the existing Native lane policy: its binary
+          # lockfile is generated on the disposable runner. Semwright itself remains --locked.
+          cargo build -p launchwright-native
+          sha256sum target/debug/launchwright-native > evidence/native-host/launchwright-native.sha256
+      - name: Build exact Semwright daemon, CLI and sandbox Host
+        working-directory: .ci-semwright
+        run: |
+          set -euo pipefail
+          cargo build --locked -p semwright-daemon -p semwright-cli --bins
+          cargo build --locked -p semwright-plugin-host --bin semwright-sandbox
+          sha256sum target/debug/semwright target/debug/semwrightd target/debug/semwright-sandbox > "$GITHUB_WORKSPACE/evidence/native-host/semwright-binaries.sha256"
+      - name: Real Broker Policy Driver Host NodeBridge acceptance
+        env:
+          SEMWRIGHT_CHECKOUT: ${{ github.workspace }}/.ci-semwright
+          LAUNCHWRIGHT_NATIVE_BINARY: ${{ github.workspace }}/target/debug/launchwright-native
+          SEMWRIGHT_TEST_DRIVER_SANDBOX: '1'
+          SEMWRIGHT_TEST_SANDBOX_HELPER: ${{ github.workspace }}/.ci-semwright/target/debug/semwright-sandbox
+        run: |
+          set -euo pipefail
+          python3 scripts/verify-native-host.py | tee evidence/native-host/acceptance.log
+          grep -q '^LAUNCHWRIGHT_NATIVE_HOST_ACCEPTANCE_PASS ' evidence/native-host/acceptance.log
+          jq -e '.passed == true and .authority.driver_host_isolation_accepted == true and .authority.broker_policy_path_observed == true and .authority.host_mediated_node_runtime == true and .authority.platform_external_acceptance == false' evidence/native-host/report.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: launchwright-native-host-${{ github.sha }}
+          path: |
+            evidence/native-host/
+            dist/native-bundle.json
           if-no-files-found: error
           retention-days: 14
 

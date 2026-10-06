@@ -31,6 +31,6 @@
   "specification_sha256": "587663d1de9672c8c6aaa7b93592acf8aa72ec2599126ebbd044cd3ed21245d6",
   "node_required": ">=24.21.0 <25",
   "local_validation_node": "22.22.0 (outside upstream supported engine; supplemental only)",
-  "heavy_tests": "GitHub Actions native/browser/stress lanes configured; exact-SHA results are tracked in docs/ACCEPTANCE.md",
+  "heavy_tests": "GitHub Actions native/host/effects/browser/deltadesk/composition/stress lanes configured; exact-SHA results are tracked in docs/ACCEPTANCE.md",
   "workstation_validation_node": "22.22.0 (supplemental, outside supported engine)"
 }
