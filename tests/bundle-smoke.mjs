@@ -34,6 +34,7 @@ const reads={
   production:['release-coverage',{release_id:release.id}],
   review:['verification-summary',{candidate_id:candidate.id}],
   integrations:['channel-status',{release_id:release.id}],
+  extensions:['compatibility-negotiate',{schema_major:1}],
   work:['workspace-snapshot',{}],
   media:['media-inspect',{}],
   publish:['publish-inspect',{deployment_id:deployment.id}]

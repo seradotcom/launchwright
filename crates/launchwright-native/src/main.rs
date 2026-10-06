@@ -17,6 +17,7 @@ const PRODUCTION_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_PRODUCT
 const REVIEW_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_REVIEW_BUNDLE_SHA256");
 const INTEGRATIONS_BUNDLE: Option<&str> =
     option_env!("LAUNCHWRIGHT_NATIVE_INTEGRATIONS_BUNDLE_SHA256");
+const EXTENSIONS_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_EXTENSIONS_BUNDLE_SHA256");
 const WORK_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_WORK_BUNDLE_SHA256");
 const MEDIA_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_MEDIA_BUNDLE_SHA256");
 const PUBLISH_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_PUBLISH_BUNDLE_SHA256");
@@ -27,6 +28,7 @@ enum Profile {
     Production,
     Review,
     Integrations,
+    Extensions,
     Work,
     Media,
     Publish,
@@ -254,37 +256,43 @@ const OPERATIONS: &[Operation] = &[
         suffix: "extension-discovery",
         read: true,
         consent: false,
-        profile: Profile::Integrations,
+        profile: Profile::Extensions,
     },
     Operation {
         suffix: "extension-generic_view",
         read: true,
         consent: false,
-        profile: Profile::Integrations,
+        profile: Profile::Extensions,
     },
     Operation {
         suffix: "extension-preparation_status",
         read: true,
         consent: false,
-        profile: Profile::Integrations,
+        profile: Profile::Extensions,
+    },
+    Operation {
+        suffix: "extension-result_inspect",
+        read: true,
+        consent: false,
+        profile: Profile::Extensions,
     },
     Operation {
         suffix: "source-cli_inspect",
         read: true,
         consent: false,
-        profile: Profile::Integrations,
+        profile: Profile::Extensions,
     },
     Operation {
         suffix: "compatibility-negotiate",
         read: true,
         consent: false,
-        profile: Profile::Integrations,
+        profile: Profile::Extensions,
     },
     Operation {
         suffix: "compatibility-inspect",
         read: true,
         consent: false,
-        profile: Profile::Integrations,
+        profile: Profile::Extensions,
     },
     Operation {
         suffix: "localization-create",
@@ -302,31 +310,37 @@ const OPERATIONS: &[Operation] = &[
         suffix: "extension-register",
         read: false,
         consent: false,
-        profile: Profile::Integrations,
+        profile: Profile::Extensions,
     },
     Operation {
         suffix: "extension-retire",
         read: false,
         consent: false,
-        profile: Profile::Integrations,
+        profile: Profile::Extensions,
     },
     Operation {
         suffix: "extension-prepare_use",
         read: false,
         consent: false,
-        profile: Profile::Integrations,
+        profile: Profile::Extensions,
+    },
+    Operation {
+        suffix: "extension-result_record",
+        read: false,
+        consent: false,
+        profile: Profile::Extensions,
     },
     Operation {
         suffix: "source-cli_ingest",
         read: false,
         consent: false,
-        profile: Profile::Integrations,
+        profile: Profile::Extensions,
     },
     Operation {
         suffix: "compatibility-lock",
         read: false,
         consent: false,
-        profile: Profile::Integrations,
+        profile: Profile::Extensions,
     },
     Operation {
         suffix: "workspace-snapshot",
@@ -532,6 +546,7 @@ async fn main() -> Result<()> {
     let production = bridge("launchwright-production.cjs", PRODUCTION_BUNDLE)?;
     let review = bridge("launchwright-review.cjs", REVIEW_BUNDLE)?;
     let integrations = bridge("launchwright-integrations.cjs", INTEGRATIONS_BUNDLE)?;
+    let extensions = bridge("launchwright-extensions.cjs", EXTENSIONS_BUNDLE)?;
     let work = bridge("launchwright-work.cjs", WORK_BUNDLE)?;
     let media = bridge("launchwright-media.cjs", MEDIA_BUNDLE)?;
     let publish = bridge("launchwright-publish.cjs", PUBLISH_BUNDLE)?;
@@ -547,6 +562,7 @@ async fn main() -> Result<()> {
             Profile::Production => production.clone(),
             Profile::Review => review.clone(),
             Profile::Integrations => integrations.clone(),
+            Profile::Extensions => extensions.clone(),
             Profile::Work => work.clone(),
             Profile::Media => media.clone(),
             Profile::Publish => publish.clone(),
@@ -574,7 +590,7 @@ mod tests {
         for spec in OPERATIONS {
             assert!(names.insert(spec.suffix));
         }
-        assert_eq!(names.len(), 69);
+        assert_eq!(names.len(), 71);
     }
     #[test]
     fn profile_partition_counts_are_stable() {
@@ -585,7 +601,8 @@ mod tests {
         assert_eq!(counts.get(&Profile::Core), Some(&13));
         assert_eq!(counts.get(&Profile::Production), Some(&9));
         assert_eq!(counts.get(&Profile::Review), Some(&9));
-        assert_eq!(counts.get(&Profile::Integrations), Some(&17));
+        assert_eq!(counts.get(&Profile::Integrations), Some(&6));
+        assert_eq!(counts.get(&Profile::Extensions), Some(&13));
         assert_eq!(counts.get(&Profile::Work), Some(&6));
         assert_eq!(counts.get(&Profile::Media), Some(&5));
         assert_eq!(counts.get(&Profile::Publish), Some(&10));
