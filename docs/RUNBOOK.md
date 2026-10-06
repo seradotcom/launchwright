@@ -17,6 +17,8 @@ git diff --check
 
 Node 24.21.x is the acceptance runtime. Another local Node version is diagnostic only.
 
+`doctor` never installs, repairs or migrates automatically. It reports unsafe local file permissions, missing/changed Native SDK pins, schema/history state and outstanding intents with remediation text. For an independent reproduction of the documented lifecycle, run `node scripts/clean-room.mjs`; CI records the same report on all three supported runner OSes.
+
 ## Heavy acceptance
 
 `Application checks` runs the supported Node runtime on Ubuntu, Windows and macOS. `Native and browser acceptance` is manually dispatched by affected lane:
