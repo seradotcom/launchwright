@@ -9,7 +9,7 @@ use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::{
     fs,
-    os::unix::fs::PermissionsExt,
+    os::unix::fs::{MetadataExt, PermissionsExt},
     path::{Path, PathBuf},
     process::Command,
 };
@@ -70,10 +70,32 @@ fn png_dimensions(path: &Path) -> (u32, u32) {
     )
 }
 
-fn link_or_copy(source: &Path, destination: &Path) {
-    if fs::hard_link(source, destination).is_err() {
-        fs::copy(source, destination).unwrap();
-    }
+fn normalize_capture(ffmpeg: &Path, source: &Path, destination: &Path) {
+    let status = Command::new(ffmpeg)
+        .args(["-hide_banner", "-loglevel", "error", "-nostdin", "-y", "-i"])
+        .arg(source)
+        .args([
+            "-vf",
+            "pad=ceil(iw/2)*2:ceil(ih/2)*2:0:0:color=black",
+            "-frames:v",
+            "1",
+        ])
+        .arg(destination)
+        .status()
+        .unwrap();
+    assert!(
+        status.success(),
+        "failed to normalize capture to an even H.264 canvas"
+    );
+    let (width, height) = png_dimensions(destination);
+    assert_eq!(width % 2, 0, "normalized capture width must be even");
+    assert_eq!(height % 2, 0, "normalized capture height must be even");
+    let metadata = fs::metadata(destination).unwrap();
+    assert_eq!(
+        metadata.nlink(),
+        1,
+        "normalized capture must be a single-link file"
+    );
 }
 
 #[tokio::test]
@@ -104,9 +126,13 @@ async fn real_deltadesk_captures_become_verified_h264_mp4_inside_driver_host() {
 
     let capture_a_sha = digest(&capture_a);
     let capture_b_sha = digest(&capture_b);
-    let (width, height) = png_dimensions(&capture_a);
-    assert_eq!(png_dimensions(&capture_b), (width, height));
-    assert!(width >= 640 && height >= 480);
+    let (source_width, source_height) = png_dimensions(&capture_a);
+    assert_eq!(
+        png_dimensions(&capture_b),
+        (source_width, source_height),
+        "DeltaDesk A/B captures must share an exact source viewport"
+    );
+    assert!(source_width >= 640 && source_height >= 480);
 
     let cargo_executable = PathBuf::from(env!("CARGO_BIN_EXE_semwright-mlt-video-driver"));
     let cargo_runtime_runner = PathBuf::from(env!("CARGO_BIN_EXE_semwright-mlt-runtime-runner"));
@@ -170,10 +196,16 @@ async fn real_deltadesk_captures_become_verified_h264_mp4_inside_driver_host() {
     let artifact = media.path().join("deltadesk-capture-artifact");
     let frames = artifact.join("frames");
     fs::create_dir_all(&frames).unwrap();
-    let seed_a = artifact.join("capture-a.png");
-    let seed_b = artifact.join("capture-b.png");
-    fs::copy(&capture_a, &seed_a).unwrap();
-    fs::copy(&capture_b, &seed_b).unwrap();
+    let seed_a = artifact.join("capture-a-even.png");
+    let seed_b = artifact.join("capture-b-even.png");
+    normalize_capture(&ffmpeg, &capture_a, &seed_a);
+    normalize_capture(&ffmpeg, &capture_b, &seed_b);
+    let (width, height) = png_dimensions(&seed_a);
+    assert_eq!(png_dimensions(&seed_b), (width, height));
+    assert_eq!(width, source_width + (source_width % 2));
+    assert_eq!(height, source_height + (source_height % 2));
+    let normalized_a_sha = digest(&seed_a);
+    let normalized_b_sha = digest(&seed_b);
 
     let mut frame_rows = Vec::with_capacity(FRAME_COUNT as usize);
     for index in 0..FRAME_COUNT {
@@ -183,7 +215,12 @@ async fn real_deltadesk_captures_become_verified_h264_mp4_inside_driver_host() {
             &seed_b
         };
         let path = frames.join(format!("{index:06}.png"));
-        link_or_copy(source, &path);
+        fs::copy(source, &path).unwrap();
+        assert_eq!(
+            fs::metadata(&path).unwrap().nlink(),
+            1,
+            "Semwright Root requires every staged frame to be a single-link regular file"
+        );
         frame_rows.push(json!({
             "index": index,
             "file": format!("frames/{index:06}.png"),
@@ -211,11 +248,15 @@ async fn real_deltadesk_captures_become_verified_h264_mp4_inside_driver_host() {
             "color_space": "srgb",
             "timeout_ms": 300000
         },
-        "pixel_validation": {"mode":"source-byte-bound","sample_indices":[0,299,300,599]},
+        "pixel_validation": {
+            "mode":"source-lineage-plus-even-canvas-normalization",
+            "sample_indices":[0,299,300,599],
+            "presentation_transform":"pad right/bottom to next even dimension using the owner-pinned FFmpeg; no crop, rescale or synthetic UI"
+        },
         "frames": frame_rows,
         "source_captures": [
-            {"build":"A","sha256":capture_a_sha},
-            {"build":"B","sha256":capture_b_sha}
+            {"build":"A","sha256":capture_a_sha,"normalized_sha256":normalized_a_sha},
+            {"build":"B","sha256":capture_b_sha,"normalized_sha256":normalized_b_sha}
         ]
     });
     let manifest_path = artifact.join("artifact-manifest.json");
@@ -514,18 +555,30 @@ async fn real_deltadesk_captures_become_verified_h264_mp4_inside_driver_host() {
 
     let receipt = json!({
         "schema_version":"launchwright-real-media-driver/1",
-        "classification":"REAL_BROWSER_CAPTURE_TO_DRIVER_HOST_MLT",
+        "classification":"REAL_BROWSER_CAPTURE_DERIVATIVE_TO_DRIVER_HOST_MLT",
         "semwright_sha":source_sha,
         "provider":"driver.mlt-video",
         "driver_host":true,
         "broker_dispatch":false,
         "network":false,
         "source":{
-            "kind":"semwright-chromium-capture",
+            "kind":"semwright-chromium-capture-with-bounded-presentation-normalization",
             "capture_a_sha256":capture_a_sha,
             "capture_b_sha256":capture_b_sha,
+            "source_width":source_width,
+            "source_height":source_height,
+            "normalized_a_sha256":normalized_a_sha,
+            "normalized_b_sha256":normalized_b_sha,
             "width":width,
-            "height":height
+            "height":height,
+            "normalization":{
+                "tool":"owner-pinned-ffmpeg",
+                "ffmpeg_sha256":digest(&ffmpeg),
+                "operation":"pad-to-even-dimensions",
+                "crop":false,
+                "rescale":false,
+                "synthetic_ui":false
+            }
         },
         "timeline":{
             "fps":{"num":FPS,"den":1},
@@ -545,7 +598,7 @@ async fn real_deltadesk_captures_become_verified_h264_mp4_inside_driver_host() {
             "bytes":fs::metadata(&retained_video).unwrap().len(),
             "mime":"video/mp4"
         },
-        "technical_scope":"real captured bytes -> pinned Semwright MLT driver inside Driver Host -> H.264/AAC MP4",
+        "technical_scope":"real captured bytes -> explicit bounded even-canvas presentation derivative -> pinned Semwright MLT driver inside Driver Host -> H.264/AAC MP4",
         "composition_coordinator_receipt":false,
         "platform_job_receipt":false,
         "editorial_approval":false

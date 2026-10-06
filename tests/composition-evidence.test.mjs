@@ -16,10 +16,15 @@ function fixture(){
       ]
     },
     media_receipt:{
-      schema_version:'launchwright-real-media-driver/1',classification:'REAL_BROWSER_CAPTURE_TO_DRIVER_HOST_MLT',
+      schema_version:'launchwright-real-media-driver/1',classification:'REAL_BROWSER_CAPTURE_DERIVATIVE_TO_DRIVER_HOST_MLT',
       semwright_sha:semwright,provider:'driver.mlt-video',driver_host:true,broker_dispatch:false,network:false,
       platform_job_receipt:false,composition_coordinator_receipt:false,
-      source:{kind:'semwright-chromium-capture',capture_a_sha256:a,capture_b_sha256:b,width:1440,height:900},
+      source:{
+        kind:'semwright-chromium-capture-with-bounded-presentation-normalization',
+        capture_a_sha256:a,capture_b_sha256:b,source_width:780,source_height:493,
+        normalized_a_sha256:c,normalized_b_sha256:d,width:780,height:494,
+        normalization:{tool:'owner-pinned-ffmpeg',ffmpeg_sha256:e,operation:'pad-to-even-dimensions',crop:false,rescale:false,synthetic_ui:false}
+      },
       timeline:{fps:{num:30,den:1},frame_count:600,duration:{num:20,den:1},segments:[
         {build:'A',first_frame:0,end_frame_exclusive:300},{build:'B',first_frame:300,end_frame_exclusive:600}
       ]},
