@@ -2,7 +2,7 @@
 import { randomUUID } from 'node:crypto';
 import { NativeError, applicationContext, dispatchApplication, requireCondition as ensure, object, integer, requestIdentity, sameVersion, checkCancelled, validateValue } from '@semwright/native-sdk';
 import { Store } from './store.mjs';
-import { APP_VERSION, RESOURCE, KINDS, EDITABLE, RIGHTS, CLASSES, OPERATION_SCOPES, validateEntity, inputObject, idText, str, lines, array, choice, sha, digest, makeRequest, iso, noSecrets } from './contracts.mjs';
+import { APP_VERSION, RESOURCE, KINDS, EDITABLE, RIGHTS, CLASSES, OPERATION_SCOPES, READ_OPERATIONS, validateEntity, inputObject, idText, str, lines, array, choice, sha, digest, makeRequest, iso, noSecrets } from './contracts.mjs';
 import { renderText } from './render.mjs';
 import { validateVerification, validateWaiver, validateChannelPackage, validateChannelOutcome } from './records.mjs';
 import { recordCapture } from './capture.mjs';
@@ -13,12 +13,11 @@ import { freezeCandidate, buildCandidateGates, inspectCandidateState, recordCand
 import { proposeChange, inspectChange, applyChange } from './change-proposal.mjs';
 import { getHistory, listHistory, diffHistory } from './history.mjs';
 import { createMediaPlan, reviseMediaPlan, inspectMediaPlan, recordMediaOutput, recordMediaReview } from './media.mjs';
-export const PLATFORM_ACTIONS = ['recipes.prepare','recipes.execute','jobs.get','jobs.cancel','jobs.reconcile','evidence.get','artifacts.get','graph.observe','graph.observation','publish.preflight','publish.define','publish.version','publish.deploy','publish.invoke','publish.result'];
-const PUBLICATION_ACTIONS = new Set(['publish.define','publish.version','publish.deploy','publish.invoke']);
-const READ_ACTIONS = new Set(['jobs.get','evidence.get','artifacts.get','graph.observation','publish.result']);
+import { createReleaseTemplate, updateReleaseTemplate, freezeProductVersion, createDeployment, transitionDeployment, prepareInvocation, inspectPublish, exportProductVersion, importProductVersion, rebindImportedTemplate } from './publish.mjs';
+import { PLATFORM_ACTIONS, PUBLICATION_ACTIONS, PLATFORM_READ_ACTIONS, preparePublicationWork } from './publish-work.mjs';
 
 export class LaunchwrightApplication {
-  constructor(root, { initialize = false, readOnly = false, principal = 'local-owner', scopes = ['read','edit','capture','review','publish','admin'], capabilities = {} } = {}) {
+  constructor(root, { initialize = false, readOnly = false, principal = 'local-owner', scopes = ['read','edit','capture','review','publish','consume','admin'], capabilities = {} } = {}) {
     this.store = new Store(root,{initialize,readOnly});
     this.principal=str(principal,128); this.scopes=new Set(scopes); this.capabilities=capabilities;
     this.operations = new Map(Object.keys(OPERATION_SCOPES).map(operation => [operation,(args,context)=>this.invoke(operation,args,context)]));
@@ -79,7 +78,7 @@ export class LaunchwrightApplication {
     return identity.epoch<epoch?{state:'retention_expired',identity,current_epoch:epoch}:{state:'outcome_unknown',identity};
   }
   describe(){return{app:'Launchwright',version:APP_VERSION,schema_version:'launchwright/1',workspace_version:this.store.version(),request_epoch:this.store.meta().epoch,
-    scope_mode:'local-single-owner',principal:this.principal,scopes:[...this.scopes],native_sdk:'0.9.0-dev.1',operations:Object.entries(OPERATION_SCOPES).map(([name,scope])=>({name,scope,read_only:scope==='read'})),
+    scope_mode:'local-single-owner',principal:this.principal,scopes:[...this.scopes],native_sdk:'0.9.0-dev.1',operations:Object.entries(OPERATION_SCOPES).map(([name,scope])=>({name,scope,read_only:READ_OPERATIONS.has(name)})),
     capabilities:{editorial_text_exports:'available',durable_entity_history:this.store.hasHistory?'available':'migration-required',private_draft_delivery:'available',portable_snapshot_restore:'available-local-admin',declared_release_contracts:'available',localization_ledger:'available-layout-quality-not-inferred',extension_descriptors:'available-no-remote-code',compatibility_negotiation:'available',profile_preflight:'available-contract-only',state_anchors:'contract-and-assessment-only',impact_proposals:'available-no-execution-authority',document_change_proposals:'available-application-local-no-auto-merge',capture_receipts:'available-provenance-only',verification_ledger:'available-canonical-pass-requires-admission',waivers:'available-never-overwrite-verifier-state',channel_packages:'available-no-send',native_driver_host:'requires-owner-pinned-bundle-and-broker',platform:this.capabilities.platform??'not-connected',canonical_graph:'requires-platform-observation',browser_capture:'requires-canonical-driver-recipe',media_render:'requires-composition-recipe',mobile:'provenance-import-only',public_delivery:'requires-canonical-publish-receipt',...this.capabilities},
     limits:{page_items:128,reply_bytes:256*1024,artifact_bytes:1024*1024,receipt_epoch_items:20000},disclosure:'Local editorial checks are not Platform approvals or canonical effect verification.'};}
   profilePreflight(input){
@@ -122,7 +121,7 @@ export class LaunchwrightApplication {
   }
   invoke(operation,args,context){
     const scope=OPERATION_SCOPES[operation];this.allow(scope);checkCancelled(context);
-    if(scope==='read')return this.read(operation,args);
+    if(READ_OPERATIONS.has(operation))return this.read(operation,args);
     object(args,['request','input'],['request','input']);const request=requestIdentity(args.request);
     ensure(request.resource===RESOURCE,'Request is bound to a different workspace');
     const prepared=makeRequest(operation,args.input,context.expected,request.epoch,request.key);
@@ -161,6 +160,7 @@ export class LaunchwrightApplication {
       case'compatibility.inspect':inputObject(input,['id']);return this.compatibilityInspect(input.id);
       case'change.inspect':inputObject(input,['id']);return inspectChange(this,input.id);
       case'media.inspect':return inspectMediaPlan(this,input);
+      case'publish.inspect':return inspectPublish(this,input);
       case'artifact.read':{
         inputObject(input,['id']);const a=this.get(input.id,'artifact');const b=this.store.readBlob(a.data.sha256);
         ensure(b.bytes.length<=160000,'Use authenticated artifact download for this output','ResourceExhausted');return{artifact:a,text:b.bytes.toString('utf8')};
@@ -288,6 +288,15 @@ export class LaunchwrightApplication {
       case'media.revise':return reviseMediaPlan(this,input);
       case'media.output_record':return recordMediaOutput(this,input);
       case'media.review_record':return recordMediaReview(this,input);
+      case'publish.template_create':return createReleaseTemplate(this,input);
+      case'publish.template_update':return updateReleaseTemplate(this,input);
+      case'publish.version_freeze':return freezeProductVersion(this,input);
+      case'publish.deployment_create':return createDeployment(this,input);
+      case'publish.deployment_transition':return transitionDeployment(this,input);
+      case'publish.invoke_prepare':return prepareInvocation(this,input);
+      case'publish.export':return exportProductVersion(this,input);
+      case'publish.import':return importProductVersion(this,input);
+      case'publish.import_rebind':return rebindImportedTemplate(this,input);
       case'verification.record':{
         const data=validateVerification(input),candidate=this.get(data.candidate_id,'candidate');
         const artifactSet=new Set(candidate.data.manifest.artifact_ids);
@@ -379,9 +388,12 @@ export class LaunchwrightApplication {
       }
       case'work.prepare':{
         inputObject(input,['release_id','name','action','arguments','budget','authorization'],['release_id','name','action','arguments','budget']);this.get(input.release_id,'release');str(input.name,160);choice(input.action,PLATFORM_ACTIONS);object(input.arguments);noSecrets(input.arguments);object(input.budget,['max_cost_microunits','currency','max_runtime_seconds'],['max_cost_microunits','currency','max_runtime_seconds']);integer(input.budget.max_cost_microunits,0,1000000000);str(input.budget.currency,8);integer(input.budget.max_runtime_seconds,1,3600);
-        // This record is only an intent and budget proposal. Platform enforces actual execution authority and costs.
-        if(PUBLICATION_ACTIONS.has(input.action)){this.allow('publish');ensure(input.authorization==='explicit-publication','External publication requires explicit per-intent authorization','ConsentRequired');}
-        return{entity:this.store.create('work',{...input,state:'PREPARED',authority:'platform-required',budget_enforced:false,platform_job_id:null,pending_digest:null})};
+        let argumentsRecord=input.arguments,publicationBinding=null;
+        if(input.action.startsWith('publish.')){
+          if(PUBLICATION_ACTIONS.has(input.action)){this.allow('publish');ensure(input.authorization==='explicit-publication','External publication requires explicit per-intent authorization','ConsentRequired');}
+          const bound=preparePublicationWork(this,input.action,input.arguments);argumentsRecord=bound.arguments;publicationBinding=bound.publication_binding;
+        }
+        return{entity:this.store.create('work',{...input,arguments:argumentsRecord,...(publicationBinding?{publication_binding:publicationBinding}:{}),state:'PREPARED',authority:'platform-required',budget_enforced:false,platform_job_id:null,pending_digest:null})};
       }
       case'work.claim':{
         inputObject(input,['id','prepared_record']);const w=this.get(input.id,'work');ensure(w.data.state==='PREPARED','Work has already been claimed; recover rather than resend','Conflict');object(input.prepared_record);noSecrets(input.prepared_record);
@@ -407,7 +419,7 @@ export class LaunchwrightApplication {
 }
 // Human/API/CLI/native calls all use the canonical dispatcher, including cancellation and reply validation.
 export async function execute(app,operation,input,{key=randomUUID(),expected=app.store.version(),epoch=app.store.meta().epoch,signal}={}){
-  const args=OPERATION_SCOPES[operation]==='read'?input:makeRequest(operation,input,expected,epoch,key);
+  const args=READ_OPERATIONS.has(operation)?input:makeRequest(operation,input,expected,epoch,key);
   return dispatchApplication(app,'invoke',operation,args,applicationContext(key,expected,signal));
 }
-export { RESOURCE, APP_VERSION, READ_ACTIONS, PUBLICATION_ACTIONS };
+export { RESOURCE, APP_VERSION, PLATFORM_READ_ACTIONS as READ_ACTIONS, PUBLICATION_ACTIONS };

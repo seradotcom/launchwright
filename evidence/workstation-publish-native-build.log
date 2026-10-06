@@ -1,0 +1,42 @@
+
+> launchwright@0.2.0-dev.9 build:native-bundle
+> node scripts/build-native-bundle.mjs
+
+
+  dist/core.esbuild.cjs  44.6kb
+
+⚡ Done in 7ms
+core: 45304 bytes d23357b65e2d3744a3f20e81220da0990dde335e721da6c3137924b09cb3d015
+
+  dist/production.esbuild.cjs  44.7kb
+
+⚡ Done in 10ms
+production: 45504 bytes 26573a6fdaabdeee418aa8622dcf4f90f599a4f8932f5fbfd6d7ce8085f4d12b
+
+  dist/review.esbuild.cjs  48.3kb
+
+⚡ Done in 7ms
+review: 49056 bytes ad48857e5ecfd35523f66576e833e6ea04225adf656fe62242faedd1ad1ac883
+
+  dist/integrations.esbuild.cjs  38.1kb
+
+⚡ Done in 8ms
+integrations: 38684 bytes 65a0369ed43233cf3b00ad45799072a02b9d9350d3b3178503cb8dda0a398de6
+
+  dist/work.esbuild.cjs  31.1kb
+
+⚡ Done in 6ms
+work: 31627 bytes 62d4b40dc2f4abf1d9ecb91ea5efe3170d91bc853fa4f913b1a1cd664fa5bd58
+
+  dist/media.esbuild.cjs  39.0kb
+
+⚡ Done in 6ms
+media: 39558 bytes 55352997ff01bec5a2442f53f6df6b71048192486e07c41ef6b5c1a31a343397
+
+  dist/publish.esbuild.cjs  47.3kb
+
+⚡ Done in 8ms
+publish: 48058 bytes 53fbd97f697040e7fc6073b9c48caad4bfb7b8fa731f64bf8558aa52154a7323
+Native profile partition: 64 operations across 7 bundles.
+(node:3119453) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)

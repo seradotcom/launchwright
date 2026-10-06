@@ -29,6 +29,7 @@ export class LaunchwrightClient {
   extensionDiscovery(input={}){return this.read('extension.discovery',input);}
   negotiateCompatibility(input){return this.read('compatibility.negotiate',input);}
   compatibilityInspect(id){return this.read('compatibility.inspect',{id});}
+  publishInspect(input){return this.read('publish.inspect',input);}
   observe(scope='all',cursor=null,limit=64){return this.request('/api/v1/observe',{resource:'launchwright:workspace',scope,cursor,limit});}
   async *pages(scope='all',{limit=64,maxPages=100}={}){let cursor=null;for(let n=0;n<maxPages;n++){const p=await this.observe(scope,cursor,limit);yield p;if(p.complete)return;if(!p.next)throw new LaunchwrightError({code:'ProtocolMismatch',message:'Incomplete observation has no cursor',outcome_known:true});cursor=p.next;}throw new LaunchwrightError({code:'ResourceExhausted',message:'Observation page budget reached; resume explicitly',outcome_known:true});}
   async inventory(){const entities=[];let version=null;for await(const page of this.pages()){version=page.version;entities.push(...page.items);}return{entities,version};}

@@ -5,8 +5,9 @@ import { resolve, join, relative, isAbsolute } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createHash } from 'node:crypto';
 import { NativeError, requireCondition as ensure, object } from '@semwright/native-sdk';
-import { execute, READ_ACTIONS, PUBLICATION_ACTIONS } from './application.mjs';
+import { execute } from './application.mjs';
 import { digest } from './contracts.mjs';
+import { PLATFORM_READ_ACTIONS, PUBLICATION_ACTIONS, publicationBindingCurrent } from './publish-work.mjs';
 
 export async function loadPlatformClient(env=process.env){
   const packageDir=env.SEMWRIGHT_PLATFORM_SDK,lockPath=env.SEMWRIGHT_PLATFORM_LOCK,configPath=env.SEMWRIGHT_PLATFORM_CONFIG;
@@ -41,13 +42,15 @@ export async function runPlatformWork(app,id,{recover=false,client:injected,conf
   const action=work.data.action;
   // Backend auth is always checked by the canonical SDK, not by app actor fields.
   await client.verifyIdentity();await client.negotiate([action]);
-  if(PUBLICATION_ACTIONS.has(action)){
-    app.allow('publish');ensure(work.data.authorization==='explicit-publication','Publication intent was not expressly authorized','ConsentRequired');
-    throw new NativeError('Unsupported','Launchwright public delivery acceptance and candidate-to-Publish binding are not implemented. No publication request was sent.');
+  if(action.startsWith('publish.')){
+    publicationBindingCurrent(app,work);
+    if(action==='publish.invoke'){app.allow('consume');ensure(work.data.authorization==='consumer-invocation','Publish invocation was not prepared by the bounded consumer operation','ConsentRequired');}
+    else if(PUBLICATION_ACTIONS.has(action)){app.allow('publish');ensure(work.data.authorization==='explicit-publication','Publication intent was not expressly authorized','ConsentRequired');}
+    else app.allow('consume');
   }
   // Cost-bearing work requires a real Platform recipe/preflight configuration that enforces its own limits.
   if(['recipes.execute','recipes.prepare'].includes(action))ensure(config.budget_enforcement_confirmed===true,'Platform-side budget enforcement must be configured before a recipe intent can be sent','PolicyDenied');
-  if(READ_ACTIONS.has(action)){
+  if(PLATFORM_READ_ACTIONS.has(action)){
     ensure(!recover&&work.data.state==='PREPARED','This read intent has already been claimed','Conflict');
     const marker={schema_version:'launchwright-read-projection/1',action,arguments:work.data.arguments};
     const claimed=await execute(app,'work.claim',{id,prepared_record:marker});
