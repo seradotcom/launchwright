@@ -8,6 +8,7 @@ import { NativeError, requireCondition as ensure, object } from '@semwright/nati
 import { execute } from './application.mjs';
 import { digest } from './contracts.mjs';
 import { PLATFORM_READ_ACTIONS, PUBLICATION_ACTIONS, publicationBindingCurrent } from './publish-work.mjs';
+import { requirePreparedUsageReservation } from './usage.mjs';
 
 export async function loadPlatformClient(env=process.env){
   const packageDir=env.SEMWRIGHT_PLATFORM_SDK,lockPath=env.SEMWRIGHT_PLATFORM_LOCK,configPath=env.SEMWRIGHT_PLATFORM_CONFIG;
@@ -48,8 +49,12 @@ export async function runPlatformWork(app,id,{recover=false,client:injected,conf
     else if(PUBLICATION_ACTIONS.has(action)){app.allow('publish');ensure(work.data.authorization==='explicit-publication','Publication intent was not expressly authorized','ConsentRequired');}
     else app.allow('consume');
   }
-  // Cost-bearing work requires a real Platform recipe/preflight configuration that enforces its own limits.
-  if(['recipes.execute','recipes.prepare'].includes(action))ensure(config.budget_enforcement_confirmed===true,'Platform-side budget enforcement must be configured before a recipe intent can be sent','PolicyDenied');
+  // Cost-bearing work requires a real Platform reservation and external enforcement. Launchwright records custody; it is not another scheduler or credit counter.
+  const costBearing=work.data.budget.max_cost_microunits>0||['recipes.execute','recipes.prepare'].includes(action);
+  if(costBearing){
+    ensure(config.budget_enforcement_confirmed===true,'Platform-side budget enforcement must be configured before cost-bearing work can be sent','PolicyDenied');
+    requirePreparedUsageReservation(app,work);
+  }
   if(PLATFORM_READ_ACTIONS.has(action)){
     ensure(!recover&&work.data.state==='PREPARED','This read intent has already been claimed','Conflict');
     const marker={schema_version:'launchwright-read-projection/1',action,arguments:work.data.arguments};

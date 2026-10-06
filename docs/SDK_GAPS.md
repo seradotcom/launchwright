@@ -9,7 +9,8 @@ These are explicit integration gaps, not implied application successes.
 | Effects | Stores exact results from the pinned Native SDK immutable JSON/CSV Effects reader, exact artifact/scenario revision bindings and owner-gated admission; dedicated CI lane runs the real upstream binary | Native application mutation/noninterference effects, Driver Host admission and scenario-effect coverage on a supported real runner |
 | Media | VTT timing and text artifacts are local | Composition timeline, render and media verification |
 | Verification | Admin-protected verifier profiles are pinned by exact revision/digest into candidates; reports bind exact candidate/artifact/target context, expose coverage/omissions and make incomplete/drifted PASS UNKNOWN; FAIL/ERROR and waivers preserve truth | Canonical verifier execution/runtime and owner admission on a supported Host |
-| Platform work | Durable intent and pending/recovery custody | Platform scheduler, budget and job authority |
+| Platform work | Durable intent, pending/recovery custody and exact reservation/usage/adjustment receipt ledger | Platform scheduler, quota enforcement, authoritative metering/billing and job authority |
+| Usage/billing | Estimate-vs-measured, BYO separation, bounded perf samples and test-only callback custody | Real Platform ledger/quota, invoice provider, live charge and production SLO authority |
 | Public delivery | Exact channel packages and receipt ledger | Canonical Publish action/receipt and destination-specific authority |
 | Teams | Principal/scopes work locally | Remote authentication, tenant isolation and multi-user approvals |
 | Mobile/Godot | Provenance can be imported | Canonical native drivers and real target execution |

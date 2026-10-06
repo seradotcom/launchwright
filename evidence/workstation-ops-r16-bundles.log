@@ -1,0 +1,67 @@
+
+> launchwright@0.2.0-dev.16 build:native-bundle
+> node scripts/build-native-bundle.mjs
+
+
+  dist/core.esbuild.cjs  44.0kb
+
+⚡ Done in 6ms
+core: 44728 bytes 788d6381a43a8b764dccef466ba30df89ac96238c64044ff5b18c8989cc3049d
+
+  dist/sources.esbuild.cjs  25.1kb
+
+⚡ Done in 6ms
+sources: 25312 bytes 7c2352559c84516fea9bc0f9d9d9772778e1c1f582b36335cc6dbc8c73d8677e
+
+  dist/graph.esbuild.cjs  25.8kb
+
+⚡ Done in 6ms
+graph: 26175 bytes 0dc66f84e3f475d81c9b63032a852e9ee09d79c59968211584f075a3196dfcfe
+
+  dist/effects.esbuild.cjs  29.3kb
+
+⚡ Done in 10ms
+effects: 29742 bytes a58065e6aee3ee1c003f6314423ce979fdfaf5824e1a114fba0a41b37cf05846
+
+  dist/production.esbuild.cjs  46.7kb
+
+⚡ Done in 8ms
+production: 47573 bytes 3dd127cb69ca748793f04683254f3de1160840afee2539e7e2db29009bbbadf1
+
+  dist/review.esbuild.cjs  44.6kb
+
+⚡ Done in 7ms
+review: 45231 bytes 8ec43debe2e4561b23fd95d44fd7bc33316a55c834be523a04c50c3dbb2ea035
+
+  dist/verification.esbuild.cjs  39.8kb
+
+⚡ Done in 6ms
+verification: 40423 bytes 527f79027747a8c3dcadfb3a2b26dd02f725ab4362299987a676d59cc8996f4b
+
+  dist/integrations.esbuild.cjs  48.2kb
+
+⚡ Done in 10ms
+integrations: 49011 bytes e7d3d11327bb06d83903a98e725ca572e1a88745e05cadbf7f456aaadea3f077
+
+  dist/work.esbuild.cjs  34.9kb
+
+⚡ Done in 8ms
+work: 35421 bytes 58a5e9e18391e740d1cc08d28f504f53458ea6ee9a41a9f9970c32ea8b17c384
+
+  dist/usage.esbuild.cjs  35.8kb
+
+⚡ Done in 6ms
+usage: 36412 bytes 18c5039cc6204ff28633391526a2847e95ea090d007e4eb1650e912210664304
+
+  dist/media.esbuild.cjs  41.0kb
+
+⚡ Done in 8ms
+media: 41599 bytes 39a4dfb83f680c28379b3e8d7770c0dd19c31fc3075412d09fdd5c4629fa2691
+
+  dist/publish.esbuild.cjs  46.2kb
+
+⚡ Done in 13ms
+publish: 46944 bytes 4fc3cc467955ba7dfa58ffe398eb60f433a610599f6934d1d165e5c9dd7b55ff
+Native profile partition: 79 operations across 12 bundles.
+(node:3452872) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)

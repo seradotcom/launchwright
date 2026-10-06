@@ -66,28 +66,28 @@ export class IntegrationsNativeApplication extends NativeProfileApplication {
     switch(operation){
       case'localization.create':{
         const data=validateLocalization(input),release=this.get(data.release_id,'release'),target=this.get(data.target_id,'target'),source=this.get(data.source_copy_block_id,'copy_block');
-        ensure(target.data.release_id===release.id&&source.data.release_id===release.id,'Localization references another release','PermissionDenied');
+        ensure(target.data.release_id===release.id&&source.data.release_id===release.id,'Localization scope mismatch','PermissionDenied');
         let glossary=null;
-        if(data.glossary_id){glossary=this.get(data.glossary_id,'glossary');ensure(glossary.data.product_id===release.data.product_id,'Glossary belongs to another product','PermissionDenied');ensure(glossary.data.status==='active','Glossary is deprecated','Conflict');ensure(glossary.data.source_locale===source.data.locale&&glossary.data.target_locale===data.locale,'Glossary locale pair does not match localization','Conflict');}
+        if(data.glossary_id){glossary=this.get(data.glossary_id,'glossary');ensure(glossary.data.product_id===release.data.product_id,'Glossary product mismatch','PermissionDenied');ensure(glossary.data.status==='active','Glossary is deprecated','Conflict');ensure(glossary.data.source_locale===source.data.locale&&glossary.data.target_locale===data.locale,'Glossary locale mismatch','Conflict');}
         return{entity:this.store.create('localized_copy',{...data,source_version:source.version,glossary_version:glossary?.version??null,created_by:this.principal,created_at:iso()})};
       }
       case'localization.update':{
         inputObject(input,['id','expected','data','acknowledge_rebase'],['id','expected','data']);const prior=this.get(input.id,'localized_copy');ensure(sameVersion(prior.version,input.expected),'Localization revision changed','StaleReference');const data=validateLocalization(input.data);
-        for(const key of ['release_id','target_id','source_copy_block_id','glossary_id'])ensure((data[key]??null)===(prior.data[key]??null),'Localization identity references are immutable; create another localization','Conflict');
+        for(const key of ['release_id','target_id','source_copy_block_id','glossary_id'])ensure((data[key]??null)===(prior.data[key]??null),'Localization identity is immutable','Conflict');
         const source=this.get(data.source_copy_block_id,'copy_block'),glossary=data.glossary_id?this.get(data.glossary_id,'glossary'):null;
         const sourceDrift=!sameVersion(source.version,prior.data.source_version),glossaryDrift=!!glossary&&!sameVersion(glossary.version,prior.data.glossary_version);
-        if(sourceDrift||glossaryDrift)ensure(input.acknowledge_rebase===true,'Source or glossary changed; review content and explicitly rebase','StaleReference');
-        if(glossary){ensure(glossary.data.status==='active','Glossary is deprecated','Conflict');ensure(glossary.data.source_locale===source.data.locale&&glossary.data.target_locale===data.locale,'Glossary locale pair does not match localization','Conflict');}
+        if(sourceDrift||glossaryDrift)ensure(input.acknowledge_rebase===true,'Source/glossary changed; explicit rebase required','StaleReference');
+        if(glossary){ensure(glossary.data.status==='active','Glossary is deprecated','Conflict');ensure(glossary.data.source_locale===source.data.locale&&glossary.data.target_locale===data.locale,'Glossary locale mismatch','Conflict');}
         return{entity:this.store.update(prior.id,{...data,source_version:source.version,glossary_version:glossary?.version??null,created_by:prior.data.created_by,created_at:prior.data.created_at,updated_by:this.principal,updated_at:iso()})};
       }
       case'extension.register':{
         const data=validateExtensionManifest(input);ensure(data.schema_major===1,'Unsupported extension schema major','ProtocolMismatch');
         const duplicate=this.list('extension_package').find(e=>e.data.type===data.type&&e.data.name===data.name&&e.data.package_version===data.package_version&&e.data.status==='active');
-        ensure(!duplicate,'This extension version is already registered','Conflict');
+        ensure(!duplicate,'Extension version already registered','Conflict');
         return{entity:this.store.create('extension_package',{...data,status:'active',admission:'local-descriptor-only',remote_code_executable:false,registered_by:this.principal,registered_at:iso()})};
       }
       case'extension.retire':{
-        inputObject(input,['id','expected','reason']);const ext=this.get(input.id,'extension_package');ensure(sameVersion(ext.version,input.expected),'Extension revision changed','StaleReference');ensure(ext.data.status==='active','Extension is already retired','Conflict');lines(input.reason,4000);
+        inputObject(input,['id','expected','reason']);const ext=this.get(input.id,'extension_package');ensure(sameVersion(ext.version,input.expected),'Extension changed','StaleReference');ensure(ext.data.status==='active','Extension already retired','Conflict');lines(input.reason,4000);
         return{entity:this.store.update(ext.id,{...ext.data,status:'retired',retired_by:this.principal,retired_at:iso(),retire_reason:input.reason,new_use_allowed:false})};
       }
       case'mobile.import':return registerMobileImport(this,input);
@@ -96,11 +96,11 @@ export class IntegrationsNativeApplication extends NativeProfileApplication {
         const components=data.components.map(c=>{
           if(!c.resource_id)return{...c,resource_version:null};
           const r=this.get(c.resource_id);
-          if(r.kind!=='extension_package')ensure(this.productOf(r)===product.id,'Compatibility component belongs to another product','PermissionDenied');
-          if(r.kind==='extension_package')ensure(r.data.status==='active','Cannot lock a retired extension','Conflict');
-          if(c.kind==='channel-profile')ensure(r.kind==='channel_profile','Compatibility component kind does not match resource');
-          if(c.kind==='template')ensure(r.kind==='template','Compatibility component kind does not match resource');
-          if(['source-adapter','renderer','channel-adapter','verifier'].includes(c.kind))ensure(r.kind==='extension_package','Compatibility component must reference an extension descriptor');
+          if(r.kind!=='extension_package')ensure(this.productOf(r)===product.id,'Compatibility product mismatch','PermissionDenied');
+          if(r.kind==='extension_package')ensure(r.data.status==='active','Retired extension cannot be locked','Conflict');
+          if(c.kind==='channel-profile')ensure(r.kind==='channel_profile','Compatibility kind mismatch');
+          if(c.kind==='template')ensure(r.kind==='template','Compatibility kind mismatch');
+          if(['source-adapter','renderer','channel-adapter','verifier'].includes(c.kind))ensure(r.kind==='extension_package','Extension descriptor required');
           return{...c,resource_version:r.version};
         });
         return{entity:this.store.create('compatibility_lock',{...data,components,product_version:product.version,created_by:this.principal,created_at:iso(),authority:'application-rehearsal-lock'})};

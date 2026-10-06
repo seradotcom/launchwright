@@ -28,6 +28,8 @@ const template=(await execute(app,'publish.template_create',{data:{
 }})).entity;
 const productVersion=(await execute(app,'publish.version_freeze',{template_id:template.id,template_version:template.version,version_label:'smoke-1'})).entity;
 const deployment=(await execute(app,'publish.deployment_create',{product_version_id:productVersion.id,name:'Synthetic smoke deployment'})).entity;
+const usageWork=(await execute(app,'work.prepare',{release_id:release.id,name:'Synthetic usage smoke',action:'recipes.execute',arguments:{recipe_id:'bundle-smoke'},budget:{max_cost_microunits:10,currency:'USD',max_runtime_seconds:10}})).entity;
+const usageReservation=(await execute(app,'usage.reserve_record',{work_id:usageWork.id,name:'Synthetic usage reservation',reservation_key:'bundle-smoke-reservation',platform_reservation_id:'bundle-smoke-platform-reservation',reservation_receipt_sha256:'a'.repeat(64),reserved_cost_microunits:10,compute_source:'platform-managed',budget:{max_cost_microunits:10,currency:'USD',max_runtime_seconds:10,max_storage_bytes:1024,max_egress_bytes:1024},estimate:{billable_microunits:5,runtime_seconds:5,storage_bytes:0,egress_bytes:0,confidence:'bounded'}})).entity;
 app.close();
 
 const manifest=JSON.parse(readFileSync('dist/native-bundle.json','utf8'));
@@ -41,6 +43,7 @@ const reads={
   verification:['verification-summary',{candidate_id:candidate.id}],
   integrations:['channel-status',{release_id:release.id}],
   work:['workspace-snapshot',{}],
+  usage:['usage-inspect',{id:usageReservation.id}],
   media:['media-inspect',{}],
   publish:['publish-inspect',{deployment_id:deployment.id}]
 };
