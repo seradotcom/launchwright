@@ -1,0 +1,1064 @@
+
+> launchwright@0.2.0-dev.17 test
+> node --test --test-concurrency=1 tests/*.test.mjs
+
+TAP version 13
+# (node:3734976) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: candidate v2 seals target, contract, channel and rights references into its digest
+ok 1 - candidate v2 seals target, contract, channel and rights references into its digest
+  ---
+  duration_ms: 110.774615
+  type: 'test'
+  ...
+# Subtest: changing a protected ReleaseContract or ChannelProfile invalidates the frozen candidate
+ok 2 - changing a protected ReleaseContract or ChannelProfile invalidates the frozen candidate
+  ---
+  duration_ms: 172.329516
+  type: 'test'
+  ...
+# Subtest: partial channel package requires candidate policy and explicit omissions
+ok 3 - partial channel package requires candidate policy and explicit omissions
+  ---
+  duration_ms: 117.325666
+  type: 'test'
+  ...
+# Subtest: candidate pins localization source and glossary revisions without fabricating final-language PASS
+ok 4 - candidate pins localization source and glossary revisions without fabricating final-language PASS
+  ---
+  duration_ms: 122.942771
+  type: 'test'
+  ...
+# Subtest: late review for an older candidate never approves a newer candidate
+ok 5 - late review for an older candidate never approves a newer candidate
+  ---
+  duration_ms: 131.310997
+  type: 'test'
+  ...
+# Subtest: latest decision from a reviewer supersedes that reviewer without deleting history
+ok 6 - latest decision from a reviewer supersedes that reviewer without deleting history
+  ---
+  duration_ms: 94.042837
+  type: 'test'
+  ...
+# Subtest: review refuses a candidate after any protected input changes
+ok 7 - review refuses a candidate after any protected input changes
+  ---
+  duration_ms: 97.891946
+  type: 'test'
+  ...
+# Subtest: editorial quorum counts distinct latest reviewer identities
+ok 8 - editorial quorum counts distinct latest reviewer identities
+  ---
+  duration_ms: 99.915944
+  type: 'test'
+  ...
+# (node:3734996) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: RS-CAP-01 observed capture requires Platform correlation and native receipt digest
+ok 9 - RS-CAP-01 observed capture requires Platform correlation and native receipt digest
+  ---
+  duration_ms: 86.039374
+  type: 'test'
+  ...
+# Subtest: RS-CAP-02 and RS-CAP-03 readiness or ambiguous anchors block observed success
+ok 10 - RS-CAP-02 and RS-CAP-03 readiness or ambiguous anchors block observed success
+  ---
+  duration_ms: 87.367407
+  type: 'test'
+  ...
+# Subtest: RS-CAP-04 and RS-CAP-05 target drift and demo-data relabeling fail closed
+ok 11 - RS-CAP-04 and RS-CAP-05 target drift and demo-data relabeling fail closed
+  ---
+  duration_ms: 81.915538
+  type: 'test'
+  ...
+# Subtest: RS-CAP-07 and RS-CAP-08 mutable capture requires scoped auth and bounded cleanup
+ok 12 - RS-CAP-07 and RS-CAP-08 mutable capture requires scoped auth and bounded cleanup
+  ---
+  duration_ms: 83.517459
+  type: 'test'
+  ...
+# Subtest: RS-CAP-06 sanitized derivatives preserve source relation without manufacturing PASS
+ok 13 - RS-CAP-06 sanitized derivatives preserve source relation without manufacturing PASS
+  ---
+  duration_ms: 95.748182
+  type: 'test'
+  ...
+# Subtest: RS-CAP-09 capture segments are ordered and non-overlapping
+ok 14 - RS-CAP-09 capture segments are ordered and non-overlapping
+  ---
+  duration_ms: 89.662533
+  type: 'test'
+  ...
+# Subtest: RS-CAP-10 generated illustration can never become observed product state
+ok 15 - RS-CAP-10 generated illustration can never become observed product state
+  ---
+  duration_ms: 80.240148
+  type: 'test'
+  ...
+# Subtest: RS-CAP-11 imported real-adapter evidence remains unverified without Platform authority
+ok 16 - RS-CAP-11 imported real-adapter evidence remains unverified without Platform authority
+  ---
+  duration_ms: 80.459147
+  type: 'test'
+  ...
+# (node:3735003) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: proposal is immutable intent and does not edit human-owned copy
+ok 17 - proposal is immutable intent and does not edit human-owned copy
+  ---
+  duration_ms: 80.970681
+  type: 'test'
+  ...
+# Subtest: human copy cannot be applied without explicit acknowledgement
+ok 18 - human copy cannot be applied without explicit acknowledgement
+  ---
+  duration_ms: 86.633804
+  type: 'test'
+  ...
+# Subtest: managed CopyBlock proposal still requires an explicit apply operation but not a human-content waiver
+ok 19 - managed CopyBlock proposal still requires an explicit apply operation but not a human-content waiver
+  ---
+  duration_ms: 90.713787
+  type: 'test'
+  ...
+# Subtest: newer edits make an older proposal stale instead of being force-overwritten
+ok 20 - newer edits make an older proposal stale instead of being force-overwritten
+  ---
+  duration_ms: 89.751125
+  type: 'test'
+  ...
+# Subtest: applying a whole-document proposal requires acknowledgement and invalidates old artifact/candidate pins
+ok 21 - applying a whole-document proposal requires acknowledgement and invalidates old artifact/candidate pins
+  ---
+  duration_ms: 106.285171
+  type: 'test'
+  ...
+# (node:3735010) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: private channel bundle is deterministic and includes exact manifests plus artifact bytes
+ok 22 - private channel bundle is deterministic and includes exact manifests plus artifact bytes
+  ---
+  duration_ms: 114.690746
+  type: 'test'
+  ...
+# Subtest: delivery outcome keeps the same reconstructable private bundle without implying publication
+ok 23 - delivery outcome keeps the same reconstructable private bundle without implying publication
+  ---
+  duration_ms: 79.174282
+  type: 'test'
+  ...
+# Subtest: zip builder rejects unsafe names and duplicate entries
+ok 24 - zip builder rejects unsafe names and duplicate entries
+  ---
+  duration_ms: 1.17007
+  type: 'test'
+  ...
+# Subtest: default browser-style fetch keeps the global receiver instead of LaunchwrightClient
+ok 25 - default browser-style fetch keeps the global receiver instead of LaunchwrightClient
+  ---
+  duration_ms: 2.166672
+  type: 'test'
+  ...
+# Subtest: composition evidence preserves partial authority while proving both real-media legs
+ok 26 - composition evidence preserves partial authority while proving both real-media legs
+  ---
+  duration_ms: 2.722692
+  type: 'test'
+  ...
+# Subtest: composition evidence rejects media that is not bound to exact browser bytes
+ok 27 - composition evidence rejects media that is not bound to exact browser bytes
+  ---
+  duration_ms: 1.263928
+  type: 'test'
+  ...
+# Subtest: composition evidence rejects another Semwright source revision
+ok 28 - composition evidence rejects another Semwright source revision
+  ---
+  duration_ms: 1.381668
+  type: 'test'
+  ...
+# Subtest: composition evidence rejects non-exhaustive canonical AV verification
+ok 29 - composition evidence rejects non-exhaustive canonical AV verification
+  ---
+  duration_ms: 0.3623
+  type: 'test'
+  ...
+# (node:3735033) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: portable snapshot restores durable identities and bytes but disables old mutation receipts
+ok 30 - portable snapshot restores durable identities and bytes but disables old mutation receipts
+  ---
+  duration_ms: 152.071286
+  type: 'test'
+  ...
+# Subtest: snapshot digest rejects modified portable content
+ok 31 - snapshot digest rejects modified portable content
+  ---
+  duration_ms: 76.936014
+  type: 'test'
+  ...
+# Subtest: capture receipts preserve provenance without manufacturing technical PASS
+ok 32 - capture receipts preserve provenance without manufacturing technical PASS
+  ---
+  duration_ms: 87.286265
+  type: 'test'
+  ...
+# Subtest: capture execution requires an explicitly approved source
+ok 33 - capture execution requires an explicitly approved source
+  ---
+  duration_ms: 76.506395
+  type: 'test'
+  ...
+# Subtest: heuristic PASS remains UNKNOWN and a waiver preserves a recorded failure
+ok 34 - heuristic PASS remains UNKNOWN and a waiver preserves a recorded failure
+  ---
+  duration_ms: 92.762585
+  type: 'test'
+  ...
+# Subtest: canonical verifier PASS is only admitted behind the explicit owner capability
+ok 35 - canonical verifier PASS is only admitted behind the explicit owner capability
+  ---
+  duration_ms: 83.185258
+  type: 'test'
+  ...
+# Subtest: channel packaging freezes exact bytes separately from external delivery state
+ok 36 - channel packaging freezes exact bytes separately from external delivery state
+  ---
+  duration_ms: 119.040667
+  type: 'test'
+  ...
+# Subtest: DeltaDesk laboratory exposes owned two-build source identities and the required A/B change oracle
+ok 37 - DeltaDesk laboratory exposes owned two-build source identities and the required A/B change oracle
+  ---
+  duration_ms: 2.477297
+  type: 'test'
+  ...
+# Subtest: DeltaDesk fixture provides es-MX, demo login, source build headers and explicit reset
+ok 38 - DeltaDesk fixture provides es-MX, demo login, source build headers and explicit reset
+  ---
+  duration_ms: 38.349286
+  type: 'test'
+  ...
+# Subtest: DeltaDesk fixture rejects unknown routes instead of serving a generic fake surface
+ok 39 - DeltaDesk fixture rejects unknown routes instead of serving a generic fake surface
+  ---
+  duration_ms: 8.286032
+  type: 'test'
+  ...
+# (node:3735049) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: same canonical dispatcher persists identities and opaque revisions
+ok 40 - same canonical dispatcher persists identities and opaque revisions
+  ---
+  duration_ms: 94.913694
+  type: 'test'
+  ...
+# Subtest: equivalent duplicate mutation returns exact historical receipt without another event
+ok 41 - equivalent duplicate mutation returns exact historical receipt without another event
+  ---
+  duration_ms: 46.732527
+  type: 'test'
+  ...
+# Subtest: same key with a different body is conflict, even when new digest is valid
+ok 42 - same key with a different body is conflict, even when new digest is valid
+  ---
+  duration_ms: 48.481942
+  type: 'test'
+  ...
+# Subtest: tampered exact digest is rejected before mutation
+ok 43 - tampered exact digest is rejected before mutation
+  ---
+  duration_ms: 42.807568
+  type: 'test'
+  ...
+# Subtest: stale workspace CAS is enforced inside transaction
+ok 44 - stale workspace CAS is enforced inside transaction
+  ---
+  duration_ms: 48.25582
+  type: 'test'
+  ...
+# Subtest: read-only and reviewer principals cannot mutate author content
+ok 45 - read-only and reviewer principals cannot mutate author content
+  ---
+  duration_ms: 77.809493
+  type: 'test'
+  ...
+# Subtest: recipients cannot forge a reviewer by adding a body field
+ok 46 - recipients cannot forge a reviewer by adding a body field
+  ---
+  duration_ms: 110.663879
+  type: 'test'
+  ...
+# Subtest: recovery binds principal and digest and never resends
+ok 47 - recovery binds principal and digest and never resends
+  ---
+  duration_ms: 44.512918
+  type: 'test'
+  ...
+# Subtest: unknown recovery is UNKNOWN, not an invented success
+ok 48 - unknown recovery is UNKNOWN, not an invented success
+  ---
+  duration_ms: 44.122126
+  type: 'test'
+  ...
+# Subtest: epoch rotation prevents replay after receipt retention
+ok 49 - epoch rotation prevents replay after receipt retention
+  ---
+  duration_ms: 61.519281
+  type: 'test'
+  ...
+# Subtest: cancelled invocation makes no effects
+ok 50 - cancelled invocation makes no effects
+  ---
+  duration_ms: 43.944468
+  type: 'test'
+  ...
+# Subtest: all observation pages are complete and snapshot-bound
+ok 51 - all observation pages are complete and snapshot-bound
+  ---
+  duration_ms: 70.048824
+  type: 'test'
+  ...
+# Subtest: mutating between pages makes the old cursor stale
+ok 52 - mutating between pages makes the old cursor stale
+  ---
+  duration_ms: 70.170913
+  type: 'test'
+  ...
+# Subtest: cursor page-size changes are rejected
+ok 53 - cursor page-size changes are rejected
+  ---
+  duration_ms: 62.899394
+  type: 'test'
+  ...
+# Subtest: invalid reference or cross-product input rolls back all effects
+ok 54 - invalid reference or cross-product input rolls back all effects
+  ---
+  duration_ms: 80.326661
+  type: 'test'
+  ...
+# Subtest: moving a resource to another parent is forbidden
+ok 55 - moving a resource to another parent is forbidden
+  ---
+  duration_ms: 78.836539
+  type: 'test'
+  ...
+# Subtest: target locale, plan and flags remain distinct from editorial locale
+ok 56 - target locale, plan and flags remain distinct from editorial locale
+  ---
+  duration_ms: 68.68062
+  type: 'test'
+  ...
+# Subtest: source query secrets and URL userinfo are rejected
+ok 57 - source query secrets and URL userinfo are rejected
+  ---
+  duration_ms: 63.594174
+  type: 'test'
+  ...
+# Subtest: arbitrary executable fields are not accepted as a scenario
+ok 58 - arbitrary executable fields are not accepted as a scenario
+  ---
+  duration_ms: 61.334758
+  type: 'test'
+  ...
+# Subtest: safe HTML render cannot execute author-supplied markup
+ok 59 - safe HTML render cannot execute author-supplied markup
+  ---
+  duration_ms: 81.950237
+  type: 'test'
+  ...
+# Subtest: artifact hashes are verified against persisted bytes
+ok 60 - artifact hashes are verified against persisted bytes
+  ---
+  duration_ms: 76.893542
+  type: 'test'
+  ...
+# Subtest: artifacts and candidates cannot be edited as generic entities
+ok 61 - artifacts and candidates cannot be edited as generic entities
+  ---
+  duration_ms: 83.468852
+  type: 'test'
+  ...
+# Subtest: candidate hash binds destination and review contract
+ok 62 - candidate hash binds destination and review contract
+  ---
+  duration_ms: 78.401262
+  type: 'test'
+  ...
+# Subtest: stale text artifacts cannot be frozen into a candidate
+ok 63 - stale text artifacts cannot be frozen into a candidate
+  ---
+  duration_ms: 74.582728
+  type: 'test'
+  ...
+# Subtest: human edit after freezing invalidates review and delivery
+ok 64 - human edit after freezing invalidates review and delivery
+  ---
+  duration_ms: 86.888563
+  type: 'test'
+  ...
+# Subtest: private draft requires explicit acknowledgment and matching approval
+ok 65 - private draft requires explicit acknowledgment and matching approval
+  ---
+  duration_ms: 91.667888
+  type: 'test'
+  ...
+# Subtest: alias CAS prevents overwriting a newer private destination
+ok 66 - alias CAS prevents overwriting a newer private destination
+  ---
+  duration_ms: 93.315342
+  type: 'test'
+  ...
+# Subtest: old LTS artifact remains pinned after new source revision
+ok 67 - old LTS artifact remains pinned after new source revision
+  ---
+  duration_ms: 83.335885
+  type: 'test'
+  ...
+# Subtest: imported PASS cannot become native technical evidence
+ok 68 - imported PASS cannot become native technical evidence
+  ---
+  duration_ms: 59.120014
+  type: 'test'
+  ...
+# Subtest: claim availability requires evidence beyond pixels or imported provenance
+ok 69 - claim availability requires evidence beyond pixels or imported provenance
+  ---
+  duration_ms: 64.317849
+  type: 'test'
+  ...
+# Subtest: template parameter allowlist and output escaping survive a second product
+ok 70 - template parameter allowlist and output escaping survive a second product
+  ---
+  duration_ms: 76.405951
+  type: 'test'
+  ...
+# Subtest: VTT enforces non-overlap and integer timing
+ok 71 - VTT enforces non-overlap and integer timing
+  ---
+  duration_ms: 67.194602
+  type: 'test'
+  ...
+# Subtest: VTT real bytes preserve millisecond timing and escape cue markup
+ok 72 - VTT real bytes preserve millisecond timing and escape cue markup
+  ---
+  duration_ms: 67.657743
+  type: 'test'
+  ...
+# Subtest: Platform intent is not an executed job or cost authority
+ok 73 - Platform intent is not an executed job or cost authority
+  ---
+  duration_ms: 71.253299
+  type: 'test'
+  ...
+# Subtest: Platform pending request can be claimed only once, unknown is not resendable
+ok 74 - Platform pending request can be claimed only once, unknown is not resendable
+  ---
+  duration_ms: 75.687636
+  type: 'test'
+  ...
+# Subtest: external publication intent requires explicit per-intent consent
+ok 75 - external publication intent requires explicit per-intent consent
+  ---
+  duration_ms: 64.739927
+  type: 'test'
+  ...
+# (node:3735059) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: extension preparation pins exact package and retirement blocks new starts without deleting history
+ok 76 - extension preparation pins exact package and retirement blocks new starts without deleting history
+  ---
+  duration_ms: 60.417675
+  type: 'test'
+  ...
+# Subtest: extension descriptor rejects executable metadata
+ok 77 - extension descriptor rejects executable metadata
+  ---
+  duration_ms: 46.503197
+  type: 'test'
+  ...
+# Subtest: real CLI fixture is observed as a non-DOM source and never promoted to Host PASS
+ok 78 - real CLI fixture is observed as a non-DOM source and never promoted to Host PASS
+  ---
+  duration_ms: 148.02931
+  type: 'test'
+  ...
+# Subtest: CLI receipt rejects build drift and secret-bearing flags
+ok 79 - CLI receipt rejects build drift and secret-bearing flags
+  ---
+  duration_ms: 80.695446
+  type: 'test'
+  ...
+# (node:3735075) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: localization pins source and glossary revisions and exposes unverified layout honestly
+ok 80 - localization pins source and glossary revisions and exposes unverified layout honestly
+  ---
+  duration_ms: 84.776844
+  type: 'test'
+  ...
+# Subtest: RTL mismatch, unresolved font rights and missing critical terminology fail closed
+ok 81 - RTL mismatch, unresolved font rights and missing critical terminology fail closed
+  ---
+  duration_ms: 100.569387
+  type: 'test'
+  ...
+# Subtest: source edits make translation stale and explicit rebase is required
+ok 82 - source edits make translation stale and explicit rebase is required
+  ---
+  duration_ms: 104.396587
+  type: 'test'
+  ...
+# Subtest: localization target must preserve the source audience context
+ok 83 - localization target must preserve the source audience context
+  ---
+  duration_ms: 91.578567
+  type: 'test'
+  ...
+# Subtest: profile preflight is contract-only and requires explicit execution capability
+ok 84 - profile preflight is contract-only and requires explicit execution capability
+  ---
+  duration_ms: 147.828648
+  type: 'test'
+  ...
+# Subtest: extension discovery stores bounded descriptors and never turns them into executable code
+ok 85 - extension discovery stores bounded descriptors and never turns them into executable code
+  ---
+  duration_ms: 45.914391
+  type: 'test'
+  ...
+# Subtest: compatibility locks detect retired extension drift and major negotiation never silently succeeds
+ok 86 - compatibility locks detect retired extension drift and major negotiation never silently succeeds
+  ---
+  duration_ms: 85.672399
+  type: 'test'
+  ...
+# (node:3735082) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: RS-EXT-07 real deliverable renderer records a bounded generic result and retirement preserves history
+ok 87 - RS-EXT-07 real deliverable renderer records a bounded generic result and retirement preserves history
+  ---
+  duration_ms: 113.697554
+  type: 'test'
+  ...
+# Subtest: MOBILE_IMPORT profile uses a real bounded importer and never claims device capture
+ok 88 - MOBILE_IMPORT profile uses a real bounded importer and never claims device capture
+  ---
+  duration_ms: 139.531115
+  type: 'test'
+  ...
+# Subtest: extension rights are visible and unresolved rights block prepared use
+ok 89 - extension rights are visible and unresolved rights block prepared use
+  ---
+  duration_ms: 40.545072
+  type: 'test'
+  ...
+# Subtest: generic result rejects output type substitution and output beyond package budget
+ok 90 - generic result rejects output type substitution and output beyond package budget
+  ---
+  duration_ms: 57.90967
+  type: 'test'
+  ...
+# (node:3735103) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: Launchwright graph contract lock equals the checked-in canonical projection
+ok 91 - Launchwright graph contract lock equals the checked-in canonical projection
+  ---
+  duration_ms: 7.975366
+  type: 'test'
+  ...
+# Subtest: caller data cannot self-promote a Platform response into canonical Graph authority
+ok 92 - caller data cannot self-promote a Platform response into canonical Graph authority
+  ---
+  duration_ms: 85.992239
+  type: 'test'
+  ...
+# Subtest: trusted Graph profile records immutable admitted projection and release impact consumes it
+ok 93 - trusted Graph profile records immutable admitted projection and release impact consumes it
+  ---
+  duration_ms: 106.006493
+  type: 'test'
+  ...
+# Subtest: bounded Graph projection rejects hidden impact nodes instead of leaking a private dependency path
+ok 94 - bounded Graph projection rejects hidden impact nodes instead of leaking a private dependency path
+  ---
+  duration_ms: 77.322789
+  type: 'test'
+  ...
+# Subtest: cycles are accepted only as already-bounded canonical reports and never traversed by Launchwright
+ok 95 - cycles are accepted only as already-bounded canonical reports and never traversed by Launchwright
+  ---
+  duration_ms: 87.880281
+  type: 'test'
+  ...
+# Subtest: unknown frontier survives incomplete inventory and percentages stay scoped to visible denominator
+ok 96 - unknown frontier survives incomplete inventory and percentages stay scoped to visible denominator
+  ---
+  duration_ms: 85.067702
+  type: 'test'
+  ...
+# Subtest: observed local relation must be backed by the exact admitted canonical Graph edge
+ok 97 - observed local relation must be backed by the exact admitted canonical Graph edge
+  ---
+  duration_ms: 87.300586
+  type: 'test'
+  ...
+# Subtest: heuristic relation never clears canonical uncertainty or upgrades itself to observed
+ok 98 - heuristic relation never clears canonical uncertainty or upgrades itself to observed
+  ---
+  duration_ms: 73.097856
+  type: 'test'
+  ...
+# Subtest: reuse key binds target toolchain fixture templates verifier tenant rights permissions and final delivery check
+ok 99 - reuse key binds target toolchain fixture templates verifier tenant rights permissions and final delivery check
+  ---
+  duration_ms: 102.396625
+  type: 'test'
+  ...
+# Subtest: impact proposals remain authority-free and coalescing preserves exact changed revisions
+ok 100 - impact proposals remain authority-free and coalescing preserves exact changed revisions
+  ---
+  duration_ms: 81.369826
+  type: 'test'
+  ...
+# Subtest: rebuild receipt partitions exact proposal revisions and final package verification cannot be skipped
+ok 101 - rebuild receipt partitions exact proposal revisions and final package verification cannot be skipped
+  ---
+  duration_ms: 107.227631
+  type: 'test'
+  ...
+# (node:3735112) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: durable history stores exact entity revisions and computes bounded diffs
+ok 102 - durable history stores exact entity revisions and computes bounded diffs
+  ---
+  duration_ms: 87.797806
+  type: 'test'
+  ...
+# Subtest: portable snapshot v2 preserves exact revision history and keeps old receipts inactive
+ok 103 - portable snapshot v2 preserves exact revision history and keeps old receipts inactive
+  ---
+  duration_ms: 133.668555
+  type: 'test'
+  ...
+# Subtest: snapshot v1 restore keeps only known current revisions and never fabricates history
+ok 104 - snapshot v1 restore keeps only known current revisions and never fabricates history
+  ---
+  duration_ms: 134.008788
+  type: 'test'
+  ...
+# Subtest: legacy migration backfills only the current revision and blocks mutation until explicit migration
+ok 105 - legacy migration backfills only the current revision and blocks mutation until explicit migration
+  ---
+  duration_ms: 125.023332
+  type: 'test'
+  ...
+# Subtest: core Native profile exposes the same history records as the full application
+ok 106 - core Native profile exposes the same history records as the full application
+  ---
+  duration_ms: 76.27764
+  type: 'test'
+  ...
+# (node:3735121) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: external public client creates and reads using only documented HTTP surface
+ok 107 - external public client creates and reads using only documented HTTP surface
+  ---
+  duration_ms: 129.87539
+  type: 'test'
+  ...
+# Subtest: unauthenticated API access is denied but login assets are available
+ok 108 - unauthenticated API access is denied but login assets are available
+  ---
+  duration_ms: 51.790096
+  type: 'test'
+  ...
+# Subtest: DNS rebinding Host and cross-origin POST are denied
+ok 109 - DNS rebinding Host and cross-origin POST are denied
+  ---
+  duration_ms: 60.797138
+  type: 'test'
+  ...
+# Subtest: query tokens, traversal and unexpected routes are not accepted
+ok 110 - query tokens, traversal and unexpected routes are not accepted
+  ---
+  duration_ms: 55.594958
+  type: 'test'
+  ...
+# Subtest: local session creates HttpOnly SameSite cookie and cookie login works
+ok 111 - local session creates HttpOnly SameSite cookie and cookie login works
+  ---
+  duration_ms: 62.716749
+  type: 'test'
+  ...
+# Subtest: wrong local token does not set a cookie
+ok 112 - wrong local token does not set a cookie
+  ---
+  duration_ms: 55.818568
+  type: 'test'
+  ...
+# Subtest: prepared HTTP intent can recover after caller loses original reply
+ok 113 - prepared HTTP intent can recover after caller loses original reply
+  ---
+  duration_ms: 66.447237
+  type: 'test'
+  ...
+# Subtest: bounded bodies and malformed JSON are rejected without effects
+ok 114 - bounded bodies and malformed JSON are rejected without effects
+  ---
+  duration_ms: 55.787352
+  type: 'test'
+  ...
+# Subtest: read route cannot be used as a mutation bypass
+ok 115 - read route cannot be used as a mutation bypass
+  ---
+  duration_ms: 51.168289
+  type: 'test'
+  ...
+# Subtest: artifact downloads recheck bytes, set attachment and keep strict CSP
+ok 116 - artifact downloads recheck bytes, set attachment and keep strict CSP
+  ---
+  duration_ms: 100.501607
+  type: 'test'
+  ...
+# Subtest: stored pending custody completes before the only outgoing invoke
+ok 117 - stored pending custody completes before the only outgoing invoke
+  ---
+  duration_ms: 63.58102
+  type: 'test'
+  ...
+# Subtest: failed pending persistence aborts before network mutation
+ok 118 - failed pending persistence aborts before network mutation
+  ---
+  duration_ms: 53.960063
+  type: 'test'
+  ...
+# Subtest: private channel bundle download is authenticated, deterministic and cache-addressed
+ok 119 - private channel bundle download is authenticated, deterministic and cache-addressed
+  ---
+  duration_ms: 92.604808
+  type: 'test'
+  ...
+# (node:3735130) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: RS-MED-01 and RS-MED-09 use canonical Composition/media-time contracts without a local clock kernel
+ok 120 - RS-MED-01 and RS-MED-09 use canonical Composition/media-time contracts without a local clock kernel
+  ---
+  duration_ms: 137.539693
+  type: 'test'
+  ...
+# Subtest: RS-MED-02 and RS-MED-03 revisions preserve sources and identify reusable variants
+ok 121 - RS-MED-02 and RS-MED-03 revisions preserve sources and identify reusable variants
+  ---
+  duration_ms: 127.150547
+  type: 'test'
+  ...
+# Subtest: RS-MED-04 and RS-MED-06 reject fake footage and unsafe interactive sources
+ok 122 - RS-MED-04 and RS-MED-06 reject fake footage and unsafe interactive sources
+  ---
+  duration_ms: 110.993628
+  type: 'test'
+  ...
+# Subtest: RS-MED-05 claim changes invalidate narration/captions through versioned pins
+ok 123 - RS-MED-05 claim changes invalidate narration/captions through versioned pins
+  ---
+  duration_ms: 108.222313
+  type: 'test'
+  ...
+# Subtest: RS-MED-07 alternate backends must declare fidelity losses instead of silent equivalence
+ok 124 - RS-MED-07 alternate backends must declare fidelity losses instead of silent equivalence
+  ---
+  duration_ms: 122.533297
+  type: 'test'
+  ...
+# Subtest: RS-MED-08 technically admitted media remains editorially pending
+ok 125 - RS-MED-08 technically admitted media remains editorially pending
+  ---
+  duration_ms: 117.459468
+  type: 'test'
+  ...
+# Subtest: RS-MED-10 video, screenshot series and interactive demo require independent canonical receipts
+ok 126 - RS-MED-10 video, screenshot series and interactive demo require independent canonical receipts
+  ---
+  duration_ms: 130.113627
+  type: 'test'
+  ...
+# (node:3735142) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: split native profiles preserve canonical mutation transactions across one workspace
+ok 127 - split native profiles preserve canonical mutation transactions across one workspace
+  ---
+  duration_ms: 184.112213
+  type: 'test'
+  ...
+# (node:3735152) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: vendored public Native SDK source files match the canonical archive lock
+ok 128 - vendored public Native SDK source files match the canonical archive lock
+  ---
+  duration_ms: 1.466876
+  type: 'test'
+  ...
+# Subtest: native driver command aliases adapt actual SDK args to the same application transaction
+ok 129 - native driver command aliases adapt actual SDK args to the same application transaction
+  ---
+  duration_ms: 49.25085
+  type: 'test'
+  ...
+# Subtest: actual canonical bridge emits one valid reply frame in a separate Node process
+ok 130 - actual canonical bridge emits one valid reply frame in a separate Node process
+  ---
+  duration_ms: 119.72632
+  type: 'test'
+  ...
+# Subtest: bridge rejects bad schema before opening an uninitialized data root
+ok 131 - bridge rejects bad schema before opening an uninitialized data root
+  ---
+  duration_ms: 62.575781
+  type: 'test'
+  ...
+# Subtest: canonical exact digest is key-order invariant and rejects non-integer floats
+ok 132 - canonical exact digest is key-order invariant and rejects non-integer floats
+  ---
+  duration_ms: 2.356359
+  type: 'test'
+  ...
+# Subtest: canonical SDK JSON budgets reject oversized, cyclic and accessor input
+ok 133 - canonical SDK JSON budgets reject oversized, cyclic and accessor input
+  ---
+  duration_ms: 9.542199
+  type: 'test'
+  ...
+# Subtest: native profiles cover every public application operation exactly once
+ok 134 - native profiles cover every public application operation exactly once
+  ---
+  duration_ms: 2.663561
+  type: 'test'
+  ...
+# (node:3735173) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: RS-OPS-07 doctor diagnoses an initialized workspace without mutating domain state
+ok 135 - RS-OPS-07 doctor diagnoses an initialized workspace without mutating domain state
+  ---
+  duration_ms: 78.708271
+  type: 'test'
+  ...
+# Subtest: RS-OPS-07 doctor does not initialize or repair an empty state path
+ok 136 - RS-OPS-07 doctor does not initialize or repair an empty state path
+  ---
+  duration_ms: 1.278741
+  type: 'test'
+  ...
+# Subtest: RS-OPS-07 doctor reports unsafe local permissions but does not repair them
+ok 137 - RS-OPS-07 doctor reports unsafe local permissions but does not repair them
+  ---
+  duration_ms: 78.561828
+  type: 'test'
+  ...
+# Subtest: doctor reports unsupported local engines as diagnostic rather than acceptance
+ok 138 - doctor reports unsupported local engines as diagnostic rather than acceptance
+  ---
+  duration_ms: 1.209186
+  type: 'test'
+  ...
+# (node:3735180) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: adapter contract simulation saves exported record before one send
+ok 139 - adapter contract simulation saves exported record before one send
+  ---
+  duration_ms: 89.840143
+  type: 'test'
+  ...
+# Subtest: adapter contract simulation preserves unknown and recovery never resends
+ok 140 - adapter contract simulation preserves unknown and recovery never resends
+  ---
+  duration_ms: 97.401601
+  type: 'test'
+  ...
+# Subtest: recipe execution requires configured Platform budget enforcement
+ok 141 - recipe execution requires configured Platform budget enforcement
+  ---
+  duration_ms: 73.432393
+  type: 'test'
+  ...
+# Subtest: missing owner SDK configuration fails closed
+ok 142 - missing owner SDK configuration fails closed
+  ---
+  duration_ms: 72.302818
+  type: 'test'
+  ...
+# (node:3735189) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: RS-PUB-01/04 ReleaseTemplate drafts remain editable while ProductVersion and deployment stay pinned
+ok 143 - RS-PUB-01/04 ReleaseTemplate drafts remain editable while ProductVersion and deployment stay pinned
+  ---
+  duration_ms: 116.564439
+  type: 'test'
+  ...
+# Subtest: RS-PUB-02 rejects URL/path semantics, out-of-scope values and direct publish.invoke work preparation
+ok 144 - RS-PUB-02 rejects URL/path semantics, out-of-scope values and direct publish.invoke work preparation
+  ---
+  duration_ms: 103.502007
+  type: 'test'
+  ...
+# Subtest: RS-PUB-03/05 consumer scope can use the product without owner workspace read and consumers cannot inspect each other invocations
+ok 145 - RS-PUB-03/05 consumer scope can use the product without owner workspace read and consumers cannot inspect each other invocations
+  ---
+  duration_ms: 102.828941
+  type: 'test'
+  ...
+# Subtest: RS-PUB-07 same consumer attempt key deduplicates invocation and work while conflicting input fails
+ok 146 - RS-PUB-07 same consumer attempt key deduplicates invocation and work while conflicting input fails
+  ---
+  duration_ms: 106.30084
+  type: 'test'
+  ...
+# Subtest: RS-PUB-06 retirement blocks new invocations but preserves prior result custody and inspection
+ok 147 - RS-PUB-06 retirement blocks new invocations but preserves prior result custody and inspection
+  ---
+  duration_ms: 109.728116
+  type: 'test'
+  ...
+# Subtest: RS-PUB-08 export excludes authority and import requires explicit local rebind/recheck
+ok 148 - RS-PUB-08 export excludes authority and import requires explicit local rebind/recheck
+  ---
+  duration_ms: 154.016387
+  type: 'test'
+  ...
+# Subtest: RS-PUB-01/07 canonical Platform adapter accepts only an exact bound publication intent and sends it once
+ok 149 - RS-PUB-01/07 canonical Platform adapter accepts only an exact bound publication intent and sends it once
+  ---
+  duration_ms: 118.704891
+  type: 'test'
+  ...
+# Subtest: RS-PUB-04 bound outbound work becomes stale if its deployment lifecycle changes before send
+ok 150 - RS-PUB-04 bound outbound work becomes stale if its deployment lifecycle changes before send
+  ---
+  duration_ms: 100.097225
+  type: 'test'
+  ...
+# (node:3735198) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: R7 separate process consumes a private ProductVersion over public HTTP without owner workspace authority
+ok 151 - R7 separate process consumes a private ProductVersion over public HTTP without owner workspace authority
+  ---
+  duration_ms: 353.316677
+  type: 'test'
+  ...
+# Subtest: consumer bearer configuration loads only bounded private files and rejects ambiguous authority
+ok 152 - consumer bearer configuration loads only bounded private files and rejects ambiguous authority
+  ---
+  duration_ms: 44.236165
+  type: 'test'
+  ...
+# (node:3735212) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: external source requires approved purpose before it can be registered
+ok 153 - external source requires approved purpose before it can be registered
+  ---
+  duration_ms: 64.296323
+  type: 'test'
+  ...
+# Subtest: build snapshot identity is distinct from release label and survives release edits
+ok 154 - build snapshot identity is distinct from release label and survives release edits
+  ---
+  duration_ms: 93.841581
+  type: 'test'
+  ...
+# Subtest: declared unavailability deterministically blocks an availability claim without manufacturing PASS
+ok 155 - declared unavailability deterministically blocks an availability claim without manufacturing PASS
+  ---
+  duration_ms: 87.284577
+  type: 'test'
+  ...
+# Subtest: Claim changes invalidate artifacts linked through CopyBlocks even if pixels were not compared
+ok 156 - Claim changes invalidate artifacts linked through CopyBlocks even if pixels were not compared
+  ---
+  duration_ms: 112.88621
+  type: 'test'
+  ...
+# Subtest: ReleaseContract exposes a real readiness denominator without treating UNKNOWN claims as verified
+ok 157 - ReleaseContract exposes a real readiness denominator without treating UNKNOWN claims as verified
+  ---
+  duration_ms: 78.046487
+  type: 'test'
+  ...
+# Subtest: anchor assessment rejects ambiguous cardinality instead of selecting an arbitrary match
+ok 158 - anchor assessment rejects ambiguous cardinality instead of selecting an arbitrary match
+  ---
+  duration_ms: 72.113675
+  type: 'test'
+  ...
+# Subtest: impact plan is an immutable proposal and creates no jobs or execution authority
+ok 159 - impact plan is an immutable proposal and creates no jobs or execution authority
+  ---
+  duration_ms: 75.066498
+  type: 'test'
+  ...
+# Subtest: retiring a resource preserves identity as a redacted tombstone and invalidates pinned outputs
+ok 160 - retiring a resource preserves identity as a redacted tombstone and invalidates pinned outputs
+  ---
+  duration_ms: 83.844168
+  type: 'test'
+  ...
+# Subtest: parent retirement is blocked while active children still reference it
+ok 161 - parent retirement is blocked while active children still reference it
+  ---
+  duration_ms: 66.881515
+  type: 'test'
+  ...
+# Subtest: explicit relations preserve provenance and heuristic edges cannot become observed or complete by serialization
+ok 162 - explicit relations preserve provenance and heuristic edges cannot become observed or complete by serialization
+  ---
+  duration_ms: 73.049181
+  type: 'test'
+  ...
+# (node:3735221) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: RS-OPS-01 duplicate Platform usage receipt creates one logical usage entry
+ok 163 - RS-OPS-01 duplicate Platform usage receipt creates one logical usage entry
+  ---
+  duration_ms: 99.098384
+  type: 'test'
+  ...
+# Subtest: RS-OPS-02 reserve, finalize and correction preserve an auditable accounting chain
+ok 164 - RS-OPS-02 reserve, finalize and correction preserve an auditable accounting chain
+  ---
+  duration_ms: 116.35993
+  type: 'test'
+  ...
+# Subtest: RS-OPS-03 estimated, measured and BYO cost classes stay distinct
+ok 165 - RS-OPS-03 estimated, measured and BYO cost classes stay distinct
+  ---
+  duration_ms: 92.956113
+  type: 'test'
+  ...
+# Subtest: RS-OPS-04 external limit overruns remain observable instead of being rewritten as compliant
+ok 166 - RS-OPS-04 external limit overruns remain observable instead of being rewritten as compliant
+  ---
+  duration_ms: 84.334751
+  type: 'test'
+  ...
+# Subtest: RS-OPS-05 usage correlation binds Platform job, native receipt and artifact without promoting evidence
+ok 167 - RS-OPS-05 usage correlation binds Platform job, native receipt and artifact without promoting evidence
+  ---
+  duration_ms: 126.87281
+  type: 'test'
+  ...
+# Subtest: RS-OPS-09 failed test billing callback never replays work or mutates evidence
+ok 168 - RS-OPS-09 failed test billing callback never replays work or mutates evidence
+  ---
+  duration_ms: 97.513697
+  type: 'test'
+  ...
+1..168
+# tests 168
+# suites 0
+# pass 168
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 15985.932119
