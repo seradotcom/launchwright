@@ -7,10 +7,10 @@ This ledger separates implemented behavior from execution evidence. A PASS belon
 Supplemental workstation pass for this branch:
 
 - Node: 22.22.0 — **outside** the Native SDK supported engine.
-- `npm test`: **137 passed, 0 failed, 0 skipped**. Exact TAP output is retained in `evidence/workstation-extension-runtime-pass.tap`.
-- `node scripts/verify.mjs`: source-lock integrity and syntax PASS; **73 JavaScript modules and 71 Native driver operations** checked. Output is retained in `evidence/workstation-extension-runtime-verify.json`.
+- `npm test`: **139 passed, 0 failed, 0 skipped**. Exact TAP output is retained in `evidence/workstation-publish-consumer-pass.tap`.
+- `node scripts/verify.mjs`: source-lock integrity and syntax PASS; **75 JavaScript modules and 71 Native driver operations** checked. Output is retained in `evidence/workstation-publish-consumer-verify.json`.
 - Native profile build: **71/71 public operations assigned exactly once** across eight compacted canonical bridge bundles. Exact local sizes are core **45,595**, production **45,734**, review **49,129**, integrations **31,825**, extensions **42,300**, work **31,857**, media **39,788**, publish **48,288** bytes. The review profile has 23 bytes of local headroom; the 49,152-byte NodeBridge limit was not raised or bypassed.
-- Multi-profile canonical bridge smoke: **PASS** for `core`, `production`, `review`, `integrations`, `extensions`, `work`, `media` and `publish`; exact bundle SHA-256 values were rechecked before execution and all eight invocation frames stayed within the canonical combined-input budget. Output is retained in `evidence/workstation-extension-runtime-bundle-smoke.json`. This is not Driver Host isolation acceptance.
+- Multi-profile canonical bridge smoke: **PASS** for `core`, `production`, `review`, `integrations`, `extensions`, `work`, `media` and `publish`; exact bundle SHA-256 values were rechecked before execution and all eight invocation frames stayed within the canonical combined-input budget. Output is retained in `evidence/workstation-publish-consumer-bundle-smoke.json`. This is not Driver Host isolation acceptance.
 - Clean CLI drill: init → synthetic demo → portable snapshot → restore to a new state directory → doctor PASS.
 - Restore drill confirmed a new workspace generation, advanced request epoch and no activation of historical mutation receipts.
 - Independent `unzip -t` validation of a generated private bundle: **PASS**; exact channel manifest, candidate manifest, artifact bytes and review notice were all readable.
@@ -18,8 +18,10 @@ Supplemental workstation pass for this branch:
 - Executable DeltaCLI reference source: real process execution and bounded receipt ingestion PASS, including build-drift rejection, secret-bearing flag rejection, exact adapter pinning and retirement detection; technical state intentionally remains UNKNOWN without Driver Host admission.
 - Executable DeltaRender extension fixture: bounded owner-controlled renderer output is recorded through an exact preparation/result contract; output-type substitution and package-budget overflow are rejected, and retirement preserves history while blocking new starts.
 - Mobile-import fixture: bounded Android/iOS bundle normalization is import-only, records content hashes/provenance, and explicitly reports `device_execution_observed=false` and `IMPORTED_UNVERIFIED` instead of fabricating native capture.
+- R7 local consumer rehearsal: a separate Node process that imports only the public client invokes a pinned ProductVersion through loopback HTTP under a `consume`-only identity; owner workspace reads, owner-session login and cross-consumer invocation inspection are rejected. Template edits leave the frozen ProductVersion digest unchanged, deprecation is observable, retirement blocks new invocations, and earlier invocation history remains readable by its own consumer.
+- Prepared HTTP v2 envelopes are bound to the authenticated principal before mutation. Another consumer cannot submit that envelope, and durable recovery returns a stored result only to the principal that originally committed it.
 
-These checks are useful regression evidence only. They are not supported-engine, Driver Host, browser-product-capture or external-channel acceptance. The local `RS-PUB-01..08` regressions establish application-side contract behavior only; the source acceptance scenario still requires a real Platform Publish ProductVersion/deployment and a distinct consumer identity/job/output ACL path.
+These checks are useful regression evidence only. They are not supported-engine, Driver Host, browser-product-capture or external-channel acceptance. The local `RS-PUB-01..08` regressions plus the separate-process rehearsal establish application-side contract and identity isolation only; the source acceptance scenario still requires a real Platform Publish ProductVersion/deployment, canonical cross-tenant identity/entitlements, metered job execution and output ACL enforcement.
 
 ## Supported-engine GitHub acceptance
 

@@ -18,6 +18,8 @@ node src/main.mjs serve --state .state --port 4317
 
 Open `http://127.0.0.1:4317` and unlock it with the local `.state/session-token`. The service is loopback-only, rejects query-string credentials and unexpected Host/Origin values, and uses an HttpOnly SameSite session cookie.
 
+For a bounded local consumer rehearsal, `serve --consumer-auth FILE` (or `LAUNCHWRIGHT_CONSUMER_AUTH`) accepts a private `0600` JSON file with schema `launchwright-consumer-auth/1` and principals restricted to the `consume` scope. Consumer bearer credentials cannot create the owner session cookie, read owner workspace resources without `read`, reuse another principal's prepared mutation, or recover another principal's receipt. This is a loopback acceptance surface only; it is not Semwright Platform tenant authentication or a substitute for Platform Publish.
+
 For explicitly synthetic sample data:
 
 ```sh

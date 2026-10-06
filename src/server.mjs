@@ -6,6 +6,7 @@ import { dirname, join } from 'node:path';
 import { randomBytes, timingSafeEqual, randomUUID } from 'node:crypto';
 import { NativeError, dispatchApplication, applicationContext, requireCondition as ensure, object, validateValue } from '@semwright/native-sdk';
 import { OPERATION_SCOPES, READ_OPERATIONS, makeRequest, str, idText } from './contracts.mjs';
+import { LaunchwrightApplication } from './application.mjs';
 import { buildPrivateChannelBundle } from './channel-bundle.mjs';
 const CODE=dirname(dirname(fileURLToPath(import.meta.url)));
 const statusFor={InvalidArgument:400,PermissionDenied:403,PolicyDenied:403,ConsentRequired:403,NotFound:404,StaleReference:409,Conflict:409,ResourceExhausted:413,Unavailable:503,Unsupported:501};
@@ -19,11 +20,37 @@ async function body(req){
   let data;try{data=JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{throw new NativeError('InvalidArgument','Invalid JSON');}validateValue(data);return data;
 }
 export function localToken(root){const path=join(root,'session-token');if(existsSync(path)){ensure(!lstatSync(path).isSymbolicLink(),'Token file cannot be a symlink');return str(readFileSync(path,'utf8').trim(),128);}const token=randomBytes(32).toString('base64url');writeFileSync(path,token+'\n',{mode:0o600,flag:'wx'});return token;}
-export function createAppServer(app,{token=localToken(app.store.root),port=4317}={}){
+export function loadConsumerAuth(path){
+  const stat=lstatSync(path);ensure(stat.isFile()&&!stat.isSymbolicLink(),'Consumer auth must be a regular file','InvalidArgument');ensure(stat.size<=65536,'Consumer auth file exceeds budget','ResourceExhausted');
+  if(process.platform!=='win32')ensure((stat.mode&0o077)===0,'Consumer auth file must not be group/world accessible','PermissionDenied');
+  let data;try{data=JSON.parse(readFileSync(path,'utf8'));}catch{throw new NativeError('InvalidArgument','Consumer auth file is not valid JSON');}
+  validateValue(data);object(data,['schema_version','principals'],['schema_version','principals']);ensure(data.schema_version==='launchwright-consumer-auth/1','Unsupported consumer auth schema','ProtocolMismatch');
+  ensure(Array.isArray(data.principals),'Consumer auth principals must be a list');return data.principals;
+}
+export function createAppServer(app,{token=localToken(app.store.root),port=4317,bearerPrincipals=[]}={}){
+  ensure(Array.isArray(bearerPrincipals)&&bearerPrincipals.length<=64,'bearerPrincipals must be a bounded array');
+  const knownScopes=new Set(['consume']);
+  const actors=bearerPrincipals.map((record,index)=>{
+    object(record,['token','principal','scopes'],['token','principal','scopes']);
+    const actorToken=str(record.token,128),principal=str(record.principal,128);
+    ensure(actorToken.length>=16,'Bearer principal token is too short');
+    ensure(!equal(actorToken,token),'Bearer principal token must differ from the owner token','Conflict');
+    ensure(Array.isArray(record.scopes)&&record.scopes.length>0&&record.scopes.length<=knownScopes.size,'Bearer principal scopes are invalid');
+    const scopes=record.scopes.map(scope=>{str(scope,32);ensure(knownScopes.has(scope),'Unknown bearer principal scope');return scope;});
+    ensure(new Set(scopes).size===scopes.length,'Duplicate bearer principal scope');
+    return{token:actorToken,principal,scopes,index};
+  });
+  ensure(new Set(actors.map(actor=>actor.token)).size===actors.length,'Duplicate bearer principal token','Conflict');
+  ensure(new Set(actors.map(actor=>actor.principal)).size===actors.length,'Duplicate bearer principal identity','Conflict');
   const allowedHosts=new Set([`127.0.0.1:${port}`,`localhost:${port}`]);
   const staticFiles=new Map([['/',['web/index.html','text/html; charset=utf-8']],['/app.mjs',['web/app.mjs','text/javascript; charset=utf-8']],['/style.css',['web/style.css','text/css; charset=utf-8']],['/client.mjs',['client/index.mjs','text/javascript; charset=utf-8']],['/LICENSE',['LICENSE','text/plain; charset=utf-8']]]);
+  const resolveActor=bearer=>{
+    if(equal(bearer,token))return null;
+    return actors.find(actor=>equal(bearer,actor.token))??undefined;
+  };
   let actualPort=port;
   const server=createServer(async(req,res)=>{
+    let requestApp=app,requestOwnsApp=false;
     res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');res.setHeader('X-Frame-Options','DENY');res.setHeader('Cross-Origin-Resource-Policy','same-origin');
     res.setHeader('Content-Security-Policy',"default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; font-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
     try{
@@ -39,32 +66,38 @@ export function createAppServer(app,{token=localToken(app.store.root),port=4317}
       }
       const bearer=req.headers.authorization?.startsWith('Bearer ')?req.headers.authorization.slice(7):null;
       const cookies=(req.headers.cookie??'').split(';').map(x=>x.trim());const cookie=cookies.find(x=>x.startsWith('launchwright='))?.slice(13);
-      ensure(equal(bearer,token)||equal(cookie,token),'Unlock this local workspace with its session token','PermissionDenied');
-      const call=(operation,input)=>dispatchApplication(app,'invoke',operation,input,applicationContext(randomUUID(),null));
+      const ownerAuthenticated=equal(bearer,token)||equal(cookie,token),actor=ownerAuthenticated?null:resolveActor(bearer);
+      ensure(ownerAuthenticated||actor!==undefined,'Unlock this local workspace with an authorized credential','PermissionDenied');
+      if(actor){requestApp=new LaunchwrightApplication(app.store.root,{principal:actor.principal,scopes:actor.scopes});requestOwnsApp=true;}
+      const call=(operation,input)=>dispatchApplication(requestApp,'invoke',operation,input,applicationContext(randomUUID(),null));
       if(path==='/api/v1/describe'&&req.method==='GET'){json(res,200,await call('workspace.describe',{}));return;}
       if(req.method==='GET'&&/^\/api\/v1\/artifacts\/[a-z0-9_-]+\/download$/.test(path)){
-        app.allow('read');const id=path.split('/')[4];idText(id);const artifact=app.get(id,'artifact');const bytes=app.store.readBlob(artifact.data.sha256);
+        requestApp.allow('read');const id=path.split('/')[4];idText(id);const artifact=requestApp.get(id,'artifact');const bytes=requestApp.store.readBlob(artifact.data.sha256);
         res.writeHead(200,{'Content-Type':bytes.mime,'Content-Disposition':`attachment; filename="${artifact.id}.${artifact.data.extension}"`,'Content-Length':bytes.bytes.length,'Cache-Control':'no-store','ETag':`"${artifact.data.sha256}"`});res.end(bytes.bytes);return;
       }
       if(req.method==='GET'&&/^\/api\/v1\/channel-deliveries\/[a-z0-9_-]+\/bundle\.zip$/.test(path)){
-        app.allow('read');const id=path.split('/')[4];idText(id);const bundle=buildPrivateChannelBundle(app,id);
+        requestApp.allow('read');const id=path.split('/')[4];idText(id);const bundle=buildPrivateChannelBundle(requestApp,id);
         res.writeHead(200,{'Content-Type':bundle.mime,'Content-Disposition':`attachment; filename="${bundle.filename}"`,'Content-Length':bundle.bytes.length,'Cache-Control':'no-store','ETag':`"${bundle.sha256}"`});res.end(bundle.bytes);return;
       }
       ensure(req.method==='POST','Route not found','NotFound');const data=await body(req);
       if(path==='/api/v1/read'){object(data,['operation','input'],['operation','input']);ensure(READ_OPERATIONS.has(data.operation),'This route accepts only read operations');json(res,200,await call(data.operation,data.input));}
-      else if(path==='/api/v1/observe')json(res,200,await dispatchApplication(app,'observe',null,data,applicationContext(randomUUID())));
-      else if(path==='/api/v1/recover')json(res,200,await dispatchApplication(app,'lookup',null,data,applicationContext(randomUUID())));
+      else if(path==='/api/v1/observe')json(res,200,await dispatchApplication(requestApp,'observe',null,data,applicationContext(randomUUID())));
+      else if(path==='/api/v1/recover')json(res,200,await dispatchApplication(requestApp,'lookup',null,data,applicationContext(randomUUID())));
       else if(path==='/api/v1/prepare'){
-        object(data,['operation','input','expected','key'],['operation','input','key']);str(data.key,128);const scope=OPERATION_SCOPES[data.operation];ensure(scope&&!READ_OPERATIONS.has(data.operation),'Unknown mutation');app.allow(scope);
-        const expected=data.expected??app.store.version(),args=makeRequest(data.operation,data.input,expected,app.store.meta().epoch,data.key);
+        object(data,['operation','input','expected','key'],['operation','input','key']);str(data.key,128);const scope=OPERATION_SCOPES[data.operation];ensure(scope&&!READ_OPERATIONS.has(data.operation),'Unknown mutation');requestApp.allow(scope);
+        const expected=data.expected??requestApp.store.version(),args=makeRequest(data.operation,data.input,expected,requestApp.store.meta().epoch,data.key);
         // Preparation has no durable effects and is NOT authorization to bypass the dispatcher's checks.
-        json(res,200,{schema_version:'launchwright-prepared/1',operation:data.operation,expected,args});
+        json(res,200,{schema_version:'launchwright-prepared/2',principal:requestApp.principal,operation:data.operation,expected,args});
       }else if(path==='/api/v1/invoke'){
-        object(data,['schema_version','operation','expected','args'],['schema_version','operation','expected','args']);ensure(data.schema_version==='launchwright-prepared/1','Prepared request schema mismatch');
-        json(res,200,await dispatchApplication(app,'invoke',data.operation,data.args,applicationContext(data.args?.request?.key??'invalid',data.expected)));
+        object(data,['schema_version','principal','operation','expected','args'],['schema_version','operation','expected','args']);
+        ensure(['launchwright-prepared/1','launchwright-prepared/2'].includes(data.schema_version),'Prepared request schema mismatch');
+        if(data.schema_version==='launchwright-prepared/2')ensure(data.principal===requestApp.principal,'Prepared request belongs to another authenticated principal','PermissionDenied');
+        else ensure(ownerAuthenticated,'Legacy prepared requests are accepted only for the local owner','PermissionDenied');
+        json(res,200,await dispatchApplication(requestApp,'invoke',data.operation,data.args,applicationContext(data.args?.request?.key??'invalid',data.expected)));
       }else if(path==='/api/v1/logout'){res.setHeader('Set-Cookie','launchwright=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0');json(res,200,{authenticated:false});}
       else throw new NativeError('NotFound','Route not found');
     }catch(err){const failure=err instanceof NativeError?err:new NativeError('BackendFailed','Request could not complete',req.method==='GET');if(!res.headersSent)json(res,statusFor[failure.code]??500,{error:failure.record()});else res.end();}
+    finally{if(requestOwnsApp){try{requestApp.close();}catch{}}}
   });
   server.requestTimeout=15000;server.headersTimeout=10000;server.maxHeadersCount=64;
   return{server,token,async listen(){await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(port,'127.0.0.1',resolve);});actualPort=server.address().port;allowedHosts.add(`127.0.0.1:${actualPort}`);allowedHosts.add(`localhost:${actualPort}`);return`http://127.0.0.1:${actualPort}`;},async close(){server.closeAllConnections();await new Promise(r=>server.close(r));},get port(){return actualPort;}};
