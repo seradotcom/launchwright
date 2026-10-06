@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "source_sha": null,
+  "schema_version": "launchwright-native-bundles/2",
+  "profiles": {
+    "core": {
+      "sha256": "73c3d2a0415256a6b6b5d7d84363555c261c3a3cb81b5e2f782f9e8c36b881a4",
+      "bytes": 45595,
+      "operation": "driver.launchwright.workspace-describe"
+    },
+    "production": {
+      "sha256": "8c684b962128423b64d23f6464b4797feeac160df6572d798ff9cf4c9f726df2",
+      "bytes": 45734,
+      "operation": "driver.launchwright.release-coverage"
+    },
+    "review": {
+      "sha256": "5a010d589cf9043da988c91af37ba97eb7f9a9dcdc4dc727cd14c0ee457a20b8",
+      "bytes": 49129,
+      "operation": "driver.launchwright.verification-summary"
+    },
+    "integrations": {
+      "sha256": "447cb981964bca19a9db2f065b1bd5da27005b57fc4a6458c642810f0af2eea5",
+      "bytes": 31825,
+      "operation": "driver.launchwright.channel-status"
+    },
+    "extensions": {
+      "sha256": "8f98f2832fe2890399fd525162acff32ab963bd2c2217ef896712767207a51da",
+      "bytes": 42300,
+      "operation": "driver.launchwright.compatibility-negotiate"
+    },
+    "work": {
+      "sha256": "a0f98937b6c2e9ca8ef55e404b2c4bab39388cc9b0ce4c92b32eccb5c7ea8920",
+      "bytes": 31857,
+      "operation": "driver.launchwright.workspace-snapshot"
+    },
+    "media": {
+      "sha256": "292514735921ba7875cc4fee6c5b2f64c8ca9b4ca342a856d8afa28c785542ef",
+      "bytes": 39788,
+      "operation": "driver.launchwright.media-inspect"
+    },
+    "publish": {
+      "sha256": "278d633679e8e23c94d895c093934964852120be4cb26b38a6a09e2dcad1b2a6",
+      "bytes": 48288,
+      "operation": "driver.launchwright.publish-inspect"
+    }
+  },
+  "canonical_bridge_reply": "semwright-native-app-bridge/1",
+  "driver_host_isolation_accepted": false
+}

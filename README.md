@@ -45,6 +45,7 @@ Synthetic data is never described as a real product capture.
 - bounded Publish product contracts: editable ReleaseTemplate drafts, immutable ProductVersion pins, deployment lifecycle, isolated consumer invocations, idempotent attempt keys and authority-free export/import with explicit local rebind/recheck; external activation still belongs to Platform Publish;
 - private-draft alias delivery with compare-and-swap;
 - portable snapshot/restore v2 that preserves exact stored revision history, rotates workspace generation/request epoch, suspends uncertain intents, and accepts older snapshots without fabricating historical revisions;
+- bounded extension runtime receipts for owner-controlled renderer/importer fixtures, with exact preparation pins, rights checks, output budgets, retirement-aware freshness and explicit UNKNOWN technical state until canonical Host admission.
 - public HTTP client, browser UI, CLI and Native Application bridge sharing the same dispatcher and SQLite transaction model.
 
 ## Semwright Native SDK
@@ -55,7 +56,7 @@ The public `@semwright/native-sdk` source is vendored unchanged under its upstre
 - Native SDK `0.9.0-dev.1`
 - exact SHA-256 hashes for the redistributed SDK files/archive
 
-The canonical `NodeBridge` allows at most 48 KiB per owner-pinned executable bundle. Launchwright therefore maps all 64 public operations exactly once across seven bounded profiles (`core`, `production`, `review`, `integrations`, `work`, `media`, `publish`) instead of weakening that upstream limit. `scripts/build-native-bundle.mjs` hashes each exact bundle and rejects missing/duplicate operations or oversized output. `crates/launchwright-native` pins those seven hashes at build time. The caller cannot choose arbitrary executable code, mounts or runtime paths.
+The canonical `NodeBridge` allows at most 48 KiB per owner-pinned executable bundle. Launchwright therefore maps all 71 public operations exactly once across eight bounded profiles (`core`, `production`, `review`, `integrations`, `extensions`, `work`, `media`, `publish`) instead of weakening that upstream limit. `scripts/build-native-bundle.mjs` hashes each exact bundle and rejects missing/duplicate operations or oversized output. `crates/launchwright-native` pins those eight hashes at build time. The caller cannot choose arbitrary executable code, mounts or runtime paths.
 
 The optional Platform adapter consumes an owner-supplied byte-pinned package. The inspected Platform source is not licensed for redistribution, so it is not copied into this public repository.
 

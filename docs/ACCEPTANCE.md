@@ -7,15 +7,17 @@ This ledger separates implemented behavior from execution evidence. A PASS belon
 Supplemental workstation pass for this branch:
 
 - Node: 22.22.0 — **outside** the Native SDK supported engine.
-- `npm test`: **133 passed, 0 failed, 0 skipped**. Exact TAP output is retained in `evidence/workstation-extensibility-pass.tap`.
-- `node scripts/verify.mjs`: source-lock integrity and syntax PASS; **68 JavaScript modules and 69 Native driver operations** checked. Output is retained in `evidence/workstation-extensibility-verify.json`.
-- Native profile build: **69/69 public operations assigned exactly once** across seven compacted canonical bridge bundles. Exact local sizes are core **45,506**, production **45,664**, review **49,114**, integrations **46,200**, work **31,787**, media **39,718**, publish **48,218** bytes. The review profile has 38 bytes of local headroom; the 49,152-byte NodeBridge limit was not raised or bypassed.
-- Multi-profile canonical bridge smoke: **PASS** for `core`, `production`, `review`, `integrations`, `work`, `media` and `publish`; exact bundle SHA-256 values were rechecked before execution and all seven invocation frames stayed within the canonical combined-input budget. Output is retained in `evidence/workstation-extensibility-bundle-smoke.json`. This is not Driver Host isolation acceptance.
+- `npm test`: **137 passed, 0 failed, 0 skipped**. Exact TAP output is retained in `evidence/workstation-extension-runtime-pass.tap`.
+- `node scripts/verify.mjs`: source-lock integrity and syntax PASS; **73 JavaScript modules and 71 Native driver operations** checked. Output is retained in `evidence/workstation-extension-runtime-verify.json`.
+- Native profile build: **71/71 public operations assigned exactly once** across eight compacted canonical bridge bundles. Exact local sizes are core **45,595**, production **45,734**, review **49,129**, integrations **31,825**, extensions **42,300**, work **31,857**, media **39,788**, publish **48,288** bytes. The review profile has 23 bytes of local headroom; the 49,152-byte NodeBridge limit was not raised or bypassed.
+- Multi-profile canonical bridge smoke: **PASS** for `core`, `production`, `review`, `integrations`, `extensions`, `work`, `media` and `publish`; exact bundle SHA-256 values were rechecked before execution and all eight invocation frames stayed within the canonical combined-input budget. Output is retained in `evidence/workstation-extension-runtime-bundle-smoke.json`. This is not Driver Host isolation acceptance.
 - Clean CLI drill: init → synthetic demo → portable snapshot → restore to a new state directory → doctor PASS.
 - Restore drill confirmed a new workspace generation, advanced request epoch and no activation of historical mutation receipts.
 - Independent `unzip -t` validation of a generated private bundle: **PASS**; exact channel manifest, candidate manifest, artifact bytes and review notice were all readable.
 - Git diff whitespace gate: PASS.
 - Executable DeltaCLI reference source: real process execution and bounded receipt ingestion PASS, including build-drift rejection, secret-bearing flag rejection, exact adapter pinning and retirement detection; technical state intentionally remains UNKNOWN without Driver Host admission.
+- Executable DeltaRender extension fixture: bounded owner-controlled renderer output is recorded through an exact preparation/result contract; output-type substitution and package-budget overflow are rejected, and retirement preserves history while blocking new starts.
+- Mobile-import fixture: bounded Android/iOS bundle normalization is import-only, records content hashes/provenance, and explicitly reports `device_execution_observed=false` and `IMPORTED_UNVERIFIED` instead of fabricating native capture.
 
 These checks are useful regression evidence only. They are not supported-engine, Driver Host, browser-product-capture or external-channel acceptance. The local `RS-PUB-01..08` regressions establish application-side contract behavior only; the source acceptance scenario still requires a real Platform Publish ProductVersion/deployment and a distinct consumer identity/job/output ACL path.
 
@@ -25,7 +27,7 @@ The repository requires Node 24.21.x. The current branch must pass `Application 
 
 The manual heavy workflow provides independent lanes:
 
-- **native**: build the pinned canonical TypeScript SDK, generate/hash all seven bounded bridge profiles, compile/test the real Rust NativeDriver, and run a bridge smoke against each profile.
+- **native**: build the pinned canonical TypeScript SDK, generate/hash all eight bounded bridge profiles, compile/test the real Rust NativeDriver, and run a bridge smoke against each profile.
 - **browser**: install Chromium on a disposable GitHub runner and exercise the real Launchwright UI.
 - **stress**: create a bounded high-volume workspace, page observations, export a portable snapshot, restore it and verify row continuity.
 

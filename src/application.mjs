@@ -8,7 +8,7 @@ import { validateVerification, validateWaiver, validateChannelPackage, validateC
 import { recordCapture } from './capture.mjs';
 import { snapshotSummary } from './snapshot.mjs';
 import { validateLocalization, assessLocalization } from './localization.mjs';
-import { PROFILE_MATRIX, validateExtensionManifest, validateCompatibilityLock, prepareExtensionUse, inspectExtensionPreparation, genericExtensionView } from './extensions.mjs';
+import { PROFILE_MATRIX, validateExtensionManifest, validateCompatibilityLock, prepareExtensionUse, inspectExtensionPreparation, genericExtensionView, recordExtensionResult, inspectExtensionResult } from './extensions.mjs';
 import { recordCliObservation, inspectCliObservation } from './cli-source.mjs';
 import { freezeCandidate, buildCandidateGates, inspectCandidateState, recordCandidateReview, assertPrivateDeliveryReady, assertChannelPinned, assertPartialDeliveryPolicy } from './candidate.mjs';
 import { proposeChange, inspectChange, applyChange } from './change-proposal.mjs';
@@ -97,7 +97,7 @@ export class LaunchwrightApplication {
   }
   extensionDiscovery(input){
     inputObject(input,['type','include_retired'],[]);if(input.type!==undefined)choice(input.type,['source_adapter','deliverable_renderer','channel_adapter','verifier_profile']);if(input.include_retired!==undefined)ensure(typeof input.include_retired==='boolean','include_retired must be boolean');
-    const items=this.list('extension_package').filter(e=>(!input.type||e.data.type===input.type)&&(input.include_retired||e.data.status==='active')).map(e=>({id:e.id,version:e.version,name:e.data.name,type:e.data.type,package_version:e.data.package_version,schema_major:e.data.schema_major,digest:e.data.digest,license:e.data.license,permissions:e.data.permissions,inputs:e.data.inputs,outputs:e.data.outputs,preconditions:e.data.preconditions,evidence:e.data.evidence,limits:e.data.limits,status:e.data.status,admission:e.data.admission}));
+    const items=this.list('extension_package').filter(e=>(!input.type||e.data.type===input.type)&&(input.include_retired||e.data.status==='active')).map(e=>({id:e.id,version:e.version,name:e.data.name,type:e.data.type,package_version:e.data.package_version,schema_major:e.data.schema_major,digest:e.data.digest,license:e.data.license,rights:e.data.rights,permissions:e.data.permissions,inputs:e.data.inputs,outputs:e.data.outputs,preconditions:e.data.preconditions,evidence:e.data.evidence,limits:e.data.limits,status:e.data.status,admission:e.data.admission}));
     return{schema_version:'launchwright-extension-discovery/1',items,remote_code_execution:false,platform_registry_authority:false};
   }
   compatibilityNegotiate(input){
@@ -159,6 +159,7 @@ export class LaunchwrightApplication {
       case'extension.discovery':return this.extensionDiscovery(input);
       case'extension.generic_view':{inputObject(input,['id']);return genericExtensionView(this.get(input.id,'extension_package'));}
       case'extension.preparation_status':{inputObject(input,['id']);return inspectExtensionPreparation(this,input.id);}
+      case'extension.result_inspect':{inputObject(input,['id']);return inspectExtensionResult(this,input.id);}
       case'source.cli_inspect':{inputObject(input,['id']);return inspectCliObservation(this,input.id);}
       case'compatibility.negotiate':return this.compatibilityNegotiate(input);
       case'compatibility.inspect':inputObject(input,['id']);return this.compatibilityInspect(input.id);
@@ -340,7 +341,7 @@ export class LaunchwrightApplication {
         const checked=this.inspectCandidate(candidate);ensure(checked.private_draft_allowed,'Candidate has stale inputs or invalid bytes','StaleReference');
         if(candidate.data.manifest.schema_version==='launchwright-candidate/2'){assertChannelPinned(candidate,profile);assertPartialDeliveryPolicy(candidate,data.allow_partial);}
         if(!data.allow_partial)ensure(data.omissions.length===0,'Package omissions require explicit partial delivery approval','ConsentRequired');
-        if(data.allow_partial)ensure(data.omissions.length>0,'Partial delivery must enumerate the omitted variants or obligations');
+        if(data.allow_partial)ensure(data.omissions.length>0,'Partial delivery must enumerate omissions');
         const candidateManifestBytes=Buffer.from(JSON.stringify(candidate.data.manifest,null,2)+'\n'),candidateManifestSha=this.store.blob(candidateManifestBytes,'application/json');
         const manifest={schema_version:'launchwright-channel-package/2',candidate_id:candidate.id,candidate_sha256:candidate.data.candidate_sha256,candidate_manifest_sha256:candidateManifestSha,release_id:release.id,profile:{id:profile.id,version:profile.version,profile_version:profile.data.profile_version,channel:profile.data.channel,destination_class:profile.data.destination_class},participant:data.participant,locale:data.locale,partial:data.allow_partial,omissions:data.omissions,bundle_recipe:'private-zip-v1',artifacts:candidate.data.manifest.artifacts};
         const bytes=Buffer.from(JSON.stringify(manifest,null,2)+'\n'),packageSha=this.store.blob(bytes,'application/json');
@@ -350,7 +351,7 @@ export class LaunchwrightApplication {
         const data=validateChannelOutcome(input),base=this.get(data.delivery_id,'channel_delivery'),profile=this.get(base.data.profile_id,'channel_profile');
         ensure(base.data.release_id&&base.data.candidate_id,'Channel delivery record is incomplete','Conflict');
         if(['UPLOADED','DRAFT_CREATED','ACTIVATED','PUBLISHED','RETIRED'].includes(data.state))ensure(!!data.receipt_digest,'External success state requires an exact receipt digest','InvalidArgument');
-        if(['ACTIVATED','PUBLISHED','RETIRED'].includes(data.state))ensure(this.capabilities.canonical_publish_receipts===true,'Canonical publish receipt admission is unavailable in this session','PolicyDenied');
+        if(['ACTIVATED','PUBLISHED','RETIRED'].includes(data.state))ensure(this.capabilities.canonical_publish_receipts===true,'Canonical publish receipt unavailable','PolicyDenied');
         const root=base.data.root_delivery_id??base.id;
         const recoveryRequired=data.state==='UNKNOWN'&&profile.data.idempotency!=='safe';
         return{entity:this.store.create('channel_delivery',{release_id:base.data.release_id,name:base.data.name,profile_id:base.data.profile_id,profile_version:base.data.profile_version,candidate_id:base.data.candidate_id,candidate_sha256:base.data.candidate_sha256,candidate_manifest_sha256:base.data.candidate_manifest_sha256??null,participant:base.data.participant,locale:base.data.locale,partial:base.data.partial,omissions:base.data.omissions,package_sha256:base.data.package_sha256,package_size_bytes:base.data.package_size_bytes,bundle_recipe:base.data.bundle_recipe??null,state:data.state,external_state:data.state,external_id:data.external_id??null,receipt_digest:data.receipt_digest??null,message:data.message??'',observed_at:data.observed_at,root_delivery_id:root,parent_delivery_id:base.id,recovery_required:recoveryRequired,retry_policy:recoveryRequired?'RECOVER_BEFORE_RETRY':profile.data.idempotency==='safe'?'IDEMPOTENT_RETRY_ALLOWED':'NO_AUTOMATIC_RETRY',recorded_by:this.principal})};
@@ -371,6 +372,7 @@ export class LaunchwrightApplication {
         return{entity:this.store.update(prior.id,{...data,source_version:source.version,glossary_version:glossary?.version??null,created_by:prior.data.created_by,created_at:prior.data.created_at,updated_by:this.principal,updated_at:iso()})};
       }
       case'extension.prepare_use':{return{entity:prepareExtensionUse(this,input)};}
+      case'extension.result_record':{return{entity:recordExtensionResult(this,input)};}
       case'source.cli_ingest':{return{entity:recordCliObservation(this,input)};}
       case'extension.register':{
         const data=validateExtensionManifest(input);ensure(data.schema_major===1,'Unsupported extension schema major','ProtocolMismatch');

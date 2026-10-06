@@ -8,6 +8,7 @@ import { CoreNativeApplication } from '../src/native-core-app.mjs';
 import { ProductionNativeApplication } from '../src/native-production-app.mjs';
 import { ReviewNativeApplication } from '../src/native-review-app.mjs';
 import { IntegrationsNativeApplication } from '../src/native-integrations-app.mjs';
+import { ExtensionsNativeApplication } from '../src/native-extensions-app.mjs';
 import { WorkNativeApplication } from '../src/native-work-app.mjs';
 import { MediaNativeApplication } from '../src/native-media-app.mjs';
 import { PublishNativeApplication } from '../src/native-publish-app.mjs';
@@ -57,7 +58,7 @@ test('split native profiles preserve canonical mutation transactions across one 
   assert.equal(review.entity.kind,'candidate');
 
   const manifest={name:'Native profile adapter',type:'source_adapter',package_version:'1.0.0',schema_major:1,digest:'e'.repeat(64),license:'AGPL-3.0-only',source:'repo:synthetic/native-profile-adapter',permissions:['read'],inputs:['source-contract/1'],outputs:['capture-receipt/1'],preconditions:['approved-source'],evidence:['operation-receipt'],limits:{max_input_bytes:4096,max_output_bytes:4096,timeout_seconds:10}};
-  const integration=await invokeProfile(IntegrationsNativeApplication,seeded.root,'extension.register',manifest);
+  const integration=await invokeProfile(ExtensionsNativeApplication,seeded.root,'extension.register',manifest);
   assert.equal(integration.entity.kind,'extension_package');
   assert.equal(integration.entity.data.remote_code_executable,false);
 

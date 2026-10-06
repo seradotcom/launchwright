@@ -1,0 +1,20 @@
+{
+  "schema_version": "launchwright-mobile-bundle/1",
+  "platform": "android",
+  "app_id": "com.launchwright.fixture",
+  "build": "build-A",
+  "source_owner": "Launchwright synthetic fixture",
+  "rights": "owned",
+  "files": [
+    {
+      "path": "assets/screen.txt",
+      "mime": "text/plain",
+      "content_base64": "c3ludGhldGljIG1vYmlsZSBzY3JlZW4gZml4dHVyZQo="
+    },
+    {
+      "path": "metadata/release.json",
+      "mime": "application/json",
+      "content_base64": "eyJzY3JlZW4iOiJob21lIiwibG9jYWxlIjoiZW4tVVMifQo="
+    }
+  ]
+}

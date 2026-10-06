@@ -7,7 +7,7 @@ import { execute } from '../src/application.mjs';
 import { setup, baseline, update } from './helpers.mjs';
 
 const fixture=fileURLToPath(new URL('../fixtures/deltacli.mjs',import.meta.url));
-const manifest=()=>({name:'DeltaCLI source adapter',type:'source_adapter',package_version:'1.0.0',schema_major:1,digest:'e'.repeat(64),license:'AGPL-3.0-only',source:'repo:fixtures/deltacli-adapter',permissions:['read','capture'],inputs:['cli-source/1'],outputs:['cli-observation/1'],preconditions:['approved-source'],evidence:['process-receipt'],limits:{max_input_bytes:4096,max_output_bytes:65536,timeout_seconds:10}});
+const manifest=()=>({name:'DeltaCLI source adapter',type:'source_adapter',package_version:'1.0.0',schema_major:1,digest:'e'.repeat(64),license:'AGPL-3.0-only',rights:'owned',source:'repo:fixtures/deltacli-adapter',permissions:['read','capture'],inputs:['cli-source/1'],outputs:['cli-observation/1'],preconditions:['approved-source'],evidence:['process-receipt'],limits:{max_input_bytes:4096,max_output_bytes:65536,timeout_seconds:10}});
 
 test('extension preparation pins exact package and retirement blocks new starts without deleting history', async t=>{
   const {app}=setup(t);

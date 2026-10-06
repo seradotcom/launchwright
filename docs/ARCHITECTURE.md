@@ -55,6 +55,8 @@ Extension manifests are bounded descriptors, not executable grants. `extension.p
 
 The reference second source is an executable CLI fixture. Its process is run outside the application contract, then `source.cli_ingest` records bounded stdout/stderr, exact process timing/exit status, approved source/build pins and optional source-adapter pins. The observation can be inspected for source/target/adapter drift. A successful exit is recorded as process success only; technical state remains `UNKNOWN` because this application does not claim canonical Driver Host isolation or admission from a process receipt.
 
+Extension execution evidence uses the same conservative boundary. `extension.result_record` accepts only a prepared output type, enforces the package output budget, pins the exact preparation/package revision and digest, and records technical state as `UNKNOWN` with `host_isolation_verified=false`. `extension.result_inspect` reports drift/retirement without deleting history. The owned DeltaRender fixture exercises the deliverable-renderer path; the owned mobile importer normalizes a bounded externally supplied bundle and explicitly reports that no device execution was observed.
+
 ## Portability
 
 Portable snapshot v2 contains application entities, exact entity revision history, migration provenance, content-addressed blobs, aliases, pending records and audit events. Historical request receipts are exported for forensic continuity but intentionally not activated during restore. Restored uncertain intents are marked RESTORE_RECONCILE_REQUIRED.
