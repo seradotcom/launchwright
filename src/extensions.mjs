@@ -5,12 +5,24 @@ export { PROFILE_MATRIX } from './source-profiles.mjs';
 
 export function validateExtensionManifest(raw){
   validateValue(raw);noSecrets(raw);const d=structuredClone(raw);
-  object(d,['name','type','package_version','schema_major','digest','license','source','permissions','inputs','outputs','preconditions','evidence','limits'],['name','type','package_version','schema_major','digest','license','source','permissions','inputs','outputs','preconditions','evidence','limits']);
+  object(d,['name','type','package_version','schema_major','digest','license','source','permissions','inputs','outputs','preconditions','evidence','limits','verifier'],['name','type','package_version','schema_major','digest','license','source','permissions','inputs','outputs','preconditions','evidence','limits']);
   str(d.name,160);choice(d.type,['source_adapter','deliverable_renderer','channel_adapter','verifier_profile']);str(d.package_version,96);integer(d.schema_major,1,32);sha(d.digest);str(d.license,128);str(d.source,2048);
   array(d.permissions,16).forEach(p=>choice(p,['read','edit','capture','review','publish']));ensure(new Set(d.permissions).size===d.permissions.length,'Duplicate extension permission');
   for(const key of ['inputs','outputs','preconditions','evidence'])array(d[key],32).forEach(v=>str(v,160));
   object(d.limits,['max_input_bytes','max_output_bytes','timeout_seconds'],['max_input_bytes','max_output_bytes','timeout_seconds']);
   integer(d.limits.max_input_bytes,1,67108864);integer(d.limits.max_output_bytes,1,67108864);integer(d.limits.timeout_seconds,1,3600);
+  if(d.type==='verifier_profile'){
+    ensure(d.permissions.includes('review'),'Verifier profile requires review permission');
+    ensure(d.verifier&&typeof d.verifier==='object'&&!Array.isArray(d.verifier),'Verifier profile requires a structured verifier policy');
+    object(d.verifier,['dimensions','authority','model','negative_controls','coverage_mode'],['dimensions','authority','negative_controls','coverage_mode']);
+    const dimensions=['format','semantic','editorial','privacy','rights','accessibility','product-evidence','permissions'];
+    array(d.verifier.dimensions,dimensions.length).forEach(value=>choice(value,dimensions));
+    ensure(d.verifier.dimensions.length>0&&new Set(d.verifier.dimensions).size===d.verifier.dimensions.length,'Verifier dimensions must be non-empty and unique');
+    choice(d.verifier.authority,['canonical','independent','human','heuristic']);
+    if(d.verifier.model!==undefined)str(d.verifier.model,160);
+    ensure(typeof d.verifier.negative_controls==='boolean','Verifier negative_controls must be boolean');
+    choice(d.verifier.coverage_mode,['complete','sampled']);
+  }else ensure(d.verifier===undefined,'Only verifier_profile extensions may declare verifier policy');
   return d;
 }
 

@@ -5,7 +5,8 @@ import { Store } from './store.mjs';
 import { APP_VERSION, RESOURCE, KINDS, EDITABLE, RIGHTS, CLASSES, validateEntity, inputObject, idText, str, lines, array, choice, sha, digest, makeRequest, iso, noSecrets } from './contracts.mjs';
 import { OPERATION_SCOPES, READ_OPERATIONS } from './operations.mjs';
 import { renderText } from './render.mjs';
-import { validateVerification, validateWaiver, validateChannelPackage, validateChannelOutcome } from './records.mjs';
+import { validateChannelPackage, validateChannelOutcome } from './records.mjs';
+import { recordVerification, verificationSummary as buildVerificationSummary, recordWaiver } from './verification.mjs';
 import { recordCapture } from './capture.mjs';
 import { snapshotSummary } from './snapshot.mjs';
 import { validateLocalization, assessLocalization } from './localization.mjs';
@@ -217,20 +218,7 @@ export class LaunchwrightApplication {
     const relations=this.list('relation',releaseId).map(r=>({id:r.id,from_id:r.data.from_id,to_id:r.data.to_id,kind:r.data.relation_kind,provenance:r.data.provenance,completeness:r.data.completeness,admission:r.data.admission,graph_observation_id:r.data.graph_observation_id??null}));
     return{release_id:releaseId,items,bindings,contract_blockers,relations,graph,coverage:graph.coverage,canonical_graph_authority:graph.canonical_graph_authority,unknown_frontier:graph.unknown_frontier,note:graph.canonical_graph_authority?'Canonical Project Graph output is preserved verbatim; local checks add release meaning but do not recompute Graph freshness.':'Local revision comparisons remain advisory until a current admitted Project Graph impact observation is bound.'};
   }
-  verificationSummary(candidateId){
-    const candidate=this.get(candidateId,'candidate');
-    const records=this.list('verification',candidate.data.release_id).filter(v=>v.data.candidate_id===candidate.id);
-    const waivers=this.list('waiver',candidate.data.release_id).filter(w=>w.data.candidate_id===candidate.id);
-    const checks=records.map(v=>{
-      const related=waivers.filter(w=>w.data.verification_id===v.id);
-      const active=related.filter(w=>!w.data.expires_at||Date.parse(w.data.expires_at)>Date.now());
-      const admitted=v.data.admission==='canonical-owner-admitted';
-      const effective=v.data.state==='FAIL'||v.data.state==='ERROR'?v.data.state:(admitted?v.data.state:'UNKNOWN');
-      return{verification_id:v.id,dimension:v.data.dimension,reported_state:v.data.state,effective_state:effective,admission:v.data.admission,verifier:v.data.verifier,coverage:v.data.coverage,omissions:v.data.omissions,findings:v.data.findings,waivers:related.map(w=>({id:w.id,scope:w.data.scope,expires_at:w.data.expires_at??null,active:active.some(a=>a.id===w.id)})),waived:active.length>0};
-    });
-    const state=checks.some(c=>['FAIL','ERROR'].includes(c.effective_state))?'FAIL':checks.length&&checks.every(c=>c.effective_state==='PASS')?'PASS':'UNKNOWN';
-    return{candidate_id:candidate.id,state,checks,canonical_passes:checks.filter(c=>c.effective_state==='PASS').length,failures:checks.filter(c=>['FAIL','ERROR'].includes(c.effective_state)).length,unknown:checks.filter(c=>c.effective_state==='UNKNOWN').length,note:'Waivers preserve the underlying verification state; non-canonical PASS reports remain UNKNOWN.'};
-  }
+  verificationSummary(candidateId){return buildVerificationSummary(this,candidateId);}
   channelStatus(releaseId){
     this.get(releaseId,'release');
     const rows=this.list('channel_delivery',releaseId).sort((a,b)=>a.created.localeCompare(b.created));
@@ -305,22 +293,8 @@ export class LaunchwrightApplication {
       case'publish.export':return exportProductVersion(this,input);
       case'publish.import':return importProductVersion(this,input);
       case'publish.import_rebind':return rebindImportedTemplate(this,input);
-      case'verification.record':{
-        const data=validateVerification(input),candidate=this.get(data.candidate_id,'candidate');
-        const artifactSet=new Set(candidate.data.manifest.artifact_ids);
-        for(const id of data.artifact_ids)ensure(artifactSet.has(id),'Verification references bytes outside the candidate','PermissionDenied');
-        if(data.target_id){const target=this.get(data.target_id,'target');ensure(target.data.release_id===candidate.data.release_id,'Verification target belongs to another release','PermissionDenied');}
-        if(data.verifier.authority==='canonical')ensure(this.capabilities.canonical_verifier_admission===true,'Canonical verifier admission is unavailable in this session','PolicyDenied');
-        const admission=data.verifier.authority==='canonical'?'canonical-owner-admitted':data.verifier.authority==='heuristic'?'heuristic-report':'local-review-record';
-        return{entity:this.store.create('verification',{release_id:candidate.data.release_id,name:data.dimension+' verification',...data,admission,recorded_by:this.principal,recorded_at:iso()})};
-      }
-      case'waiver.record':{
-        const data=validateWaiver(input),candidate=this.get(data.candidate_id,'candidate'),verification=this.get(data.verification_id,'verification');
-        ensure(verification.data.candidate_id===candidate.id&&verification.data.release_id===candidate.data.release_id,'Waiver verification belongs to another candidate','PermissionDenied');
-        ensure(verification.data.state!=='PASS','A passing verification does not need a waiver','InvalidArgument');
-        if(data.expires_at)ensure(Date.parse(data.expires_at)>Date.now(),'Waiver is already expired','InvalidArgument');
-        return{entity:this.store.create('waiver',{release_id:candidate.data.release_id,name:'Waiver · '+verification.data.dimension,...data,author:this.principal,underlying_state:verification.data.state,created_at:iso(),changes_verification_state:false})};
-      }
+      case'verification.record':return recordVerification(this,input);
+      case'waiver.record':return recordWaiver(this,input);
       case'deliverable.render':{
         inputObject(input,['id']);const d=this.get(input.id,'deliverable'),r=this.get(d.data.release_id,'release'),t=this.get(d.data.target_id,'target');
         const rendered=renderText(d,t,r);const hash=this.store.blob(rendered.bytes,rendered.mime);

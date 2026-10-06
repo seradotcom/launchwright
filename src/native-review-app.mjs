@@ -2,61 +2,30 @@
 import { randomUUID } from 'node:crypto';
 import { NativeError, requireCondition as ensure, sameVersion } from '@semwright/native-sdk';
 import { NativeProfileApplication } from './native-profile-base.mjs';
-import { inputObject, sha, choice, lines } from './contracts.mjs';
-import { iso } from './base.mjs';
-import { validateVerification, validateWaiver, validateChannelPackage, validateChannelOutcome } from './records.mjs';
+import { inputObject } from './contracts.mjs';
+import { validateChannelPackage, validateChannelOutcome } from './records.mjs';
 import { claimCheck } from './claim-check.mjs';
 import { freezeCandidate, buildCandidateGates, inspectCandidateState, recordCandidateReview, assertPrivateDeliveryReady, assertChannelPinned, assertPartialDeliveryPolicy } from './candidate.mjs';
 
-export const REVIEW_NATIVE_READS=Object.freeze(['candidate.inspect','verification.summary']);
+export const REVIEW_NATIVE_READS=Object.freeze(['candidate.inspect']);
 export const REVIEW_NATIVE_MUTATIONS=Object.freeze([
-  'verification.record','waiver.record','candidate.freeze','candidate.review',
-  'candidate.deliver_private','channel.package','channel.record_outcome'
+  'candidate.freeze','candidate.review','candidate.deliver_private','channel.package','channel.record_outcome'
 ]);
 export const REVIEW_NATIVE_OPERATIONS=Object.freeze([...REVIEW_NATIVE_READS,...REVIEW_NATIVE_MUTATIONS]);
 
 export class ReviewNativeApplication extends NativeProfileApplication {
   constructor(root,options={}){super(root,{...options,readOperations:REVIEW_NATIVE_READS,operations:REVIEW_NATIVE_OPERATIONS});}
   claimCheck(claim){return claimCheck(this,claim);}
-  verificationSummary(candidateId){
-    const candidate=this.get(candidateId,'candidate');
-    const records=this.list('verification',candidate.data.release_id).filter(v=>v.data.candidate_id===candidate.id);
-    const waivers=this.list('waiver',candidate.data.release_id).filter(w=>w.data.candidate_id===candidate.id);
-    const checks=records.map(v=>{
-      const related=waivers.filter(w=>w.data.verification_id===v.id),active=related.filter(w=>!w.data.expires_at||Date.parse(w.data.expires_at)>Date.now());
-      const admitted=v.data.admission==='canonical-owner-admitted',effective=v.data.state==='FAIL'||v.data.state==='ERROR'?v.data.state:(admitted?v.data.state:'UNKNOWN');
-      return{verification_id:v.id,dimension:v.data.dimension,reported_state:v.data.state,effective_state:effective,admission:v.data.admission,verifier:v.data.verifier,coverage:v.data.coverage,omissions:v.data.omissions,findings:v.data.findings,waivers:related.map(w=>({id:w.id,scope:w.data.scope,expires_at:w.data.expires_at??null,active:active.some(a=>a.id===w.id)})),waived:active.length>0};
-    });
-    const state=checks.some(c=>['FAIL','ERROR'].includes(c.effective_state))?'FAIL':checks.length&&checks.every(c=>c.effective_state==='PASS')?'PASS':'UNKNOWN';
-    return{candidate_id:candidate.id,state,checks,canonical_passes:checks.filter(c=>c.effective_state==='PASS').length,failures:checks.filter(c=>['FAIL','ERROR'].includes(c.effective_state)).length,unknown:checks.filter(c=>c.effective_state==='UNKNOWN').length,note:'Waivers preserve the underlying verification state; non-canonical PASS reports remain UNKNOWN.'};
-  }
   candidateGates(candidate){return buildCandidateGates(this,candidate);}
   inspectCandidate(candidate){return inspectCandidateState(this,candidate);}
   read(operation,input){
     switch(operation){
       case'candidate.inspect':inputObject(input,['id']);return this.inspectCandidate(this.get(input.id,'candidate'));
-      case'verification.summary':inputObject(input,['candidate_id']);return this.verificationSummary(input.candidate_id);
       default:throw new NativeError('Unsupported','Read operation is outside review profile');
     }
   }
   mutate(operation,input){
     switch(operation){
-      case'verification.record':{
-        const data=validateVerification(input),candidate=this.get(data.candidate_id,'candidate');
-        const artifactSet=new Set(candidate.data.manifest.artifact_ids);
-        for(const id of data.artifact_ids)ensure(artifactSet.has(id),'Verification references bytes outside the candidate','PermissionDenied');
-        if(data.target_id){const target=this.get(data.target_id,'target');ensure(target.data.release_id===candidate.data.release_id,'Verification target belongs to another release','PermissionDenied');}
-        if(data.verifier.authority==='canonical')ensure(this.capabilities.canonical_verifier_admission===true,'Canonical verifier admission is unavailable in this session','PolicyDenied');
-        const admission=data.verifier.authority==='canonical'?'canonical-owner-admitted':data.verifier.authority==='heuristic'?'heuristic-report':'local-review-record';
-        return{entity:this.store.create('verification',{release_id:candidate.data.release_id,name:data.dimension+' verification',...data,admission,recorded_by:this.principal,recorded_at:iso()})};
-      }
-      case'waiver.record':{
-        const data=validateWaiver(input),candidate=this.get(data.candidate_id,'candidate'),verification=this.get(data.verification_id,'verification');
-        ensure(verification.data.candidate_id===candidate.id&&verification.data.release_id===candidate.data.release_id,'Waiver verification belongs to another candidate','PermissionDenied');
-        ensure(verification.data.state!=='PASS','A passing verification does not need a waiver','InvalidArgument');
-        if(data.expires_at)ensure(Date.parse(data.expires_at)>Date.now(),'Waiver is already expired','InvalidArgument');
-        return{entity:this.store.create('waiver',{release_id:candidate.data.release_id,name:'Waiver · '+verification.data.dimension,...data,author:this.principal,underlying_state:verification.data.state,created_at:iso(),changes_verification_state:false})};
-      }
       case'candidate.freeze':return freezeCandidate(this,input);
       case'candidate.review':return recordCandidateReview(this,input);
       case'candidate.deliver_private':{

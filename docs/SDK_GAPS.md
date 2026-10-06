@@ -8,7 +8,7 @@ These are explicit integration gaps, not implied application successes.
 | Project Graph | Prepares canonical `project.*` reads plus `project.edge.declare`, binds exact local revisions, records immutable response digests, preserves admitted output verbatim and invalidates stale local bindings | Live Host/Broker admission, authenticated Project access and end-to-end CURRENT/STALE evidence on a supported runner |
 | Effects | Stores exact results from the pinned Native SDK immutable JSON/CSV Effects reader, exact artifact/scenario revision bindings and owner-gated admission; dedicated CI lane runs the real upstream binary | Native application mutation/noninterference effects, Driver Host admission and scenario-effect coverage on a supported real runner |
 | Media | VTT timing and text artifacts are local | Composition timeline, render and media verification |
-| Verification | Full immutable verifier/coverage/finding ledger; canonical PASS gated | Canonical verifier admission/runtime |
+| Verification | Admin-protected verifier profiles are pinned by exact revision/digest into candidates; reports bind exact candidate/artifact/target context, expose coverage/omissions and make incomplete/drifted PASS UNKNOWN; FAIL/ERROR and waivers preserve truth | Canonical verifier execution/runtime and owner admission on a supported Host |
 | Platform work | Durable intent and pending/recovery custody | Platform scheduler, budget and job authority |
 | Public delivery | Exact channel packages and receipt ledger | Canonical Publish action/receipt and destination-specific authority |
 | Teams | Principal/scopes work locally | Remote authentication, tenant isolation and multi-user approvals |

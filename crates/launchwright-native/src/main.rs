@@ -18,6 +18,8 @@ const GRAPH_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_GRAPH_BUNDLE
 const EFFECTS_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_EFFECTS_BUNDLE_SHA256");
 const PRODUCTION_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_PRODUCTION_BUNDLE_SHA256");
 const REVIEW_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_REVIEW_BUNDLE_SHA256");
+const VERIFICATION_BUNDLE: Option<&str> =
+    option_env!("LAUNCHWRIGHT_NATIVE_VERIFICATION_BUNDLE_SHA256");
 const INTEGRATIONS_BUNDLE: Option<&str> =
     option_env!("LAUNCHWRIGHT_NATIVE_INTEGRATIONS_BUNDLE_SHA256");
 const WORK_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_WORK_BUNDLE_SHA256");
@@ -32,6 +34,7 @@ enum Profile {
     Effects,
     Production,
     Review,
+    Verification,
     Integrations,
     Work,
     Media,
@@ -188,7 +191,7 @@ const OPERATIONS: &[Operation] = &[
         suffix: "verification-summary",
         read: true,
         consent: false,
-        profile: Profile::Review,
+        profile: Profile::Verification,
     },
     Operation {
         suffix: "channel-status",
@@ -200,13 +203,13 @@ const OPERATIONS: &[Operation] = &[
         suffix: "verification-record",
         read: false,
         consent: false,
-        profile: Profile::Review,
+        profile: Profile::Verification,
     },
     Operation {
         suffix: "waiver-record",
         read: false,
         consent: false,
-        profile: Profile::Review,
+        profile: Profile::Verification,
     },
     Operation {
         suffix: "candidate-freeze",
@@ -552,6 +555,7 @@ async fn main() -> Result<()> {
     let effects = bridge("launchwright-effects.cjs", EFFECTS_BUNDLE)?;
     let production = bridge("launchwright-production.cjs", PRODUCTION_BUNDLE)?;
     let review = bridge("launchwright-review.cjs", REVIEW_BUNDLE)?;
+    let verification = bridge("launchwright-verification.cjs", VERIFICATION_BUNDLE)?;
     let integrations = bridge("launchwright-integrations.cjs", INTEGRATIONS_BUNDLE)?;
     let work = bridge("launchwright-work.cjs", WORK_BUNDLE)?;
     let media = bridge("launchwright-media.cjs", MEDIA_BUNDLE)?;
@@ -570,6 +574,7 @@ async fn main() -> Result<()> {
             Profile::Effects => effects.clone(),
             Profile::Production => production.clone(),
             Profile::Review => review.clone(),
+            Profile::Verification => verification.clone(),
             Profile::Integrations => integrations.clone(),
             Profile::Work => work.clone(),
             Profile::Media => media.clone(),
@@ -633,7 +638,8 @@ mod tests {
         assert_eq!(counts.get(&Profile::Graph), Some(&2));
         assert_eq!(counts.get(&Profile::Effects), Some(&2));
         assert_eq!(counts.get(&Profile::Production), Some(&9));
-        assert_eq!(counts.get(&Profile::Review), Some(&9));
+        assert_eq!(counts.get(&Profile::Review), Some(&6));
+        assert_eq!(counts.get(&Profile::Verification), Some(&3));
         assert_eq!(counts.get(&Profile::Integrations), Some(&12));
         assert_eq!(counts.get(&Profile::Work), Some(&6));
         assert_eq!(counts.get(&Profile::Media), Some(&6));

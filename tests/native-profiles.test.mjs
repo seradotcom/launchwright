@@ -7,6 +7,7 @@ import { nativeDriverName } from '../src/native-profile-base.mjs';
 import { CoreNativeApplication } from '../src/native-core-app.mjs';
 import { ProductionNativeApplication } from '../src/native-production-app.mjs';
 import { ReviewNativeApplication } from '../src/native-review-app.mjs';
+import { VerificationNativeApplication } from '../src/native-verification-app.mjs';
 import { IntegrationsNativeApplication } from '../src/native-integrations-app.mjs';
 import { WorkNativeApplication } from '../src/native-work-app.mjs';
 import { MediaNativeApplication } from '../src/native-media-app.mjs';
@@ -71,6 +72,10 @@ test('split native profiles preserve canonical mutation transactions across one 
     contract:{version:'v1',required_reviewers:1,require_claims_verified:false}
   });
   assert.equal(review.entity.kind,'candidate');
+
+  const verification=await readProfile(VerificationNativeApplication,seeded.root,'verification.summary',{candidate_id:review.entity.id});
+  assert.equal(verification.state,'UNKNOWN');
+  assert.deepEqual(verification.checks,[]);
 
   const manifest={name:'Native profile adapter',type:'source_adapter',package_version:'1.0.0',schema_major:1,digest:'e'.repeat(64),license:'AGPL-3.0-only',source:'repo:synthetic/native-profile-adapter',permissions:['read'],inputs:['source-contract/1'],outputs:['capture-receipt/1'],preconditions:['approved-source'],evidence:['operation-receipt'],limits:{max_input_bytes:4096,max_output_bytes:4096,timeout_seconds:10}};
   const integration=await invokeProfile(IntegrationsNativeApplication,seeded.root,'extension.register',manifest);
