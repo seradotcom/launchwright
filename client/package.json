@@ -1,6 +1,6 @@
 {
   "name": "@launchwright/client",
-  "version": "0.2.0-dev.15",
+  "version": "0.2.0-dev.16",
   "description": "Public HTTP client for Launchwright",
   "type": "module",
   "license": "AGPL-3.0-only",

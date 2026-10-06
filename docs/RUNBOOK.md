@@ -41,6 +41,10 @@ Doctor reports the local schema and whether durable history is ready. A schema-v
 
 The migration stores the current known revision for every entity and records NOT_RECONSTRUCTED for all earlier history. Do not infer missing revisions from audit events, receipts or external repositories.
 
+## Usage, reservation and billing-test incidents
+
+Use [OPS_RUNBOOK.md](OPS_RUNBOOK.md) for exact reservation-before-send, OUTCOME_UNKNOWN reconciliation, BYO accounting, performance phase recording and billing-test callback procedures. Those procedures preserve external Platform authority and never authorize a live charge.
+
 ## Backup/restore drill
 
 Export a snapshot, restore into a fresh directory, confirm a new workspace generation/epoch, inspect `RESTORE_RECONCILE_REQUIRED` items, and only then resume normal mutations. Old request receipts are intentionally inactive.

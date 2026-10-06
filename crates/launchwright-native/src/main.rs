@@ -23,6 +23,7 @@ const VERIFICATION_BUNDLE: Option<&str> =
 const INTEGRATIONS_BUNDLE: Option<&str> =
     option_env!("LAUNCHWRIGHT_NATIVE_INTEGRATIONS_BUNDLE_SHA256");
 const WORK_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_WORK_BUNDLE_SHA256");
+const USAGE_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_USAGE_BUNDLE_SHA256");
 const MEDIA_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_MEDIA_BUNDLE_SHA256");
 const PUBLISH_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_PUBLISH_BUNDLE_SHA256");
 
@@ -37,6 +38,7 @@ enum Profile {
     Verification,
     Integrations,
     Work,
+    Usage,
     Media,
     Publish,
 }
@@ -392,6 +394,42 @@ const OPERATIONS: &[Operation] = &[
         profile: Profile::Work,
     },
     Operation {
+        suffix: "usage-inspect",
+        read: true,
+        consent: false,
+        profile: Profile::Usage,
+    },
+    Operation {
+        suffix: "usage-reserve_record",
+        read: false,
+        consent: false,
+        profile: Profile::Usage,
+    },
+    Operation {
+        suffix: "usage-receipt_record",
+        read: false,
+        consent: false,
+        profile: Profile::Usage,
+    },
+    Operation {
+        suffix: "usage-finalize",
+        read: false,
+        consent: false,
+        profile: Profile::Usage,
+    },
+    Operation {
+        suffix: "usage-billing_record",
+        read: false,
+        consent: true,
+        profile: Profile::Usage,
+    },
+    Operation {
+        suffix: "usage-performance_record",
+        read: false,
+        consent: false,
+        profile: Profile::Usage,
+    },
+    Operation {
         suffix: "media-inspect",
         read: true,
         consent: false,
@@ -570,6 +608,7 @@ async fn main() -> Result<()> {
     let verification = bridge("launchwright-verification.cjs", VERIFICATION_BUNDLE)?;
     let integrations = bridge("launchwright-integrations.cjs", INTEGRATIONS_BUNDLE)?;
     let work = bridge("launchwright-work.cjs", WORK_BUNDLE)?;
+    let usage = bridge("launchwright-usage.cjs", USAGE_BUNDLE)?;
     let media = bridge("launchwright-media.cjs", MEDIA_BUNDLE)?;
     let publish = bridge("launchwright-publish.cjs", PUBLISH_BUNDLE)?;
     let mut app = Application::new("launchwright", VERSION)?
@@ -589,6 +628,7 @@ async fn main() -> Result<()> {
             Profile::Verification => verification.clone(),
             Profile::Integrations => integrations.clone(),
             Profile::Work => work.clone(),
+            Profile::Usage => usage.clone(),
             Profile::Media => media.clone(),
             Profile::Publish => publish.clone(),
         };
@@ -615,7 +655,7 @@ mod tests {
         for spec in OPERATIONS {
             assert!(names.insert(spec.suffix));
         }
-        assert_eq!(names.len(), 71);
+        assert_eq!(names.len(), 79);
     }
     #[test]
     fn canonical_graph_adapter_is_linked_without_an_admission_surface() {
@@ -654,6 +694,7 @@ mod tests {
         assert_eq!(counts.get(&Profile::Verification), Some(&5));
         assert_eq!(counts.get(&Profile::Integrations), Some(&12));
         assert_eq!(counts.get(&Profile::Work), Some(&6));
+        assert_eq!(counts.get(&Profile::Usage), Some(&6));
         assert_eq!(counts.get(&Profile::Media), Some(&6));
         assert_eq!(counts.get(&Profile::Publish), Some(&10));
     }

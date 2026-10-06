@@ -22,6 +22,7 @@ import { listEvents } from './events.mjs';
 import { inspectMobileImport, registerMobileImport } from './mobile-import.mjs';
 import { CANONICAL_GRAPH_ACTIONS, CANONICAL_GRAPH_MUTATIONS, prepareGraphWork, inspectGraph, recordGraphObservation } from './graph.mjs';
 import { inspectEffects, recordEffectResult } from './effects.mjs';
+import { inspectUsage, recordUsageReservation, recordUsageReceipt, finalizeUsage, recordBillingEvent, recordPerformanceSample } from './usage.mjs';
 
 export class LaunchwrightApplication {
   constructor(root, { initialize = false, readOnly = false, principal = 'local-owner', scopes = ['read','edit','capture','review','publish','consume','admin'], capabilities = {} } = {}) {
@@ -155,6 +156,7 @@ export class LaunchwrightApplication {
       case'media.inspect':return inspectMediaPlan(this,input);
       case'media.composition_manifest':return prepareCompositionManifest(this,input);
       case'publish.inspect':return inspectPublish(this,input);
+      case'usage.inspect':return inspectUsage(this,input);
       case'artifact.read':{
         inputObject(input,['id']);const a=this.get(input.id,'artifact');const b=this.store.readBlob(a.data.sha256);
         ensure(b.bytes.length<=160000,'Use authenticated artifact download for this output','ResourceExhausted');return{artifact:a,text:b.bytes.toString('utf8')};
@@ -293,6 +295,11 @@ export class LaunchwrightApplication {
       case'publish.export':return exportProductVersion(this,input);
       case'publish.import':return importProductVersion(this,input);
       case'publish.import_rebind':return rebindImportedTemplate(this,input);
+      case'usage.reserve_record':return recordUsageReservation(this,input);
+      case'usage.receipt_record':return recordUsageReceipt(this,input);
+      case'usage.finalize':return finalizeUsage(this,input);
+      case'usage.billing_record':return recordBillingEvent(this,input);
+      case'usage.performance_record':return recordPerformanceSample(this,input);
       case'verification.record':return recordVerification(this,input);
       case'verification.repair_prepare':return prepareVerificationRepair(this,input);
       case'verification.repair_record':return recordVerificationRepairAttempt(this,input);

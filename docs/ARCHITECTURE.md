@@ -4,9 +4,9 @@ Launchwright is an application layer over Semwright contracts, not a replacement
 
 ## Authority boundaries
 
-**Launchwright owns:** release briefs, target context, local source declarations, scenarios, claims, CopyBlocks, ReleaseContracts, ReleaseTemplate drafts, immutable ProductVersion contracts, local deployment/invocation records, immutable editorial artifacts, exact candidate manifests, editorial decisions, verifier/waiver ledgers, channel package manifests, local audit events, portable snapshots and local recovery state.
+**Launchwright owns:** release briefs, target context, local source declarations, scenarios, claims, CopyBlocks, ReleaseContracts, ReleaseTemplate drafts, immutable ProductVersion contracts, local deployment/invocation records, immutable editorial artifacts, exact candidate manifests, editorial decisions, verifier/waiver ledgers, channel package manifests, exact Platform usage/billing-test receipt custody, local audit events, portable snapshots and local recovery state.
 
-**Semwright owners remain authoritative for:** native driver execution and Host isolation, canonical Graph observations, Effect evaluation authority (including native mutation/noninterference), Platform jobs/budgets, Composition/AV rendering, canonical verifier admission and external Publish receipts. Launchwright may preserve a result emitted by the exact pinned Native SDK immutable-artifact Effects reader, but that custody does not transfer evaluator or execution authority.
+**Semwright owners remain authoritative for:** native driver execution and Host isolation, canonical Graph observations, Effect evaluation authority (including native mutation/noninterference), Platform jobs/reservations/quotas/metering/billing enforcement, Composition/AV rendering, canonical verifier admission and external Publish receipts. Launchwright may preserve a result emitted by the exact pinned Native SDK immutable-artifact Effects reader, but that custody does not transfer evaluator or execution authority.
 
 The application never converts an imported declaration, screenshot, capture receipt, model result or waiver into a canonical PASS by serialization.
 
@@ -63,6 +63,14 @@ A `release_template` is an editable application-owned contract over explicitly a
 A `publish_deployment` points to one exact ProductVersion and has an explicit ACTIVE → DEPRECATED → RETIRED lifecycle. Consumer invocation preparation accepts only the version's parameter surface, rejects URL/path/secret-style parameter names and out-of-scope resource options, applies a budget ceiling, and deduplicates `(consumer, deployment, invocation_key)` without sharing owner workspace read access. Retiring a deployment blocks new invocations while preserving prior invocation/result custody according to the declared retention contract.
 
 Export serializes only the authorized contract/pins and explicitly carries no credentials, grants or permissions. Import requires caller-supplied local resource rebindings and an explicit contract recheck before the imported template may be frozen again. Platform-facing publish work is bound to the exact local template/version/deployment/invocation revision and digest and fails stale before send if that binding changes. These records are preparation/custody only: actual cross-account execution, metering, output ACL enforcement and external activation remain Platform Publish authority.
+
+## Platform usage and cost custody
+
+`usage.reserve_record` stores one exact Platform reservation receipt before cost-bearing work may be sent. The reservation binds the Launchwright work intent, external reservation ID/digest, compute source, hard ceilings and a bounded estimate. Exact duplicates deduplicate; identity reuse with different content conflicts. The Platform adapter still requires explicit external budget enforcement and is the only side that can actually impose scheduler/runtime limits.
+
+`usage.receipt_record` preserves exact measured receipts and the correlation chain from release/work through Platform job/ledger, optional native receipt and exact artifact IDs. Estimate and measurement are never collapsed. BYO compute cannot be serialized as Launchwright-managed compute. `OUTCOME_UNKNOWN` releases nothing; after reconciliation, `usage.finalize` releases only the unconsumed reservation and retains observed overrun/breaches.
+
+`usage.performance_record` stores query/admission/queue/render phases separately with environment and code SHA. Local-lab samples cannot become production percentile claims. `usage.billing_record` accepts test mode only; duplicate/failed callbacks never resend work, rerun rendering, alter technical evidence or perform a live charge.
 
 ## Portability
 
