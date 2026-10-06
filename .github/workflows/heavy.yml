@@ -134,7 +134,7 @@ jobs:
           PY
           SPEC_SHA="$(sha256sum evidence/effects/spec.json | cut -d' ' -f1)"
           printf '%s\n' "$SPEC_SHA" > evidence/effects/spec.sha256
-          "$BIN" --spec evidence/effects/spec.json --spec-sha256 "$SPEC_SHA" --artifact-root evidence/effects/artifacts </dev/null > evidence/effects/result.json
+          "$BIN" --spec evidence/effects/spec.json --spec-sha256 "$SPEC_SHA" --artifact-root "$GITHUB_WORKSPACE/evidence/effects/artifacts" </dev/null > evidence/effects/result.json
           jq -e '.schema_version == "semwright-native-effects-result/1" and .verdict == "PASS" and .execution_authority == false and .scope == "immutable_native_sdk_artifact_properties_only"' evidence/effects/result.json
           node scripts/verify-effects-acceptance.mjs | tee evidence/effects/launchwright-verifier.log
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
