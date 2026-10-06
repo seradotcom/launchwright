@@ -148,7 +148,9 @@ jobs:
           export LAUNCHWRIGHT_NATIVE_PUBLISH_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.publish.sha256')"
           export LAUNCHWRIGHT_NATIVE_GRAPH_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.graph.sha256')"
           export LAUNCHWRIGHT_NATIVE_EFFECTS_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.effects.sha256')"
-          cargo build --locked -p launchwright-native
+          # Launchwright intentionally follows the existing Native lane policy: its binary
+          # lockfile is generated on the disposable runner. Semwright itself remains --locked.
+          cargo build -p launchwright-native
           sha256sum target/debug/launchwright-native > evidence/native-host/launchwright-native.sha256
       - name: Build exact Semwright daemon, CLI and sandbox Host
         working-directory: .ci-semwright
