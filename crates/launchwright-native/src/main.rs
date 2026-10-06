@@ -15,6 +15,7 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 const CORE_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_CORE_BUNDLE_SHA256");
 const SOURCES_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_SOURCES_BUNDLE_SHA256");
 const GRAPH_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_GRAPH_BUNDLE_SHA256");
+const EFFECTS_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_EFFECTS_BUNDLE_SHA256");
 const PRODUCTION_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_PRODUCTION_BUNDLE_SHA256");
 const REVIEW_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_REVIEW_BUNDLE_SHA256");
 const INTEGRATIONS_BUNDLE: Option<&str> =
@@ -28,6 +29,7 @@ enum Profile {
     Core,
     Sources,
     Graph,
+    Effects,
     Production,
     Review,
     Integrations,
@@ -265,6 +267,18 @@ const OPERATIONS: &[Operation] = &[
         read: false,
         consent: false,
         profile: Profile::Graph,
+    },
+    Operation {
+        suffix: "effects-inspect",
+        read: true,
+        consent: false,
+        profile: Profile::Effects,
+    },
+    Operation {
+        suffix: "effects-record",
+        read: false,
+        consent: false,
+        profile: Profile::Effects,
     },
     Operation {
         suffix: "extension-discovery",
@@ -529,6 +543,7 @@ async fn main() -> Result<()> {
     let core = bridge("launchwright-core.cjs", CORE_BUNDLE)?;
     let sources = bridge("launchwright-sources.cjs", SOURCES_BUNDLE)?;
     let graph = bridge("launchwright-graph.cjs", GRAPH_BUNDLE)?;
+    let effects = bridge("launchwright-effects.cjs", EFFECTS_BUNDLE)?;
     let production = bridge("launchwright-production.cjs", PRODUCTION_BUNDLE)?;
     let review = bridge("launchwright-review.cjs", REVIEW_BUNDLE)?;
     let integrations = bridge("launchwright-integrations.cjs", INTEGRATIONS_BUNDLE)?;
@@ -546,6 +561,7 @@ async fn main() -> Result<()> {
             Profile::Core => core.clone(),
             Profile::Sources => sources.clone(),
             Profile::Graph => graph.clone(),
+            Profile::Effects => effects.clone(),
             Profile::Production => production.clone(),
             Profile::Review => review.clone(),
             Profile::Integrations => integrations.clone(),
@@ -576,7 +592,7 @@ mod tests {
         for spec in OPERATIONS {
             assert!(names.insert(spec.suffix));
         }
-        assert_eq!(names.len(), 68);
+        assert_eq!(names.len(), 70);
     }
     #[test]
     fn canonical_graph_adapter_is_linked_without_an_admission_surface() {
@@ -590,6 +606,17 @@ mod tests {
         );
     }
     #[test]
+    fn canonical_effects_readback_is_linked_without_execution_authority() {
+        assert_eq!(
+            semwright_native_sdk::effects_readback::SCOPE,
+            "immutable_native_sdk_artifact_properties_only"
+        );
+        assert_eq!(
+            semwright_native_sdk::effects_readback::RESULT_SCHEMA,
+            "semwright-native-effects-result/1"
+        );
+    }
+    #[test]
     fn profile_partition_counts_are_stable() {
         let mut counts = std::collections::BTreeMap::new();
         for spec in OPERATIONS {
@@ -598,6 +625,7 @@ mod tests {
         assert_eq!(counts.get(&Profile::Core), Some(&13));
         assert_eq!(counts.get(&Profile::Sources), Some(&2));
         assert_eq!(counts.get(&Profile::Graph), Some(&2));
+        assert_eq!(counts.get(&Profile::Effects), Some(&2));
         assert_eq!(counts.get(&Profile::Production), Some(&9));
         assert_eq!(counts.get(&Profile::Review), Some(&9));
         assert_eq!(counts.get(&Profile::Integrations), Some(&12));

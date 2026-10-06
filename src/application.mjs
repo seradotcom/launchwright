@@ -20,6 +20,7 @@ import { PLATFORM_ACTIONS, PUBLICATION_ACTIONS, PLATFORM_READ_ACTIONS, preparePu
 import { listEvents } from './events.mjs';
 import { inspectMobileImport, registerMobileImport } from './mobile-import.mjs';
 import { CANONICAL_GRAPH_ACTIONS, CANONICAL_GRAPH_MUTATIONS, prepareGraphWork, inspectGraph, recordGraphObservation } from './graph.mjs';
+import { inspectEffects, recordEffectResult } from './effects.mjs';
 
 export class LaunchwrightApplication {
   constructor(root, { initialize = false, readOnly = false, principal = 'local-owner', scopes = ['read','edit','capture','review','publish','consume','admin'], capabilities = {} } = {}) {
@@ -84,7 +85,7 @@ export class LaunchwrightApplication {
   }
   describe(){return{app:'Launchwright',version:APP_VERSION,schema_version:'launchwright/1',workspace_version:this.store.version(),request_epoch:this.store.meta().epoch,
     scope_mode:'local-single-owner',principal:this.principal,scopes:[...this.scopes],native_sdk:'0.9.0-dev.1',operations:Object.entries(OPERATION_SCOPES).map(([name,scope])=>({name,scope,read_only:READ_OPERATIONS.has(name)})),
-    capabilities:{editorial_text_exports:'available',durable_entity_history:this.store.hasHistory?'available':'migration-required',private_draft_delivery:'available',portable_snapshot_restore:'available-local-admin',declared_release_contracts:'available',localization_ledger:'available-layout-quality-not-inferred',extension_descriptors:'available-no-remote-code',compatibility_negotiation:'available',profile_preflight:'available-contract-only',state_anchors:'contract-and-assessment-only',impact_proposals:'available-no-execution-authority',document_change_proposals:'available-application-local-no-auto-merge',capture_receipts:'available-provenance-only',verification_ledger:'available-canonical-pass-requires-admission',waivers:'available-never-overwrite-verifier-state',channel_packages:'available-no-send',native_driver_host:'requires-owner-pinned-bundle-and-broker',platform:this.capabilities.platform??'not-connected',canonical_graph:'canonical-project-contracts-available-live-admission-required',browser_capture:'requires-canonical-driver-recipe',media_render:'requires-composition-recipe',mobile:'provenance-import-only',public_delivery:'requires-canonical-publish-receipt',...this.capabilities},
+    capabilities:{editorial_text_exports:'available',durable_entity_history:this.store.hasHistory?'available':'migration-required',private_draft_delivery:'available',portable_snapshot_restore:'available-local-admin',declared_release_contracts:'available',localization_ledger:'available-layout-quality-not-inferred',extension_descriptors:'available-no-remote-code',compatibility_negotiation:'available',profile_preflight:'available-contract-only',state_anchors:'contract-and-assessment-only',impact_proposals:'available-no-execution-authority',document_change_proposals:'available-application-local-no-auto-merge',capture_receipts:'available-provenance-only',verification_ledger:'available-canonical-pass-requires-admission',waivers:'available-never-overwrite-verifier-state',channel_packages:'available-no-send',native_driver_host:'requires-owner-pinned-bundle-and-broker',platform:this.capabilities.platform??'not-connected',canonical_graph:'canonical-project-contracts-available-live-admission-required',canonical_effects:'native-sdk-immutable-readback-contract-available-live-admission-required',browser_capture:'requires-canonical-driver-recipe',media_render:'requires-composition-recipe',mobile:'provenance-import-only',public_delivery:'requires-canonical-publish-receipt',...this.capabilities},
     limits:{page_items:128,reply_bytes:256*1024,artifact_bytes:1024*1024,receipt_epoch_items:20000},disclosure:'Local editorial checks are not Platform approvals or canonical effect verification.'};}
   profilePreflight(input){return runProfilePreflight(this,input);}
   extensionDiscovery(input){
@@ -133,6 +134,7 @@ export class LaunchwrightApplication {
       case'release.coverage':inputObject(input,['release_id']);return this.coverage(input.release_id);
       case'release.impact':inputObject(input,['release_id']);return this.impact(input.release_id);
       case'graph.inspect':return inspectGraph(this,input);
+      case'effects.inspect':return inspectEffects(this,input);
       case'anchor.assess':{
         inputObject(input,['id','observed_matches']);const anchor=this.get(input.id,'anchor');const observed=integer(input.observed_matches,0,1000);
         const expected=anchor.data.expected_count,state=observed===expected?'PASS':'FAIL';
@@ -255,6 +257,7 @@ export class LaunchwrightApplication {
         return{entity:this.store.retire(e.id,{subject_id:e.id,original_kind:e.kind,retired_at:iso(),reason:input.reason,content_revoked:true})};
       }
       case'graph.record':return recordGraphObservation(this,input);
+      case'effects.record':return recordEffectResult(this,input);
       case'relation.record':{
         inputObject(input,['release_id','name','from_id','to_id','relation_kind','provenance','completeness','evidence_ids','graph_observation_id'],['release_id','name','from_id','to_id','relation_kind','provenance','completeness']);
         const release=this.get(input.release_id,'release'),from=this.get(input.from_id),to=this.get(input.to_id);str(input.name,160);str(input.relation_kind,128);ensure(/^[a-z][a-z0-9_.-]{0,127}$/.test(input.relation_kind),'Invalid relation kind');

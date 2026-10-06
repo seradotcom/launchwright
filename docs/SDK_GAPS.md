@@ -6,7 +6,7 @@ These are explicit integration gaps, not implied application successes.
 | --- | --- | --- |
 | Browser/product capture | Stores approved source/scenario contracts plus capture-contract v2: exact Platform/native receipt correlation, readiness/anchors, drift, isolation/cleanup and provenance/derivative eligibility | Semwright browser/native driver execution and Host acceptance |
 | Project Graph | Prepares canonical `project.*` reads plus `project.edge.declare`, binds exact local revisions, records immutable response digests, preserves admitted output verbatim and invalidates stale local bindings | Live Host/Broker admission, authenticated Project access and end-to-end CURRENT/STALE evidence on a supported runner |
-| Effects | Scenarios can declare bounded effects | Canonical Effect evaluator and admitted receipts |
+| Effects | Stores exact results from the pinned Native SDK immutable JSON/CSV Effects reader, exact artifact/scenario revision bindings and owner-gated admission; dedicated CI lane runs the real upstream binary | Native application mutation/noninterference effects, Driver Host admission and scenario-effect coverage on a supported real runner |
 | Media | VTT timing and text artifacts are local | Composition timeline, render and media verification |
 | Verification | Full immutable verifier/coverage/finding ledger; canonical PASS gated | Canonical verifier admission/runtime |
 | Platform work | Durable intent and pending/recovery custody | Platform scheduler, budget and job authority |
