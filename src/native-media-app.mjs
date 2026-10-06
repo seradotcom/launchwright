@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 import { NativeError } from '@semwright/native-sdk';
 import { NativeProfileApplication } from './native-profile-base.mjs';
-import { createMediaPlan, reviseMediaPlan, inspectMediaPlan, recordMediaOutput, recordMediaReview } from './media.mjs';
+import { createMediaPlan, reviseMediaPlan, inspectMediaPlan, prepareCompositionManifest, recordMediaOutput, recordMediaReview } from './media.mjs';
 
-export const MEDIA_NATIVE_READS=Object.freeze(['media.inspect']);
+export const MEDIA_NATIVE_READS=Object.freeze(['media.inspect','media.composition_manifest']);
 export const MEDIA_NATIVE_MUTATIONS=Object.freeze(['media.plan','media.revise','media.output_record','media.review_record']);
 export const MEDIA_NATIVE_OPERATIONS=Object.freeze([...MEDIA_NATIVE_READS,...MEDIA_NATIVE_MUTATIONS]);
 
@@ -14,6 +14,7 @@ export class MediaNativeApplication extends NativeProfileApplication{
   read(operation,input){
     switch(operation){
       case'media.inspect':return inspectMediaPlan(this,input);
+      case'media.composition_manifest':return prepareCompositionManifest(this,input);
       default:throw new NativeError('Unsupported','Read operation is outside media profile');
     }
   }
