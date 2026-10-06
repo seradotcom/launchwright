@@ -29,6 +29,10 @@ Node 24.21.x is the acceptance runtime. Another local Node version is diagnostic
 
 Always retain the exact run URL, SHA and artifact name in `ACCEPTANCE.md` after a successful run.
 
+## Usage and billing projection
+
+`usage.reserve` is application-side preflight only: it may not exceed the work budget, but it does not reserve money or capacity in Semwright Platform. `usage.record` retains provider observations idempotently by source/event ID, including externally observed overruns. `usage.adjust` finalizes or corrects the application projection from explicit measured receipt IDs. `usage.inspect` keeps estimate, measured usage, reservation, accounted charge and overruns separate. `billing.test_callback` is permanently test-only and never retries render work or mutates evidence. Reconcile all of these records against canonical Platform ledger/billing receipts before making any financial claim.
+
 ## Incident: lost mutation reply
 
 Do not issue a replacement mutation. Recover the original request identity. In the browser, the pending request remains in localStorage until reconciliation. Platform-bound work also keeps its exported request before the one allowed send.

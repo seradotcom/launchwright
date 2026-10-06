@@ -1,0 +1,158 @@
+{
+  "schema_version": "launchwright-native-bundles/2",
+  "sdk_sha": "4d291de26724810017ce7b6d185326514cb79fa6",
+  "native_sdk": "0.9.0-dev.1",
+  "max_bundle_bytes": 49152,
+  "max_combined_stdin_bytes": 65536,
+  "host_accepted": false,
+  "profiles": {
+    "core": {
+      "entry": "src/native-core-entry.mjs",
+      "file": "launchwright-core.cjs",
+      "sha256": "3ee474c97d1945bff3ecb538fc2b4107777239a0447a375a4d29163b5b695a93",
+      "bytes": 45798,
+      "remaining_frame_bytes": 18714,
+      "operations": [
+        "workspace.describe",
+        "resource.get",
+        "events.list",
+        "history.get",
+        "history.list",
+        "history.diff",
+        "change.inspect",
+        "entity.create",
+        "entity.update",
+        "entity.retire",
+        "change.propose",
+        "change.apply",
+        "template.instantiate"
+      ]
+    },
+    "production": {
+      "entry": "src/native-production-entry.mjs",
+      "file": "launchwright-production.cjs",
+      "sha256": "d6e208065709d753c70a191399bb2340d02dfd75cb64f3e830b8fdf3990d8af4",
+      "bytes": 45744,
+      "remaining_frame_bytes": 18768,
+      "operations": [
+        "release.coverage",
+        "release.impact",
+        "anchor.assess",
+        "artifact.read",
+        "relation.record",
+        "impact.plan",
+        "evidence.import",
+        "capture.ingest",
+        "deliverable.render"
+      ]
+    },
+    "review": {
+      "entry": "src/native-review-entry.mjs",
+      "file": "launchwright-review.cjs",
+      "sha256": "f6b7e701fde3a2e814c3529e14a99c34f76c62114e3fe5ce3936a2b238b24121",
+      "bytes": 47048,
+      "remaining_frame_bytes": 17464,
+      "operations": [
+        "candidate.inspect",
+        "verification.summary",
+        "verification.record",
+        "waiver.record",
+        "candidate.freeze",
+        "candidate.review",
+        "candidate.deliver_private",
+        "channel.package"
+      ]
+    },
+    "integrations": {
+      "entry": "src/native-integrations-entry.mjs",
+      "file": "launchwright-integrations.cjs",
+      "sha256": "9d2023cefc4fc6a435ce4351adac8bcbd181ca7d8a2706464865bb5cf4804ad3",
+      "bytes": 34008,
+      "remaining_frame_bytes": 30504,
+      "operations": [
+        "localization.assess",
+        "profile.matrix",
+        "profile.preflight",
+        "channel.status",
+        "localization.create",
+        "localization.update",
+        "channel.record_outcome"
+      ]
+    },
+    "extensions": {
+      "entry": "src/native-extensions-entry.mjs",
+      "file": "launchwright-extensions.cjs",
+      "sha256": "37ff252a26fb7696795059127a90102fda802e51f955d773b226c3072c396378",
+      "bytes": 42388,
+      "remaining_frame_bytes": 22124,
+      "operations": [
+        "extension.discovery",
+        "extension.generic_view",
+        "extension.preparation_status",
+        "extension.result_inspect",
+        "source.cli_inspect",
+        "compatibility.negotiate",
+        "compatibility.inspect",
+        "extension.register",
+        "extension.retire",
+        "extension.prepare_use",
+        "extension.result_record",
+        "source.cli_ingest",
+        "compatibility.lock"
+      ]
+    },
+    "work": {
+      "entry": "src/native-work-entry.mjs",
+      "file": "launchwright-work.cjs",
+      "sha256": "575920711de55b50b65097a4fd7fb4482be03036e390610c1f65ca8ba544ee91",
+      "bytes": 41985,
+      "remaining_frame_bytes": 22527,
+      "operations": [
+        "workspace.snapshot",
+        "usage.inspect",
+        "work.prepare",
+        "work.claim",
+        "work.complete",
+        "work.mark_unknown",
+        "usage.reserve",
+        "usage.record",
+        "usage.adjust",
+        "billing.test_callback",
+        "workspace.rotate_epoch"
+      ]
+    },
+    "media": {
+      "entry": "src/native-media-entry.mjs",
+      "file": "launchwright-media.cjs",
+      "sha256": "fef18a2fdc7569ed4296e64c3a66ce62afab1669bcbdb22e72db757a0cdbce6f",
+      "bytes": 39798,
+      "remaining_frame_bytes": 24714,
+      "operations": [
+        "media.inspect",
+        "media.plan",
+        "media.revise",
+        "media.output_record",
+        "media.review_record"
+      ]
+    },
+    "publish": {
+      "entry": "src/native-publish-entry.mjs",
+      "file": "launchwright-publish.cjs",
+      "sha256": "712acf3030f8ad4c4618a28929db1043cec0a891a7f3766d6b133650dad2a7d9",
+      "bytes": 48298,
+      "remaining_frame_bytes": 16214,
+      "operations": [
+        "publish.inspect",
+        "publish.template_create",
+        "publish.template_update",
+        "publish.version_freeze",
+        "publish.deployment_create",
+        "publish.deployment_transition",
+        "publish.invoke_prepare",
+        "publish.export",
+        "publish.import",
+        "publish.import_rebind"
+      ]
+    }
+  }
+}

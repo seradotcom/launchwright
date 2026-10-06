@@ -16,6 +16,7 @@ import { getHistory, listHistory, diffHistory } from './history.mjs';
 import { createMediaPlan, reviseMediaPlan, inspectMediaPlan, recordMediaOutput, recordMediaReview } from './media.mjs';
 import { createReleaseTemplate, updateReleaseTemplate, freezeProductVersion, createDeployment, transitionDeployment, prepareInvocation, inspectPublish, exportProductVersion, importProductVersion, rebindImportedTemplate } from './publish.mjs';
 import { PLATFORM_ACTIONS, PUBLICATION_ACTIONS, PLATFORM_READ_ACTIONS, preparePublicationWork } from './publish-work.mjs';
+import { reserveUsage, recordUsage, adjustUsage, inspectUsage, recordBillingTestCallback } from './usage-ledger.mjs';
 
 export class LaunchwrightApplication {
   constructor(root, { initialize = false, readOnly = false, principal = 'local-owner', scopes = ['read','edit','capture','review','publish','consume','admin'], capabilities = {} } = {}) {
@@ -165,6 +166,7 @@ export class LaunchwrightApplication {
       case'compatibility.negotiate':return this.compatibilityNegotiate(input);
       case'compatibility.inspect':inputObject(input,['id']);return this.compatibilityInspect(input.id);
       case'change.inspect':inputObject(input,['id']);return inspectChange(this,input.id);
+      case'usage.inspect':return inspectUsage(this,input);
       case'media.inspect':return inspectMediaPlan(this,input);
       case'publish.inspect':return inspectPublish(this,input);
       case'artifact.read':{
@@ -419,6 +421,10 @@ export class LaunchwrightApplication {
       case'work.mark_unknown':{
         inputObject(input,['id']);const w=this.get(input.id,'work');ensure(['CLAIMED','OUTCOME_UNKNOWN'].includes(w.data.state),'Only claimed work can have an unknown send outcome','Conflict');return{entity:this.store.update(w.id,{...w.data,state:'OUTCOME_UNKNOWN'})};
       }
+      case'usage.reserve':return reserveUsage(this,input);
+      case'usage.record':return recordUsage(this,input);
+      case'usage.adjust':return adjustUsage(this,input);
+      case'billing.test_callback':return recordBillingTestCallback(this,input);
       case'workspace.rotate_epoch':{
         inputObject(input,['expected_epoch']);integer(input.expected_epoch,0,Number.MAX_SAFE_INTEGER-1);ensure(this.store.meta().epoch===input.expected_epoch,'Request epoch changed','Conflict');
         const next=input.expected_epoch+1;this.store.db.prepare('UPDATE meta SET epoch=? WHERE singleton=1').run(next);this.store.db.prepare('DELETE FROM receipts WHERE epoch<?').run(Math.max(0,next-1));return{request_epoch:next};
