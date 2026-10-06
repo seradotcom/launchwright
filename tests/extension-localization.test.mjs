@@ -117,3 +117,60 @@ test('compatibility locks detect retired extension drift and major negotiation n
   assert.deepEqual(negotiation.unsupported_kinds,['future_kind']);
   assert.equal(negotiation.major_mismatch_behavior,'reject');
 });
+
+
+test('generic extension view preserves package rights and refuses false renderer equivalence', async t=>{
+  const {app}=setup(t);
+  const renderer={name:'Synthetic diagram renderer',type:'deliverable_renderer',package_version:'3.1.0',schema_major:1,digest:'e'.repeat(64),license:'Apache-2.0',source:'repo:synthetic/diagram-renderer',permissions:['read','edit'],inputs:['diagram-model/1'],outputs:['svg-artifact/1'],preconditions:['typed-model'],evidence:['fidelity-report'],limits:{max_input_bytes:8192,max_output_bytes:65536,timeout_seconds:20},
+    renderer:{fidelity:'bounded-loss',equivalent:false,preserved_relations:['parent-child'],lost_relations:['camera-depth'],constraints:['2d-only']},
+    rights:{owner:'Synthetic fixture',package_license:'Apache-2.0',redistribution:'metadata-only',notices:['Synthetic package notice'],third_party:[{name:'Synthetic font metadata',license:'OFL-1.1',source:'https://example.invalid/font',redistribution:'forbidden',notice:'Metadata only; bytes are not bundled.'}]},
+    namespaces:{'example.renderer':{quality:'bounded',units:'px'}}};
+  const ext=(await execute(app,'extension.register',renderer)).entity;
+  const discovery=await execute(app,'extension.discovery',{});
+  assert.equal(discovery.schema_version,'launchwright-extension-discovery/2');
+  const view=discovery.items.find(item=>item.id===ext.id);
+  assert.equal(view.presentation_code_executable,false);
+  assert.equal(view.authority_grants_from_descriptor,false);
+  assert.equal(view.renderer.equivalent,false);
+  assert.deepEqual(view.renderer.lost_relations,['camera-depth']);
+  assert.equal(view.rights.redistribution,'metadata-only');
+  assert.equal(view.rights.third_party[0].redistribution,'forbidden');
+  assert.deepEqual(view.properties.namespaces['example.renderer'],{quality:'bounded',units:'px'});
+  await assert.rejects(execute(app,'extension.register',{...renderer,name:'False exact renderer',package_version:'3.1.1',digest:'f'.repeat(64),renderer:{fidelity:'exact',equivalent:true,preserved_relations:[],lost_relations:['required-relation'],constraints:[]}}),/cannot claim equivalence/i);
+  await assert.rejects(execute(app,'extension.register',{...renderer,name:'Executable descriptor',package_version:'3.1.2',digest:'1'.repeat(64),namespaces:{'example.renderer':{html:'<script>alert(1)</script>'}}}),/presentation code/i);
+});
+
+test('retirement identifies affected locks, blocks reuse and preserves historical lock evidence', async t=>{
+  const {app}=setup(t);const b=await baseline(app);
+  const manifest={name:'Synthetic git source',type:'source_adapter',package_version:'1.0.0',schema_major:1,digest:'2'.repeat(64),license:'MIT',source:'repo:synthetic/git-source',permissions:['read','capture'],inputs:['git-tree/1'],outputs:['source-observation/1'],preconditions:['repository-readable'],evidence:['tree-digest'],limits:{max_input_bytes:4096,max_output_bytes:4096,timeout_seconds:10},rights:{package_license:'MIT',redistribution:'metadata-only',notices:[],third_party:[]}};
+  const ext=(await execute(app,'extension.register',manifest)).entity;
+  const lock=(await execute(app,'compatibility.lock',{product_id:b.product.id,name:'Git source lock',components:[{kind:'source-adapter',name:ext.data.name,version:ext.data.package_version,digest:ext.data.digest,resource_id:ext.id}],notes:'Non-DOM source adapter rehearsal'})).entity;
+  const retired=await execute(app,'extension.retire',{id:ext.id,expected:ext.version,reason:'Revoked synthetic package'});
+  assert.deepEqual(retired.affected_compatibility_lock_ids,[lock.id]);
+  assert.equal(retired.prior_attempts_preserved,true);
+  assert.equal(retired.automatic_rerun,false);
+  const historical=await execute(app,'resource.get',{id:lock.id});
+  assert.equal(historical.id,lock.id);
+  const inspected=await execute(app,'compatibility.inspect',{id:lock.id});
+  assert.equal(inspected.state,'DRIFT');
+  assert.equal(inspected.components[0].state,'RETIRED');
+  await assert.rejects(execute(app,'compatibility.lock',{product_id:b.product.id,name:'Forbidden reuse',components:[{kind:'source-adapter',name:ext.data.name,version:ext.data.package_version,digest:ext.data.digest,resource_id:ext.id}]}),/retired extension/i);
+});
+
+test('compatibility rehearsal records change without inheriting prior PASS evidence', async t=>{
+  const {app}=setup(t);const b=await baseline(app);
+  const base={name:'Synthetic channel adapter',type:'channel_adapter',schema_major:1,license:'AGPL-3.0-only',source:'repo:synthetic/channel',permissions:['publish'],inputs:['candidate/1'],outputs:['receipt/1'],preconditions:['consent'],evidence:['receipt'],limits:{max_input_bytes:4096,max_output_bytes:4096,timeout_seconds:10}};
+  const v1=(await execute(app,'extension.register',{...base,package_version:'1.0.0',digest:'3'.repeat(64)})).entity;
+  const v2=(await execute(app,'extension.register',{...base,package_version:'2.0.0',digest:'4'.repeat(64)})).entity;
+  const first=(await execute(app,'compatibility.lock',{product_id:b.product.id,name:'Channel toolchain v1',components:[{kind:'channel-adapter',name:base.name,version:v1.data.package_version,digest:v1.data.digest,resource_id:v1.id}]})).entity;
+  const next=(await execute(app,'compatibility.lock',{product_id:b.product.id,name:'Channel toolchain v2 rehearsal',rehearsal_of_id:first.id,components:[{kind:'channel-adapter',name:base.name,version:v2.data.package_version,digest:v2.data.digest,resource_id:v2.id}],notes:'Explicit upgrade rehearsal'})).entity;
+  assert.equal(next.data.rehearsal.from_lock_id,first.id);
+  assert.equal(next.data.rehearsal.previous_state,'CURRENT');
+  assert.equal(next.data.rehearsal.evidence_reused,false);
+  assert.deepEqual(next.data.rehearsal.inherited_passes,[]);
+  assert.equal(next.data.rehearsal.state,'REQUIRES_REVIEW');
+  assert.equal(next.data.rehearsal.changed_components.length,1);
+  const negotiation=await execute(app,'compatibility.negotiate',{schema_major:1,operations:['future.operation'],kinds:['future_kind']});
+  assert.equal(negotiation.compatible,true);
+  assert.deepEqual(negotiation.diagnostics.map(x=>x.code),['OPERATION_UNSUPPORTED','KIND_UNSUPPORTED']);
+});

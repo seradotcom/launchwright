@@ -77,3 +77,12 @@ Export serializes only the authorized contract/pins and explicitly carries no cr
 Portable snapshot v2 contains application entities, exact entity revision history, migration provenance, content-addressed blobs, aliases, pending records and audit events. Historical request receipts are exported for forensic continuity but intentionally not activated during restore. Restored uncertain intents are marked RESTORE_RECONCILE_REQUIRED.
 
 Restore also accepts the older snapshot-v1 envelope. Because v1 did not carry entity-history rows, restore archives only each current entity revision and records that earlier snapshot history was NOT_RECONSTRUCTED; it never synthesizes old revisions from audit events.
+
+
+## Extension contracts and compatibility rehearsal
+
+R17 keeps extension metadata declarative. Source adapters, renderers, channel adapters and verifier profiles are registered as bounded descriptors; registration never fetches or executes package code. Discovery returns a generic escaped-data view that carries contracts, permissions, namespaces, rights/notices and renderer fidelity without HTML/JS or authority grants. Renderer descriptors cannot claim exact equivalence when a required relation is declared lost.
+
+Retiring a descriptor blocks new compatibility locks and reports existing locks that pin the retired package without deleting those historical records or forcing a rerun. A replacement lock may name `rehearsal_of_id`; the new lock records component differences and explicitly records `evidence_reused: false` with no inherited PASS list. Platform registry distribution/revocation and real extension package execution remain external acceptance gates.
+
+Native SDK transport is split so extension/compatibility operations use the dedicated `extensions` bridge profile instead of increasing the canonical 48 KiB bundle limit.
