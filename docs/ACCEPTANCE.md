@@ -4,6 +4,13 @@ This ledger separates implemented behavior from execution evidence. A PASS belon
 
 ## Supplemental workstation checks
 
+R19 pre-Host checkpoint on the workstation:
+
+- Node 22.22.0 remains **outside** the supported Native SDK engine and therefore cannot establish supported-engine acceptance.
+- `npm test`: **175 passed, 0 failed, 0 skipped**. The three new R19 source regressions lock the exact Semwright SHA, real Host/sandbox requirements and the non-escalation of Driver Host evidence into external Platform authority. Exact TAP is retained in `evidence/r19/local-test.tap`.
+- `node scripts/verify.mjs`: **97 JavaScript modules and 84 Native driver operations** checked; source lock/syntax PASS. Exact output is retained in `evidence/r19/verify.json`, and `host_acceptance` intentionally remains false because workstation/direct-process evidence cannot establish Driver Host isolation.
+- The R19 `host` lane itself is CI-only. Its status belongs to the exact pushed SHA and is recorded only after the real daemon/Broker/Policy/Driver Host route completes.
+
 Supplemental workstation pass for the current R12 Effects-readback branch:
 
 - Node: 22.22.0 — **outside** the Native SDK supported engine.
@@ -37,6 +44,7 @@ R11 exact-SHA acceptance is complete for `71f9c89604a2b244cac12661db3a09493ff7f7
 The manual heavy workflow provides independent lanes:
 
 - **native**: build the pinned canonical TypeScript SDK, generate/hash all ten bounded bridge profiles, compile/test the real Rust NativeDriver including Project Graph and Effects SDK feature locks, and run a bridge smoke against each profile.
+- **host**: check out the exact pinned Semwright source and exercise Launchwright through the real daemon/Broker/Policy/Driver Host with its sealed Node runtime and ten owner-pinned NodeBridge bundles. The lane requires durable mutation/readback, stale native-ref rejection across Host restart, exact request-digest rejection without state change, provider provenance, and an explicit policy-denied negative control. Only an exact-SHA green run may establish Launchwright Driver Host isolation; it does not establish external Platform, Publish or ChatGPT-host authority.
 - **effects**: build the real pinned `semwright-native-effects` binary, prepare a protected spec for an exact Launchwright-owned JSON artifact, require the canonical immutable-artifact PASS/readback scope with `execution_authority:false`, then record and reinspect that exact result through Launchwright. This does not claim mutation/noninterference or Host acceptance.
 - **browser**: install Chromium on a disposable GitHub runner and exercise the real Launchwright UI.
 - **deltadesk**: check out the exact pinned Semwright source, run its real Chromium semantic adapter against the owned DeltaDesk A/B fixture, retain exact screenshots/receipt hashes, and ingest those results into `launchwright-capture/2` as `IMPORTED_UNVERIFIED` without fabricating Platform or Host authority.
@@ -51,7 +59,7 @@ Durable identity/revisions; exact archived entity history with get/list/diff; ex
 
 ## Explicitly not established
 
-- canonical Driver Host isolation/acceptance of Launchwright; the executable DeltaCLI fixture proves a real non-DOM process path and receipt ingestion only, not Host isolation;
+- canonical Driver Host isolation/acceptance of Launchwright remains unestablished for a source SHA until that exact SHA passes the selective `host` lane; direct-process bundle smoke and the DeltaCLI fixture do not substitute for that run;
 - live production Platform execution, budgets or billing;
 - live Project Graph traversal/query execution and owner/Host admission; canonical native/browser/Godot mutation-effect, noninterference and scenario-effect execution/admission beyond the narrower immutable-artifact Effects readback; R9/R12 custody layers do not replace those authorities;
 - canonical real customer browser/mobile/Godot product capture; the R10 owned DeltaDesk browser lane is cross-system adapter evidence only and remains imported-unverified until Platform/Host authority exists;

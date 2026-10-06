@@ -29,4 +29,12 @@ The split is an installation profile, not a second application protocol. Every p
 
 Launchwright does not expose arbitrary Python/JavaScript execution, caller-selected runtime paths, dynamic mounts or a second protocol. Runtime acceptance still belongs to the real Semwright Host/Broker boundary; a successful local bridge test or Rust build is not a Host-isolation certificate.
 
+## Real Driver Host acceptance
+
+The selective GitHub Actions `host` lane is the acceptance path for Launchwright's own NativeDriver. It checks out the exact Semwright SHA from `SOURCE_LOCK.json`, configures Semwright's disposable-runner sandbox profile, builds the real Semwright daemon/CLI/sandbox and the real Launchwright NativeDriver, and stages all ten reviewed NodeBridge bundles plus a SHA-pinned Node 24 runtime. The test then executes through **CLI → daemon → Broker/Policy → Driver Host → Launchwright NativeDriver → Host-mediated sealed Node tool → owner-pinned bundle → SQLite workspace**.
+
+`scripts/verify-native-host.py` verifies provider provenance and descriptor/generation bindings, performs a durable mutation and readback, proves the old opaque native ref is unusable after daemon/Host restart while application state persists, rejects an invalid request digest without changing the workspace revision, and repeats the route with `driver:launchwright` removed from policy to prove fail-closed denial. The harness is CI-only and refuses to substitute an in-process Provider.
+
+A green `host` lane is exact-SHA evidence for this Driver Host/Broker/Policy boundary. It is **not** Semwright Cloud/Platform acceptance, remote tenant authentication, Platform Publish acceptance, public-channel delivery, canonical Graph traversal, broad mutation/noninterference Effects acceptance, or ChatGPT host acceptance. Those authorities remain separate.
+
 The optional Platform adapter consumes an owner-supplied, byte-pinned client because the inspected Platform package is not licensed for redistribution in this public repository.
