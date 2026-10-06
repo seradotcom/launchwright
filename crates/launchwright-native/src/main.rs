@@ -22,6 +22,7 @@ const VERIFICATION_BUNDLE: Option<&str> =
     option_env!("LAUNCHWRIGHT_NATIVE_VERIFICATION_BUNDLE_SHA256");
 const INTEGRATIONS_BUNDLE: Option<&str> =
     option_env!("LAUNCHWRIGHT_NATIVE_INTEGRATIONS_BUNDLE_SHA256");
+const EXTENSIONS_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_EXTENSIONS_BUNDLE_SHA256");
 const WORK_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_WORK_BUNDLE_SHA256");
 const USAGE_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_USAGE_BUNDLE_SHA256");
 const MEDIA_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_MEDIA_BUNDLE_SHA256");
@@ -37,6 +38,7 @@ enum Profile {
     Review,
     Verification,
     Integrations,
+    Extensions,
     Work,
     Usage,
     Media,
@@ -301,19 +303,19 @@ const OPERATIONS: &[Operation] = &[
         suffix: "extension-discovery",
         read: true,
         consent: false,
-        profile: Profile::Integrations,
+        profile: Profile::Extensions,
     },
     Operation {
         suffix: "compatibility-negotiate",
         read: true,
         consent: false,
-        profile: Profile::Integrations,
+        profile: Profile::Extensions,
     },
     Operation {
         suffix: "compatibility-inspect",
         read: true,
         consent: false,
-        profile: Profile::Integrations,
+        profile: Profile::Extensions,
     },
     Operation {
         suffix: "mobile-inspect",
@@ -343,19 +345,19 @@ const OPERATIONS: &[Operation] = &[
         suffix: "extension-register",
         read: false,
         consent: false,
-        profile: Profile::Integrations,
+        profile: Profile::Extensions,
     },
     Operation {
         suffix: "extension-retire",
         read: false,
         consent: false,
-        profile: Profile::Integrations,
+        profile: Profile::Extensions,
     },
     Operation {
         suffix: "compatibility-lock",
         read: false,
         consent: false,
-        profile: Profile::Integrations,
+        profile: Profile::Extensions,
     },
     Operation {
         suffix: "workspace-snapshot",
@@ -607,6 +609,7 @@ async fn main() -> Result<()> {
     let review = bridge("launchwright-review.cjs", REVIEW_BUNDLE)?;
     let verification = bridge("launchwright-verification.cjs", VERIFICATION_BUNDLE)?;
     let integrations = bridge("launchwright-integrations.cjs", INTEGRATIONS_BUNDLE)?;
+    let extensions = bridge("launchwright-extensions.cjs", EXTENSIONS_BUNDLE)?;
     let work = bridge("launchwright-work.cjs", WORK_BUNDLE)?;
     let usage = bridge("launchwright-usage.cjs", USAGE_BUNDLE)?;
     let media = bridge("launchwright-media.cjs", MEDIA_BUNDLE)?;
@@ -627,6 +630,7 @@ async fn main() -> Result<()> {
             Profile::Review => review.clone(),
             Profile::Verification => verification.clone(),
             Profile::Integrations => integrations.clone(),
+            Profile::Extensions => extensions.clone(),
             Profile::Work => work.clone(),
             Profile::Usage => usage.clone(),
             Profile::Media => media.clone(),
@@ -692,7 +696,8 @@ mod tests {
         assert_eq!(counts.get(&Profile::Production), Some(&9));
         assert_eq!(counts.get(&Profile::Review), Some(&6));
         assert_eq!(counts.get(&Profile::Verification), Some(&5));
-        assert_eq!(counts.get(&Profile::Integrations), Some(&12));
+        assert_eq!(counts.get(&Profile::Integrations), Some(&6));
+        assert_eq!(counts.get(&Profile::Extensions), Some(&6));
         assert_eq!(counts.get(&Profile::Work), Some(&6));
         assert_eq!(counts.get(&Profile::Usage), Some(&6));
         assert_eq!(counts.get(&Profile::Media), Some(&6));

@@ -17,3 +17,8 @@ These are explicit integration gaps, not implied application successes.
 | Plugin/ChatGPT host | Native Application bridge is implemented | Host-side product acceptance |
 
 No application-side schema should be promoted to an upstream Semwright API merely because it is useful locally.
+
+
+## R17 extension boundary
+
+Launchwright now has a dedicated Native SDK `extensions` profile for extension discovery/registration/retirement and compatibility negotiation/inspection/locking. It deliberately does not create a second package registry or Driver SDK host. Real package distribution, approvals, revocation enforcement in running jobs, runtime isolation and executable renderer/provider code remain Platform/Host responsibilities and require their own acceptance evidence.

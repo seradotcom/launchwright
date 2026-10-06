@@ -1,0 +1,72 @@
+
+> launchwright@0.2.0-dev.17 build:native-bundle
+> node scripts/build-native-bundle.mjs
+
+
+  dist/core.esbuild.cjs  44.0kb
+
+⚡ Done in 11ms
+core: 44728 bytes 893f3fb37a45a837bff3a7dcc80e3fa7c0b52f06795923387a1997fb4adc30dc
+
+  dist/sources.esbuild.cjs  25.1kb
+
+⚡ Done in 6ms
+sources: 25312 bytes b5b0e9bf6db9e4c3b47fd3a31244820ab6aae019457cdb3312ca6bd65e822182
+
+  dist/graph.esbuild.cjs  25.8kb
+
+⚡ Done in 8ms
+graph: 26175 bytes 1cbd3d519900fc41a5f3910014b5cfaa51c2b991c3626337ec6c8db931b8acef
+
+  dist/effects.esbuild.cjs  29.3kb
+
+⚡ Done in 7ms
+effects: 29742 bytes ac3661ce925c09de2f10b2d571efb205b477dffe06a34afe07227021ccba1562
+
+  dist/production.esbuild.cjs  46.7kb
+
+⚡ Done in 11ms
+production: 47573 bytes cf85a703e730f2b5eec34239e39952131b97b8737159f8e4c386330676d1a492
+
+  dist/review.esbuild.cjs  44.6kb
+
+⚡ Done in 7ms
+review: 45231 bytes 49cb708730696fbee1914cc5711643894de6ef291098b9a3f5041fac54764a15
+
+  dist/verification.esbuild.cjs  39.8kb
+
+⚡ Done in 7ms
+verification: 40423 bytes 49250bab98a667130bcbfc6ff4c2f24fa79a2a74683325083109b938727ccac9
+
+  dist/integrations.esbuild.cjs  36.4kb
+
+⚡ Done in 8ms
+integrations: 36926 bytes e72361f938d084536f6912909c2f421f2d695f314d099d6cfc43f24c2dbe79c2
+
+  dist/extensions.esbuild.cjs  38.8kb
+
+⚡ Done in 11ms
+extensions: 39437 bytes a2657c43fc0a2964680d95f93528c311a791e6fe1af90de24fd776637d569428
+
+  dist/work.esbuild.cjs  34.9kb
+
+⚡ Done in 10ms
+work: 35421 bytes 50623d873275473f674f1be2cd3a9476c461cfac6711462a38c512aa6c5c0f18
+
+  dist/usage.esbuild.cjs  35.8kb
+
+⚡ Done in 10ms
+usage: 36412 bytes 203bc0e069298448b3e331a5c1f23b61fb5abed7c506f571fb9fa3e830db9d59
+
+  dist/media.esbuild.cjs  41.0kb
+
+⚡ Done in 15ms
+media: 41599 bytes 623b18f8c8cf388e0ecc17a5866cde4cbb67e251b84a167dd49f0b69e20666f4
+
+  dist/publish.esbuild.cjs  46.2kb
+
+⚡ Done in 17ms
+publish: 46944 bytes a188cc0de76422cde5558a465d3cf2e78ae7c72b63a247096fdcb149ab0a2414
+Native profile partition: 79 operations across 13 bundles.
+(node:3471663) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)

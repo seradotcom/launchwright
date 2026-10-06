@@ -4,6 +4,7 @@ import { PRODUCTION_NATIVE_OPERATIONS } from './native-production-app.mjs';
 import { REVIEW_NATIVE_OPERATIONS } from './native-review-app.mjs';
 import { VERIFICATION_NATIVE_OPERATIONS } from './native-verification-app.mjs';
 import { INTEGRATIONS_NATIVE_OPERATIONS } from './native-integrations-app.mjs';
+import { EXTENSIONS_NATIVE_OPERATIONS } from './native-extensions-app.mjs';
 import { WORK_NATIVE_OPERATIONS } from './native-work-app.mjs';
 import { USAGE_NATIVE_OPERATIONS } from './native-usage-app.mjs';
 import { MEDIA_NATIVE_OPERATIONS } from './native-media-app.mjs';
@@ -21,6 +22,7 @@ export const NATIVE_PROFILES=Object.freeze({
   review:Object.freeze({entry:'src/native-review-entry.mjs',file:'launchwright-review.cjs',operations:REVIEW_NATIVE_OPERATIONS}),
   verification:Object.freeze({entry:'src/native-verification-entry.mjs',file:'launchwright-verification.cjs',operations:VERIFICATION_NATIVE_OPERATIONS}),
   integrations:Object.freeze({entry:'src/native-integrations-entry.mjs',file:'launchwright-integrations.cjs',operations:INTEGRATIONS_NATIVE_OPERATIONS}),
+  extensions:Object.freeze({entry:'src/native-extensions-entry.mjs',file:'launchwright-extensions.cjs',operations:EXTENSIONS_NATIVE_OPERATIONS}),
   work:Object.freeze({entry:'src/native-work-entry.mjs',file:'launchwright-work.cjs',operations:WORK_NATIVE_OPERATIONS}),
   usage:Object.freeze({entry:'src/native-usage-entry.mjs',file:'launchwright-usage.cjs',operations:USAGE_NATIVE_OPERATIONS}),
   media:Object.freeze({entry:'src/native-media-entry.mjs',file:'launchwright-media.cjs',operations:MEDIA_NATIVE_OPERATIONS}),

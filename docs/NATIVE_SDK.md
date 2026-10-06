@@ -6,7 +6,7 @@ The JavaScript application imports the real `@semwright/native-sdk` package for 
 
 ## Host bridge profiles
 
-The canonical `NodeBridge` limits an owner-pinned executable bundle to 48 KiB and limits bundle plus invocation stdin to 64 KiB. Launchwright does not raise or bypass those limits. Its 79 public application operations are partitioned, without overlap, across twelve owner-pinned bridge profiles:
+The canonical `NodeBridge` limits an owner-pinned executable bundle to 48 KiB and limits bundle plus invocation stdin to 64 KiB. Launchwright does not raise or bypass those limits. Its 79 public application operations are partitioned, without overlap, across thirteen owner-pinned bridge profiles:
 
 | Profile | Operations | Local compacted bytes | Headroom to 48 KiB | Purpose |
 | --- | ---: | ---: | ---: | --- |
@@ -17,18 +17,22 @@ The canonical `NodeBridge` limits an owner-pinned executable bundle to 48 KiB an
 | `production` | 9 | 47,573 | 1,579 | coverage/impact, relations, evidence, capture ingestion and text rendering |
 | `review` | 6 | 45,231 | 3,921 | candidate, editorial review and channel-package lifecycle |
 | `verification` | 5 | 40,423 | 8,729 | protected verifier report/summary/waiver custody plus bounded repair ledgers |
-| `integrations` | 12 | 49,011 | 141 | localization, extension/verifier descriptors, compatibility locks, mobile import/inspection and channel status |
+| `integrations` | 6 | 36,926 | 12,226 | localization, mobile import/inspection and channel status |
+| `extensions` | 6 | 39,437 | 9,715 | declarative extension discovery/retirement plus compatibility negotiation and rehearsal locks |
 | `work` | 6 | 35,421 | 13,731 | snapshot summary and Platform-intent custody/recovery, including Graph preparation |
 | `usage` | 6 | 36,412 | 12,740 | Platform reservation/usage/adjustment custody, performance samples and test-only billing callbacks |
 | `media` | 6 | 41,599 | 7,553 | media-plan, authority-free Composition handoff and receipt custody |
 | `publish` | 10 | 46,944 | 2,208 | publish-product contracts and authority-free export/import |
 
-The byte counts above are workstation build evidence, not Driver Host acceptance. The narrowest headroom is 141 bytes in `integrations`. Project Graph custody is isolated in `graph`; canonical immutable-artifact Effects result custody is isolated in `effects`; verification report custody is isolated in `verification`; Platform usage receipt custody is isolated in `usage`. The public protocol contains 79 operations, with each of those authority-sensitive surfaces occupying its dedicated profile.
+The byte counts above are workstation build evidence, not Driver Host acceptance. The narrowest headroom remains 1,579 bytes in `production`; R17 moves extension contracts out of the formerly near-limit `integrations` bundle. Project Graph custody is isolated in `graph`; canonical immutable-artifact Effects result custody is isolated in `effects`; verification report custody is isolated in `verification`; extension compatibility custody is isolated in `extensions`; Platform usage receipt custody is isolated in `usage`. The public protocol contains 79 operations, with each of those authority-sensitive surfaces occupying its dedicated profile.
 
-`scripts/build-native-bundle.mjs` rejects missing/duplicate operations and any profile above the canonical 48 KiB maximum. The Rust driver pins all twelve hashes and maps each `driver.launchwright.*` operation to exactly one `NodeBridge`. Its `graph` and `effects` features come from the exact Semwright Native SDK pin; Launchwright does not expose Host, Graph, Effects or verifier-runtime admission authority to ordinary application callers.
+`scripts/build-native-bundle.mjs` rejects missing/duplicate operations and any profile above the canonical 48 KiB maximum. The Rust driver pins all thirteen hashes and maps each `driver.launchwright.*` operation to exactly one `NodeBridge`. Its `graph` and `effects` features come from the exact Semwright Native SDK pin; Launchwright does not expose Host, Graph, Effects or verifier-runtime admission authority to ordinary application callers.
 
 The split is an installation profile, not a second application protocol. Every profile still uses the same SQLite workspace transaction model and canonical bridge schema. `core` still supplies the observation and recovery providers; `sources` is read-only and contains no alternate execution kernel.
 
 Launchwright does not expose arbitrary Python/JavaScript execution, caller-selected runtime paths, dynamic mounts or a second protocol. Runtime acceptance still belongs to the real Semwright Host/Broker boundary; a successful local bridge test or Rust build is not a Host-isolation certificate.
 
 The optional Platform adapter consumes an owner-supplied, byte-pinned client because the inspected Platform package is not licensed for redistribution in this public repository.
+
+
+R17 splits descriptor/compatibility operations into a thirteenth `extensions` profile. The 48 KiB canonical NodeBridge maximum remains unchanged; this prevents extension growth from overflowing the prior `integrations` profile. Exact bundle byte counts and digests are regenerated by `npm run build:native-bundle`.

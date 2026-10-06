@@ -10,7 +10,7 @@ import { recordVerification, verificationSummary as buildVerificationSummary, re
 import { recordCapture } from './capture.mjs';
 import { snapshotSummary } from './snapshot.mjs';
 import { validateLocalization, assessLocalization } from './localization.mjs';
-import { PROFILE_MATRIX, validateExtensionManifest, validateCompatibilityLock } from './extensions.mjs';
+import { PROFILE_MATRIX, extensionDiscovery as discoverExtensions, compatibilityNegotiate as negotiateCompatibility, compatibilityInspect as inspectCompatibility, registerExtension, retireExtension, createCompatibilityLock } from './extensions.mjs';
 import { profilePreflight as runProfilePreflight } from './source-profiles.mjs';
 import { freezeCandidate, buildCandidateGates, inspectCandidateState, recordCandidateReview, assertPrivateDeliveryReady, assertChannelPinned, assertPartialDeliveryPolicy } from './candidate.mjs';
 import { proposeChange, inspectChange, applyChange } from './change-proposal.mjs';
@@ -87,34 +87,12 @@ export class LaunchwrightApplication {
   }
   describe(){return{app:'Launchwright',version:APP_VERSION,schema_version:'launchwright/1',workspace_version:this.store.version(),request_epoch:this.store.meta().epoch,
     scope_mode:'local-single-owner',principal:this.principal,scopes:[...this.scopes],native_sdk:'0.9.0-dev.1',operations:Object.entries(OPERATION_SCOPES).map(([name,scope])=>({name,scope,read_only:READ_OPERATIONS.has(name)})),
-    capabilities:{editorial_text_exports:'available',durable_entity_history:this.store.hasHistory?'available':'migration-required',private_draft_delivery:'available',portable_snapshot_restore:'available-local-admin',declared_release_contracts:'available',localization_ledger:'available-layout-quality-not-inferred',extension_descriptors:'available-no-remote-code',compatibility_negotiation:'available',profile_preflight:'available-contract-only',state_anchors:'contract-and-assessment-only',impact_proposals:'available-no-execution-authority',document_change_proposals:'available-application-local-no-auto-merge',capture_receipts:'available-provenance-only',verification_ledger:'available-canonical-pass-requires-admission',waivers:'available-never-overwrite-verifier-state',channel_packages:'available-no-send',native_driver_host:'requires-owner-pinned-bundle-and-broker',platform:this.capabilities.platform??'not-connected',canonical_graph:'canonical-project-contracts-available-live-admission-required',canonical_effects:'native-sdk-immutable-readback-contract-available-live-admission-required',browser_capture:'requires-canonical-driver-recipe',media_render:'requires-composition-recipe',composition_handoff:'motion-canvas-contract-available-no-execution-authority',mobile:'provenance-import-only',public_delivery:'requires-canonical-publish-receipt',...this.capabilities},
+    capabilities:{editorial_text_exports:'available',durable_entity_history:this.store.hasHistory?'available':'migration-required',private_draft_delivery:'available',portable_snapshot_restore:'available-local-admin',declared_release_contracts:'available',localization_ledger:'available-layout-quality-not-inferred',extension_descriptors:'available-declarative-generic-view-no-remote-code',compatibility_negotiation:'available',profile_preflight:'available-contract-only',state_anchors:'contract-and-assessment-only',impact_proposals:'available-no-execution-authority',document_change_proposals:'available-application-local-no-auto-merge',capture_receipts:'available-provenance-only',verification_ledger:'available-canonical-pass-requires-admission',waivers:'available-never-overwrite-verifier-state',channel_packages:'available-no-send',native_driver_host:'requires-owner-pinned-bundle-and-broker',platform:this.capabilities.platform??'not-connected',canonical_graph:'canonical-project-contracts-available-live-admission-required',canonical_effects:'native-sdk-immutable-readback-contract-available-live-admission-required',browser_capture:'requires-canonical-driver-recipe',media_render:'requires-composition-recipe',composition_handoff:'motion-canvas-contract-available-no-execution-authority',mobile:'provenance-import-only',public_delivery:'requires-canonical-publish-receipt',...this.capabilities},
     limits:{page_items:128,reply_bytes:256*1024,artifact_bytes:1024*1024,receipt_epoch_items:20000},disclosure:'Local editorial checks are not Platform approvals or canonical effect verification.'};}
   profilePreflight(input){return runProfilePreflight(this,input);}
-  extensionDiscovery(input){
-    inputObject(input,['type','include_retired'],[]);if(input.type!==undefined)choice(input.type,['source_adapter','deliverable_renderer','channel_adapter','verifier_profile']);if(input.include_retired!==undefined)ensure(typeof input.include_retired==='boolean','include_retired must be boolean');
-    const items=this.list('extension_package').filter(e=>(!input.type||e.data.type===input.type)&&(input.include_retired||e.data.status==='active')).map(e=>({id:e.id,version:e.version,name:e.data.name,type:e.data.type,package_version:e.data.package_version,schema_major:e.data.schema_major,digest:e.data.digest,license:e.data.license,permissions:e.data.permissions,inputs:e.data.inputs,outputs:e.data.outputs,preconditions:e.data.preconditions,evidence:e.data.evidence,limits:e.data.limits,status:e.data.status,admission:e.data.admission}));
-    return{schema_version:'launchwright-extension-discovery/1',items,remote_code_execution:false,platform_registry_authority:false};
-  }
-  compatibilityNegotiate(input){
-    inputObject(input,['schema_major','operations','kinds'],['schema_major']);integer(input.schema_major,1,32);
-    const operations=input.operations??[],kinds=input.kinds??[];array(operations,128).forEach(v=>str(v,160));array(kinds,128).forEach(v=>str(v,160));
-    const supportedOps=new Set(this.operations.keys()),supportedKinds=new Set(KINDS);
-    return{schema_major:1,requested_schema_major:input.schema_major,compatible:input.schema_major===1,unsupported_operations:operations.filter(v=>!supportedOps.has(v)),unsupported_kinds:kinds.filter(v=>!supportedKinds.has(v)),supported_optional:{extensions:true,localization:true,channel_packages:true,portable_snapshots:true,durable_history:this.store.hasHistory},major_mismatch_behavior:'reject'};
-  }
-  compatibilityInspect(id){
-    const lock=this.get(id,'compatibility_lock');
-    const components=lock.data.components.map(c=>{
-      if(!c.resource_id)return{...c,state:'DECLARED',observed:null};
-      let r;try{r=this.get(c.resource_id);}catch{return{...c,state:'MISSING',observed:null};}
-      if(r.kind==='tombstone')return{...c,state:'RETIRED',observed:{kind:r.kind,version:r.version}};
-      let observedVersion=r.version.revision,observedDigest=null;
-      if(r.kind==='extension_package'){observedVersion=r.data.package_version;observedDigest=r.data.digest;if(r.data.status==='retired')return{...c,state:'RETIRED',observed:{kind:r.kind,version:observedVersion,digest:observedDigest,resource_version:r.version}};}
-      if(r.kind==='channel_profile')observedVersion=r.data.profile_version;
-      const versionMatch=observedVersion===c.version,digestMatch=!c.digest||observedDigest===c.digest;
-      return{...c,state:versionMatch&&digestMatch?'CURRENT':'DRIFT',observed:{kind:r.kind,version:observedVersion,digest:observedDigest,resource_version:r.version}};
-    });
-    return{lock,components,state:components.some(c=>['MISSING','RETIRED','DRIFT'].includes(c.state))?'DRIFT':'CURRENT',authority:'application-compatibility-lock-only',rehearsal_required_on_change:true};
-  }
+  extensionDiscovery(input){return discoverExtensions(this,input);}
+  compatibilityNegotiate(input){return negotiateCompatibility(this,input);}
+  compatibilityInspect(id){return inspectCompatibility(this,id);}
   invoke(operation,args,context){
     const scope=OPERATION_SCOPES[operation];this.allow(scope);checkCancelled(context);
     if(READ_OPERATIONS.has(operation))return this.read(operation,args);
@@ -357,20 +335,9 @@ export class LaunchwrightApplication {
         if(glossary){ensure(glossary.data.status==='active','Glossary is deprecated','Conflict');ensure(glossary.data.source_locale===source.data.locale&&glossary.data.target_locale===data.locale,'Glossary locale pair does not match localization','Conflict');}
         return{entity:this.store.update(prior.id,{...data,source_version:source.version,glossary_version:glossary?.version??null,created_by:prior.data.created_by,created_at:prior.data.created_at,updated_by:this.principal,updated_at:iso()})};
       }
-      case'extension.register':{
-        const data=validateExtensionManifest(input);ensure(data.schema_major===1,'Unsupported extension schema major','ProtocolMismatch');
-        const duplicate=this.list('extension_package').find(e=>e.data.type===data.type&&e.data.name===data.name&&e.data.package_version===data.package_version&&e.data.status==='active');ensure(!duplicate,'This extension version is already registered','Conflict');
-        return{entity:this.store.create('extension_package',{...data,status:'active',admission:'local-descriptor-only',remote_code_executable:false,registered_by:this.principal,registered_at:iso()})};
-      }
-      case'extension.retire':{
-        inputObject(input,['id','expected','reason']);const ext=this.get(input.id,'extension_package');ensure(sameVersion(ext.version,input.expected),'Extension revision changed','StaleReference');ensure(ext.data.status==='active','Extension is already retired','Conflict');lines(input.reason,4000);
-        return{entity:this.store.update(ext.id,{...ext.data,status:'retired',retired_by:this.principal,retired_at:iso(),retire_reason:input.reason,new_use_allowed:false})};
-      }
-      case'compatibility.lock':{
-        const data=validateCompatibilityLock(input);const product=this.get(data.product_id,'product');
-        const components=data.components.map(c=>{if(!c.resource_id)return{...c,resource_version:null};const r=this.get(c.resource_id);if(r.kind!=='extension_package')ensure(this.productOf(r)===product.id,'Compatibility component belongs to another product','PermissionDenied');if(r.kind==='extension_package')ensure(r.data.status==='active','Cannot lock a retired extension','Conflict');if(c.kind==='channel-profile')ensure(r.kind==='channel_profile','Compatibility component kind does not match resource');if(c.kind==='template')ensure(r.kind==='template','Compatibility component kind does not match resource');if(['source-adapter','renderer','channel-adapter','verifier'].includes(c.kind))ensure(r.kind==='extension_package','Compatibility component must reference an extension descriptor');return{...c,resource_version:r.version};});
-        return{entity:this.store.create('compatibility_lock',{...data,components,product_version:product.version,created_by:this.principal,created_at:iso(),authority:'application-rehearsal-lock'})};
-      }
+      case'extension.register':return registerExtension(this,input);
+      case'extension.retire':return retireExtension(this,input);
+      case'compatibility.lock':return createCompatibilityLock(this,input);
       case'template.instantiate':{
         inputObject(input,['id','release_id','target_id','parameters','name']);const template=this.get(input.id,'template');object(input.parameters,template.data.parameters,template.data.parameters);for(const value of Object.values(input.parameters))str(value,4000);
         const d={release_id:input.release_id,target_id:input.target_id,name:str(input.name,160),format:template.data.format,content:template.data.content.replace(/\{\{([a-z][a-z0-9_]*)\}\}/g,(_,key)=>{ensure(Object.hasOwn(input.parameters,key),'Template contains an undeclared parameter');return input.parameters[key];}),claim_ids:[],source_ids:[]};

@@ -55,3 +55,8 @@ Durable identity/revisions; exact archived entity history with get/list/diff; ex
 - commercial-production deployment.
 
 A stored receipt, hash, editorial decision, successful local render or local verifier report must not be described as one of those outcomes.
+
+
+### R17 extension contract evidence
+
+The local suite covers declarative registration/discovery, escaped generic views, major-version negotiation, non-DOM source contracts, renderer loss/equivalence rules, package-rights metadata, retirement drift, affected compatibility locks and no-PASS-reuse rehearsal locks. Native bundle smoke includes the dedicated extensions profile. This evidence does not establish Platform registry installation/revocation, remote package execution, Driver Host isolation or a live second renderer.

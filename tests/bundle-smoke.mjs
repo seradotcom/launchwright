@@ -42,6 +42,7 @@ const reads={
   review:['candidate-inspect',{id:candidate.id}],
   verification:['verification-summary',{candidate_id:candidate.id}],
   integrations:['channel-status',{release_id:release.id}],
+  extensions:['extension-discovery',{}],
   work:['workspace-snapshot',{}],
   usage:['usage-inspect',{id:usageReservation.id}],
   media:['media-inspect',{}],

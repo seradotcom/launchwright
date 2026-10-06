@@ -34,7 +34,7 @@ test('public client validates discovery compatibility and required operations',a
   assert.equal(discovery.api.version,'0.2');
   assert.equal(discovery.api.public_client,'@launchwright/client');
   assert.equal(discovery.api.discovery_schema,discovery.schema_version);
-  assert.equal(CLIENT_VERSION,'0.2.0-dev.16');
+  assert.equal(CLIENT_VERSION,'0.2.0-dev.17');
 });
 
 test('an older or incompatible client fails closed instead of reinterpreting discovery',async()=>{
@@ -76,5 +76,5 @@ console.log(JSON.stringify({client:CLIENT_VERSION,api:discovery.api.version,id:r
   const result=await runChild(process.execPath,['consumer.mjs'],{cwd:consumer,env:{...process.env,LAUNCHWRIGHT_URL:baseUrl,LAUNCHWRIGHT_TOKEN:service.token}});
   assert.equal(result.code,0,result.stderr||result.stdout);
   const output=JSON.parse(result.stdout.trim());
-  assert.deepEqual({client:output.client,api:output.api,name:output.name},{client:'0.2.0-dev.16',api:'0.2',name:'Clean-room consumer'});
+  assert.deepEqual({client:output.client,api:output.api,name:output.name},{client:'0.2.0-dev.17',api:'0.2',name:'Clean-room consumer'});
 });
