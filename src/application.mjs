@@ -6,7 +6,7 @@ import { APP_VERSION, RESOURCE, KINDS, EDITABLE, RIGHTS, CLASSES, validateEntity
 import { OPERATION_SCOPES, READ_OPERATIONS } from './operations.mjs';
 import { renderText } from './render.mjs';
 import { validateChannelPackage, validateChannelOutcome } from './records.mjs';
-import { recordVerification, verificationSummary as buildVerificationSummary, recordWaiver } from './verification.mjs';
+import { recordVerification, verificationSummary as buildVerificationSummary, recordWaiver, prepareVerificationRepair, recordVerificationRepairAttempt } from './verification.mjs';
 import { recordCapture } from './capture.mjs';
 import { snapshotSummary } from './snapshot.mjs';
 import { validateLocalization, assessLocalization } from './localization.mjs';
@@ -294,6 +294,8 @@ export class LaunchwrightApplication {
       case'publish.import':return importProductVersion(this,input);
       case'publish.import_rebind':return rebindImportedTemplate(this,input);
       case'verification.record':return recordVerification(this,input);
+      case'verification.repair_prepare':return prepareVerificationRepair(this,input);
+      case'verification.repair_record':return recordVerificationRepairAttempt(this,input);
       case'waiver.record':return recordWaiver(this,input);
       case'deliverable.render':{
         inputObject(input,['id']);const d=this.get(input.id,'deliverable'),r=this.get(d.data.release_id,'release'),t=this.get(d.data.target_id,'target');

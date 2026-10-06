@@ -20,7 +20,8 @@ async function protectedCandidate(app,b,{allowPartial=false,requiredDimensions=[
       digest:'c'.repeat(64),license:'AGPL-3.0-only',source:'repo:synthetic/candidate-verifier-'+n,
       permissions:['read','review'],inputs:['candidate/2'],outputs:['verification-report/1'],preconditions:['candidate-frozen'],
       evidence:['negative-controls'],limits:{max_input_bytes:8192,max_output_bytes:8192,timeout_seconds:10},
-      verifier:{dimensions:requiredDimensions,authority:'canonical',negative_controls:true,coverage_mode:'complete'}
+      verifier:{dimensions:requiredDimensions,authority:'canonical',negative_controls:true,coverage_mode:'complete',
+        negative_control_cases:requiredDimensions.map((dimension,index)=>({id:dimension+'-negative-'+n,dimension,kind:index%2?'wrong-price':'wrong-screen',fixture_sha256:((index%8)+1).toString().repeat(64),expected_outcome:'DETECTED'}))}
     })).entity;
   }
   const artifact=(await execute(app,'deliverable.render',{id:b.deliverable.id})).entity;
@@ -47,7 +48,7 @@ test('candidate v2 seals target, contract, channel and rights references into it
   assert.equal(m.target_contexts.length,1);assert.equal(m.target_contexts[0].id,b.target.id);assert.match(m.target_contexts[0].fingerprint_sha256,/^[0-9a-f]{64}$/);
   assert.deepEqual(m.channel_profiles.map(p=>p.id),[f.profile.id]);
   assert.deepEqual(m.rights.map(r=>[r.id,r.rights]),[[f.evidence.id,'licensed']]);
-  assert.equal(m.verifier_profiles.length,1);assert.equal(m.verifier_profiles[0].id,f.verifierProfile.id);assert.deepEqual(m.verifier_profiles[0].dimensions,['format','rights']);
+  assert.equal(m.verifier_profiles.length,1);assert.equal(m.verifier_profiles[0].id,f.verifierProfile.id);assert.deepEqual(m.verifier_profiles[0].dimensions,['format','rights']);assert.equal(m.verifier_profiles[0].negative_control_cases.length,2);
   for(const id of [b.release.id,b.target.id,f.contract.id,f.profile.id,f.evidence.id])assert.ok(m.inputs.some(pin=>pin.id===id),id);
   const inspected=await execute(app,'candidate.inspect',{id:f.candidate.id});
   assert.equal(inspected.gates.find(g=>g.name==='release-contract').state,'PASS');

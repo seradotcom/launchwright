@@ -4,14 +4,18 @@ import assert from 'node:assert/strict';
 import { LaunchwrightApplication, execute } from '../src/application.mjs';
 import { setup, baseline } from './helpers.mjs';
 
-async function registerVerifier(app,{name='Protected semantic oracle',authority='canonical',dimensions=['semantic'],negative_controls=true,coverage_mode='complete',model}={}){
+async function registerVerifier(app,{name='Protected semantic oracle',authority='canonical',dimensions=['semantic'],negative_controls=true,coverage_mode='complete',model,negative_control_cases}={}){
+  const controls=negative_control_cases??(negative_controls?dimensions.map((dimension,index)=>({
+    id:dimension+'-benign-negative-'+index,dimension,kind:['wrong-screen','wrong-price','frozen-video','stale-caption'][index%4],
+    fixture_sha256:['1','2','3','4','5','6','7','8'][index%8].repeat(64),expected_outcome:'DETECTED'
+  })):[]);
   return (await execute(app,'extension.register',{
     name,type:'verifier_profile',package_version:'1.4.0',schema_major:1,digest:'e'.repeat(64),
     license:'AGPL-3.0-only',source:'repo:synthetic/protected-verifier',
     permissions:['read','review'],inputs:['candidate/2'],outputs:['verification-report/1'],
     preconditions:['candidate-frozen','exact-bytes'],evidence:['negative-controls','coverage'],
     limits:{max_input_bytes:32768,max_output_bytes:32768,timeout_seconds:20},
-    verifier:{dimensions,authority,negative_controls,coverage_mode,...(model?{model}:{})}
+    verifier:{dimensions,authority,negative_controls,negative_control_cases:controls,coverage_mode,...(model?{model}:{})}
   })).entity;
 }
 async function freezeWithVerifier(app,b,profile,{required=['semantic']}={}){
@@ -27,10 +31,14 @@ const verifierIdentity=profile=>({
   id:profile.data.name,version:profile.data.package_version,digest:profile.data.digest,
   authority:profile.data.verifier.authority,...(profile.data.verifier.model?{model:profile.data.verifier.model}:{})
 });
+const detectedControls=(profile,dimension='semantic')=>(profile.data.verifier.negative_control_cases??[]).filter(control=>control.dimension===dimension).map(control=>({
+  case_id:control.id,fixture_sha256:control.fixture_sha256,outcome:'DETECTED',detail:'Synthetic benign negative detected'
+}));
 const report=(candidate,artifact,profile,overrides={})=>({
   candidate_id:candidate.id,candidate_sha256:candidate.data.candidate_sha256,dimension:'semantic',state:'PASS',
   verifier:verifierIdentity(profile),verifier_profile_id:profile.id,artifact_ids:[artifact.id],
-  coverage:{checked:4,total:4},omissions:[],findings:[],observed_at:'2026-10-05T20:00:00.000Z',...overrides
+  coverage:{checked:4,total:4},omissions:[],findings:[],negative_control_results:detectedControls(profile),
+  observed_at:'2026-10-05T20:00:00.000Z',...overrides
 });
 
 test('RS-VER protected required dimensions reject unpinned, heuristic, sampled or negative-control-free oracles',async t=>{
@@ -50,6 +58,7 @@ test('RS-VER exact protected oracle can admit PASS only for the frozen candidate
   assert.equal(candidate.data.manifest.verifier_profiles[0].digest,profile.data.digest);
   assert.equal(candidate.data.manifest.verifier_profiles[0].negative_controls,true);
   assert.equal(candidate.data.manifest.verifier_profiles[0].coverage_mode,'complete');
+  assert.equal(candidate.data.manifest.verifier_profiles[0].negative_control_cases.length,1);
 
   await assert.rejects(execute(app,'verification.record',report(candidate,artifact,profile,{candidate_sha256:'a'.repeat(64)})),{code:'Conflict'});
   await assert.rejects(execute(app,'verification.record',report(candidate,artifact,profile,{artifact_ids:[]})),{code:'InvalidArgument'});

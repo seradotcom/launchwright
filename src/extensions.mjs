@@ -12,17 +12,24 @@ export function validateExtensionManifest(raw){
   object(d.limits,['max_input_bytes','max_output_bytes','timeout_seconds'],['max_input_bytes','max_output_bytes','timeout_seconds']);
   integer(d.limits.max_input_bytes,1,67108864);integer(d.limits.max_output_bytes,1,67108864);integer(d.limits.timeout_seconds,1,3600);
   if(d.type==='verifier_profile'){
-    ensure(d.permissions.includes('review'),'Verifier profile requires review permission');
-    ensure(d.verifier&&typeof d.verifier==='object'&&!Array.isArray(d.verifier),'Verifier profile requires a structured verifier policy');
-    object(d.verifier,['dimensions','authority','model','negative_controls','coverage_mode'],['dimensions','authority','negative_controls','coverage_mode']);
-    const dimensions=['format','semantic','editorial','privacy','rights','accessibility','product-evidence','permissions'];
-    array(d.verifier.dimensions,dimensions.length).forEach(value=>choice(value,dimensions));
-    ensure(d.verifier.dimensions.length>0&&new Set(d.verifier.dimensions).size===d.verifier.dimensions.length,'Verifier dimensions must be non-empty and unique');
-    choice(d.verifier.authority,['canonical','independent','human','heuristic']);
-    if(d.verifier.model!==undefined)str(d.verifier.model,160);
-    ensure(typeof d.verifier.negative_controls==='boolean','Verifier negative_controls must be boolean');
-    choice(d.verifier.coverage_mode,['complete','sampled']);
-  }else ensure(d.verifier===undefined,'Only verifier_profile extensions may declare verifier policy');
+    ensure(d.permissions.includes('review'),'Verifier requires review permission');
+    ensure(d.verifier&&typeof d.verifier==='object'&&!Array.isArray(d.verifier),'Verifier policy required');
+    const verifier=d.verifier,dimensions=['format','semantic','editorial','privacy','rights','accessibility','product-evidence','permissions'];
+    object(verifier,['dimensions','authority','model','negative_controls','negative_control_cases','coverage_mode'],['dimensions','authority','negative_controls','negative_control_cases','coverage_mode']);
+    array(verifier.dimensions,dimensions.length).forEach(value=>choice(value,dimensions));
+    ensure(verifier.dimensions.length>0&&new Set(verifier.dimensions).size===verifier.dimensions.length,'Invalid verifier dimensions');
+    choice(verifier.authority,['canonical','independent','human','heuristic']);
+    if(verifier.model!==undefined)str(verifier.model,160);
+    ensure(typeof verifier.negative_controls==='boolean','Invalid negative_controls');
+    const controls=verifier.negative_control_cases,controlFields=['id','dimension','kind','fixture_sha256','expected_outcome'],controlKinds=['wrong-screen','wrong-price','frozen-video','stale-caption','custom-benign'];
+    array(controls,32).forEach(control=>{
+      object(control,controlFields,controlFields);str(control.id,96);ensure(/^[a-z][a-z0-9_.-]{0,95}$/.test(control.id),'Invalid control ID');
+      choice(control.dimension,dimensions);choice(control.kind,controlKinds);sha(control.fixture_sha256);ensure(control.expected_outcome==='DETECTED','Invalid control outcome');
+    });
+    ensure(new Set(controls.map(control=>control.id)).size===controls.length,'Duplicate control ID');
+    ensure(verifier.negative_controls===(controls.length>0),'Negative-control declaration mismatch');
+    choice(verifier.coverage_mode,['complete','sampled']);
+  }else ensure(d.verifier===undefined,'Verifier policy type mismatch');
   return d;
 }
 
