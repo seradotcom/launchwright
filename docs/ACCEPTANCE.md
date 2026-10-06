@@ -7,11 +7,12 @@ This ledger separates implemented behavior from execution evidence. A PASS belon
 Supplemental workstation pass for this branch:
 
 - Node: 22.22.0 — **outside** the Native SDK supported engine.
-- `npm test`: **139 passed, 0 failed, 0 skipped**. Exact TAP output is retained in `evidence/workstation-publish-consumer-pass.tap`.
-- `node scripts/verify.mjs`: source-lock integrity and syntax PASS; **75 JavaScript modules and 71 Native driver operations** checked. Output is retained in `evidence/workstation-publish-consumer-verify.json`.
+- `npm test`: **143 passed, 0 failed, 0 skipped** on the current operations/clean-room branch. Exact TAP output is retained in `evidence/r8a/local-test.tap`; this local run is supplemental because Node 22.22.0 is outside the supported engine.
+- `node scripts/verify.mjs`: source-lock integrity and syntax PASS; **78 JavaScript modules and 71 Native driver operations** checked. Current output is retained in `evidence/r8a/verify.json`.
 - Native profile build: **71/71 public operations assigned exactly once** across eight compacted canonical bridge bundles. Exact local sizes are core **45,595**, production **45,734**, review **49,129**, integrations **31,825**, extensions **42,300**, work **31,857**, media **39,788**, publish **48,288** bytes. The review profile has 23 bytes of local headroom; the 49,152-byte NodeBridge limit was not raised or bypassed.
 - Multi-profile canonical bridge smoke: **PASS** for `core`, `production`, `review`, `integrations`, `extensions`, `work`, `media` and `publish`; exact bundle SHA-256 values were rechecked before execution and all eight invocation frames stayed within the canonical combined-input budget. Output is retained in `evidence/workstation-publish-consumer-bundle-smoke.json`. This is not Driver Host isolation acceptance.
 - Clean CLI drill: init → synthetic demo → portable snapshot → restore to a new state directory → doctor PASS.
+- Clean-room operator rehearsal launches those commands in fresh temporary state with only a minimal inherited environment, verifies Native SDK pin integrity, rejects exported session-token/machine-path leakage, and proves the restored workspace rotates generation without reactivating old mutation receipts. GitHub CI repeats this on Linux, Windows and macOS and uploads the exact report per SHA.
 - Restore drill confirmed a new workspace generation, advanced request epoch and no activation of historical mutation receipts.
 - Independent `unzip -t` validation of a generated private bundle: **PASS**; exact channel manifest, candidate manifest, artifact bytes and review notice were all readable.
 - Git diff whitespace gate: PASS.

@@ -35,3 +35,13 @@ jobs:
           node src/main.mjs snapshot --state .state-ci --out snapshot-ci.json
           node src/main.mjs restore --snapshot snapshot-ci.json --state .state-restored-ci
           node src/main.mjs doctor --state .state-restored-ci
+      - name: Clean-room operator reproduction
+        env:
+          LAUNCHWRIGHT_CLEANROOM_REPORT: evidence/clean-room/report-${{ runner.os }}.json
+        run: node scripts/clean-room.mjs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: launchwright-clean-room-${{ runner.os }}-${{ github.sha }}
+          path: evidence/clean-room/
+          if-no-files-found: error
+          retention-days: 14
