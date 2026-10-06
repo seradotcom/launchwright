@@ -4,11 +4,11 @@ This ledger separates implemented behavior from execution evidence. A PASS belon
 
 ## Supplemental workstation checks
 
-Supplemental workstation pass for the current R10 browser-lab branch:
+Supplemental workstation pass for the current R11 real-media branch:
 
 - Node: 22.22.0 — **outside** the Native SDK supported engine.
-- `npm test`: **164 passed, 0 failed, 0 skipped**. Exact TAP output is retained in `evidence/r10-local-test.tap`; this local run is supplemental because Node 22.22.0 is outside the supported engine. R10 adds the owned DeltaDesk A/B fixture tests plus a fail-closed capture-contract regression proving imported real-adapter evidence remains UNKNOWN without Platform/Host authority.
-- `node scripts/verify.mjs`: source-lock integrity and syntax PASS; **87 JavaScript modules and 82 Native driver operations** checked. Exact output is retained in `evidence/r10-verify.json`.
+- `npm test`: **168 passed, 0 failed, 0 skipped**. Exact TAP output is retained in `evidence/r11/local-test.tap`; this local run is supplemental because Node 22.22.0 is outside the supported engine. R11 adds fail-closed Composition cross-system evidence tests proving exact real-capture bindings, exact Semwright source binding and exhaustive canonical AV evidence without promoting the separate legs to technical PASS.
+- `node scripts/verify.mjs`: source-lock integrity and syntax PASS; **90 JavaScript modules and 82 Native driver operations** checked. Exact output is retained in `evidence/r11/verify.json`.
 - R9 supplemental Native profile build (source SHA `554e153458d734aea92fb2c56aa6d461324051cd`): **82/82 public operations assigned exactly once** across nine compacted canonical bridge bundles. Exact local sizes are core **46,007**, production **42,528**, review **47,219**, integrations **34,179**, extensions **42,597**, work **42,156**, media **39,969**, publish **48,469**, graph **48,166** bytes. Graph authority-sensitive operations were moved out of general production rather than weakening the canonical 48 KiB limit; `publish` is tightest with 683 bytes of headroom and `graph` has 986 bytes. Exact manifest and build log are retained in `evidence/r9/native-bundle.json` and `evidence/r9/native-bundle-build.log`.
 - R9 supplemental multi-profile canonical bridge smoke: **PASS** for all nine profiles (`core`, `production`, `review`, `integrations`, `extensions`, `work`, `media`, `publish`, `graph`); exact bundle SHA-256 and byte counts were rechecked before execution and every invocation stayed within the canonical input budget. Output is retained in `evidence/r9/bundle-smoke.json`. This direct-process workstation smoke is not Driver Host isolation acceptance; the exact R9 GitHub `native` lane subsequently passed and is recorded below.
 - Clean CLI drill: init → synthetic demo → portable snapshot → restore to a new state directory → doctor PASS.
@@ -37,6 +37,7 @@ The manual heavy workflow provides independent lanes:
 - **native**: build the pinned canonical TypeScript SDK, generate/hash all nine bounded bridge profiles, compile/test the real Rust NativeDriver including the compile-time Project Graph contract lock, and run a bridge smoke against each profile.
 - **browser**: install Chromium on a disposable GitHub runner and exercise the real Launchwright UI.
 - **deltadesk**: check out the exact pinned Semwright source, run its real Chromium semantic adapter against the owned DeltaDesk A/B fixture, retain exact screenshots/receipt hashes, and ingest those results into `launchwright-capture/2` as `IMPORTED_UNVERIFIED` without fabricating Platform or Host authority.
+- **composition**: capture DeltaDesk A/B through the same exact adapter; bind those exact PNG hashes into 600 frames/20 seconds; encode and mux them through the pinned Semwright MLT provider inside Driver Host; retain the MP4 and driver receipt; independently run Semwright's canonical Composition + Audio AV E2E at that same Semwright SHA; then validate both legs with `composition-evidence`. The resulting cross-system state is intentionally `PARTIAL` and technical `UNKNOWN` until a single admitted Composition recipe owns the real-capture path.
 - **stress**: create a bounded high-volume workspace, page observations, export a portable snapshot, restore it and verify row continuity.
 
 Exact run IDs and SHA are recorded here only after completion.
@@ -51,7 +52,7 @@ Durable identity/revisions; exact archived entity history with get/list/diff; ex
 - live production Platform execution, budgets or billing;
 - live Project Graph traversal/query execution, owner/Host admission and canonical effects evaluation; R9 validates and stores an admitted projection but does not replace those authorities;
 - canonical real customer browser/mobile/Godot product capture; the R10 owned DeltaDesk browser lane is cross-system adapter evidence only and remains imported-unverified until Platform/Host authority exists;
-- Composition video/audio rendering and final-media verification;
+- one canonical owner-admitted Composition recipe that consumes the real DeltaDesk captures and returns the final-media receipt; the selective `composition` lane proves the real-capture MLT/Driver Host leg and the canonical AV coordinator leg separately and therefore does not promote the combined state above `UNKNOWN`;
 - remote tenant/team authentication and canonical shared approvals;
 - external public/cross-account Platform Publish execution, consumer job/output ACL acceptance, metering and destination activation;
 - ChatGPT Plugin host acceptance;
