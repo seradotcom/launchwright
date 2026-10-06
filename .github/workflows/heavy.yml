@@ -120,21 +120,22 @@ jobs:
           (cd .ci-semwright && cargo build --locked -p semwright-native-sdk --features effects --bin semwright-native-effects)
       - name: Prepare exact Launchwright-owned artifact fixture
         run: |
-          mkdir -p evidence/effects
+          mkdir -p evidence/effects/protected
           node scripts/prepare-effects-acceptance.mjs | tee evidence/effects/prepare.log
       - name: Evaluate with the real canonical Effects CLI
         run: |
           set -euo pipefail
           BIN="$GITHUB_WORKSPACE/.ci-semwright/target/debug/semwright-native-effects"
-          "$BIN" --prepare < evidence/effects/definition.json > evidence/effects/spec.json
+          "$BIN" --prepare < evidence/effects/definition.json > evidence/effects/protected/spec.json
           python3 - <<'PY'
           from pathlib import Path
-          p=Path('evidence/effects/spec.json')
+          p=Path('evidence/effects/protected/spec.json')
           p.write_bytes(p.read_bytes().rstrip(b'\n'))
+          p.chmod(0o600)
           PY
-          SPEC_SHA="$(sha256sum evidence/effects/spec.json | cut -d' ' -f1)"
-          printf '%s\n' "$SPEC_SHA" > evidence/effects/spec.sha256
-          "$BIN" --spec "$GITHUB_WORKSPACE/evidence/effects/spec.json" --spec-sha256 "$SPEC_SHA" --artifact-root "$GITHUB_WORKSPACE/evidence/effects/artifacts" </dev/null > evidence/effects/result.json
+          SPEC_SHA="$(sha256sum evidence/effects/protected/spec.json | cut -d' ' -f1)"
+          printf '%s\n' "$SPEC_SHA" > evidence/effects/protected/spec.sha256
+          "$BIN" --spec "$GITHUB_WORKSPACE/evidence/effects/protected/spec.json" --spec-sha256 "$SPEC_SHA" --artifact-root "$GITHUB_WORKSPACE/evidence/effects/artifacts" </dev/null > evidence/effects/result.json
           jq -e '.schema_version == "semwright-native-effects-result/1" and .verdict == "PASS" and .execution_authority == false and .scope == "immutable_native_sdk_artifact_properties_only"' evidence/effects/result.json
           node scripts/verify-effects-acceptance.mjs | tee evidence/effects/launchwright-verifier.log
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
