@@ -122,3 +122,44 @@ test('RS-CAP-10 generated illustration can never become observed product state',
   assert.equal(evidence.data.admission,'editorial-not-observed');
   assert.equal(evidence.data.technical,'UNKNOWN');
 });
+
+test('RS-CAP-11 imported real-adapter evidence remains unverified without Platform authority',async t=>{
+  const{app,b,source,scenario}=await captureFixture(t);
+  const input=captureInput(b,source,scenario,{
+    name:'Pinned Chromium adapter evidence',
+    classification:'imported',
+    receipt:{
+      authority:'imported',
+      provider:'chromium',
+      provider_version:'semwright@4d291de26724',
+      operation_id:'deltadesk-a-semantic-acceptance',
+      profile:'browser.semantic',
+      outcome:'SUCCEEDED',
+      platform_job_id:undefined,
+      native_receipt_sha256:undefined
+    },
+    readiness:{
+      state:'UNKNOWN',
+      checks:[
+        {name:'semwright-adapter-execution',state:'PASS'},
+        {name:'platform-job-correlation',state:'UNKNOWN'},
+        {name:'driver-host-isolation',state:'UNKNOWN'}
+      ]
+    },
+    anchors:[],
+    isolation:{context_id:'owned-ci-fixture',auth_scope:'not-applicable',mutable_state:false},
+    cleanup:{policy:'none',created_resource_ids:[],removed_resource_ids:[]},
+    provenance:{capture_class:'IMPORTED_UNVERIFIED',synthetic:true,transformations:[]},
+    observations:[{kind:'driver-receipt-sha256',key:'semwright-deltadesk-driver',value:'d'.repeat(64),source:'imported'}]
+  });
+  delete input.receipt.platform_job_id;
+  delete input.receipt.native_receipt_sha256;
+  delete input.receipt.build_before;
+  delete input.receipt.build_after;
+  const evidence=(await execute(app,'capture.ingest',input)).entity;
+  assert.equal(evidence.data.capture_contract,'launchwright-capture/2');
+  assert.equal(evidence.data.admission,'imported-declaration');
+  assert.equal(evidence.data.observed_state_eligible,false);
+  assert.equal(evidence.data.technical,'UNKNOWN');
+  assert.equal(evidence.data.host_acceptance,'NOT_ESTABLISHED');
+});

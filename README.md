@@ -4,7 +4,7 @@
 
 Launchwright keeps product/build context, scenarios, claims, immutable release materials, verifier evidence, exact-candidate review, channel packages and recovery history in one application-owned workspace.
 
-> **Developer preview.** The repository deliberately does not claim that the complete private product specification has passed acceptance. Real product capture, live Project Graph traversal/admission, canonical effects, Composition media rendering, Platform execution, remote teams and public Publish remain external Semwright integration boundaries until exact receipts prove otherwise.
+> **Developer preview.** The repository deliberately does not claim that the complete private product specification has passed acceptance. Launchwright now has an owned synthetic DeltaDesk A/B lane that executes the exact pinned Semwright Chromium semantic adapter, but canonical customer-product capture/Host admission, live Project Graph traversal, canonical effects, Composition media rendering, Platform execution, remote teams and public Publish remain external Semwright integration boundaries until exact receipts prove otherwise.
 
 ## Run locally
 
@@ -39,6 +39,7 @@ Synthetic data is never described as a real product capture.
 - exact-base document change proposals that cannot force-overwrite newer edits;
 - exact candidate manifests that pin artifact bytes, target context, ReleaseContract, localization/glossary revisions, channel profiles and declared rights, with input freshness and review-race isolation;
 - capture contract v2 tied to source + build + target + scenario, with Platform/native receipt correlation, readiness checks, anchor cardinality, build-drift detection, isolation/cleanup bounds, provenance classes and derived-material lineage while technical state stays UNKNOWN;
+- owned DeltaDesk A/B browser laboratory exercised by the exact pinned Semwright Chromium semantic adapter in a dedicated heavy CI lane; its real adapter receipts and screenshot hashes are preserved as `IMPORTED_UNVERIFIED` capture records rather than promoted to canonical Platform/Host evidence;
 - immutable verifier identity/version/digest, coverage, omissions and findings;
 - waivers that annotate failures without changing verifier truth;
 - versioned channel profiles, exact package generation, authenticated deterministic private ZIP bundles, and receipt/recovery state without performing the external send;
@@ -94,10 +95,11 @@ node scripts/verify.mjs
 node src/main.mjs doctor --state .state
 ```
 
-GitHub Actions runs the supported Node 24.21 runtime on Linux, Windows and macOS. The manual heavy workflow has three independently selectable lanes:
+GitHub Actions runs the supported Node 24.21 runtime on Linux, Windows and macOS. The manual heavy workflow has four independently selectable lanes:
 
 - **native** — builds the pinned TypeScript SDK, native bundle and real Rust NativeDriver;
 - **browser** — installs Chromium on the runner and exercises the real Launchwright UI;
+- **deltadesk** — executes the owned DeltaDesk A/B fixture through the exact pinned Semwright Chromium semantic adapter, retains screenshots/receipts and ingests them as `IMPORTED_UNVERIFIED` capture evidence without fabricating Platform or Host authority;
 - **stress** — bounded high-volume persistence, observation and portable-restore acceptance.
 
 Run expensive dependencies on GitHub Actions rather than the development workstation.
@@ -108,6 +110,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [Architecture and authority boundaries](docs/ARCHITECTURE.md)
 - [Native SDK integration](docs/NATIVE_SDK.md)
 - [Project Graph projection and impact](docs/PROJECT_GRAPH.md)
+- [DeltaDesk real-browser laboratory](docs/DELTADESK_LAB.md)
 - [Known SDK/platform gaps](docs/SDK_GAPS.md)
 - [Storage and portability](docs/PORTABILITY.md)
 - [Operations, metering and cost projection](docs/OPERATIONS_AND_COSTS.md)

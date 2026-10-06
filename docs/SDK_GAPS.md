@@ -4,7 +4,7 @@ These are explicit integration gaps, not implied application successes.
 
 | Area | Current Launchwright behavior | External authority still required |
 | --- | --- | --- |
-| Browser/product capture | Stores approved source/scenario contracts plus capture-contract v2: exact Platform/native receipt correlation, readiness/anchors, drift, isolation/cleanup and provenance/derivative eligibility | Semwright browser/native driver execution and Host acceptance |
+| Browser/product capture | Stores approved source/scenario contracts plus capture-contract v2. The owned DeltaDesk A/B lane now executes the exact pinned Semwright Chromium semantic adapter and preserves its receipt/screenshot hashes as `IMPORTED_UNVERIFIED` capture records with technical UNKNOWN. | Canonical Platform job correlation, Driver Host admission/isolation and real customer-product capture acceptance |
 | Project Graph | Stores declared/imported relations and impact proposals | Canonical Graph observation, completeness and CURRENT/STALE verdicts |
 | Effects | Scenarios can declare bounded effects | Canonical Effect evaluator and admitted receipts |
 | Media | VTT timing and text artifacts are local | Composition timeline, render and media verification |
