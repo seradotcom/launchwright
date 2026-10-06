@@ -7,7 +7,7 @@ import { LaunchwrightApplication, execute } from '../src/application.mjs';
 
 const evidence=resolve(process.env.LAUNCHWRIGHT_EFFECTS_EVIDENCE??'evidence/effects');
 const context=JSON.parse(readFileSync(resolve(evidence,'context.json'),'utf8'));
-const specText=readFileSync(resolve(evidence,'spec.json'),'utf8');
+const specText=readFileSync(resolve(evidence,'protected/spec.json'),'utf8');
 const resultText=readFileSync(resolve(evidence,'result.json'),'utf8').trim();
 const app=new LaunchwrightApplication(context.state_root,{capabilities:{canonical_effect_admission:true}});
 try{
