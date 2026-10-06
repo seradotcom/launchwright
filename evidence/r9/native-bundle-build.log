@@ -1,0 +1,48 @@
+
+  dist/core.esbuild.cjs  45.2kb
+
+⚡ Done in 11ms
+core: 46007 bytes 7493cc81fb805e28a962c23eb4a5f4fd4a94e7d0fad35c64902d5136cdc6c387
+
+  dist/production.esbuild.cjs  41.8kb
+
+⚡ Done in 10ms
+production: 42528 bytes 5daa091c3afec2d2140a40c21a612ec3cbc518a7257a90e791480c42f4213ee0
+
+  dist/review.esbuild.cjs  46.5kb
+
+⚡ Done in 11ms
+review: 47219 bytes fcbe750f8bad0293b5f8f09e0f1bed805ba44ff0f2cce1cbe33e845c77b92601
+
+  dist/integrations.esbuild.cjs  33.7kb
+
+⚡ Done in 10ms
+integrations: 34179 bytes a14114b50cc520dfcbc538334ba2c98d0281bb047cbc589305599788f5ae41c6
+
+  dist/extensions.esbuild.cjs  41.9kb
+
+⚡ Done in 10ms
+extensions: 42597 bytes 3f8ecfa817eda1838bdba51481a01bd759be712ba6c3d1cfd89e46b273e6d8c8
+
+  dist/work.esbuild.cjs  41.5kb
+
+⚡ Done in 8ms
+work: 42156 bytes 52f04c25743f719a04c8d97e44655803a188e67b53baef30000bb0edc4ac66c3
+
+  dist/media.esbuild.cjs  39.4kb
+
+⚡ Done in 11ms
+media: 39969 bytes 535c311e9a315b3ef4b143a3ad9dce4d37cedc260679cdad4306194ac1962e0a
+
+  dist/publish.esbuild.cjs  47.7kb
+
+⚡ Done in 14ms
+publish: 48469 bytes 7a8d02160bcf05b43097abe86865b1babd8cca33269d90bc3c8dd4f22bbd0044
+
+  dist/graph.esbuild.cjs  47.4kb
+
+⚡ Done in 8ms
+graph: 48166 bytes 681a64822b22a6574b576d18a5dfb2d2b5f42071b801d7239249a587b2496a65
+Native profile partition: 82 operations across 9 bundles.
+(node:3706515) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)

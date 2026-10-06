@@ -24,7 +24,7 @@ Node 24.21.x is the acceptance runtime. Another local Node version is diagnostic
 `Application checks` runs the supported Node runtime on Ubuntu, Windows and macOS. `Native and browser acceptance` is manually dispatched by affected lane:
 
 - `browser`: installs Chromium only on the GitHub runner and exercises the real Launchwright UI.
-- `native`: builds the pinned TypeScript SDK, bundles the bridge and compiles/tests the real Rust NativeDriver.
+- `native`: builds the pinned TypeScript SDK, bundles all nine bridge profiles, compiles/tests the real Rust NativeDriver, checks the pinned `semwright-project-graph` contract at the same Semwright SHA and runs the per-profile bridge smoke. Do not move these Cargo/dependency builds to the storage-constrained workstation.
 - `stress`: exercises bounded high-volume persistence, observation and portable restore without consuming workstation disk.
 
 Always retain the exact run URL, SHA and artifact name in `ACCEPTANCE.md` after a successful run.

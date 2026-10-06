@@ -7,6 +7,7 @@ import { EXTENSIONS_NATIVE_OPERATIONS } from './native-extensions-app.mjs';
 import { WORK_NATIVE_OPERATIONS } from './native-work-app.mjs';
 import { MEDIA_NATIVE_OPERATIONS } from './native-media-app.mjs';
 import { PUBLISH_NATIVE_OPERATIONS } from './native-publish-app.mjs';
+import { GRAPH_NATIVE_OPERATIONS } from './native-graph-app.mjs';
 
 export const NATIVE_PROFILES=Object.freeze({
   core:Object.freeze({entry:'src/native-core-entry.mjs',file:'launchwright-core.cjs',operations:CORE_NATIVE_OPERATIONS}),
@@ -16,6 +17,7 @@ export const NATIVE_PROFILES=Object.freeze({
   extensions:Object.freeze({entry:'src/native-extensions-entry.mjs',file:'launchwright-extensions.cjs',operations:EXTENSIONS_NATIVE_OPERATIONS}),
   work:Object.freeze({entry:'src/native-work-entry.mjs',file:'launchwright-work.cjs',operations:WORK_NATIVE_OPERATIONS}),
   media:Object.freeze({entry:'src/native-media-entry.mjs',file:'launchwright-media.cjs',operations:MEDIA_NATIVE_OPERATIONS}),
-  publish:Object.freeze({entry:'src/native-publish-entry.mjs',file:'launchwright-publish.cjs',operations:PUBLISH_NATIVE_OPERATIONS})
+  publish:Object.freeze({entry:'src/native-publish-entry.mjs',file:'launchwright-publish.cjs',operations:PUBLISH_NATIVE_OPERATIONS}),
+  graph:Object.freeze({entry:'src/native-graph-entry.mjs',file:'launchwright-graph.cjs',operations:GRAPH_NATIVE_OPERATIONS})
 });
 export const NATIVE_PROFILE_NAMES=Object.freeze(Object.keys(NATIVE_PROFILES));

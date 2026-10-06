@@ -11,7 +11,7 @@ The private specification text is intentionally not redistributed in this AGPL r
 - Build/source/target/scenario/anchor contracts with explicit authorization and provenance.
 - Claims, CopyBlocks, availability and ReleaseContract denominators without fabricated coverage.
 - Immutable text artifacts, exact candidate manifests and freshness invalidation.
-- Explicit relation provenance and impact proposals with no execution authority.
+- RS-GRF-01..10 application-side Project Graph integration: immutable owner-admitted canonical projections at the pinned Semwright schema/SHA; strict declared/observed/imported/heuristic provenance; visible-resource-only bounded impact; preserved UNKNOWN frontiers; authority-free exact-revision impact proposals and coalescing; reuse identities bound to target/toolchain/fixtures/templates/verifiers/tenant/rights/permissions; exact built-vs-pending rebuild receipts; mandatory final-delivery revalidation; and percentages only over an explicitly safe authorized visible denominator. Launchwright does not become the Graph traversal/admission or effect authority.
 - Application-local document change proposals for CopyBlocks and deliverables: proposal creation never mutates content, application requires an exact base revision, stale proposals fail closed, and human-owned/whole-document content requires explicit acknowledgement.
 - Capture contract v2 covering receipt correlation, readiness, anchor uniqueness, build drift, demo-data labeling, derivative lineage, isolation, bounded cleanup, ordered segments and no-fake-UI eligibility; technical state remains UNKNOWN.
 - Immutable verifier records, coverage/omissions/findings and non-state-changing waivers.
@@ -25,6 +25,6 @@ The private specification text is intentionally not redistributed in this AGPL r
 
 ## Integration-dependent / not accepted
 
-Real product capture across target applications; canonical Project Graph/effects; Composition video rendering; real Platform job execution; canonical verifier runtime admission; remote teams; real cross-account Platform Publish execution/output ACLs/external activation; mobile/Godot target acceptance; ChatGPT Plugin host acceptance; production deployment.
+Real product capture across target applications; live Project Graph query/traversal and owner/Host admission; canonical effects; Composition video rendering; real Platform recipe/job execution; canonical verifier runtime admission; remote teams; real cross-account Platform Publish execution/output ACLs/external activation; mobile/Godot target acceptance; ChatGPT Plugin host acceptance; production deployment. The stored Graph projection layer is implemented, but it intentionally does not replace those external authorities.
 
 Requirement completion is therefore not represented as a single vanity percentage. Evidence is tracked by exact behavior, SHA and acceptance lane in `ACCEPTANCE.md`.

@@ -12,6 +12,7 @@ import { ExtensionsNativeApplication } from '../src/native-extensions-app.mjs';
 import { WorkNativeApplication } from '../src/native-work-app.mjs';
 import { MediaNativeApplication } from '../src/native-media-app.mjs';
 import { PublishNativeApplication } from '../src/native-publish-app.mjs';
+import { GraphNativeApplication } from '../src/native-graph-app.mjs';
 import { setup, baseline } from './helpers.mjs';
 
 async function invokeProfile(Profile,root,operation,input){
@@ -92,4 +93,12 @@ test('split native profiles preserve canonical mutation transactions across one 
   }});
   assert.equal(publish.entity.kind,'release_template');
   assert.equal(publish.entity.data.state,'DRAFT');
+
+  const graph=await readProfile(GraphNativeApplication,seeded.root,'graph.contract',{});
+  assert.equal(graph.source.sha,'4d291de26724810017ce7b6d185326514cb79fa6');
+  assert.equal(graph.query.budget.nodes,20000);
+  const proposal=await invokeProfile(GraphNativeApplication,seeded.root,'impact.plan',{release_id:b.release.id,cause_ids:[b.source.id],note:'Native graph profile'});
+  assert.equal(proposal.entity.kind,'impact_proposal');
+  assert.equal(proposal.entity.data.authority,'NONE');
+  assert.equal(proposal.entity.data.jobs_created,0);
 });
