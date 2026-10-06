@@ -28,7 +28,7 @@ export class ReviewNativeApplication extends NativeProfileApplication {
       return{verification_id:v.id,dimension:v.data.dimension,reported_state:v.data.state,effective_state:effective,admission:v.data.admission,verifier:v.data.verifier,coverage:v.data.coverage,omissions:v.data.omissions,findings:v.data.findings,waivers:related.map(w=>({id:w.id,scope:w.data.scope,expires_at:w.data.expires_at??null,active:active.some(a=>a.id===w.id)})),waived:active.length>0};
     });
     const state=checks.some(c=>['FAIL','ERROR'].includes(c.effective_state))?'FAIL':checks.length&&checks.every(c=>c.effective_state==='PASS')?'PASS':'UNKNOWN';
-    return{candidate_id:candidate.id,state,checks,canonical_passes:checks.filter(c=>c.effective_state==='PASS').length,failures:checks.filter(c=>['FAIL','ERROR'].includes(c.effective_state)).length,unknown:checks.filter(c=>c.effective_state==='UNKNOWN').length,note:'Waivers preserve the underlying verification state; non-canonical PASS reports remain UNKNOWN.'};
+    return{candidate_id:candidate.id,state,checks,canonical_passes:checks.filter(c=>c.effective_state==='PASS').length,failures:checks.filter(c=>['FAIL','ERROR'].includes(c.effective_state)).length,unknown:checks.filter(c=>c.effective_state==='UNKNOWN').length};
   }
   candidateGates(candidate){return buildCandidateGates(this,candidate);}
   inspectCandidate(candidate){return inspectCandidateState(this,candidate);}

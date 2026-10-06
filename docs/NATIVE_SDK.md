@@ -10,13 +10,13 @@ The canonical `NodeBridge` limits an owner-pinned executable bundle to 48 KiB an
 
 | Profile | Operations | Local compacted bytes | Purpose |
 | --- | ---: | ---: | --- |
-| `core` | 13 | 45,304 | workspace/entity/history reads, entity CRUD, change proposals and template instantiation |
-| `production` | 9 | 45,504 | coverage/impact, relations, evidence, capture-contract ingestion and text rendering |
-| `review` | 9 | 49,056 | candidate, verification, waiver and channel-package lifecycle |
-| `integrations` | 12 | 38,684 | localization, source-profile preflight, extension descriptors, compatibility locks and channel status |
-| `work` | 6 | 31,627 | snapshot summary and Platform-intent custody/recovery |
-| `media` | 5 | 39,558 | media-plan inspection/revision and Composition output/editorial receipt custody |
-| `publish` | 10 | 48,058 | ReleaseTemplate/ProductVersion/deployment/invocation contracts and authority-free export/import |
+| `core` | 13 | 45,506 | workspace/entity/history reads, entity CRUD, change proposals and template instantiation |
+| `production` | 9 | 45,664 | coverage/impact, relations, evidence, capture-contract ingestion and text rendering |
+| `review` | 9 | 49,114 | candidate, verification, waiver and channel-package lifecycle |
+| `integrations` | 17 | 46,200 | localization, source-profile preflight, extension descriptors, compatibility locks and channel status |
+| `work` | 6 | 31,787 | snapshot summary and Platform-intent custody/recovery |
+| `media` | 5 | 39,718 | media-plan inspection/revision and Composition output/editorial receipt custody |
+| `publish` | 10 | 48,218 | ReleaseTemplate/ProductVersion/deployment/invocation contracts and authority-free export/import |
 
 The byte counts above are workstation build evidence, not Driver Host acceptance. The review bundle has only 96 bytes of workstation headroom and must not grow without repartitioning/minification; the new Publish surface is isolated in its own profile rather than weakening or bypassing the limit.
 

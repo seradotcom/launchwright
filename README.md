@@ -112,3 +112,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 New Launchwright code is **AGPL-3.0-only**. Canonical Semwright SDK files retain **MIT OR Apache-2.0** and their original notices.
 
 The private source specification, credentials, private runtime state, browser profiles, product captures and unlicensed Platform source are not part of this public repository.
+
+### Extensibility reference path
+
+Launchwright includes a bounded extension registry/preparation contract and an executable fixtures/deltacli.mjs second-source fixture. The fixture produces a real process receipt; Launchwright deliberately keeps its technical state UNKNOWN until canonical Driver Host admission is available.

@@ -4,14 +4,15 @@ import { NativeProfileApplication } from './native-profile-base.mjs';
 import { KINDS, OPERATION_SCOPES, inputObject, str, choice, array, lines } from './contracts.mjs';
 import { iso } from './base.mjs';
 import { validateLocalization, assessLocalization } from './localization.mjs';
-import { PROFILE_MATRIX, validateExtensionManifest, validateCompatibilityLock } from './extensions.mjs';
+import { PROFILE_MATRIX, validateExtensionManifest, validateCompatibilityLock, prepareExtensionUse, inspectExtensionPreparation, genericExtensionView } from './extensions.mjs';
+import { recordCliObservation, inspectCliObservation } from './cli-source.mjs';
 
 export const INTEGRATIONS_NATIVE_READS=Object.freeze([
   'localization.assess','profile.matrix','profile.preflight',
-  'extension.discovery','compatibility.negotiate','compatibility.inspect','channel.status'
+  'extension.discovery','extension.generic_view','extension.preparation_status','source.cli_inspect','compatibility.negotiate','compatibility.inspect','channel.status'
 ]);
 export const INTEGRATIONS_NATIVE_MUTATIONS=Object.freeze([
-  'localization.create','localization.update','extension.register','extension.retire','compatibility.lock'
+  'localization.create','localization.update','extension.register','extension.retire','extension.prepare_use','source.cli_ingest','compatibility.lock'
 ]);
 export const INTEGRATIONS_NATIVE_OPERATIONS=Object.freeze([...INTEGRATIONS_NATIVE_READS,...INTEGRATIONS_NATIVE_MUTATIONS]);
 
@@ -69,6 +70,9 @@ export class IntegrationsNativeApplication extends NativeProfileApplication {
       case'profile.matrix':inputObject(input,[]);return{profiles:PROFILE_MATRIX,execution_proof:false};
       case'profile.preflight':return this.profilePreflight(input);
       case'extension.discovery':return this.extensionDiscovery(input);
+      case'extension.generic_view':{inputObject(input,['id']);return genericExtensionView(this.get(input.id,'extension_package'));}
+      case'extension.preparation_status':{inputObject(input,['id']);return inspectExtensionPreparation(this,input.id);}
+      case'source.cli_inspect':{inputObject(input,['id']);return inspectCliObservation(this,input.id);}
       case'compatibility.negotiate':return this.compatibilityNegotiate(input);
       case'compatibility.inspect':inputObject(input,['id']);return this.compatibilityInspect(input.id);
       case'channel.status':inputObject(input,['release_id']);return this.channelStatus(input.release_id);
@@ -93,6 +97,8 @@ export class IntegrationsNativeApplication extends NativeProfileApplication {
         if(glossary){ensure(glossary.data.status==='active','Glossary is deprecated','Conflict');ensure(glossary.data.source_locale===source.data.locale&&glossary.data.target_locale===data.locale,'Glossary locale pair does not match localization','Conflict');}
         return{entity:this.store.update(prior.id,{...data,source_version:source.version,glossary_version:glossary?.version??null,created_by:prior.data.created_by,created_at:prior.data.created_at,updated_by:this.principal,updated_at:iso()})};
       }
+      case'extension.prepare_use':{return{entity:prepareExtensionUse(this,input)};}
+      case'source.cli_ingest':{return{entity:recordCliObservation(this,input)};}
       case'extension.register':{
         const data=validateExtensionManifest(input);ensure(data.schema_major===1,'Unsupported extension schema major','ProtocolMismatch');
         const duplicate=this.list('extension_package').find(e=>e.data.type===data.type&&e.data.name===data.name&&e.data.package_version===data.package_version&&e.data.status==='active');
@@ -101,7 +107,8 @@ export class IntegrationsNativeApplication extends NativeProfileApplication {
       }
       case'extension.retire':{
         inputObject(input,['id','expected','reason']);const ext=this.get(input.id,'extension_package');ensure(sameVersion(ext.version,input.expected),'Extension revision changed','StaleReference');ensure(ext.data.status==='active','Extension is already retired','Conflict');lines(input.reason,4000);
-        return{entity:this.store.update(ext.id,{...ext.data,status:'retired',retired_by:this.principal,retired_at:iso(),retire_reason:input.reason,new_use_allowed:false})};
+        const affected=this.list('extension_preparation').filter(p=>p.data.extension_id===ext.id).map(p=>p.id);
+        return{entity:this.store.update(ext.id,{...ext.data,status:'retired',retired_by:this.principal,retired_at:iso(),retire_reason:input.reason,new_use_allowed:false}),affected_preparations:affected};
       }
       case'compatibility.lock':{
         const data=validateCompatibilityLock(input),product=this.get(data.product_id,'product');
