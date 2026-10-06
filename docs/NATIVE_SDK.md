@@ -1,25 +1,25 @@
 # Canonical Semwright Native SDK integration
 
-Launchwright pins Semwright commit `4d291de26724810017ce7b6d185326514cb79fa6` and Native SDK `0.9.0-dev.1`. Exact public SDK source hashes are in `../SOURCE_LOCK.json`. The pin was rechecked against `origin/main` on 2026-10-04 and matched the current Semwright main SHA.
+Launchwright pins Semwright commit `4d291de26724810017ce7b6d185326514cb79fa6` and Native SDK `0.9.0-dev.1`. Exact public SDK source hashes are in `../SOURCE_LOCK.json`. The pin was rechecked against `origin/main` on 2026-10-06 and still exactly matches the current Semwright main SHA.
 
 The JavaScript application imports the real `@semwright/native-sdk` package for application contexts, exact request digests, JSON budgets, cancellation, observations, recovery and dispatch. The vendored SDK keeps its upstream MIT OR Apache-2.0 licensing.
 
 ## Host bridge profiles
 
-The canonical `NodeBridge` limits an owner-pinned executable bundle to 48 KiB and limits bundle plus invocation stdin to 64 KiB. Launchwright does not raise or bypass those limits. Its 71 public application operations are partitioned, without overlap, across eight owner-pinned bridge profiles:
+The canonical `NodeBridge` limits an owner-pinned executable bundle to 48 KiB and limits bundle plus invocation stdin to 64 KiB. Launchwright does not raise or bypass those limits. Its 76 public application operations are partitioned, without overlap, across eight owner-pinned bridge profiles:
 
 | Profile | Operations | Local compacted bytes | Purpose |
 | --- | ---: | ---: | --- |
-| `core` | 13 | 45,595 | workspace/entity/history reads, entity CRUD, change proposals and template instantiation |
-| `production` | 9 | 45,734 | coverage/impact, relations, evidence, capture-contract ingestion and text rendering |
-| `review` | 9 | 49,129 | candidate, verification, waiver and channel-package lifecycle |
-| `integrations` | 6 | 31,825 | localization, source-profile preflight and channel status |
-| `extensions` | 13 | 42,300 | extension descriptors, exact-use preparation, generic results, compatibility locks and CLI-source observation |
-| `work` | 6 | 31,857 | snapshot summary and Platform-intent custody/recovery |
-| `media` | 5 | 39,788 | media-plan inspection/revision and Composition output/editorial receipt custody |
-| `publish` | 10 | 48,288 | ReleaseTemplate/ProductVersion/deployment/invocation contracts and authority-free export/import |
+| `core` | 13 | 45,798 | workspace/entity/history reads, entity CRUD, change proposals and template instantiation |
+| `production` | 9 | 45,744 | coverage/impact, relations, evidence, capture-contract ingestion and text rendering |
+| `review` | 8 | 47,048 | candidate, verification, waiver, private delivery and channel packaging |
+| `integrations` | 7 | 34,008 | localization, source-profile preflight, channel status and external channel outcome custody |
+| `extensions` | 13 | 42,388 | extension descriptors, exact-use preparation, generic results, compatibility locks and CLI-source observation |
+| `work` | 11 | 41,985 | snapshot summary, Platform-intent custody/recovery and application-side usage ledger |
+| `media` | 5 | 39,798 | media-plan inspection/revision and Composition output/editorial receipt custody |
+| `publish` | 10 | 48,298 | ReleaseTemplate/ProductVersion/deployment/invocation contracts and authority-free export/import |
 
-The byte counts above are workstation build evidence, not Driver Host acceptance. The review bundle has only 23 bytes of workstation headroom and must not grow without repartitioning/minification; the new Publish surface is isolated in its own profile rather than weakening or bypassing the limit.
+The byte counts above are workstation build evidence, not Driver Host acceptance. `channel.record_outcome` was moved from `review` to the semantically adjacent `integrations` profile so review retains 2,104 bytes of headroom; the tightest profile is now `publish` with 854 bytes remaining. No canonical limit was raised or bypassed.
 
 `scripts/build-native-bundle.mjs` refuses to build if an operation is missing, duplicated or if any compacted profile exceeds the canonical 48 KiB maximum. It emits a manifest containing the exact SHA-256 and byte count of every profile. The Rust driver pins all eight hashes at build time and maps each `driver.launchwright.*` operation to exactly one `NodeBridge`.
 

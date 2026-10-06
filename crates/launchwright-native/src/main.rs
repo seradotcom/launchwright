@@ -232,7 +232,7 @@ const OPERATIONS: &[Operation] = &[
         suffix: "channel-record_outcome",
         read: false,
         consent: false,
-        profile: Profile::Review,
+        profile: Profile::Integrations,
     },
     Operation {
         suffix: "localization-assess",
@@ -349,6 +349,12 @@ const OPERATIONS: &[Operation] = &[
         profile: Profile::Work,
     },
     Operation {
+        suffix: "usage-inspect",
+        read: true,
+        consent: false,
+        profile: Profile::Work,
+    },
+    Operation {
         suffix: "work-prepare",
         read: false,
         consent: false,
@@ -368,6 +374,30 @@ const OPERATIONS: &[Operation] = &[
     },
     Operation {
         suffix: "work-mark_unknown",
+        read: false,
+        consent: false,
+        profile: Profile::Work,
+    },
+    Operation {
+        suffix: "usage-reserve",
+        read: false,
+        consent: false,
+        profile: Profile::Work,
+    },
+    Operation {
+        suffix: "usage-record",
+        read: false,
+        consent: false,
+        profile: Profile::Work,
+    },
+    Operation {
+        suffix: "usage-adjust",
+        read: false,
+        consent: false,
+        profile: Profile::Work,
+    },
+    Operation {
+        suffix: "billing-test_callback",
         read: false,
         consent: false,
         profile: Profile::Work,

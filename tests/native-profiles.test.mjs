@@ -64,10 +64,18 @@ test('split native profiles preserve canonical mutation transactions across one 
 
   const work=await invokeProfile(WorkNativeApplication,seeded.root,'work.prepare',{
     release_id:b.release.id,name:'Native profile work',action:'graph.observe',arguments:{project:'synthetic'},
-    budget:{max_cost_microunits:0,currency:'USD',max_runtime_seconds:30}
+    budget:{max_cost_microunits:1000,currency:'USD',max_runtime_seconds:30}
   });
   assert.equal(work.entity.kind,'work');
   assert.equal(work.entity.data.state,'PREPARED');
+  const reservation=await invokeProfile(WorkNativeApplication,seeded.root,'usage.reserve',{
+    work_id:work.entity.id,reservation_key:'native-profile-reservation',compute_origin:'byo',reserved_microunits:250,
+    estimate:{total_microunits:100,own_compute_microunits:0,service_microunits:100,currency:'USD'}
+  });
+  assert.equal(reservation.entity.kind,'usage_reservation');
+  const usage=await readProfile(WorkNativeApplication,seeded.root,'usage.inspect',{reservation_id:reservation.entity.id});
+  assert.equal(usage.compute.origin,'byo');
+  assert.equal(usage.authority.billing,false);
 
   const media=await readProfile(MediaNativeApplication,seeded.root,'media.inspect',{});
   assert.equal(media.composition_contract,'semwright-composition/C0');

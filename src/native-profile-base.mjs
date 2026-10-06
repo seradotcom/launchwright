@@ -21,7 +21,7 @@ export class NativeProfileApplication {
     text(id,96,'resource ID');
     ensure(/^[a-z][a-z0-9_-]{1,95}$/.test(id),'Invalid resource ID');
     const e=this.store.get(id);
-    ensure(!kind||e.kind===kind,'Resource kind differs from the operation contract');
+    ensure(!kind||e.kind===kind,'Resource kind mismatch');
     return e;
   }
   list(kind,release){return this.store.all(kind).filter(e=>!release||e.data.release_id===release);}
@@ -45,7 +45,7 @@ export class NativeProfileApplication {
   dispatchNative(operation,raw,context){
     const read=this.readOperations.has(operation);
     object(raw,read?['ref','input']:['ref','request','input'],read?['ref','input']:['ref','request','input']);
-    text(raw.ref,4096,'canonical reference');
+    text(raw.ref,4096,'reference');
     return this.invoke(operation,read?raw.input:{request:raw.request,input:raw.input},context);
   }
   invoke(operation,args,context){
@@ -53,14 +53,14 @@ export class NativeProfileApplication {
     if(this.readOperations.has(operation))return this.read(operation,args,context);
     object(args,['request','input'],['request','input']);
     const request=requestIdentity(args.request);
-    ensure(request.resource===RESOURCE,'Request is bound to a different workspace');
+    ensure(request.resource===RESOURCE,'Request targets another workspace');
     const prepared=makeRequest(operation,args.input,context.expected,request.epoch,request.key);
-    ensure(prepared.request.request_sha256===request.request_sha256,'Request digest does not match command, input, revision and identity','Conflict');
+    ensure(prepared.request.request_sha256===request.request_sha256,'Request digest mismatch','Conflict');
     return this.store.transaction(operation,this.principal,request,context.expected,()=>{
       checkCancelled(context);
       return this.mutate(operation,args.input,context);
     });
   }
-  read(){throw new NativeError('Unsupported','Read operation is outside this native profile');}
-  mutate(){throw new NativeError('Unsupported','Mutation is outside this native profile');}
+  read(){throw new NativeError('Unsupported','Read unavailable in profile');}
+  mutate(){throw new NativeError('Unsupported','Mutation unavailable in profile');}
 }

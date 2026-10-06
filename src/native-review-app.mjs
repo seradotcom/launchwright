@@ -4,14 +4,14 @@ import { NativeError, requireCondition as ensure, sameVersion } from '@semwright
 import { NativeProfileApplication } from './native-profile-base.mjs';
 import { inputObject, sha, choice, lines } from './contracts.mjs';
 import { iso } from './base.mjs';
-import { validateVerification, validateWaiver, validateChannelPackage, validateChannelOutcome } from './records.mjs';
+import { validateVerification, validateWaiver, validateChannelPackage } from './records.mjs';
 import { claimCheck } from './claim-check.mjs';
 import { freezeCandidate, buildCandidateGates, inspectCandidateState, recordCandidateReview, assertPrivateDeliveryReady, assertChannelPinned, assertPartialDeliveryPolicy } from './candidate.mjs';
 
 export const REVIEW_NATIVE_READS=Object.freeze(['candidate.inspect','verification.summary']);
 export const REVIEW_NATIVE_MUTATIONS=Object.freeze([
   'verification.record','waiver.record','candidate.freeze','candidate.review',
-  'candidate.deliver_private','channel.package','channel.record_outcome'
+  'candidate.deliver_private','channel.package'
 ]);
 export const REVIEW_NATIVE_OPERATIONS=Object.freeze([...REVIEW_NATIVE_READS,...REVIEW_NATIVE_MUTATIONS]);
 
@@ -44,9 +44,9 @@ export class ReviewNativeApplication extends NativeProfileApplication {
       case'verification.record':{
         const data=validateVerification(input),candidate=this.get(data.candidate_id,'candidate');
         const artifactSet=new Set(candidate.data.manifest.artifact_ids);
-        for(const id of data.artifact_ids)ensure(artifactSet.has(id),'Verification references bytes outside the candidate','PermissionDenied');
+        for(const id of data.artifact_ids)ensure(artifactSet.has(id),'Verification artifact is outside candidate','PermissionDenied');
         if(data.target_id){const target=this.get(data.target_id,'target');ensure(target.data.release_id===candidate.data.release_id,'Verification target belongs to another release','PermissionDenied');}
-        if(data.verifier.authority==='canonical')ensure(this.capabilities.canonical_verifier_admission===true,'Canonical verifier admission is unavailable in this session','PolicyDenied');
+        if(data.verifier.authority==='canonical')ensure(this.capabilities.canonical_verifier_admission===true,'Canonical verifier admission unavailable','PolicyDenied');
         const admission=data.verifier.authority==='canonical'?'canonical-owner-admitted':data.verifier.authority==='heuristic'?'heuristic-report':'local-review-record';
         return{entity:this.store.create('verification',{release_id:candidate.data.release_id,name:data.dimension+' verification',...data,admission,recorded_by:this.principal,recorded_at:iso()})};
       }
@@ -75,20 +75,12 @@ export class ReviewNativeApplication extends NativeProfileApplication {
         ensure(profile.data.product_id===release.data.product_id,'Channel profile belongs to another product','PermissionDenied');
         const checked=this.inspectCandidate(candidate);ensure(checked.private_draft_allowed,'Candidate has stale inputs or invalid bytes','StaleReference');
         if(candidate.data.manifest.schema_version==='launchwright-candidate/2'){assertChannelPinned(candidate,profile);assertPartialDeliveryPolicy(candidate,data.allow_partial);}
-        if(!data.allow_partial)ensure(data.omissions.length===0,'Package omissions require explicit partial delivery approval','ConsentRequired');
+        if(!data.allow_partial)ensure(data.omissions.length===0,'Partial omissions require approval','ConsentRequired');
         if(data.allow_partial)ensure(data.omissions.length>0,'Partial delivery must enumerate omissions');
         const candidateManifestBytes=Buffer.from(JSON.stringify(candidate.data.manifest,null,2)+'\n'),candidateManifestSha=this.store.blob(candidateManifestBytes,'application/json');
         const manifest={schema_version:'launchwright-channel-package/2',candidate_id:candidate.id,candidate_sha256:candidate.data.candidate_sha256,candidate_manifest_sha256:candidateManifestSha,release_id:release.id,profile:{id:profile.id,version:profile.version,profile_version:profile.data.profile_version,channel:profile.data.channel,destination_class:profile.data.destination_class},participant:data.participant,locale:data.locale,partial:data.allow_partial,omissions:data.omissions,bundle_recipe:'private-zip-v1',artifacts:candidate.data.manifest.artifacts};
         const bytes=Buffer.from(JSON.stringify(manifest,null,2)+'\n'),packageSha=this.store.blob(bytes,'application/json');
         return{entity:this.store.create('channel_delivery',{release_id:release.id,name:profile.data.channel+' · '+data.participant,profile_id:profile.id,profile_version:profile.version,candidate_id:candidate.id,candidate_sha256:candidate.data.candidate_sha256,candidate_manifest_sha256:candidateManifestSha,participant:data.participant,locale:data.locale,partial:data.allow_partial,omissions:data.omissions,package_sha256:packageSha,package_size_bytes:bytes.length,bundle_recipe:'private-zip-v1',state:'PACKAGE_READY',external_state:'NOT_SENT',root_delivery_id:null,parent_delivery_id:null,recovery_required:false,created_by:this.principal}),manifest};
-      }
-      case'channel.record_outcome':{
-        const data=validateChannelOutcome(input),base=this.get(data.delivery_id,'channel_delivery'),profile=this.get(base.data.profile_id,'channel_profile');
-        ensure(base.data.release_id&&base.data.candidate_id,'Channel delivery record is incomplete','Conflict');
-        if(['UPLOADED','DRAFT_CREATED','ACTIVATED','PUBLISHED','RETIRED'].includes(data.state))ensure(!!data.receipt_digest,'External success state requires an exact receipt digest','InvalidArgument');
-        if(['ACTIVATED','PUBLISHED','RETIRED'].includes(data.state))ensure(this.capabilities.canonical_publish_receipts===true,'Canonical publish receipt unavailable','PolicyDenied');
-        const root=base.data.root_delivery_id??base.id,recoveryRequired=data.state==='UNKNOWN'&&profile.data.idempotency!=='safe';
-        return{entity:this.store.create('channel_delivery',{release_id:base.data.release_id,name:base.data.name,profile_id:base.data.profile_id,profile_version:base.data.profile_version,candidate_id:base.data.candidate_id,candidate_sha256:base.data.candidate_sha256,candidate_manifest_sha256:base.data.candidate_manifest_sha256??null,participant:base.data.participant,locale:base.data.locale,partial:base.data.partial,omissions:base.data.omissions,package_sha256:base.data.package_sha256,package_size_bytes:base.data.package_size_bytes,bundle_recipe:base.data.bundle_recipe??null,state:data.state,external_state:data.state,external_id:data.external_id??null,receipt_digest:data.receipt_digest??null,message:data.message??'',observed_at:data.observed_at,root_delivery_id:root,parent_delivery_id:base.id,recovery_required:recoveryRequired,retry_policy:recoveryRequired?'RECOVER_BEFORE_RETRY':profile.data.idempotency==='safe'?'IDEMPOTENT_RETRY_ALLOWED':'NO_AUTOMATIC_RETRY',recorded_by:this.principal})};
       }
       default:throw new NativeError('Unsupported','Mutation is outside review profile');
     }

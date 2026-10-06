@@ -4,12 +4,13 @@ import { NativeProfileApplication } from './native-profile-base.mjs';
 import { inputObject, str } from './contracts.mjs';
 import { iso } from './base.mjs';
 import { validateLocalization, assessLocalization } from './localization.mjs';
+import { validateChannelOutcome } from './records.mjs';
 import { PROFILE_MATRIX } from './extensions.mjs';
 
 export const INTEGRATIONS_NATIVE_READS=Object.freeze([
   'localization.assess','profile.matrix','profile.preflight','channel.status'
 ]);
-export const INTEGRATIONS_NATIVE_MUTATIONS=Object.freeze(['localization.create','localization.update']);
+export const INTEGRATIONS_NATIVE_MUTATIONS=Object.freeze(['localization.create','localization.update','channel.record_outcome']);
 export const INTEGRATIONS_NATIVE_OPERATIONS=Object.freeze([...INTEGRATIONS_NATIVE_READS,...INTEGRATIONS_NATIVE_MUTATIONS]);
 
 export class IntegrationsNativeApplication extends NativeProfileApplication {
@@ -59,6 +60,14 @@ export class IntegrationsNativeApplication extends NativeProfileApplication {
         if(sourceDrift||glossaryDrift)ensure(input.acknowledge_rebase===true,'Source or glossary changed; review content and explicitly rebase','StaleReference');
         if(glossary){ensure(glossary.data.status==='active','Glossary is deprecated','Conflict');ensure(glossary.data.source_locale===source.data.locale&&glossary.data.target_locale===data.locale,'Glossary locale pair does not match localization','Conflict');}
         return{entity:this.store.update(prior.id,{...data,source_version:source.version,glossary_version:glossary?.version??null,created_by:prior.data.created_by,created_at:prior.data.created_at,updated_by:this.principal,updated_at:iso()})};
+      }
+      case'channel.record_outcome':{
+        const data=validateChannelOutcome(input),base=this.get(data.delivery_id,'channel_delivery'),profile=this.get(base.data.profile_id,'channel_profile');
+        ensure(base.data.release_id&&base.data.candidate_id,'Channel delivery incomplete','Conflict');
+        if(['UPLOADED','DRAFT_CREATED','ACTIVATED','PUBLISHED','RETIRED'].includes(data.state))ensure(!!data.receipt_digest,'External success requires receipt digest','InvalidArgument');
+        if(['ACTIVATED','PUBLISHED','RETIRED'].includes(data.state))ensure(this.capabilities.canonical_publish_receipts===true,'Canonical publish receipt unavailable','PolicyDenied');
+        const root=base.data.root_delivery_id??base.id,recoveryRequired=data.state==='UNKNOWN'&&profile.data.idempotency!=='safe';
+        return{entity:this.store.create('channel_delivery',{release_id:base.data.release_id,name:base.data.name,profile_id:base.data.profile_id,profile_version:base.data.profile_version,candidate_id:base.data.candidate_id,candidate_sha256:base.data.candidate_sha256,candidate_manifest_sha256:base.data.candidate_manifest_sha256??null,participant:base.data.participant,locale:base.data.locale,partial:base.data.partial,omissions:base.data.omissions,package_sha256:base.data.package_sha256,package_size_bytes:base.data.package_size_bytes,bundle_recipe:base.data.bundle_recipe??null,state:data.state,external_state:data.state,external_id:data.external_id??null,receipt_digest:data.receipt_digest??null,message:data.message??'',observed_at:data.observed_at,root_delivery_id:root,parent_delivery_id:base.id,recovery_required:recoveryRequired,retry_policy:recoveryRequired?'RECOVER_BEFORE_RETRY':profile.data.idempotency==='safe'?'IDEMPOTENT_RETRY_ALLOWED':'NO_AUTOMATIC_RETRY',recorded_by:this.principal})};
       }
       default:throw new NativeError('Unsupported','Mutation is outside integrations profile');
     }
