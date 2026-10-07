@@ -354,6 +354,7 @@ jobs:
       - name: Pin Semwright Rust compiler
         run: |
           rustup toolchain install 1.98.1 --profile minimal
+          rustup component add rustfmt --toolchain 1.98.1
           (cd .ci-semwright && rustup override set 1.98.1)
       - name: Bind runner Chromium
         run: |
@@ -378,18 +379,32 @@ jobs:
             sleep 0.2
           done
           exit 1
-      - name: Capture DeltaDesk A/B through exact Semwright Chromium adapter
+      - name: Install pinned Semwright Linux browser build prerequisite
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpipewire-0.3-dev
+      - name: Capture DeltaDesk A/B through exact Semwright Broker, Policy and Chromium backend
         env:
           LAUNCHWRIGHT_DELTADESK_ORIGIN: http://127.0.0.1:4399
           LAUNCHWRIGHT_EVIDENCE_DIR: ${{ github.workspace }}/evidence/composition
         run: |
           set -euo pipefail
-          cp acceptance/chromium_deltadesk.rs .ci-semwright/crates/adapters/tests/launchwright_deltadesk.rs
+          mkdir -p .ci-semwright/crates/daemon/tests
+          cp acceptance/chromium_deltadesk_broker.rs .ci-semwright/crates/daemon/tests/launchwright_deltadesk_broker.rs
           (
             cd .ci-semwright
-            cargo test --locked -p semwright-adapters --test launchwright_deltadesk -- --ignored --nocapture
-          ) 2>&1 | tee evidence/composition/semwright-browser.log
-          grep -q '^REAL_DELTADESK_BROWSER_ACCEPTANCE_PASS ' evidence/composition/semwright-browser.log
+            cargo test --locked -p semwright-daemon --test launchwright_deltadesk_broker \
+              real_semwright_broker_policy_captures_deltadesk_a_and_b \
+              -- --ignored --exact --nocapture
+          ) 2>&1 | tee evidence/composition/semwright-browser-broker.log
+          grep -q '^REAL_DELTADESK_BROKER_ACCEPTANCE_PASS ' evidence/composition/semwright-browser-broker.log
+          CAPTURE_A_SHA256="$(sha256sum evidence/composition/deltadesk-a-checkout.png | awk '{print $1}')"
+          CAPTURE_B_SHA256="$(sha256sum evidence/composition/deltadesk-b-checkout.png | awk '{print $1}')"
+          test "$CAPTURE_A_SHA256" != "$CAPTURE_B_SHA256"
+          echo "LAUNCHWRIGHT_CAPTURE_A_SHA256=$CAPTURE_A_SHA256" >> "$GITHUB_ENV"
+          echo "LAUNCHWRIGHT_CAPTURE_B_SHA256=$CAPTURE_B_SHA256" >> "$GITHUB_ENV"
+          printf '%s  %s\n' "$CAPTURE_A_SHA256" deltadesk-a-checkout.png "$CAPTURE_B_SHA256" deltadesk-b-checkout.png \
+            > evidence/composition/capture-inputs.sha256
       - name: Stop DeltaDesk capture fixture
         if: always()
         run: |
@@ -486,29 +501,25 @@ jobs:
             install -m 0500 "target/debug/$name" "$RUNNER_TEMP/composition-av-binaries/$name"
           done
           sha256sum "$RUNNER_TEMP/composition-av-binaries/"* > "$GITHUB_WORKSPACE/evidence/composition/prepared-binaries.sha256"
-      - name: Produce 20-second MP4 from real DeltaDesk capture bytes through MLT Driver Host
-        env:
-          SEMWRIGHT_TEST_LAUNCHWRIGHT_REAL_MEDIA: '1'
-          LAUNCHWRIGHT_CAPTURE_A: ${{ github.workspace }}/evidence/composition/deltadesk-a-checkout.png
-          LAUNCHWRIGHT_CAPTURE_B: ${{ github.workspace }}/evidence/composition/deltadesk-b-checkout.png
-          LAUNCHWRIGHT_COMPOSITION_EVIDENCE_DIR: ${{ github.workspace }}/evidence/composition
-          SEMWRIGHT_TEST_SANDBOX_HELPER: ${{ runner.temp }}/composition-av-binaries/semwright-sandbox
-          SEMWRIGHT_TEST_MELT: /usr/bin/melt
-          SEMWRIGHT_TEST_FFPROBE: /usr/bin/ffprobe
-          SEMWRIGHT_TEST_FFMPEG: /usr/bin/ffmpeg
-          SEMWRIGHT_TEST_BWRAP: /usr/bin/bwrap
+      - name: Prepare exact reviewed Semwright AV test as Launchwright single-recipe acceptance
         run: |
           set -euo pipefail
-          cp acceptance/mlt_deltadesk_media.rs .ci-semwright/crates/driver-mlt-video/tests/launchwright_real_media.rs
-          (
-            cd .ci-semwright
-            cargo test --locked -p semwright-mlt-video-driver --test launchwright_real_media \
-              real_deltadesk_captures_become_verified_h264_mp4_inside_driver_host \
-              -- --ignored --exact --nocapture
-          ) 2>&1 | tee evidence/composition/semwright-real-media.log
-          grep -q '^LAUNCHWRIGHT_REAL_MEDIA_DRIVER_PASS ' evidence/composition/semwright-real-media.log
-      - name: Execute canonical Semwright Composition + Audio AV E2E at same SHA
+          python3 -m py_compile scripts/prepare-composition-single-recipe.py
+          python3 scripts/prepare-composition-single-recipe.py \
+            .ci-semwright/crates/av-composition/tests/combined_native.rs \
+            .ci-semwright/crates/av-composition/tests/launchwright_deltadesk_single_recipe.rs
+          rustup run 1.98.1 rustfmt --edition 2024 .ci-semwright/crates/av-composition/tests/launchwright_deltadesk_single_recipe.rs
+          rustup run 1.98.1 rustfmt --edition 2024 --check .ci-semwright/crates/av-composition/tests/launchwright_deltadesk_single_recipe.rs
+          sha256sum \
+            .ci-semwright/crates/av-composition/tests/combined_native.rs \
+            .ci-semwright/crates/av-composition/tests/launchwright_deltadesk_single_recipe.rs \
+            scripts/prepare-composition-single-recipe.py \
+            > evidence/composition/single-recipe-sources.sha256
+      - name: Execute one canonical Composition recipe over the exact Broker capture bytes
         env:
+          LAUNCHWRIGHT_SOURCE_SHA: ${{ github.sha }}
+          LAUNCHWRIGHT_CAPTURE_A: ${{ github.workspace }}/evidence/composition/deltadesk-a-checkout.png
+          LAUNCHWRIGHT_CAPTURE_B: ${{ github.workspace }}/evidence/composition/deltadesk-b-checkout.png
           SEMWRIGHT_TEST_COMBINED_AV: '1'
           SEMWRIGHT_TEST_COMBINED_MOTION_DRIVER: ${{ runner.temp }}/composition-av-binaries/semwright-motion-canvas-driver
           SEMWRIGHT_TEST_COMBINED_FAUST_DRIVER: ${{ runner.temp }}/composition-av-binaries/semwright-faust-audio-driver
@@ -529,23 +540,39 @@ jobs:
           set -euo pipefail
           (
             cd .ci-semwright
-            GITHUB_SHA="$SEMWRIGHT_SHA" cargo test --locked -p semwright-av-composition --test combined_native \
-              combined_a_b_native_av_candidate_uses_post_encode_audio_and_full_scan_sync \
+            GITHUB_SHA="$SEMWRIGHT_SHA" cargo test --locked -p semwright-av-composition \
+              --test launchwright_deltadesk_single_recipe \
+              launchwright_deltadesk_single_recipe_uses_real_capture_lineage \
               -- --ignored --exact --nocapture
-          ) 2>&1 | tee evidence/composition/semwright-combined-av.log
+          ) 2>&1 | tee evidence/composition/semwright-single-recipe-av.log
+          grep -q '^LAUNCHWRIGHT_SINGLE_RECIPE_COMPOSITION_PASS ' evidence/composition/semwright-single-recipe-av.log
+          cp verification/composition-av/launchwright-deltadesk-single-recipe.json evidence/composition/
+          cp verification/composition-av/launchwright-deltadesk-single-recipe.mp4 evidence/composition/
           cp verification/composition-av/combined-native.json evidence/composition/semwright-combined-native.json
           cp verification/composition-av/c14-project-graph.json evidence/composition/semwright-combined-project-graph.json
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '24.21.0'
-      - name: Verify cross-system evidence without promoting partial proof to PASS
+      - name: Verify exact Broker-to-single-recipe lineage and bounded authority
         env:
-          DELTADESK_DRIVER_RECEIPT: ${{ github.workspace }}/evidence/composition/semwright-deltadesk-driver.json
-          LAUNCHWRIGHT_REAL_MEDIA_RECEIPT: ${{ github.workspace }}/evidence/composition/launchwright-real-media-driver.json
-          SEMWRIGHT_COMBINED_AV_RECEIPT: ${{ github.workspace }}/evidence/composition/semwright-combined-native.json
+          LAUNCHWRIGHT_SOURCE_SHA: ${{ github.sha }}
+          DELTADESK_BROKER_RECEIPT: ${{ github.workspace }}/evidence/composition/semwright-deltadesk-broker.json
+          LAUNCHWRIGHT_SINGLE_RECIPE_RECEIPT: ${{ github.workspace }}/evidence/composition/launchwright-deltadesk-single-recipe.json
+          LAUNCHWRIGHT_SINGLE_RECIPE_MASTER: ${{ github.workspace }}/evidence/composition/launchwright-deltadesk-single-recipe.mp4
         run: |
-          node scripts/verify-composition-real-media.mjs | tee evidence/composition/launchwright-composition-verifier.log
-          node -e 'const r=require("./evidence/composition/launchwright-composition-chain.json"); if(r.technical_state!=="UNKNOWN"||r.media_requirement_state!=="PARTIAL"||r.native_driver_host_render!=="PASS"||r.canonical_composition_av_stack!=="PASS") process.exit(1)'
+          set -euo pipefail
+          node scripts/verify-composition-single-recipe.mjs | tee evidence/composition/launchwright-composition-single-recipe-verifier.log
+          node - <<'NODE'
+          const r=require('./evidence/composition/launchwright-composition-single-recipe-chain.json');
+          if(
+            r.technical_state!=='PASS' ||
+            r.media_requirement_state!=='PASS' ||
+            r.single_recipe_real_capture_composition!=='PASS' ||
+            r.capture_authority!=='IMPORTED_UNVERIFIED' ||
+            r.platform_execution_authority!==false ||
+            r.external_customer_acceptance!==false
+          ) process.exit(1);
+          NODE
       - name: Capture sandbox diagnostics on failure
         if: failure()
         run: |
@@ -561,7 +588,7 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: launchwright-composition-real-media-${{ github.sha }}
+          name: launchwright-composition-single-recipe-${{ github.sha }}
           path: evidence/composition/
           if-no-files-found: error
           retention-days: 14
