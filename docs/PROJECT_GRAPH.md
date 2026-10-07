@@ -18,9 +18,11 @@ R21 adds a CI-only acceptance path over the exact pinned Semwright source. The h
 
 The exact Broker responses and the Launchwright projection are retained in a canonicalized Host transcript whose SHA-256 is bound into the durable work result. That projection is then recorded through the real Launchwright NativeDriver `graph` profile and read back through `graph.inspect` and `release.impact`. The acceptance flow restarts the daemon and requires both Semwright's private Project Graph state and Launchwright's admitted projection to survive under the durable owner identity.
 
-The public Broker routes do not expose Semwright's internal observation-epoch token. R21 therefore labels the projection epoch as a Launchwright Host snapshot binding derived from the exact Project ID, Project Graph snapshot and pinned Semwright SHA; it is never represented as the hidden upstream epoch. Likewise, a generic Semwright file observation intentionally has unknown dependency coverage, and a manifest-exported declaration remains `declared`, not observed/executed evidence. Those dimensions keep the effective uncertainty visible instead of manufacturing a technical PASS.
+The public Broker routes do not expose Semwright's internal observation-epoch token. R21 therefore labels the projection epoch as a Launchwright Host snapshot binding derived from the exact Project ID, Project Graph snapshot and pinned Semwright SHA; it is never represented as the hidden upstream epoch. Semwright also marks a `file_scope` query as `scope_partial:true` relative to the whole Project Graph even when that bounded authorized page is exhausted. Launchwright preserves that marker as `scope_partial:true` and `denominator_complete:false`; it does not reinterpret `next_cursor:null` as global completeness. Likewise, a generic Semwright file observation intentionally has unknown dependency coverage, and a manifest-exported declaration remains `declared`, not observed/executed evidence. Those dimensions keep the effective uncertainty visible instead of manufacturing a technical PASS.
 
-This path establishes neither a Platform scheduler/job receipt nor real customer/project extraction. The R21 report keeps `project_graph_platform_job_authority:false`, and the broader Platform/Publish boundaries remain separate.
+The exact R21 source SHA `8de121fca5d81803c7781a2bca58d5344927a9cd` passed selective heavy Host run `37561836145`, job `112600625256`, against Semwright `4d291de26724810017ce7b6d185326514cb79fa6`. Artifact `11457174433` records schema `launchwright-native-host-acceptance/3`, live Broker Graph admission, Native projection custody, restart persistence and the separate `project.manage` denial control. That evidence is exact-SHA scoped.
+
+This path establishes neither a Platform scheduler/job receipt nor real customer/project extraction. The accepted R21 report keeps `project_graph_platform_job_authority:false`, and the broader Platform/Publish boundaries remain separate.
 
 ## Canonical projection surface
 
@@ -92,7 +94,7 @@ The projection layer does **not** establish:
 - a second Project Graph discovery/traversal engine implemented by Launchwright (Launchwright delegates traversal to Semwright instead);
 - real customer/project discovery, provider-specific dependency extraction and non-fixture scope/tenant acceptance beyond the owned R21 project;
 - canonical effect evaluation;
-- Driver Host isolation acceptance;
+- Driver Host isolation for real customer/project extraction beyond the exact owned R21 acceptance fixture;
 - real Platform recipe execution;
 - final external publication.
 
