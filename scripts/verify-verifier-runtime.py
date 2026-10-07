@@ -154,6 +154,7 @@ class VerifierFixture(host.HostFixture):
             ("launchwright-data", self.paths["launchwright-data"], True),
             ("verification-receipts", self.paths["verification-receipts"], False),
             ("launchwright-node", self.node, False),
+            ("launchwright-verifier-node", self.verifier_node, False),
             ("verification-input", self.paths["project-graph-fixture"], False),
         ]
         for name, path, writable in grants:

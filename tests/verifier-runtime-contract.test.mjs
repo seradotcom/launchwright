@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs';
 
 const workflow=readFileSync(new URL('../.github/workflows/heavy.yml',import.meta.url),'utf8');
 const harness=readFileSync(new URL('../scripts/verify-verifier-runtime.py',import.meta.url),'utf8');
+const nativeHostHarness=readFileSync(new URL('../scripts/verify-native-host.py',import.meta.url),'utf8');
 const driver=readFileSync(new URL('../crates/launchwright-verifier-driver/src/main.rs',import.meta.url),'utf8');
 const runtime=readFileSync(new URL('../src/verification-runtime.mjs',import.meta.url),'utf8');
 const verifierEntry=readFileSync(new URL('../src/native-verifier-entry.mjs',import.meta.url),'utf8');
@@ -40,7 +41,11 @@ test('R26 provider is bounded read-only format verification with a conformance p
 
 test('R26 canonical admission reads pinned bytes from a separate Host mount',()=>{
   assert.match(verifierEntry,/verificationReceiptRoot:paths\.output_root/u);
+  assert.match(nativeDriver,/"node-verifier"/u);
   assert.match(nativeDriver,/Some\("verification-receipts"\)/u);
+  assert.match(harness,/"launchwright-verifier-node"/u);
+  assert.match(nativeHostHarness,/"name": "node-verifier"/u);
+  assert.match(nativeHostHarness,/"mounts": \["launchwright-data", "verification-receipts"\]/u);
   assert.match(runtime,/realpathSync\(root\)/u);
   assert.match(runtime,/isSymbolicLink/u);
   assert.match(runtime,/observed===reference\.sha256/u);

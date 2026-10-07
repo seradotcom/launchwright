@@ -173,6 +173,10 @@ class HostFixture:
         shutil.copyfile(source_node, node)
         node.chmod(0o500)
         self.node = node
+        verifier_node = self.paths["binary"] / "node-verifier-runtime"
+        shutil.copyfile(source_node, verifier_node)
+        verifier_node.chmod(0o500)
+        self.verifier_node = verifier_node
 
     def _provision_workspace(self) -> None:
         result = subprocess.run(
@@ -234,7 +238,13 @@ class HostFixture:
                     "name": "node",
                     "sha256": sha256(self.node),
                     "mounts": ["launchwright-data"],
-                }
+                },
+                {
+                    "root": "launchwright-verifier-node",
+                    "name": "node-verifier",
+                    "sha256": sha256(self.verifier_node),
+                    "mounts": ["launchwright-data", "verification-receipts"],
+                },
             ],
             "resources": {
                 "open_files": 256,
@@ -276,6 +286,7 @@ class HostFixture:
             ("launchwright-data", self.paths["launchwright-data"], True),
             ("verification-receipts", self.paths["verification-receipts"], False),
             ("launchwright-node", self.node, False),
+            ("launchwright-verifier-node", self.verifier_node, False),
             ("project-graph-fixture", self.paths["project-graph-fixture"], False),
         ]
         for name, path, writable in grants:
@@ -295,6 +306,7 @@ class HostFixture:
             {
                 "launchwright_driver": sha256(self.driver),
                 "node_runtime": sha256(self.node),
+                "verifier_node_runtime": sha256(self.verifier_node),
                 "semwright_cli": sha256(require_binary("semwright")),
                 "semwright_daemon": sha256(require_binary("semwrightd")),
                 "semwright_sandbox": sha256(require_binary("semwright-sandbox")),

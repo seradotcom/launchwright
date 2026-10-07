@@ -25,6 +25,9 @@ test('R19 Host harness requires real Broker policy and a Host-mediated Node runt
   assert.match(harness,/"launchwright-runtime", "read_only": True/u);
   assert.match(harness,/"launchwright-data", "read_only": False/u);
   assert.match(harness,/"launchwright-node"/u);
+  assert.match(harness,/"launchwright-verifier-node"/u);
+  assert.match(harness,/"name": "node-verifier"/u);
+  assert.match(harness,/"mounts": \["launchwright-data", "verification-receipts"\]/u);
   assert.match(harness,/allow_driver=False/u);
   assert.match(harness,/fixture\.session\.unlink\(missing_ok=True\)/u);
 });

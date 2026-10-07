@@ -621,7 +621,8 @@ fn operation(spec: Operation) -> OperationContract {
     }
 }
 
-fn bridge_with_output(
+fn bridge_with_tool(
+    tool: &str,
     file: &str,
     sha: Option<&str>,
     output_mount: Option<&str>,
@@ -630,7 +631,7 @@ fn bridge_with_output(
         "Build with all LAUNCHWRIGHT_NATIVE_*_BUNDLE_SHA256 values fixed to reviewed bundles; runtime caller pins are forbidden"
     ))?;
     NodeBridge::new(NodeBridgeConfig {
-        tool: "node".into(),
+        tool: tool.into(),
         bundle_mount: "launchwright-runtime".into(),
         bundle_file: file.into(),
         bundle_sha256: sha.into(),
@@ -641,7 +642,7 @@ fn bridge_with_output(
 }
 
 fn bridge(file: &str, sha: Option<&str>) -> Result<Arc<NodeBridge>> {
-    bridge_with_output(file, sha, None)
+    bridge_with_tool("node", file, sha, None)
 }
 
 #[tokio::main(flavor = "current_thread")]
@@ -649,7 +650,8 @@ async fn main() -> Result<()> {
     let core = bridge("launchwright-core.cjs", CORE_BUNDLE)?;
     let production = bridge("launchwright-production.cjs", PRODUCTION_BUNDLE)?;
     let review = bridge("launchwright-review.cjs", REVIEW_BUNDLE)?;
-    let verifier = bridge_with_output(
+    let verifier = bridge_with_tool(
+        "node-verifier",
         "launchwright-verifier.cjs",
         VERIFIER_BUNDLE,
         Some("verification-receipts"),
