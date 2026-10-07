@@ -152,13 +152,14 @@ jobs:
           # lockfile is generated on the disposable runner. Semwright itself remains --locked.
           cargo build -p launchwright-native
           sha256sum target/debug/launchwright-native > evidence/native-host/launchwright-native.sha256
-      - name: Build exact Semwright daemon, CLI and sandbox Host
+      - name: Build exact Semwright daemon, CLI, sandbox Host and Effects reader
         working-directory: .ci-semwright
         run: |
           set -euo pipefail
           cargo build --locked -p semwright-daemon -p semwright-cli --bins
           cargo build --locked -p semwright-plugin-host --bin semwright-sandbox
-          sha256sum target/debug/semwright target/debug/semwrightd target/debug/semwright-sandbox > "$GITHUB_WORKSPACE/evidence/native-host/semwright-binaries.sha256"
+          cargo build --locked -p semwright-native-sdk --features effects --bin semwright-native-effects
+          sha256sum target/debug/semwright target/debug/semwrightd target/debug/semwright-sandbox target/debug/semwright-native-effects > "$GITHUB_WORKSPACE/evidence/native-host/semwright-binaries.sha256"
       - name: Real Broker Policy Driver Host NodeBridge acceptance
         env:
           SEMWRIGHT_CHECKOUT: ${{ github.workspace }}/.ci-semwright
@@ -169,7 +170,7 @@ jobs:
           set -euo pipefail
           python3 scripts/verify-native-host.py | tee evidence/native-host/acceptance.log
           grep -q '^LAUNCHWRIGHT_NATIVE_HOST_ACCEPTANCE_PASS ' evidence/native-host/acceptance.log
-          jq -e '.passed == true and .authority.driver_host_isolation_accepted == true and .authority.broker_policy_path_observed == true and .authority.host_mediated_node_runtime == true and .authority.extension_control_plane_driver_host_accepted == true and .authority.extension_fixture_execution_host_isolation_accepted == false and .authority.project_graph_live_broker_admitted == true and .authority.project_graph_native_projection_recorded == true and .authority.project_graph_platform_job_authority == false and .authority.platform_external_acceptance == false' evidence/native-host/report.json
+          jq -e '.passed == true and .authority.driver_host_isolation_accepted == true and .authority.broker_policy_path_observed == true and .authority.host_mediated_node_runtime == true and .authority.extension_control_plane_driver_host_accepted == true and .authority.extension_fixture_execution_host_isolation_accepted == false and .authority.project_graph_live_broker_admitted == true and .authority.project_graph_native_projection_recorded == true and .authority.project_graph_platform_job_authority == false and .authority.effects_canonical_readback_host_custody_accepted == true and .authority.effects_owner_admission_accepted == false and .authority.effects_evaluation_driver_host_isolation_accepted == false and .authority.effects_execution_authority == false and .authority.platform_external_acceptance == false' evidence/native-host/report.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

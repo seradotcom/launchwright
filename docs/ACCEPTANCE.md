@@ -4,6 +4,13 @@ This ledger separates implemented behavior from execution evidence. A PASS belon
 
 ## Supplemental workstation checks
 
+R22 workstation checkpoint (supplemental; exact CI Host acceptance is recorded below):
+
+- Node 22.22.0 remains **outside** the supported Native SDK engine and therefore cannot establish supported-engine or Driver Host acceptance.
+- Targeted Effects/Host regressions and the full lightweight suite passed locally; exact TAP/verification outputs are retained under `evidence/r22/`.
+- `node scripts/verify.mjs` retained source-lock and Native operation checks; local `host_acceptance` remains false by design.
+- The R22 `host` lane is CI-only. Exact source SHA `3a3422b2b187d4f2fa67e402093ce2960b4d579f` passed run `37563726988`, job `112606609973`, proving canonical Effects readback custody through the real daemon/Broker/Policy/Driver Host path while explicitly keeping owner admission, Effects evaluator Host isolation and execution authority false.
+
 R21 workstation checkpoint (supplemental; exact CI Host acceptance is recorded below):
 
 - Node 22.22.0 remains **outside** the supported Native SDK engine and therefore cannot establish supported-engine or Driver Host acceptance.
@@ -62,6 +69,8 @@ R20 extension-control-plane acceptance is complete for exact source SHA `c1ca612
 
 R21 Project Graph Host acceptance is complete for exact source SHA `8de121fca5d81803c7781a2bca58d5344927a9cd`: Application checks run `37561839893` passed on Linux, Windows and macOS, and selective heavy Host run `37561836145` passed job `112600625256`. Artifact `11457174433` records schema `launchwright-native-host-acceptance/3` against Semwright `4d291de26724810017ce7b6d185326514cb79fa6`, with `project_graph_live_broker_admitted=true`, `project_graph_native_projection_recorded=true` and `project_graph_platform_job_authority=false`. The Host path created the owned Project, reconciled file-backed assets, declared the edge, executed bounded query/impact/manifest export, bound transcript SHA-256 `31c5e785014d304016da627713ccc156c54562060f83fc0d286e04d8c5da2066` into the durable projection, survived daemon restart and separately rejected Project mutation without `project.manage`. Semwright's file-scoped query remains `scope_partial:true`; Launchwright preserves that uncertainty with `denominator_complete:false`. This proves only the owned R21 Broker/Native/Host path, not Platform scheduling or real customer/project extraction. This PASS belongs only to `8de121f…`.
 
+R22 Effects Host-custody acceptance is complete for exact source SHA `3a3422b2b187d4f2fa67e402093ce2960b4d579f`: Application checks run `37563728450` passed on Linux, Windows and macOS, and selective heavy Host run `37563726988` passed job `112606609973`. Artifact `11458422032` records schema `launchwright-native-host-acceptance/4` against Semwright `4d291de26724810017ce7b6d185326514cb79fa6`, with `effects_canonical_readback_host_custody_accepted=true` while deliberately retaining `effects_owner_admission_accepted=false`, `effects_evaluation_driver_host_isolation_accepted=false` and `effects_execution_authority=false`. The Host path created an exact Launchwright-owned artifact binding, carried the protected Native SDK Effects spec/result digests through the real Launchwright NativeDriver, preserved the canonical reader PASS as effective Launchwright `UNKNOWN`, rejected owner admission that this path cannot justify, and retained the earlier extension/Project Graph Host controls. This proves custody and exact readback binding through Host, not mutation/noninterference evaluation or scenario-effect execution. This PASS belongs only to `3a3422b…`.
+
 The manual heavy workflow provides independent lanes:
 
 - **native**: build the pinned canonical TypeScript SDK, generate/hash all ten bounded bridge profiles, compile/test the real Rust NativeDriver including Project Graph and Effects SDK feature locks, and run a bridge smoke against each profile.
@@ -80,7 +89,7 @@ Durable identity/revisions; exact archived entity history with get/list/diff; ex
 
 ## Explicitly not established
 
-- Driver Host acceptance is exact-SHA scoped: R21 SHA `8de121fca5d81803c7781a2bca58d5344927a9cd` passed the real Host lane for the Launchwright NativeDriver, retained the R20 extension-control-plane checks and additionally accepted the owned Project Graph Broker/Native projection path. No later SHA may inherit that result; the separately executed DeltaRender/DeltaCLI fixture processes remain explicitly **not** Host-isolated and technical UNKNOWN, and direct-process evidence never substitutes for an exact-SHA Host run;
+- Driver Host acceptance is exact-SHA scoped: R22 SHA `3a3422b2b187d4f2fa67e402093ce2960b4d579f` passed the real Host lane for the Launchwright NativeDriver, retained the R20 extension-control-plane and R21 Project Graph checks, and additionally accepted canonical Effects readback custody through Host. No later SHA may inherit that result; the separately executed DeltaRender/DeltaCLI fixture processes remain explicitly **not** Host-isolated and technical UNKNOWN, and direct-process evidence never substitutes for an exact-SHA Host run;
 - live production Platform execution, budgets or billing;
 - real customer/project Graph discovery, provider-specific dependency extraction and non-fixture scope/tenant acceptance remain unestablished; R21's owned exact-pinned fixture is Host-accepted but does not establish those production scopes or Platform job authority. Canonical native/browser/Godot mutation-effect, noninterference and scenario-effect execution/admission beyond the narrower immutable-artifact Effects readback also remain external; R9/R12 custody layers do not replace those authorities;
 - canonical real customer browser/mobile/Godot product capture; the R10 owned DeltaDesk browser lane is cross-system adapter evidence only and remains imported-unverified until Platform/Host authority exists;
