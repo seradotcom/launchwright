@@ -257,7 +257,16 @@ async fn seed_launchwright_capture_assets(
             .find(|item| item["id"] == id)
             .unwrap_or_else(|| panic!("managed asset {id} absent after import"));
         assert_eq!(item["sha256"], expected, "managed asset digest changed");
-        assert_eq!(item["dimensions"], json!([780, 493]), "capture dimensions changed");
+        let inspected = call(executor, "driver.motion-canvas.project.inspect", json!({})).await;
+        assert_eq!(inspected["fingerprint"], fingerprint, "project fingerprint drifted after import");
+        let managed = inspected["project"]["assets"]
+            .as_array()
+            .expect("managed project assets")
+            .iter()
+            .find(|asset| asset["id"] == id)
+            .unwrap_or_else(|| panic!("managed project asset {id} absent after import"));
+        assert_eq!(managed["sha256"], expected, "project asset digest changed");
+        assert_eq!(managed["dimensions"], json!([780, 493]), "capture dimensions changed");
     }
 
     (capture_a, capture_b)
