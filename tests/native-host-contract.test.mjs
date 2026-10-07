@@ -53,3 +53,25 @@ test('R20 Host harness exercises extension lifecycle without promoting external 
   assert.match(harness,/"extension_control_plane_driver_host_accepted": True/u);
   assert.match(harness,/"extension_fixture_execution_host_isolation_accepted": False/u);
 });
+
+test('R21 Host harness executes canonical Project Graph and records the bounded Native projection',()=>{
+  assert.match(harness,/allow_project_graph/u);
+  assert.match(harness,/project-graph-fixture/u);
+  assert.match(harness,/project_graph_host_flow/u);
+  assert.match(harness,/project\.create/u);
+  assert.match(harness,/project\.asset\.register/u);
+  assert.match(harness,/project\.edge\.declare/u);
+  assert.match(harness,/project\.query/u);
+  assert.match(harness,/project\.impact/u);
+  assert.match(harness,/project\.manifest\.export/u);
+  assert.match(harness,/graph-observation_record/u);
+  assert.match(harness,/"broker_project_graph_live": True/u);
+  assert.match(harness,/"native_driver_projection_recorded": True/u);
+  assert.match(harness,/"project_graph_live_broker_admitted": True/u);
+  assert.match(harness,/"project_graph_native_projection_recorded": True/u);
+  assert.match(harness,/"project_graph_platform_job_authority": False/u);
+  assert.match(harness,/"denominator_complete": False/u);
+  assert.match(harness,/"scope_partial": bool\(page\["scope_partial"\]\)/u);
+  assert.match(harness,/file-scoped query did not preserve its partial-scope marker/u);
+  assert.match(harness,/project_graph_denied_flow/u);
+});

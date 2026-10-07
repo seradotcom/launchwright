@@ -75,9 +75,16 @@ def require_binary(name: str) -> Path:
 
 
 class HostFixture:
-    def __init__(self, label: str, *, allow_driver: bool) -> None:
+    def __init__(
+        self,
+        label: str,
+        *,
+        allow_driver: bool,
+        allow_project_graph: bool = True,
+    ) -> None:
         self.label = label
         self.allow_driver = allow_driver
+        self.allow_project_graph = allow_project_graph
         self.temp = tempfile.TemporaryDirectory(prefix=f"launchwright-host-{label}-")
         self.root = Path(self.temp.name).resolve()
         self.root.chmod(0o700)
@@ -90,6 +97,7 @@ class HostFixture:
             "binary",
             "launchwright-runtime",
             "launchwright-data",
+            "project-graph-fixture",
         ):
             path = self.root / name
             path.mkdir(mode=0o700)
@@ -119,6 +127,7 @@ class HostFixture:
         self._stage_driver()
         self._stage_runtime()
         self._provision_workspace()
+        self._provision_project_graph_fixture()
         self._write_manifest_and_policy()
 
     def _stage_driver(self) -> None:
@@ -184,6 +193,17 @@ class HostFixture:
                 + result.stderr.decode("utf-8", "replace")
             )
 
+    def _provision_project_graph_fixture(self) -> None:
+        root = self.paths["project-graph-fixture"]
+        (root / "source.txt").write_text(
+            "Launchwright R21 owned synthetic source.\n", encoding="utf-8"
+        )
+        (root / "deliverable.txt").write_text(
+            "Launchwright R21 owned synthetic deliverable.\n", encoding="utf-8"
+        )
+        (root / "source.txt").chmod(0o400)
+        (root / "deliverable.txt").chmod(0o400)
+
     def _write_manifest_and_policy(self) -> None:
         cargo = tomllib.loads((ROOT / "crates" / "launchwright-native" / "Cargo.toml").read_text())
         manifest = {
@@ -236,7 +256,11 @@ class HostFixture:
         self.manifest_path = self.paths["config"] / "driver.json"
         write_private_json(self.manifest_path, manifest)
 
-        allow = ["driver:launchwright"] if self.allow_driver else []
+        allow = []
+        if self.allow_driver:
+            allow.append("driver:launchwright")
+        if self.allow_project_graph:
+            allow.append("project.manage")
         config = (
             "drivers = [" + json.dumps(str(self.manifest_path)) + "]\n"
             "driver_network = false\n"
@@ -248,6 +272,7 @@ class HostFixture:
             ("launchwright-runtime", self.paths["launchwright-runtime"], False),
             ("launchwright-data", self.paths["launchwright-data"], True),
             ("launchwright-node", self.node, False),
+            ("project-graph-fixture", self.paths["project-graph-fixture"], False),
         ]
         for name, path, writable in grants:
             config += (
@@ -413,9 +438,10 @@ def assert_error(envelope: dict[str, Any], *needles: str) -> None:
 class HostClient:
     """Fresh-ref helper for exact-digest Launchwright operations over the real Host."""
 
-    def __init__(self, fixture: HostFixture) -> None:
+    def __init__(self, fixture: HostFixture, *, key_prefix: str = "r20") -> None:
         self.fixture = fixture
         self.counter = 0
+        self.key_prefix = key_prefix
 
     def context(self) -> tuple[str, Any, dict[str, Any]]:
         observed = self.fixture.invoke(
@@ -449,7 +475,7 @@ class HostClient:
     ) -> dict[str, Any]:
         ref, expected, description = self.context()
         self.counter += 1
-        key = f"r20-{self.counter:02d}-{key_hint}"[:128]
+        key = f"{self.key_prefix}-{self.counter:02d}-{key_hint}"[:128]
         epoch = description["request_epoch"]
         digest_input = {
             "app_version": description["version"],
@@ -774,6 +800,332 @@ def extension_lifecycle_flow(fixture: HostFixture, product_id: str) -> dict[str,
     }
 
 
+def project_graph_host_flow(fixture: HostFixture, product_id: str) -> dict[str, Any]:
+    """Exercise Semwright Project Graph through Broker policy and admit its bounded projection through NativeDriver."""
+    client = HostClient(fixture, key_prefix="r21")
+    release = client.mutate(
+        "entity.create",
+        "entity-create",
+        {
+            "kind": "release",
+            "data": {
+                "product_id": product_id,
+                "name": "R21 Project Graph synthetic",
+                "build": "graph-build-A",
+                "status": "draft",
+            },
+        },
+        key_hint="graph-release",
+    )["entity"]
+    target = client.mutate(
+        "entity.create",
+        "entity-create",
+        {
+            "kind": "target",
+            "data": {
+                "release_id": release["id"],
+                "name": "R21 Graph target",
+                "ui_locale": "en-US",
+                "editorial_locale": "en-US",
+                "role": "viewer",
+                "plan": "basic",
+                "region": "MX",
+                "flags": {"advanced_export": False},
+                "viewport": {"width": 1440, "height": 900, "scale_milli": 1000},
+            },
+        },
+        key_hint="graph-target",
+    )["entity"]
+    source = client.mutate(
+        "entity.create",
+        "entity-create",
+        {
+            "kind": "source",
+            "data": {
+                "product_id": product_id,
+                "name": "R21 Graph source",
+                "type": "document",
+                "locator": "owned:r21/source.txt",
+                "build": "graph-build-A",
+                "coverage": "declared",
+                "purpose": "Owned synthetic Project Graph acceptance source",
+                "approval": "approved",
+            },
+        },
+        key_hint="graph-source",
+    )["entity"]
+    deliverable = client.mutate(
+        "entity.create",
+        "entity-create",
+        {
+            "kind": "deliverable",
+            "data": {
+                "release_id": release["id"],
+                "name": "R21 Graph deliverable",
+                "target_id": target["id"],
+                "format": "markdown",
+                "content": "Owned synthetic Project Graph acceptance deliverable.",
+                "claim_ids": [],
+                "source_ids": [source["id"]],
+            },
+        },
+        key_hint="graph-deliverable",
+    )["entity"]
+
+    root = "project-graph-fixture"
+    created = fixture.invoke("project.create", {"root": root}, ok=True)["data"]
+    if created.get("graph_schema") != 1:
+        raise AssertionError("unexpected Project Graph schema")
+    project_id = created["project"]
+    registered_source = fixture.invoke(
+        "project.asset.register",
+        {
+            "root": root,
+            "project": project_id,
+            "label": "R21 source",
+            "resource_type": "release_source",
+            "path": "source.txt",
+            "max_bytes": 4096,
+        },
+        ok=True,
+    )["data"]
+    registered_deliverable = fixture.invoke(
+        "project.asset.register",
+        {
+            "root": root,
+            "project": project_id,
+            "label": "R21 deliverable",
+            "resource_type": "release_deliverable",
+            "path": "deliverable.txt",
+            "max_bytes": 4096,
+        },
+        ok=True,
+    )["data"]
+    source_asset = registered_source["result"]["asset"]["id"]
+    deliverable_asset = registered_deliverable["result"]["asset"]["id"]
+    declared = fixture.invoke(
+        "project.edge.declare",
+        {
+            "root": root,
+            "project": project_id,
+            "from": source_asset,
+            "to": deliverable_asset,
+            "relation": "references",
+        },
+        ok=True,
+    )["data"]
+    if declared["result"].get("execution_certified") is not False:
+        raise AssertionError("declared Project Graph edge was incorrectly execution-certified")
+
+    budget = {"nodes": 64, "edges": 128, "depth": 16, "results": 64}
+    queried = fixture.invoke(
+        "project.query", {"root": root, "project": project_id, "limit": 64}, ok=True
+    )["data"]
+    impact = fixture.invoke(
+        "project.impact",
+        {"root": root, "project": project_id, "asset": source_asset, "budget": budget},
+        ok=True,
+    )["data"]
+    exported = fixture.invoke(
+        "project.manifest.export",
+        {"root": root, "project": project_id, "assets": [source_asset, deliverable_asset]},
+        ok=True,
+    )["data"]
+    page = queried["result"]
+    report = impact["result"]
+    manifest = exported["result"]
+    if page.get("next_cursor") is not None or page.get("truncated"):
+        raise AssertionError("R21 Project Graph query did not exhaust the authorized visible page")
+    if page.get("scope_partial") is not True:
+        raise AssertionError("R21 Project Graph file-scoped query did not preserve its partial-scope marker")
+    if report.get("cancelled"):
+        raise AssertionError("R21 Project Graph traversal was cancelled")
+    if manifest.get("source_project") != project_id:
+        raise AssertionError("portable declaration manifest belongs to another Project Graph")
+
+    resource_by_asset = {source_asset: source["id"], deliverable_asset: deliverable["id"]}
+    item_by_asset = {item["asset"]["id"]: item for item in page["items"]}
+    if set(item_by_asset) != set(resource_by_asset):
+        raise AssertionError("Project Graph query did not enumerate the exact authorized fixture assets")
+
+    assets = []
+    for asset_id in (source_asset, deliverable_asset):
+        item = item_by_asset[asset_id]
+        knowledge = item["knowledge"]
+        assets.append(
+            {
+                "asset_id": asset_id,
+                "resource_id": resource_by_asset[asset_id],
+                "revision": item.get("latest_revision"),
+                "knowledge": {
+                    "existence": knowledge["existence"],
+                    "freshness": knowledge["freshness"],
+                    "divergence": knowledge["divergence"],
+                    "verification": knowledge["verification"],
+                    "coverage": {
+                        "complete": knowledge["coverage"]["complete"],
+                        "unknown_frontier": sorted(knowledge["coverage"]["unknown_frontier"]),
+                    },
+                    "observed_unix_ms": knowledge.get("observed_unix_ms"),
+                    "requires_reconcile": knowledge["requires_reconcile"],
+                },
+            }
+        )
+
+    declarations = manifest.get("declarations", [])
+    edges = [
+        {
+            "from": edge["from"],
+            "to": edge["to"],
+            "relation": edge["relation"],
+            "evidence_kind": "declared",
+            "evidence_id": f"project-manifest:{manifest['source_snapshot']}:{index}",
+        }
+        for index, edge in enumerate(declarations, start=1)
+    ]
+    if not any(
+        edge["from"] == source_asset
+        and edge["to"] == deliverable_asset
+        and edge["relation"] == "references"
+        for edge in edges
+    ):
+        raise AssertionError("canonical Project Graph export lost the declared dependency")
+
+    projection_epoch = hashlib.sha256(
+        f"{project_id}:{report['snapshot']}:{os.environ['SEMWRIGHT_SHA']}".encode("utf-8")
+    ).hexdigest()
+    graph_observation = {
+        "schema_version": "semwright-project-graph-observation/1",
+        "source_sha": os.environ["SEMWRIGHT_SHA"],
+        "project_graph_schema_version": created["graph_schema"],
+        "project_id": project_id,
+        "observation_epoch": "host-snapshot-" + projection_epoch[:32],
+        "source_asset_id": source_asset,
+        "budget": budget,
+        "impact": report,
+        "assets": assets,
+        "edges": edges,
+        "inventory": {
+            "visible_total": len(page["items"]),
+            "enumerated_total": len(page["items"]),
+            # Semwright file_scope intentionally marks the query partial relative to
+            # the whole Project Graph even when this bounded page is exhausted.
+            # Preserve that upstream uncertainty instead of manufacturing a safe
+            # percentage denominator inside Launchwright.
+            "denominator_complete": False,
+            "scope_partial": bool(page["scope_partial"]),
+            "truncated": bool(page["truncated"]),
+        },
+    }
+    transcript = {
+        "schema_version": "launchwright-project-graph-host-transcript/1",
+        "semwright_sha": os.environ["SEMWRIGHT_SHA"],
+        "project_create": created,
+        "source_register": registered_source,
+        "deliverable_register": registered_deliverable,
+        "edge_declare": declared,
+        "query": queried,
+        "impact": impact,
+        "manifest_export": exported,
+        "projection": graph_observation,
+    }
+    receipt_sha = hashlib.sha256(exact_json(transcript).encode("utf-8")).hexdigest()
+    write_private_json(fixture.evidence / "project-graph-host.json", {**transcript, "transcript_sha256": receipt_sha})
+
+    work = client.mutate(
+        "work.prepare",
+        "work-prepare",
+        {
+            "release_id": release["id"],
+            "name": "R21 canonical Project Graph observation",
+            "action": "graph.observation",
+            "arguments": {
+                "project_id": project_id,
+                "source_asset_id": source_asset,
+                "snapshot": report["snapshot"],
+            },
+            "budget": {"max_cost_microunits": 0, "currency": "USD", "max_runtime_seconds": 60},
+        },
+        key_hint="graph-work",
+    )["entity"]
+    claimed = client.mutate(
+        "work.claim",
+        "work-claim",
+        {
+            "id": work["id"],
+            "prepared_record": {
+                "schema_version": "launchwright-project-graph-host-prepared/1",
+                "project_id": project_id,
+                "transcript_sha256": receipt_sha,
+            },
+        },
+        key_hint="graph-claim",
+    )
+    completed = client.mutate(
+        "work.complete",
+        "work-complete",
+        {
+            "id": work["id"],
+            "pending_digest": claimed["pending_digest"],
+            "result": {
+                "job_id": "project-graph-" + receipt_sha[:40],
+                "admission": "canonical-owner-admitted",
+                "native_receipt_sha256": receipt_sha,
+                "graph_observation": graph_observation,
+            },
+        },
+        key_hint="graph-complete",
+    )["entity"]
+    if completed["data"].get("evidence_trust") != "NOT_ADMITTED":
+        raise AssertionError("generic work custody unexpectedly self-admitted evidence")
+
+    recorded = client.mutate(
+        "graph.observation_record",
+        "graph-observation_record",
+        {
+            "release_id": release["id"],
+            "name": "R21 live Semwright Project Graph projection",
+            "work_id": work["id"],
+        },
+        key_hint="graph-record",
+    )["entity"]
+    inspected = client.read("graph-inspect", {"id": recorded["id"]})
+    release_impact = client.read("release-impact", {"release_id": release["id"]})
+    if inspected.get("canonical_graph_authority") is not True:
+        raise AssertionError("Host-admitted Project Graph projection was not canonical inside Launchwright")
+    if inspected.get("project_id") != project_id or release_impact.get("graph", {}).get("project_id") != project_id:
+        raise AssertionError("Launchwright did not retain the exact canonical Project Graph identity")
+    if release_impact.get("coverage") != "CANONICAL_PROJECT_GRAPH_PROJECTION":
+        raise AssertionError("release impact did not consume the admitted Project Graph projection")
+
+    fixture.stop()
+    fixture.session.unlink(missing_ok=True)
+    fixture.start()
+    after_restart = fixture.invoke(
+        "project.query", {"root": root, "project": project_id, "limit": 64}, ok=True
+    )["data"]["result"]
+    if len(after_restart.get("items", [])) != 2:
+        raise AssertionError("Project Graph state did not survive daemon restart")
+    persisted = client.read("graph-inspect", {"id": recorded["id"]})
+    if persisted.get("project_id") != project_id:
+        raise AssertionError("Launchwright Graph projection did not survive Driver Host restart")
+
+    return {
+        "project_id": project_id,
+        "graph_observation_id": recorded["id"],
+        "release_id": release["id"],
+        "source_asset_id": source_asset,
+        "deliverable_asset_id": deliverable_asset,
+        "snapshot": report["snapshot"],
+        "transcript_sha256": receipt_sha,
+        "broker_project_graph_live": True,
+        "native_driver_projection_recorded": True,
+        "restart_persistence": True,
+        "platform_job_authority": False,
+        "external_publish_authority": False,
+    }
+
+
 def allowed_flow() -> dict[str, Any]:
     fixture = HostFixture("allowed", allow_driver=True)
     try:
@@ -911,18 +1263,29 @@ def allowed_flow() -> dict[str, Any]:
             raise AssertionError("workspace state did not persist across Driver Host restart")
 
         extension_lifecycle = extension_lifecycle_flow(fixture, product_id)
+        project_graph = project_graph_host_flow(fixture, product_id)
 
         return {
             "product_id": product_id,
             "initial_revision": version,
-            "final_revision": third["page"]["version"],
+            "final_revision": client_revision(fixture),
             "restart_persistence": True,
             "stale_reference_rejected": True,
             "bad_request_rejected": True,
             "extension_lifecycle": extension_lifecycle,
+            "project_graph": project_graph,
         }
     finally:
         fixture.close()
+
+
+def client_revision(fixture: HostFixture) -> Any:
+    observed = fixture.invoke(
+        "driver.launchwright.observe",
+        {"resource": RESOURCE, "scope": "all", "limit": 16},
+        ok=True,
+    )["data"]
+    return observed["page"]["version"]
 
 
 def denied_flow() -> dict[str, Any]:
@@ -934,6 +1297,17 @@ def denied_flow() -> dict[str, Any]:
         )
         assert_error(denied, "policy", "permission", "denied", "authorization")
         return {"provider_allowlisted": False, "execution_rejected": True}
+
+
+def project_graph_denied_flow() -> dict[str, Any]:
+    with HostFixture(
+        "project-graph-policy-denied", allow_driver=True, allow_project_graph=False
+    ) as fixture:
+        denied = fixture.invoke(
+            "project.create", {"root": "project-graph-fixture"}, ok=False
+        )
+        assert_error(denied, "policy", "permission", "denied", "authorization")
+        return {"project_manage_allowlisted": False, "execution_rejected": True}
 
 
 def main() -> None:
@@ -949,8 +1323,9 @@ def main() -> None:
 
     allowed = allowed_flow()
     denied = denied_flow()
+    graph_denied = project_graph_denied_flow()
     report = {
-        "schema_version": "launchwright-native-host-acceptance/2",
+        "schema_version": "launchwright-native-host-acceptance/3",
         "passed": True,
         "launchwright_sha": os.environ.get("GITHUB_SHA"),
         "semwright_sha": semwright_sha,
@@ -961,12 +1336,16 @@ def main() -> None:
             "host_mediated_node_runtime": True,
             "extension_control_plane_driver_host_accepted": True,
             "extension_fixture_execution_host_isolation_accepted": False,
+            "project_graph_live_broker_admitted": True,
+            "project_graph_native_projection_recorded": True,
+            "project_graph_platform_job_authority": False,
             "platform_external_acceptance": False,
             "chatgpt_host_acceptance": False,
             "public_channel_acceptance": False,
         },
         "allowed_flow": allowed,
         "policy_denied_flow": denied,
+        "project_graph_policy_denied_flow": graph_denied,
     }
     write_private_json(EVIDENCE / "report.json", report)
     print("LAUNCHWRIGHT_NATIVE_HOST_ACCEPTANCE_PASS " + json.dumps(report, separators=(",", ":")))
