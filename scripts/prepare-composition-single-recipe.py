@@ -309,7 +309,7 @@ fn launchwright_capture_film(
                 "maximum": {"num": "1", "den": "30"},
                 "anchor": {
                     "kind": "absolute",
-                    "time": {"num": "14", "den": "15"}
+                    "time": {"num": "3", "den": "4"}
                 },
                 "preference_priority": 0
             }),
@@ -320,7 +320,7 @@ fn launchwright_capture_film(
                 "maximum": {"num": "1", "den": "30"},
                 "anchor": {
                     "kind": "absolute",
-                    "time": {"num": "16", "den": "15"}
+                    "time": {"num": "5", "den": "4"}
                 },
                 "preference_priority": 0
             }),

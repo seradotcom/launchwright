@@ -117,6 +117,8 @@ test('R24 generator is fail-closed over the reviewed exact Semwright Composition
   assert.match(source,/"id": "sync-reference"/);
   assert.match(source,/"id": "sync-guard-in-span"/);
   assert.match(source,/"id": "sync-guard-out-span"/);
+  assert.match(source,/"time": \{"num": "3", "den": "4"\}/);
+  assert.match(source,/"time": \{"num": "5", "den": "4"\}/);
   assert.doesNotMatch(source,/confidence_floor/);
   assert.doesNotMatch(source,/max_offset/);
   assert.doesNotMatch(source,/max_cue_error/);
