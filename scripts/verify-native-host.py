@@ -1126,6 +1126,292 @@ def project_graph_host_flow(fixture: HostFixture, product_id: str) -> dict[str, 
     }
 
 
+def effects_host_custody_flow(fixture: HostFixture, product_id: str) -> dict[str, Any]:
+    """Carry a real canonical Effects readback result through Driver Host without inventing admission.
+
+    The canonical semwright-native-effects reader runs as a separate CI proof. The
+    resulting protected spec/result bytes are then stored and inspected only through
+    Launchwright's real NativeDriver Effects profile. Because that reader execution is
+    not itself a Host-owned effect execution/admission path, effective PASS must remain
+    UNKNOWN and an explicit admit=true request must fail closed.
+    """
+    client = HostClient(fixture, key_prefix="r22-effects")
+
+    release = client.mutate(
+        "entity.create",
+        "entity-create",
+        {
+            "kind": "release",
+            "data": {
+                "product_id": product_id,
+                "name": "Effects Host custody R22",
+                "build": "build-A",
+                "status": "draft",
+            },
+        },
+        key_hint="release",
+    )["entity"]
+    source = client.mutate(
+        "entity.create",
+        "entity-create",
+        {
+            "kind": "source",
+            "data": {
+                "product_id": product_id,
+                "name": "Owned Effects Host source",
+                "type": "document",
+                "locator": "owned://effects-host-r22",
+                "build": "build-A",
+                "coverage": "declared",
+            },
+        },
+        key_hint="source",
+    )["entity"]
+    target = client.mutate(
+        "entity.create",
+        "entity-create",
+        {
+            "kind": "target",
+            "data": {
+                "release_id": release["id"],
+                "name": "Owned Effects Host target",
+                "ui_locale": "en-US",
+                "editorial_locale": "en-US",
+                "role": "owner",
+                "plan": "test",
+                "region": "CI",
+                "flags": {},
+                "viewport": {"width": 1280, "height": 720, "scale_milli": 1000},
+            },
+        },
+        key_hint="target",
+    )["entity"]
+    deliverable = client.mutate(
+        "entity.create",
+        "entity-create",
+        {
+            "kind": "deliverable",
+            "data": {
+                "release_id": release["id"],
+                "name": "Effects Host acceptance JSON",
+                "target_id": target["id"],
+                "format": "json",
+                "content": "Owned deterministic Effects Host custody artifact.",
+                "claim_ids": [],
+                "source_ids": [source["id"]],
+            },
+        },
+        key_hint="deliverable",
+    )["entity"]
+    artifact = client.mutate(
+        "deliverable.render",
+        "deliverable-render",
+        {"id": deliverable["id"]},
+        key_hint="render",
+    )["entity"]
+    artifact_read = client.read("artifact-read", {"id": artifact["id"]})
+    artifact_bytes = artifact_read["text"].encode("utf-8")
+    if hashlib.sha256(artifact_bytes).hexdigest() != artifact["data"]["sha256"]:
+        raise AssertionError("Host artifact readback bytes differ from the durable artifact digest")
+
+    effects_dir = fixture.evidence / "effects"
+    artifact_root = effects_dir / "artifacts"
+    protected = effects_dir / "protected"
+    artifact_root.mkdir(parents=True, exist_ok=False)
+    protected.mkdir(parents=True, exist_ok=False)
+    artifact_path = artifact_root / "release.json"
+    artifact_path.write_bytes(artifact_bytes)
+    artifact_path.chmod(0o600)
+
+    effects_binary = require_binary("semwright-native-effects")
+    definition = {
+        "owner": {
+            "session": "launchwright_effects_r22_host",
+            "principal": {"named": "launchwright_owner"},
+        },
+        "request_id": "launchwright_effects_r22_host",
+        "source_digest": sha256(ROOT / "src" / "effects.mjs"),
+        "runtime_digest": sha256(effects_binary),
+        "declared_producer_execution_status": "unknown",
+        "application_roots": [str(fixture.paths["launchwright-data"])],
+        "artifacts": [
+            {
+                "slot": "release",
+                "path": "release.json",
+                "sha256": artifact["data"]["sha256"],
+                "bytes": len(artifact_bytes),
+                "mime_type": "application/json",
+            }
+        ],
+        "checks": [
+            {
+                "id": "draft",
+                "artifact_slot": "release",
+                "selector": {
+                    "kind": "json",
+                    "pointer": "/draft",
+                    "scalar": {"kind": "bool"},
+                },
+                "predicate": {
+                    "kind": "equals",
+                    "expected": {"kind": "bool", "value": True},
+                },
+            },
+            {
+                "id": "build",
+                "artifact_slot": "release",
+                "selector": {
+                    "kind": "json",
+                    "pointer": "/release/build",
+                    "scalar": {"kind": "text"},
+                },
+                "predicate": {
+                    "kind": "equals",
+                    "expected": {"kind": "text", "value": "build-A"},
+                },
+            },
+        ],
+    }
+    definition_path = effects_dir / "definition.json"
+    write_private_json(definition_path, definition)
+
+    prepared = subprocess.run(
+        [str(effects_binary), "--prepare"],
+        cwd=ROOT,
+        env=fixture.env,
+        input=json.dumps(definition, separators=(",", ":")).encode("utf-8"),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        timeout=20,
+    )
+    if prepared.returncode:
+        raise AssertionError(
+            "canonical Effects prepare failed: "
+            + prepared.stderr.decode("utf-8", "replace")
+        )
+    spec_bytes = prepared.stdout.rstrip(b"\n")
+    if not spec_bytes:
+        raise AssertionError("canonical Effects reader returned an empty protected spec")
+    spec_path = protected / "spec.json"
+    spec_path.write_bytes(spec_bytes)
+    spec_path.chmod(0o600)
+    spec_sha256 = hashlib.sha256(spec_bytes).hexdigest()
+    (protected / "spec.sha256").write_text(spec_sha256 + "\n", encoding="utf-8")
+
+    evaluated = subprocess.run(
+        [
+            str(effects_binary),
+            "--spec",
+            str(spec_path),
+            "--spec-sha256",
+            spec_sha256,
+            "--artifact-root",
+            str(artifact_root),
+        ],
+        cwd=ROOT,
+        env=fixture.env,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        timeout=20,
+    )
+    if evaluated.returncode:
+        raise AssertionError(
+            "canonical Effects evaluation failed: "
+            + evaluated.stderr.decode("utf-8", "replace")
+        )
+    result_bytes = evaluated.stdout.rstrip(b"\n")
+    result = json.loads(result_bytes)
+    if (
+        result.get("schema_version") != "semwright-native-effects-result/1"
+        or result.get("verdict") != "PASS"
+        or result.get("execution_authority") is not False
+        or result.get("scope") != "immutable_native_sdk_artifact_properties_only"
+    ):
+        raise AssertionError("canonical Effects reader did not return the expected bounded PASS")
+    result_path = effects_dir / "result.json"
+    result_path.write_bytes(result_bytes)
+    result_path.chmod(0o600)
+
+    record_input = {
+        "release_id": release["id"],
+        "artifact_ids": [artifact["id"]],
+        "spec_text": spec_bytes.decode("utf-8"),
+        "result_text": result_bytes.decode("utf-8"),
+    }
+    recorded = client.mutate(
+        "effects.record",
+        "effects-record",
+        record_input,
+        key_hint="record",
+    )["entity"]
+    if (
+        recorded["data"].get("admission") != "canonical-result-not-admitted"
+        or recorded["data"].get("reported_verdict") != "PASS"
+        or recorded["data"].get("execution_authority") is not False
+        or recorded["data"].get("scenario_effects_covered") is not False
+    ):
+        raise AssertionError("Host Effects custody widened canonical authority")
+
+    status = client.read("effects-inspect", {"release_id": release["id"]})
+    if (
+        status.get("state") != "UNKNOWN"
+        or status.get("scenario_effects_authority") is not False
+        or len(status.get("receipts", [])) != 1
+        or status["receipts"][0].get("effective_verdict") != "UNKNOWN"
+        or status["receipts"][0].get("reported_verdict") != "PASS"
+    ):
+        raise AssertionError("Host Effects readback was incorrectly promoted above UNKNOWN")
+
+    # The same real canonical result must still fail closed when the caller asks
+    # Launchwright to manufacture owner admission. Host custody is not that authority.
+    admit_input = {**record_input, "admit": True}
+    ref, expected, description = client.context()
+    client.counter += 1
+    key = f"{client.key_prefix}-{client.counter:02d}-admit-denied"[:128]
+    epoch = description["request_epoch"]
+    request = {
+        "resource": RESOURCE,
+        "epoch": epoch,
+        "key": key,
+        "request_sha256": request_digest(
+            {
+                "app_version": description["version"],
+                "operation": "effects.record",
+                "input": admit_input,
+                "expected": expected,
+                "epoch": epoch,
+                "key": key,
+            }
+        ),
+    }
+    denied = fixture.invoke(
+        "driver.launchwright.effects-record",
+        {"ref": ref, "request": request, "input": admit_input},
+        ok=False,
+    )
+    assert_error(denied, "admission", "policy", "denied", "unavailable")
+
+    after = client.read("effects-inspect", {"release_id": release["id"]})
+    if len(after.get("receipts", [])) != 1 or after.get("state") != "UNKNOWN":
+        raise AssertionError("denied Effects admission changed durable custody state")
+
+    return {
+        "release_id": release["id"],
+        "artifact_id": artifact["id"],
+        "artifact_sha256": artifact["data"]["sha256"],
+        "spec_sha256": spec_sha256,
+        "canonical_result_sha256": recorded["data"]["result_sha256"],
+        "canonical_reader_reported_verdict": "PASS",
+        "effective_launchwright_state": "UNKNOWN",
+        "host_custody_recorded": True,
+        "owner_admission_rejected": True,
+        "canonical_reader_execution_inside_driver_host": False,
+        "execution_authority": False,
+        "scenario_effects_authority": False,
+    }
+
+
 def allowed_flow() -> dict[str, Any]:
     fixture = HostFixture("allowed", allow_driver=True)
     try:
@@ -1264,6 +1550,7 @@ def allowed_flow() -> dict[str, Any]:
 
         extension_lifecycle = extension_lifecycle_flow(fixture, product_id)
         project_graph = project_graph_host_flow(fixture, product_id)
+        effects_custody = effects_host_custody_flow(fixture, product_id)
 
         return {
             "product_id": product_id,
@@ -1274,6 +1561,7 @@ def allowed_flow() -> dict[str, Any]:
             "bad_request_rejected": True,
             "extension_lifecycle": extension_lifecycle,
             "project_graph": project_graph,
+            "effects_custody": effects_custody,
         }
     finally:
         fixture.close()
@@ -1325,7 +1613,7 @@ def main() -> None:
     denied = denied_flow()
     graph_denied = project_graph_denied_flow()
     report = {
-        "schema_version": "launchwright-native-host-acceptance/3",
+        "schema_version": "launchwright-native-host-acceptance/4",
         "passed": True,
         "launchwright_sha": os.environ.get("GITHUB_SHA"),
         "semwright_sha": semwright_sha,
@@ -1339,6 +1627,10 @@ def main() -> None:
             "project_graph_live_broker_admitted": True,
             "project_graph_native_projection_recorded": True,
             "project_graph_platform_job_authority": False,
+            "effects_canonical_readback_host_custody_accepted": True,
+            "effects_owner_admission_accepted": False,
+            "effects_evaluation_driver_host_isolation_accepted": False,
+            "effects_execution_authority": False,
             "platform_external_acceptance": False,
             "chatgpt_host_acceptance": False,
             "public_channel_acceptance": False,

@@ -1,0 +1,72 @@
+TAP version 13
+# (node:3910837) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: RS-EFX-01 stored canonical PASS remains UNKNOWN without explicit owner admission
+ok 1 - RS-EFX-01 stored canonical PASS remains UNKNOWN without explicit owner admission
+  ---
+  duration_ms: 113.111176
+  type: 'test'
+  ...
+# Subtest: RS-EFX-02 admitted PASS is exact-artifact scoped and revision drift makes it UNKNOWN
+ok 2 - RS-EFX-02 admitted PASS is exact-artifact scoped and revision drift makes it UNKNOWN
+  ---
+  duration_ms: 89.361477
+  type: 'test'
+  ...
+# Subtest: RS-EFX-03 canonical FAIL remains a failure when admitted and never grants execution authority
+ok 3 - RS-EFX-03 canonical FAIL remains a failure when admitted and never grants execution authority
+  ---
+  duration_ms: 74.46706
+  type: 'test'
+  ...
+# Subtest: RS-EFX-04 result artifact scope mismatch and unauthorized admission fail closed
+ok 4 - RS-EFX-04 result artifact scope mismatch and unauthorized admission fail closed
+  ---
+  duration_ms: 70.104168
+  type: 'test'
+  ...
+# Subtest: R19 Host lane stays pinned to the canonical Semwright source lock
+ok 5 - R19 Host lane stays pinned to the canonical Semwright source lock
+  ---
+  duration_ms: 1.366756
+  type: 'test'
+  ...
+# Subtest: R19 Host harness requires real Broker policy and a Host-mediated Node runtime
+ok 6 - R19 Host harness requires real Broker policy and a Host-mediated Node runtime
+  ---
+  duration_ms: 0.441989
+  type: 'test'
+  ...
+# Subtest: R19 evidence cannot promote Host acceptance into external Platform authority
+ok 7 - R19 evidence cannot promote Host acceptance into external Platform authority
+  ---
+  duration_ms: 0.3639
+  type: 'test'
+  ...
+# Subtest: R20 Host harness exercises extension lifecycle without promoting external fixture execution
+ok 8 - R20 Host harness exercises extension lifecycle without promoting external fixture execution
+  ---
+  duration_ms: 0.51896
+  type: 'test'
+  ...
+# Subtest: R22 Host harness preserves canonical Effects custody without manufacturing admission
+ok 9 - R22 Host harness preserves canonical Effects custody without manufacturing admission
+  ---
+  duration_ms: 0.598864
+  type: 'test'
+  ...
+# Subtest: R21 Host harness executes canonical Project Graph and records the bounded Native projection
+ok 10 - R21 Host harness executes canonical Project Graph and records the bounded Native projection
+  ---
+  duration_ms: 0.598445
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 463.809565

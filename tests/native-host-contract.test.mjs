@@ -54,6 +54,24 @@ test('R20 Host harness exercises extension lifecycle without promoting external 
   assert.match(harness,/"extension_fixture_execution_host_isolation_accepted": False/u);
 });
 
+test('R22 Host harness preserves canonical Effects custody without manufacturing admission',()=>{
+  assert.match(workflow,/semwright-native-effects/u);
+  assert.match(harness,/effects_host_custody_flow/u);
+  assert.match(harness,/canonical Effects readback result through Driver Host without inventing admission/u);
+  assert.match(harness,/"effects.record"/u);
+  assert.match(harness,/"effects-inspect"/u);
+  assert.match(harness,/"canonical-result-not-admitted"/u);
+  assert.match(harness,/"effective_launchwright_state": "UNKNOWN"/u);
+  assert.match(harness,/"owner_admission_rejected": True/u);
+  assert.match(harness,/"canonical_reader_execution_inside_driver_host": False/u);
+  assert.match(harness,/"effects_canonical_readback_host_custody_accepted": True/u);
+  assert.match(harness,/"effects_owner_admission_accepted": False/u);
+  assert.match(harness,/"effects_evaluation_driver_host_isolation_accepted": False/u);
+  assert.match(harness,/"effects_execution_authority": False/u);
+  assert.match(workflow,/effects_canonical_readback_host_custody_accepted == true/u);
+  assert.match(workflow,/effects_owner_admission_accepted == false/u);
+});
+
 test('R21 Host harness executes canonical Project Graph and records the bounded Native projection',()=>{
   assert.match(harness,/allow_project_graph/u);
   assert.match(harness,/project-graph-fixture/u);
