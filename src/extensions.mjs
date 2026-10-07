@@ -6,7 +6,7 @@ export const PROFILE_MATRIX=Object.freeze({
   browser:{source_types:['web'],execution:'canonical-driver-required',capture:'requires-authorized-driver',readback:'provider-dependent'},
   cli:{source_types:['cli'],execution:'sandboxed-real-tool-required',capture:'stdout-stderr-receipt-required',readback:'process-output'},
   'mobile-import':{source_types:['mobile-import'],execution:'import-only',capture:'external-origin-required',readback:'bundle-provenance-only'},
-  godot:{source_types:['godot'],execution:'canonical-driver-required',capture:'scene-camera-behavior-contract-required',readback:'driver-supported-only'},
+  godot:{source_types:['godot'],execution:'canonical-driver-required',capture:'scene-camera-behavior-contract-required',readback:'driver-supported-only',semantics:['scene','camera','behavior','readback'],native_acceptance:{engine_real_required:true,video_import_substitute:false,engine_family:'Godot',reviewed_engine:'4.7.2',driver_namespace:'driver.godot.'}},
   document:{source_types:['document'],execution:'parse-only',capture:'not-applicable',readback:'bounded-structured-import'}
 });
 
