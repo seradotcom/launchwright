@@ -934,8 +934,10 @@ def project_graph_host_flow(fixture: HostFixture, product_id: str) -> dict[str, 
     page = queried["result"]
     report = impact["result"]
     manifest = exported["result"]
-    if page.get("next_cursor") is not None or page.get("scope_partial") or page.get("truncated"):
-        raise AssertionError("R21 Project Graph projection is not a complete visible asset page")
+    if page.get("next_cursor") is not None or page.get("truncated"):
+        raise AssertionError("R21 Project Graph query did not exhaust the authorized visible page")
+    if page.get("scope_partial") is not True:
+        raise AssertionError("R21 Project Graph file-scoped query did not preserve its partial-scope marker")
     if report.get("cancelled"):
         raise AssertionError("R21 Project Graph traversal was cancelled")
     if manifest.get("source_project") != project_id:
@@ -1006,9 +1008,13 @@ def project_graph_host_flow(fixture: HostFixture, product_id: str) -> dict[str, 
         "inventory": {
             "visible_total": len(page["items"]),
             "enumerated_total": len(page["items"]),
-            "denominator_complete": True,
-            "scope_partial": False,
-            "truncated": False,
+            # Semwright file_scope intentionally marks the query partial relative to
+            # the whole Project Graph even when this bounded page is exhausted.
+            # Preserve that upstream uncertainty instead of manufacturing a safe
+            # percentage denominator inside Launchwright.
+            "denominator_complete": False,
+            "scope_partial": bool(page["scope_partial"]),
+            "truncated": bool(page["truncated"]),
         },
     }
     transcript = {

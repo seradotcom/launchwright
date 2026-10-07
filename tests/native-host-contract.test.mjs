@@ -70,5 +70,8 @@ test('R21 Host harness executes canonical Project Graph and records the bounded 
   assert.match(harness,/"project_graph_live_broker_admitted": True/u);
   assert.match(harness,/"project_graph_native_projection_recorded": True/u);
   assert.match(harness,/"project_graph_platform_job_authority": False/u);
+  assert.match(harness,/"denominator_complete": False/u);
+  assert.match(harness,/"scope_partial": bool\(page\["scope_partial"\]\)/u);
+  assert.match(harness,/file-scoped query did not preserve its partial-scope marker/u);
   assert.match(harness,/project_graph_denied_flow/u);
 });

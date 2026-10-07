@@ -1,100 +1,100 @@
 TAP version 13
-# (node:3843800) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (node:3899485) ExperimentalWarning: SQLite is an experimental feature and might change at any time
 # (Use `node --trace-warnings ...` to show where the warning was created)
 # Subtest: Launchwright graph contract lock equals the checked-in canonical projection
 ok 1 - Launchwright graph contract lock equals the checked-in canonical projection
   ---
-  duration_ms: 1.797547
+  duration_ms: 2.334562
   type: 'test'
   ...
 # Subtest: caller data cannot self-promote a Platform response into canonical Graph authority
 ok 2 - caller data cannot self-promote a Platform response into canonical Graph authority
   ---
-  duration_ms: 76.618439
+  duration_ms: 7110.53592
   type: 'test'
   ...
 # Subtest: trusted Graph profile records immutable admitted projection and release impact consumes it
 ok 3 - trusted Graph profile records immutable admitted projection and release impact consumes it
   ---
-  duration_ms: 98.704023
+  duration_ms: 92.426499
   type: 'test'
   ...
 # Subtest: bounded Graph projection rejects hidden impact nodes instead of leaking a private dependency path
 ok 4 - bounded Graph projection rejects hidden impact nodes instead of leaking a private dependency path
   ---
-  duration_ms: 82.529593
+  duration_ms: 68.012628
   type: 'test'
   ...
 # Subtest: cycles are accepted only as already-bounded canonical reports and never traversed by Launchwright
 ok 5 - cycles are accepted only as already-bounded canonical reports and never traversed by Launchwright
   ---
-  duration_ms: 73.667645
+  duration_ms: 80.348807
   type: 'test'
   ...
 # Subtest: unknown frontier survives incomplete inventory and percentages stay scoped to visible denominator
 ok 6 - unknown frontier survives incomplete inventory and percentages stay scoped to visible denominator
   ---
-  duration_ms: 79.499668
+  duration_ms: 76.896341
   type: 'test'
   ...
 # Subtest: observed local relation must be backed by the exact admitted canonical Graph edge
 ok 7 - observed local relation must be backed by the exact admitted canonical Graph edge
   ---
-  duration_ms: 83.415619
+  duration_ms: 75.696583
   type: 'test'
   ...
 # Subtest: heuristic relation never clears canonical uncertainty or upgrades itself to observed
 ok 8 - heuristic relation never clears canonical uncertainty or upgrades itself to observed
   ---
-  duration_ms: 64.194013
+  duration_ms: 66.008352
   type: 'test'
   ...
 # Subtest: reuse key binds target toolchain fixture templates verifier tenant rights permissions and final delivery check
 ok 9 - reuse key binds target toolchain fixture templates verifier tenant rights permissions and final delivery check
   ---
-  duration_ms: 93.133352
+  duration_ms: 82.077064
   type: 'test'
   ...
 # Subtest: impact proposals remain authority-free and coalescing preserves exact changed revisions
 ok 10 - impact proposals remain authority-free and coalescing preserves exact changed revisions
   ---
-  duration_ms: 75.995648
+  duration_ms: 84.189738
   type: 'test'
   ...
 # Subtest: rebuild receipt partitions exact proposal revisions and final package verification cannot be skipped
 ok 11 - rebuild receipt partitions exact proposal revisions and final package verification cannot be skipped
   ---
-  duration_ms: 94.192171
+  duration_ms: 106.506091
   type: 'test'
   ...
 # Subtest: R19 Host lane stays pinned to the canonical Semwright source lock
 ok 12 - R19 Host lane stays pinned to the canonical Semwright source lock
   ---
-  duration_ms: 2.094239
+  duration_ms: 2.209754
   type: 'test'
   ...
 # Subtest: R19 Host harness requires real Broker policy and a Host-mediated Node runtime
 ok 13 - R19 Host harness requires real Broker policy and a Host-mediated Node runtime
   ---
-  duration_ms: 0.339158
+  duration_ms: 0.348795
   type: 'test'
   ...
 # Subtest: R19 evidence cannot promote Host acceptance into external Platform authority
 ok 14 - R19 evidence cannot promote Host acceptance into external Platform authority
   ---
-  duration_ms: 0.234323
+  duration_ms: 0.272387
   type: 'test'
   ...
 # Subtest: R20 Host harness exercises extension lifecycle without promoting external fixture execution
 ok 15 - R20 Host harness exercises extension lifecycle without promoting external fixture execution
   ---
-  duration_ms: 0.261212
+  duration_ms: 0.26184
   type: 'test'
   ...
 # Subtest: R21 Host harness executes canonical Project Graph and records the bounded Native projection
 ok 16 - R21 Host harness executes canonical Project Graph and records the bounded Native projection
   ---
-  duration_ms: 0.415774
+  duration_ms: 0.440638
   type: 'test'
   ...
 1..16
@@ -105,4 +105,4 @@ ok 16 - R21 Host harness executes canonical Project Graph and records the bounde
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 922.115306
+# duration_ms 7944.80179
