@@ -289,22 +289,36 @@ jobs:
           done
           curl -fsS http://127.0.0.1:4399/health
           curl -fsS -X POST http://127.0.0.1:4399/lab/reset > evidence/deltadesk/reset.json
-      - name: Execute DeltaDesk through real Semwright Chromium adapter
+      - name: Execute DeltaDesk through real Semwright Broker, Policy and Chromium adapter
         env:
           LAUNCHWRIGHT_DELTADESK_ORIGIN: http://127.0.0.1:4399
           LAUNCHWRIGHT_EVIDENCE_DIR: ${{ github.workspace }}/evidence/deltadesk
         run: |
           set -euo pipefail
-          cp acceptance/chromium_deltadesk.rs .ci-semwright/crates/adapters/tests/launchwright_deltadesk.rs
+          cp acceptance/chromium_deltadesk_broker.rs .ci-semwright/crates/core/tests/launchwright_deltadesk_broker.rs
+          python3 - <<'PY'
+          from pathlib import Path
+          path=Path('.ci-semwright/crates/core/Cargo.toml')
+          text=path.read_text()
+          marker='[dev-dependencies]\n'
+          addition='semwright-adapters.workspace = true\n'
+          if addition not in text:
+              if marker not in text:
+                  raise SystemExit('Semwright core dev-dependencies marker missing')
+              text=text.replace(marker,marker+addition,1)
+              path.write_text(text)
+          PY
           (
             cd .ci-semwright
-            cargo test --locked -p semwright-adapters --test launchwright_deltadesk -- --ignored --nocapture
-          ) 2>&1 | tee evidence/deltadesk/semwright-browser.log
-          grep -q '^REAL_DELTADESK_BROWSER_ACCEPTANCE_PASS ' evidence/deltadesk/semwright-browser.log
-      - name: Ingest real adapter evidence without fabricating Platform authority
+            cargo test --locked -p semwright-core --test launchwright_deltadesk_broker \
+              real_semwright_broker_policy_captures_deltadesk_a_and_b \
+              -- --ignored --exact --nocapture
+          ) 2>&1 | tee evidence/deltadesk/semwright-browser-broker.log
+          grep -q '^REAL_DELTADESK_BROKER_ACCEPTANCE_PASS ' evidence/deltadesk/semwright-browser-broker.log
+      - name: Ingest Broker-routed real adapter evidence without fabricating Platform authority
         env:
           SEMWRIGHT_CHECKOUT: ${{ github.workspace }}/.ci-semwright
-          DELTADESK_DRIVER_RECEIPT: ${{ github.workspace }}/evidence/deltadesk/semwright-deltadesk-driver.json
+          DELTADESK_DRIVER_RECEIPT: ${{ github.workspace }}/evidence/deltadesk/semwright-deltadesk-broker.json
         run: node scripts/verify-deltadesk-browser.mjs | tee evidence/deltadesk/launchwright-verifier.log
       - name: Stop owned DeltaDesk fixture
         if: always()
