@@ -298,6 +298,33 @@ fn launchwright_capture_film(
             "license": null
         }
     ]);
+    value["timing"]["spans"]
+        .as_array_mut()
+        .expect("technical film timing spans")
+        .extend([
+            json!({
+                "id": "sync-guard-in-span",
+                "minimum": {"num": "1", "den": "30"},
+                "preferred": {"num": "1", "den": "30"},
+                "maximum": {"num": "1", "den": "30"},
+                "anchor": {
+                    "kind": "absolute",
+                    "time": {"num": "14", "den": "15"}
+                },
+                "preference_priority": 0
+            }),
+            json!({
+                "id": "sync-guard-out-span",
+                "minimum": {"num": "1", "den": "30"},
+                "preferred": {"num": "1", "den": "30"},
+                "maximum": {"num": "1", "den": "30"},
+                "anchor": {
+                    "kind": "absolute",
+                    "time": {"num": "16", "den": "15"}
+                },
+                "preference_priority": 0
+            }),
+        ]);
 
     let shot = &mut value["sequences"][0]["beats"][0]["shots"][0];
     let subjects = shot["subjects"].as_array_mut().expect("technical film subjects");
@@ -345,29 +372,81 @@ fn launchwright_capture_film(
             "clip_intentional": false
         }),
     );
-    shot["layers"]
+    subjects.insert(
+        2,
+        json!({
+            "id": "sync-guard",
+            "role": "sync-reference",
+            "parent": null,
+            "layer": "sync-reference",
+            "content": {
+                "kind": "rectangle",
+                "fill": "#000000",
+                "stroke": null,
+                "radius": 0
+            },
+            "layout": {
+                "kind": "fixed",
+                "position": {"x": 0.0, "y": 0.0},
+                "size": {"width": 320.0, "height": 180.0}
+            },
+            "initially_visible": false,
+            "clip_intentional": false
+        }),
+    );
+    let layers = shot["layers"]
         .as_array_mut()
-        .expect("technical film layers")
-        .insert(
-            0,
-            json!({
-                "id": "background",
-                "order": -1,
-                "intentional_overlay": false
-            }),
-        );
-    shot["motion"]
+        .expect("technical film layers");
+    layers
+        .iter_mut()
+        .find(|layer| layer["id"] == "content")
+        .expect("technical content layer")["order"] = json!(1);
+    layers.insert(
+        0,
+        json!({
+            "id": "background",
+            "order": -1,
+            "intentional_overlay": false
+        }),
+    );
+    layers.insert(
+        1,
+        json!({
+            "id": "sync-reference",
+            "order": 0,
+            "intentional_overlay": true
+        }),
+    );
+    let motion = shot["motion"]
         .as_array_mut()
-        .expect("technical film motion")
-        .push(json!({
-            "id": "capture-b-in",
-            "span_id": "flash-in-span",
-            "easing": "linear",
-            "primitive": {
-                "kind": "fade_in",
-                "target": "capture-b"
-            }
-        }));
+        .expect("technical film motion");
+    motion.push(json!({
+        "id": "capture-b-in",
+        "span_id": "flash-in-span",
+        "easing": "linear",
+        "primitive": {
+            "kind": "fade_in",
+            "target": "capture-b"
+        }
+    }));
+    motion.push(json!({
+        "id": "sync-guard-in",
+        "span_id": "sync-guard-in-span",
+        "easing": "linear",
+        "primitive": {
+            "kind": "fade_in",
+            "target": "sync-guard"
+        }
+    }));
+    motion.push(json!({
+        "id": "sync-guard-out",
+        "span_id": "sync-guard-out-span",
+        "easing": "linear",
+        "primitive": {
+            "kind": "fade_out",
+            "target": "sync-guard"
+        }
+    }));
 
     let film: Film = serde_json::from_value(value).unwrap();
     film.validate().unwrap();

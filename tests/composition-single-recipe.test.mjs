@@ -113,6 +113,13 @@ test('R24 generator is fail-closed over the reviewed exact Semwright Composition
   assert.match(source,/UPSTREAM_SHA256 = "09ce6823112affade6df01764f7226f6e33e72a7cb7bfafe0cea9ddca400c700"/);
   assert.match(source,/expected exactly one source anchor/);
   assert.match(source,/driver\.motion-canvas\.asset\.import/);
+  assert.match(source,/"id": "sync-guard"/);
+  assert.match(source,/"id": "sync-reference"/);
+  assert.match(source,/"id": "sync-guard-in-span"/);
+  assert.match(source,/"id": "sync-guard-out-span"/);
+  assert.doesNotMatch(source,/confidence_floor/);
+  assert.doesNotMatch(source,/max_offset/);
+  assert.doesNotMatch(source,/max_cue_error/);
   assert.match(source,/LAUNCHWRIGHT_SINGLE_RECIPE_COMPOSITION_PASS/);
 });
 
