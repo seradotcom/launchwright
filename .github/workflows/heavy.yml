@@ -276,6 +276,10 @@ jobs:
           CHROMIUM=/opt/google/chrome/chrome
           echo "SEMWRIGHT_TEST_CHROMIUM=$CHROMIUM" >> "$GITHUB_ENV"
           sha256sum "$CHROMIUM" | tee evidence/deltadesk/chromium.sha256
+      - name: Install pinned Semwright Linux media build prerequisite
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpipewire-0.3-dev
       - name: Start owned DeltaDesk A/B fixture
         run: |
           set -euo pipefail

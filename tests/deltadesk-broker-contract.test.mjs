@@ -39,6 +39,7 @@ test('R23 fixture approver is bounded to sensitive browser acceptance only',()=>
 test('R23 heavy lane builds against exact pinned Semwright without changing product source',()=>{
   assert.ok(workflow.includes('cp acceptance/chromium_deltadesk_broker.rs .ci-semwright/crates/daemon/tests/launchwright_deltadesk_broker.rs'));
   assert.ok(workflow.includes('cargo test --locked -p semwright-daemon --test launchwright_deltadesk_broker'));
+  assert.ok(workflow.includes('sudo apt-get install -y libpipewire-0.3-dev'),'R23 must mirror the pinned Semwright Linux build prerequisite');
   assert.ok(!workflow.includes('semwright-adapters.workspace = true'),'R23 must not mutate the pinned Semwright manifest/lock');
   assert.ok(workflow.includes('REAL_DELTADESK_BROKER_ACCEPTANCE_PASS'));
   assert.ok(workflow.includes('semwright-deltadesk-broker.json'));
