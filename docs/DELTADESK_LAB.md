@@ -17,7 +17,7 @@ The canonical source description is `lab/deltadesk/manifest.json`. Unit tests as
 
 Launchwright does not implement a second browser automation kernel. The cross-system acceptance lane checks out the same Semwright commit pinned by `SOURCE_LOCK.json`:
 
-`4d291de26724810017ce7b6d185326514cb79fa6`
+`8fa191250ae68274182570c65f067f7a60f85625` (`v1.0.0`)
 
 and executes Semwright's reviewed `chromium` backend through the real `Broker` + `Policy` path against the owned DeltaDesk fixture. The R23 acceptance code lives in `acceptance/chromium_deltadesk_broker.rs` and is copied only into the disposable CI checkout as a `semwright-daemon` integration test; it does not patch or vendor the backend, Broker or Policy into Launchwright. The older direct-backend harness remains isolated to the separate Composition evidence lane and does not substitute for R23 Broker evidence.
 

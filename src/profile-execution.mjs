@@ -3,7 +3,7 @@ import { object, integer, requireCondition as ensure } from '@semwright/native-s
 import { inputObject, idText, str, array, sha, noSecrets, digest, iso } from './contracts.mjs';
 import { PROFILE_MATRIX } from './extensions.mjs';
 
-export const PROFILE_RUNTIME_SEMWRIGHT_SHA='4d291de26724810017ce7b6d185326514cb79fa6';
+export const PROFILE_RUNTIME_SEMWRIGHT_SHA='8fa191250ae68274182570c65f067f7a60f85625';
 export const GODOT_PROFILE_REQUIREMENT='RS-PRO-02';
 export const GODOT_REQUIRED_OPERATIONS=Object.freeze([
   'driver.godot.scene.create',

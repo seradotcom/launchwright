@@ -22,8 +22,8 @@ if(JSON.stringify([...unique].sort())!==JSON.stringify(declared)){
 
 const manifest={
   schema_version:'launchwright-native-bundles/2',
-  sdk_sha:'4d291de26724810017ce7b6d185326514cb79fa6',
-  native_sdk:'0.9.0-dev.1',
+  sdk_sha:'8fa191250ae68274182570c65f067f7a60f85625',
+  native_sdk:'1.0.0',
   max_bundle_bytes:MAX_BUNDLE,
   max_combined_stdin_bytes:MAX_INPUT,
   host_accepted:false,

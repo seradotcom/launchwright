@@ -2,22 +2,25 @@
   "schema_version": "launchwright-source-lock/1",
   "native_sdk": {
     "repository": "https://github.com/seradotcom/semwright",
-    "sha": "4d291de26724810017ce7b6d185326514cb79fa6",
-    "version": "0.9.0-dev.1",
-    "observed_via": "Authenticated gh API read through Remote Desktop Commander; TypeScript source and package byte equality confirmed",
+    "sha": "8fa191250ae68274182570c65f067f7a60f85625",
+    "version": "1.0.0",
+    "observed_via": "Semwright v1.0.0 release tag and origin/main verified at the same commit; canonical TypeScript source/package byte equality confirmed",
     "live_main_verified": true,
-    "archive_sha256": "0e846aa7646cb8b431008daabaf8d4c163eba9e72c9b7a6204f0df12f69199a1",
+    "archive_sha256": "4421585d4e583eebd8d80d73a4eadd5f7ad43ead8ebe3ec7eaef2090cdc2b911",
     "files": {
       "LICENSE-APACHE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
-      "tsconfig.json": "de3b36bb52f84b4b08cf87436e6111c621a2364038b3e953f7b8bae49e889faa",
-      "package-lock.json": "0b6dfff1f6c24a717ee2762287d982200423b4988881527621fd0eaf89726b5b",
-      "package.json": "95269157400d0f44c61d2e774a07341bd711a12400e1ccc4d94145b13c306dae",
       "LICENSE-MIT": "ad56b5c3e274c6d82e1424447211bfb4e5b2c22c86e6cf8aa8120458aa7347ef",
       "README.md": "1fb6b30ccd2b93588116d301ae8e33bbfda7db2b34db9f069dee5b4145b0ea7b",
-      "src/index.ts": "b6515daa335e5b6851104ed72f804b798477a513c1f47b2048dab8fcaf5ee1e6"
+      "package-lock.json": "3f2878360e3daa834a0463aeec9b16dfbb5cf7312faa48760da9c5825d48d536",
+      "package.json": "a03adcad23819d34b4c77639c12a46c34e62a281b9946c6356c07799e261eb12",
+      "src/index.ts": "b6515daa335e5b6851104ed72f804b798477a513c1f47b2048dab8fcaf5ee1e6",
+      "tsconfig.json": "de3b36bb52f84b4b08cf87436e6111c621a2364038b3e953f7b8bae49e889faa"
     },
-    "prior_archive_sha": "04cf0ef7062d134b71206d832375be9545553bb4",
-    "live_observed_at": "2026-10-05T00:33:00Z"
+    "prior_archive_sha": "4d291de26724810017ce7b6d185326514cb79fa6",
+    "live_observed_at": "2026-10-07T23:37:38Z",
+    "release_tag": "v1.0.0",
+    "release_published_at": "2026-10-07T17:48:42Z",
+    "archive_kind": "vendored-npm-package"
   },
   "platform_client": {
     "version": "0.3.5-dev.1",
@@ -31,6 +34,6 @@
   "specification_sha256": "587663d1de9672c8c6aaa7b93592acf8aa72ec2599126ebbd044cd3ed21245d6",
   "node_required": ">=24.21.0 <25",
   "local_validation_node": "22.22.0 (outside upstream supported engine; supplemental only)",
-  "heavy_tests": "GitHub Actions native/host/effects/browser/deltadesk/composition/stress lanes configured; exact-SHA results are tracked in docs/ACCEPTANCE.md",
+  "heavy_tests": "GitHub Actions native/host/verifier/effects/browser/deltadesk/composition/stress/godot lanes configured; exact-SHA results are tracked in docs/ACCEPTANCE.md",
   "workstation_validation_node": "22.22.0 (supplemental, outside supported engine)"
 }

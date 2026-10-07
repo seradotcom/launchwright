@@ -102,7 +102,7 @@ test('extension discovery stores bounded descriptors and never turns them into e
 test('compatibility locks detect retired extension drift and major negotiation never silently succeeds', async t=>{
   const {app}=setup(t);const b=await baseline(app);
   const ext=(await execute(app,'extension.register',{name:'Synthetic channel adapter',type:'channel_adapter',package_version:'2.0.0',schema_major:1,digest:'d'.repeat(64),license:'AGPL-3.0-only',source:'repo:synthetic/channel-adapter',permissions:['publish'],inputs:['candidate/1'],outputs:['receipt/1'],preconditions:['consent'],evidence:['external-receipt'],limits:{max_input_bytes:4096,max_output_bytes:4096,timeout_seconds:10}})).entity;
-  const lock=(await execute(app,'compatibility.lock',{product_id:b.product.id,name:'Release toolchain',components:[{kind:'native-sdk',name:'@semwright/native-sdk',version:'0.9.0-dev.1'},{kind:'channel-adapter',name:ext.data.name,version:ext.data.package_version,digest:ext.data.digest,resource_id:ext.id}],notes:'Synthetic rehearsal lock'})).entity;
+  const lock=(await execute(app,'compatibility.lock',{product_id:b.product.id,name:'Release toolchain',components:[{kind:'native-sdk',name:'@semwright/native-sdk',version:'1.0.0'},{kind:'channel-adapter',name:ext.data.name,version:ext.data.package_version,digest:ext.data.digest,resource_id:ext.id}],notes:'Synthetic rehearsal lock'})).entity;
   let inspected=await execute(app,'compatibility.inspect',{id:lock.id});
   assert.equal(inspected.state,'CURRENT');
   assert.equal(inspected.components.find(c=>c.kind==='channel-adapter').state,'CURRENT');

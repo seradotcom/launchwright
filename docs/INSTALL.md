@@ -1,6 +1,6 @@
 # Install and local operation
 
-Launchwright is a local-first developer preview built on Semwright Native SDK 0.9.0-dev.1.
+Launchwright is a local-first developer preview built on Semwright Native SDK 1.0.0, pinned to the published Semwright v1.0.0 release commit.
 
 ## Supported runtime
 

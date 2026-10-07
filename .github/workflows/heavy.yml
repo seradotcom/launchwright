@@ -96,7 +96,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 50
     env:
-      SEMWRIGHT_SHA: 4d291de26724810017ce7b6d185326514cb79fa6
+      SEMWRIGHT_SHA: 8fa191250ae68274182570c65f067f7a60f85625
       CARGO_INCREMENTAL: '0'
       CARGO_TERM_COLOR: never
       CARGO_PROFILE_DEV_DEBUG: '0'
@@ -189,7 +189,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 55
     env:
-      SEMWRIGHT_SHA: 4d291de26724810017ce7b6d185326514cb79fa6
+      SEMWRIGHT_SHA: 8fa191250ae68274182570c65f067f7a60f85625
       CARGO_INCREMENTAL: '0'
       CARGO_TERM_COLOR: never
       CARGO_PROFILE_DEV_DEBUG: '0'
@@ -281,7 +281,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
-      SEMWRIGHT_SHA: 4d291de26724810017ce7b6d185326514cb79fa6
+      SEMWRIGHT_SHA: 8fa191250ae68274182570c65f067f7a60f85625
       CARGO_INCREMENTAL: '0'
       CARGO_TERM_COLOR: never
     steps:
@@ -337,7 +337,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     env:
-      SEMWRIGHT_SHA: 4d291de26724810017ce7b6d185326514cb79fa6
+      SEMWRIGHT_SHA: 8fa191250ae68274182570c65f067f7a60f85625
       CARGO_INCREMENTAL: '0'
       CARGO_TERM_COLOR: never
       CARGO_PROFILE_DEV_DEBUG: '0'
@@ -468,7 +468,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     env:
-      SEMWRIGHT_SHA: 4d291de26724810017ce7b6d185326514cb79fa6
+      SEMWRIGHT_SHA: 8fa191250ae68274182570c65f067f7a60f85625
       CARGO_INCREMENTAL: '0'
       CARGO_TERM_COLOR: never
     steps:
@@ -556,7 +556,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 75
     env:
-      SEMWRIGHT_SHA: 4d291de26724810017ce7b6d185326514cb79fa6
+      SEMWRIGHT_SHA: 8fa191250ae68274182570c65f067f7a60f85625
       CARGO_INCREMENTAL: '0'
       CARGO_TERM_COLOR: never
       PLAYWRIGHT_BROWSERS_PATH: '0'

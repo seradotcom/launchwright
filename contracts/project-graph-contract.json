@@ -2,7 +2,7 @@
   "schema_version": "launchwright-project-graph-contract/1",
   "source": {
     "repository": "seradotcom/semwright",
-    "sha": "4d291de26724810017ce7b6d185326514cb79fa6",
+    "sha": "8fa191250ae68274182570c65f067f7a60f85625",
     "crate": "semwright-project-graph",
     "schema_version": 1
   },

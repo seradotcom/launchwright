@@ -23,6 +23,6 @@
     "verify": "node scripts/verify.mjs"
   },
   "dependencies": {
-    "@semwright/native-sdk": "file:vendor/semwright-native-sdk-0.9.0-dev.1.tgz"
+    "@semwright/native-sdk": "file:vendor/semwright-native-sdk-1.0.0.tgz"
   }
 }
