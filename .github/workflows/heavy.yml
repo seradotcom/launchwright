@@ -5,7 +5,7 @@ on:
       lane:
         description: Select only the lane affected by the change
         type: choice
-        options: [all, native, host, browser, deltadesk, composition, effects, stress]
+        options: [all, native, host, browser, deltadesk, composition, effects, godot, stress]
         default: all
         required: true
 permissions:
@@ -234,6 +234,137 @@ jobs:
         with:
           name: launchwright-effects-${{ github.sha }}
           path: evidence/effects/
+          if-no-files-found: error
+          retention-days: 14
+
+  godot:
+    if: inputs.lane == 'all' || inputs.lane == 'godot'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      SEMWRIGHT_SHA: 4d291de26724810017ce7b6d185326514cb79fa6
+      CARGO_INCREMENTAL: '0'
+      CARGO_TERM_COLOR: never
+      CARGO_PROFILE_DEV_DEBUG: '0'
+      CARGO_PROFILE_TEST_DEBUG: '0'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Checkout exact reviewed Semwright source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: seradotcom/semwright
+          ref: ${{ env.SEMWRIGHT_SHA }}
+          path: .ci-semwright
+          persist-credentials: false
+      - name: Pin source, compiler and Driver Host sandbox
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/godot
+          test "$(git -C .ci-semwright rev-parse HEAD)" = "$SEMWRIGHT_SHA"
+          rustup toolchain install 1.98.1 --profile minimal
+          (cd .ci-semwright && rustup override set 1.98.1)
+          bash .ci-semwright/scripts/dev/ci-driver-bwrap-profile.sh evidence/godot/host-sandbox-profile.txt
+          bwrap --version | tee evidence/godot/bwrap-version.log
+      - name: Install exact Godot 4.7.2
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          curl -fL --retry 4 --retry-delay 2 \
+            "https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip" \
+            -o "$RUNNER_TEMP/godot.zip"
+          unzip -q "$RUNNER_TEMP/godot.zip" -d "$RUNNER_TEMP/godot"
+          GODOT="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+          echo "8d106cbe6144c2dc7e881d61d2429c1a8a76e6b22ef48bd5e48dcf934953f71e  $GODOT" | sha256sum -c -
+          "$GODOT" --version | tee evidence/godot/godot-version.log
+          sha256sum "$GODOT" | tee evidence/godot/godot.sha256
+          echo "GODOT_BIN=$GODOT" >> "$GITHUB_ENV"
+      - name: Exact native readback and scene-save contracts
+        run: |
+          set -euo pipefail
+          fixture="$RUNNER_TEMP/godot-native-contracts"
+          mkdir -p "$fixture/addons" "$fixture/tests"
+          cp -R .ci-semwright/integrations/godot/addons/semwright "$fixture/addons/"
+          cp .ci-semwright/integrations/godot/tests/*_contract.gd "$fixture/tests/"
+          printf '%s\n' 'config_version=5' '[application]' 'config/name="Launchwright Godot Native Contracts"' > "$fixture/project.godot"
+          for contract in readback scene_save; do
+            log="evidence/godot/${contract}-contract.log"
+            timeout 90 "$GODOT_BIN" --headless --path "$fixture" --script "res://tests/${contract}_contract.gd" 2>&1 | tee "$log"
+            grep -q "^${contract^^}_FIXTURE_TESTS PASS:" "$log"
+            if grep -E "ERROR:|SCRIPT ERROR:|Parse Error:" "$log"; then
+              exit 1
+            fi
+          done
+      - name: Build exact Godot driver and Driver Host sandbox helper
+        run: |
+          set -euo pipefail
+          (
+            cd .ci-semwright
+            cargo build --locked \
+              -p semwright-driver-godot --bin semwright-godot-driver \
+              -p semwright-plugin-host --bin semwright-sandbox
+          ) 2>&1 | tee evidence/godot/semwright-build.log
+          sha256sum \
+            .ci-semwright/target/debug/semwright-godot-driver \
+            .ci-semwright/target/debug/semwright-sandbox \
+            | tee evidence/godot/semwright-binaries.sha256
+      - name: Exact Driver Host conformance for Godot provider
+        run: |
+          set -euo pipefail
+          (
+            cd .ci-semwright
+            SEMWRIGHT_TEST_GODOT=1 \
+            SEMWRIGHT_TEST_SANDBOX_HELPER="$GITHUB_WORKSPACE/.ci-semwright/target/debug/semwright-sandbox" \
+              cargo test --locked -p semwright-driver-godot --test host_conformance -- --ignored --nocapture
+          ) 2>&1 | tee evidence/godot/host-conformance.log
+          grep -q 'test result: ok' evidence/godot/host-conformance.log
+          echo "GODOT_HOST_CONFORMANCE=PASS" >> "$GITHUB_ENV"
+      - name: Real Godot semantic execution
+        run: |
+          set -euo pipefail
+          echo "GODOT_PROFILE_STARTED_MS=$(date +%s%3N)" >> "$GITHUB_ENV"
+          (
+            cd .ci-semwright
+            SEMWRIGHT_TEST_GODOT_BIN="$GODOT_BIN" \
+            SEMWRIGHT_GODOT_TRACE="$GITHUB_WORKSPACE/evidence/godot/godot-real-trace.json" \
+            BIN_DIR="$GITHUB_WORKSPACE/.ci-semwright/target/debug" \
+              python3 -u crates/driver-godot/tools/e2e_real.py
+          ) 2>&1 | tee evidence/godot/godot-real-e2e.log
+          grep -q '^REAL_GODOT_ACCEPTANCE_PASS ' evidence/godot/godot-real-e2e.log
+          grep -q '^runtime_marker=SEMWRIGHT_LAB_READY' evidence/godot/godot-real-e2e.log
+          ! grep -E "ERROR:|SCRIPT ERROR:|Parse Error:" evidence/godot/godot-real-trace.json
+      - name: Verify RS-PRO-02 through Launchwright Native SDK profile
+        env:
+          SEMWRIGHT_GODOT_TRACE: ${{ github.workspace }}/evidence/godot/godot-real-trace.json
+          GODOT_DRIVER_BIN: ${{ github.workspace }}/.ci-semwright/target/debug/semwright-godot-driver
+          LAUNCHWRIGHT_GODOT_REPORT: ${{ github.workspace }}/evidence/godot/launchwright-godot-profile.json
+        run: |
+          set -euo pipefail
+          node scripts/verify-godot-profile.mjs | tee evidence/godot/launchwright-verifier.log
+          grep -q '^LAUNCHWRIGHT_GODOT_PROFILE_PASS ' evidence/godot/launchwright-verifier.log
+          jq -e '
+            .requirement_id == "RS-PRO-02" and
+            .profile == "godot" and
+            .acceptance_state == "PASS" and
+            .profile_contract.engine_real_observed == true and
+            .profile_contract.video_import_substitute == false and
+            .native_sdk.receipt_recorded == true and
+            .native_sdk.durable_receipt_technical_state == "UNKNOWN" and
+            .authority.driver_host_conformance_observed == true and
+            .authority.same_end_to_end_host_engine_path == false and
+            .authority.platform_execution_authority == false and
+            .authority.external_customer_acceptance == false
+          ' evidence/godot/launchwright-godot-profile.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: launchwright-godot-profile-${{ github.sha }}
+          path: evidence/godot/
           if-no-files-found: error
           retention-days: 14
 

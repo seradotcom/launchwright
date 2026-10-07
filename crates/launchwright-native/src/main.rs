@@ -305,6 +305,18 @@ const OPERATIONS: &[Operation] = &[
         profile: Profile::Integrations,
     },
     Operation {
+        suffix: "profile-execution_inspect",
+        read: true,
+        consent: false,
+        profile: Profile::Integrations,
+    },
+    Operation {
+        suffix: "profile-execution_record",
+        read: false,
+        consent: false,
+        profile: Profile::Integrations,
+    },
+    Operation {
         suffix: "extension-discovery",
         read: true,
         consent: false,

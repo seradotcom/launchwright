@@ -6,11 +6,12 @@ import { iso } from './base.mjs';
 import { validateLocalization, assessLocalization } from './localization.mjs';
 import { validateChannelOutcome } from './records.mjs';
 import { PROFILE_MATRIX } from './extensions.mjs';
+import { recordProfileExecution, inspectProfileExecution } from './profile-execution.mjs';
 
 export const INTEGRATIONS_NATIVE_READS=Object.freeze([
-  'localization.assess','profile.matrix','profile.preflight','channel.status'
+  'localization.assess','profile.matrix','profile.preflight','profile.execution_inspect','channel.status'
 ]);
-export const INTEGRATIONS_NATIVE_MUTATIONS=Object.freeze(['localization.create','localization.update','channel.record_outcome']);
+export const INTEGRATIONS_NATIVE_MUTATIONS=Object.freeze(['localization.create','localization.update','profile.execution_record','channel.record_outcome']);
 export const INTEGRATIONS_NATIVE_OPERATIONS=Object.freeze([...INTEGRATIONS_NATIVE_READS,...INTEGRATIONS_NATIVE_MUTATIONS]);
 
 export class IntegrationsNativeApplication extends NativeProfileApplication {
@@ -39,12 +40,14 @@ export class IntegrationsNativeApplication extends NativeProfileApplication {
       case'localization.assess':inputObject(input,['id']);return assessLocalization(this,this.get(input.id,'localized_copy'));
       case'profile.matrix':inputObject(input,[]);return{profiles:PROFILE_MATRIX,execution_proof:false};
       case'profile.preflight':return this.profilePreflight(input);
+      case'profile.execution_inspect':{inputObject(input,['id']);return inspectProfileExecution(this,input.id);}
       case'channel.status':inputObject(input,['release_id']);return this.channelStatus(input.release_id);
       default:throw new NativeError('Unsupported','Read operation is outside integrations profile');
     }
   }
   mutate(operation,input){
     switch(operation){
+      case'profile.execution_record':return{entity:recordProfileExecution(this,input)};
       case'localization.create':{
         const data=validateLocalization(input),release=this.get(data.release_id,'release'),target=this.get(data.target_id,'target'),source=this.get(data.source_copy_block_id,'copy_block');
         ensure(target.data.release_id===release.id&&source.data.release_id===release.id,'Localization references another release','PermissionDenied');
