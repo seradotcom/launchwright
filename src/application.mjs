@@ -20,11 +20,12 @@ import { PLATFORM_ACTIONS, PUBLICATION_ACTIONS, PLATFORM_READ_ACTIONS, preparePu
 import { reserveUsage, recordUsage, adjustUsage, inspectUsage, recordBillingTestCallback } from './usage-ledger.mjs';
 import { GRAPH_RELATIONS, graphContract, recordGraphObservation, inspectGraphObservation, latestGraphObservation, assertObservedGraphEdge, cacheIdentity, createImpactProposal, coalesceImpact, recordRebuildReceipt } from './graph.mjs';
 import { inspectEffects, recordEffectResult } from './effects.mjs';
+import { admitCanonicalVerifierRuntime } from './verification-runtime.mjs';
 
 export class LaunchwrightApplication {
-  constructor(root, { initialize = false, readOnly = false, principal = 'local-owner', scopes = ['read','edit','capture','review','publish','consume','admin'], capabilities = {} } = {}) {
+  constructor(root, { initialize = false, readOnly = false, principal = 'local-owner', scopes = ['read','edit','capture','review','publish','consume','admin'], capabilities = {}, verificationReceiptRoot = null } = {}) {
     this.store = new Store(root,{initialize,readOnly});
-    this.principal=str(principal,128); this.scopes=new Set(scopes); this.capabilities=capabilities;
+    this.principal=str(principal,128); this.scopes=new Set(scopes); this.capabilities=capabilities; this.verificationReceiptRoot=verificationReceiptRoot;
     this.operations = new Map(Object.keys(OPERATION_SCOPES).map(operation => [operation,(args,context)=>this.invoke(operation,args,context)]));
   }
   close(){this.store.close();}
@@ -325,9 +326,9 @@ export class LaunchwrightApplication {
         const artifactSet=new Set(candidate.data.manifest.artifact_ids);
         for(const id of data.artifact_ids)ensure(artifactSet.has(id),'Verification references bytes outside the candidate','PermissionDenied');
         if(data.target_id){const target=this.get(data.target_id,'target');ensure(target.data.release_id===candidate.data.release_id,'Verification target belongs to another release','PermissionDenied');}
-        if(data.verifier.authority==='canonical')ensure(this.capabilities.canonical_verifier_admission===true,'Canonical verifier admission is unavailable in this session','PolicyDenied');
+        const runtimeAdmission=data.verifier.authority==='canonical'?admitCanonicalVerifierRuntime(this,candidate,data):null;
         const admission=data.verifier.authority==='canonical'?'canonical-owner-admitted':data.verifier.authority==='heuristic'?'heuristic-report':'local-review-record';
-        return{entity:this.store.create('verification',{release_id:candidate.data.release_id,name:data.dimension+' verification',...data,admission,recorded_by:this.principal,recorded_at:iso()})};
+        return{entity:this.store.create('verification',{release_id:candidate.data.release_id,name:data.dimension+' verification',...data,admission,runtime_admission:runtimeAdmission,recorded_by:this.principal,recorded_at:iso()})};
       }
       case'waiver.record':{
         const data=validateWaiver(input),candidate=this.get(data.candidate_id,'candidate'),verification=this.get(data.verification_id,'verification');

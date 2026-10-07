@@ -97,6 +97,7 @@ class HostFixture:
             "binary",
             "launchwright-runtime",
             "launchwright-data",
+            "verification-receipts",
             "project-graph-fixture",
         ):
             path = self.root / name
@@ -224,6 +225,7 @@ class HostFixture:
             "mounts": [
                 {"root": "launchwright-runtime", "read_only": True, "execute": False},
                 {"root": "launchwright-data", "read_only": False, "execute": False},
+                {"root": "verification-receipts", "read_only": True, "execute": False},
             ],
             "tools": [
                 {
@@ -271,6 +273,7 @@ class HostFixture:
         grants = [
             ("launchwright-runtime", self.paths["launchwright-runtime"], False),
             ("launchwright-data", self.paths["launchwright-data"], True),
+            ("verification-receipts", self.paths["verification-receipts"], False),
             ("launchwright-node", self.node, False),
             ("project-graph-fixture", self.paths["project-graph-fixture"], False),
         ]

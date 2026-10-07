@@ -619,7 +619,11 @@ fn operation(spec: Operation) -> OperationContract {
     }
 }
 
-fn bridge(file: &str, sha: Option<&str>) -> Result<Arc<NodeBridge>> {
+fn bridge_with_output(
+    file: &str,
+    sha: Option<&str>,
+    output_mount: Option<&str>,
+) -> Result<Arc<NodeBridge>> {
     let sha=sha.ok_or_else(||semwright_native_sdk::Error::invalid(
         "Build with all LAUNCHWRIGHT_NATIVE_*_BUNDLE_SHA256 values fixed to reviewed bundles; runtime caller pins are forbidden"
     ))?;
@@ -629,16 +633,24 @@ fn bridge(file: &str, sha: Option<&str>) -> Result<Arc<NodeBridge>> {
         bundle_file: file.into(),
         bundle_sha256: sha.into(),
         data_mount: "launchwright-data".into(),
-        output_mount: None,
+        output_mount: output_mount.map(str::to_owned),
         timeout: Duration::from_secs(8),
     })
+}
+
+fn bridge(file: &str, sha: Option<&str>) -> Result<Arc<NodeBridge>> {
+    bridge_with_output(file, sha, None)
 }
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<()> {
     let core = bridge("launchwright-core.cjs", CORE_BUNDLE)?;
     let production = bridge("launchwright-production.cjs", PRODUCTION_BUNDLE)?;
-    let review = bridge("launchwright-review.cjs", REVIEW_BUNDLE)?;
+    let review = bridge_with_output(
+        "launchwright-review.cjs",
+        REVIEW_BUNDLE,
+        Some("verification-receipts"),
+    )?;
     let integrations = bridge("launchwright-integrations.cjs", INTEGRATIONS_BUNDLE)?;
     let extensions = bridge("launchwright-extensions.cjs", EXTENSIONS_BUNDLE)?;
     let work = bridge("launchwright-work.cjs", WORK_BUNDLE)?;

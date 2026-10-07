@@ -10,7 +10,7 @@ const semwrightSha='4d291de26724810017ce7b6d185326514cb79fa6';
 
 test('R19 Host lane stays pinned to the canonical Semwright source lock',()=>{
   assert.equal(lock.native_sdk.sha,semwrightSha);
-  assert.match(workflow,/options: \[all, native, host, browser,/u);
+  assert.match(workflow,/options: \[all, native, host, verifier, browser,/u);
   assert.match(workflow,new RegExp('SEMWRIGHT_SHA: '+semwrightSha,'u'));
   assert.match(workflow,/SEMWRIGHT_TEST_DRIVER_SANDBOX: '1'/u);
   assert.match(workflow,/SEMWRIGHT_TEST_SANDBOX_HELPER:/u);

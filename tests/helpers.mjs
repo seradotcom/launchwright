@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { LaunchwrightApplication, execute } from '../src/application.mjs';
@@ -13,11 +13,13 @@ process.once('exit',()=>{
 export function setup(t,options={}){
   const root=mkdtempSync(join(tmpdir(),'launchwright-test-'));
   temporaryRoots.add(root);
-  const app=new LaunchwrightApplication(root,{initialize:true,...options});
+  const verificationReceiptRoot=options.verificationReceiptRoot??join(root,'verification-receipts');
+  mkdirSync(verificationReceiptRoot,{recursive:true});
+  const app=new LaunchwrightApplication(root,{initialize:true,...options,verificationReceiptRoot});
   // Node's test after hooks are FIFO. Close the primary handle here, but remove the
   // directory only at process exit so later-registered secondary SQLite handles can close.
   t.after(()=>{try{app.close();}catch{}});
-  return{app,root};
+  return{app,root,verificationReceiptRoot};
 }
 export async function baseline(app){
  const create=async(kind,data)=>(await execute(app,'entity.create',{kind,data})).entity;

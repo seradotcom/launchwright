@@ -89,7 +89,7 @@ export function validateCapture(raw) {
 export function validateVerification(raw) {
   validateValue(raw); noSecrets(raw); const d=structuredClone(raw);
   object(d,
-    ['candidate_id','dimension','state','verifier','artifact_ids','target_id','coverage','omissions','findings','observed_at'],
+    ['candidate_id','dimension','state','verifier','artifact_ids','target_id','coverage','omissions','findings','observed_at','runtime_receipt'],
     ['candidate_id','dimension','state','verifier','artifact_ids','coverage','omissions','findings','observed_at']);
   idText(d.candidate_id); if(d.target_id) idText(d.target_id);
   choice(d.dimension,['format','semantic','editorial','privacy','rights','accessibility','product-evidence','permissions']);
@@ -98,6 +98,12 @@ export function validateVerification(raw) {
   str(d.verifier.id,160); str(d.verifier.version,96); sha(d.verifier.digest);
   choice(d.verifier.authority,['canonical','independent','human','heuristic']);
   if(d.verifier.model!==undefined) str(d.verifier.model,160);
+  if(d.runtime_receipt!==undefined){
+    object(d.runtime_receipt,['file','sha256'],['file','sha256']);
+    str(d.runtime_receipt.file,160); sha(d.runtime_receipt.sha256);
+  }
+  ensure(d.verifier.authority!=='canonical'||d.runtime_receipt!==undefined,'Canonical verification requires a pinned Driver Host receipt');
+  ensure(d.verifier.authority==='canonical'||d.runtime_receipt===undefined,'Only canonical verification may attach a Driver Host admission receipt');
   array(d.artifact_ids,128).forEach(idText);
   object(d.coverage,['checked','total','notes'],['checked','total']);
   integer(d.coverage.checked,0,1000000); integer(d.coverage.total,0,1000000);
