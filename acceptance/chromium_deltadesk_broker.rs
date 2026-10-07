@@ -11,12 +11,11 @@ use semwright_core::{Approval, Approver, Broker, NoApprover, audit::Audit};
 use semwright_policy::{Policy, PolicyConfig, Profile};
 use semwright_types::{Envelope, ErrorCode, ExecuteRequest, Result as SemwrightResult, unique_id};
 use serde_json::{Value, json};
-use sha2::{Digest, Sha256};
 use std::{
     collections::BTreeSet,
     fs,
-    io::Read,
     path::{Path, PathBuf},
+    process::Command,
     sync::{Arc, Mutex},
     time::Duration,
 };
@@ -29,17 +28,27 @@ fn failure(message: impl Into<String>) -> Box<dyn std::error::Error + Send + Syn
 }
 
 fn file_sha256(path: &Path) -> TestResult<String> {
-    let mut file = fs::File::open(path)?;
-    let mut hash = Sha256::new();
-    let mut buffer = [0u8; 64 * 1024];
-    loop {
-        let count = file.read(&mut buffer)?;
-        if count == 0 {
-            break;
-        }
-        hash.update(&buffer[..count]);
+    let output = Command::new("sha256sum").arg("--").arg(path).output()?;
+    if !output.status.success() {
+        return Err(failure(format!(
+            "sha256sum failed for {}: {}",
+            path.display(),
+            String::from_utf8_lossy(&output.stderr)
+        )));
     }
-    Ok(hex::encode(hash.finalize()))
+    let stdout = String::from_utf8(output.stdout)?;
+    let digest = stdout
+        .split_whitespace()
+        .next()
+        .ok_or_else(|| failure("sha256sum returned no digest"))?;
+    if digest.len() != 64
+        || !digest
+            .bytes()
+            .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
+    {
+        return Err(failure("sha256sum returned a non-canonical digest"));
+    }
+    Ok(digest.to_owned())
 }
 
 #[derive(Default)]
