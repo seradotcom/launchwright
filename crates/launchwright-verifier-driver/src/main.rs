@@ -178,7 +178,13 @@ fn format_finding(code: &str, severity: &str, message: &str, resource_id: &str) 
 }
 
 fn inspect_format(mime: &str, bytes: &[u8], resource_id: &str, findings: &mut Vec<Value>) {
-    match mime {
+    let media_type = mime
+        .split(';')
+        .next()
+        .unwrap_or_default()
+        .trim()
+        .to_ascii_lowercase();
+    match media_type.as_str() {
         "text/markdown" | "text/plain" | "text/html" | "text/vtt" => {
             let Ok(text) = std::str::from_utf8(bytes) else {
                 findings.push(format_finding(
@@ -197,7 +203,7 @@ fn inspect_format(mime: &str, bytes: &[u8], resource_id: &str, findings: &mut Ve
                     resource_id,
                 ));
             }
-            if mime == "text/vtt" && !text.trim_start().starts_with("WEBVTT") {
+            if media_type == "text/vtt" && !text.trim_start().starts_with("WEBVTT") {
                 findings.push(format_finding(
                     "FORMAT_WEBVTT_HEADER",
                     "error",
@@ -439,5 +445,48 @@ async fn main() {
     if let Err(error) = serve(LaunchwrightVerifier).await {
         eprintln!("{error}");
         std::process::exit(error.exit_code());
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn text_media_type_parameters_are_accepted() {
+        let mut findings = Vec::new();
+        inspect_format(
+            "text/markdown; charset=utf-8",
+            b"# Release\n\nOwned verifier fixture.\n",
+            "artifact-1",
+            &mut findings,
+        );
+        assert!(findings.is_empty());
+    }
+
+    #[test]
+    fn vtt_media_type_parameters_still_require_header() {
+        let mut findings = Vec::new();
+        inspect_format(
+            "text/vtt; charset=UTF-8",
+            b"not a vtt",
+            "artifact-2",
+            &mut findings,
+        );
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0]["code"], "FORMAT_WEBVTT_HEADER");
+    }
+
+    #[test]
+    fn unsupported_media_type_still_fails_closed() {
+        let mut findings = Vec::new();
+        inspect_format(
+            "application/octet-stream; name=opaque.bin",
+            b"opaque",
+            "artifact-3",
+            &mut findings,
+        );
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0]["code"], "FORMAT_UNSUPPORTED_MIME");
     }
 }

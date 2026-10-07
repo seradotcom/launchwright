@@ -16,6 +16,7 @@ test('R26 verifier lane is exact-SHA and uses real Driver Host plus Native SDK',
   assert.equal(lock.native_sdk.sha,semwrightSha);
   assert.match(workflow,/inputs\.lane == 'all' \|\| inputs\.lane == 'verifier'/u);
   assert.match(workflow,new RegExp('SEMWRIGHT_SHA: '+semwrightSha,'u'));
+  assert.match(workflow,/cargo test -p launchwright-verifier-driver/u);
   assert.match(workflow,/cargo build -p launchwright-native -p launchwright-verifier-driver/u);
   assert.match(workflow,/verify-verifier-runtime\.py/u);
   assert.match(workflow,/SEMWRIGHT_TEST_DRIVER_SANDBOX: '1'/u);
