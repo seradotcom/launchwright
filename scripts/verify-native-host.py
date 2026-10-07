@@ -30,6 +30,11 @@ LAUNCHWRIGHT_DRIVER = Path(os.environ["LAUNCHWRIGHT_NATIVE_BINARY"]).resolve()
 BUNDLE_MANIFEST = ROOT / "dist" / "native-bundle.json"
 SEMWRIGHT_BINS = SEMWRIGHT / "target" / "debug"
 EVIDENCE = ROOT / "evidence" / "native-host"
+# Two independently scoped Node tools are each digest-verified and sealed by Driver Host.
+# GitHub-hosted runners can spend more than 20s materializing the Node executables
+# before the daemon publishes its owner socket. This budget covers bootstrap only;
+# request/tool execution timeouts remain unchanged.
+DAEMON_START_TIMEOUT_SECONDS = 60
 RESOURCE = "launchwright:workspace"
 
 
@@ -343,7 +348,7 @@ class HostFixture:
             stderr=self.log,
             start_new_session=True,
         )
-        deadline = time.monotonic() + 20
+        deadline = time.monotonic() + DAEMON_START_TIMEOUT_SECONDS
         while time.monotonic() < deadline:
             if self.process.poll() is not None:
                 self.log.flush()
