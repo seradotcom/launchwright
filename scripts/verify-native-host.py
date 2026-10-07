@@ -146,6 +146,7 @@ class HostFixture:
             "core",
             "production",
             "review",
+            "verifier",
             "integrations",
             "extensions",
             "work",

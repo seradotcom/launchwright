@@ -2,6 +2,7 @@
 import { CORE_NATIVE_OPERATIONS } from './native-core-app.mjs';
 import { PRODUCTION_NATIVE_OPERATIONS } from './native-production-app.mjs';
 import { REVIEW_NATIVE_OPERATIONS } from './native-review-app.mjs';
+import { VERIFIER_NATIVE_OPERATIONS } from './native-verifier-app.mjs';
 import { INTEGRATIONS_NATIVE_OPERATIONS } from './native-integrations-app.mjs';
 import { EXTENSIONS_NATIVE_OPERATIONS } from './native-extensions-app.mjs';
 import { WORK_NATIVE_OPERATIONS } from './native-work-app.mjs';
@@ -14,6 +15,7 @@ export const NATIVE_PROFILES=Object.freeze({
   core:Object.freeze({entry:'src/native-core-entry.mjs',file:'launchwright-core.cjs',operations:CORE_NATIVE_OPERATIONS}),
   production:Object.freeze({entry:'src/native-production-entry.mjs',file:'launchwright-production.cjs',operations:PRODUCTION_NATIVE_OPERATIONS}),
   review:Object.freeze({entry:'src/native-review-entry.mjs',file:'launchwright-review.cjs',operations:REVIEW_NATIVE_OPERATIONS}),
+  verifier:Object.freeze({entry:'src/native-verifier-entry.mjs',file:'launchwright-verifier.cjs',operations:VERIFIER_NATIVE_OPERATIONS}),
   integrations:Object.freeze({entry:'src/native-integrations-entry.mjs',file:'launchwright-integrations.cjs',operations:INTEGRATIONS_NATIVE_OPERATIONS}),
   extensions:Object.freeze({entry:'src/native-extensions-entry.mjs',file:'launchwright-extensions.cjs',operations:EXTENSIONS_NATIVE_OPERATIONS}),
   work:Object.freeze({entry:'src/native-work-entry.mjs',file:'launchwright-work.cjs',operations:WORK_NATIVE_OPERATIONS}),

@@ -4,20 +4,19 @@ import { NativeError, requireCondition as ensure, sameVersion } from '@semwright
 import { NativeProfileApplication } from './native-profile-base.mjs';
 import { inputObject, sha, choice, lines } from './contracts.mjs';
 import { iso } from './base.mjs';
-import { validateVerification, validateWaiver, validateChannelPackage } from './records.mjs';
+import { validateWaiver, validateChannelPackage } from './records.mjs';
 import { claimCheck } from './claim-check.mjs';
 import { freezeCandidate, buildCandidateGates, inspectCandidateState, recordCandidateReview, assertPrivateDeliveryReady, assertChannelPinned, assertPartialDeliveryPolicy } from './candidate.mjs';
-import { admitCanonicalVerifierRuntime } from './verification-runtime.mjs';
 
 export const REVIEW_NATIVE_READS=Object.freeze(['candidate.inspect','verification.summary']);
 export const REVIEW_NATIVE_MUTATIONS=Object.freeze([
-  'verification.record','waiver.record','candidate.freeze','candidate.review',
+  'waiver.record','candidate.freeze','candidate.review',
   'candidate.deliver_private','channel.package'
 ]);
 export const REVIEW_NATIVE_OPERATIONS=Object.freeze([...REVIEW_NATIVE_READS,...REVIEW_NATIVE_MUTATIONS]);
 
 export class ReviewNativeApplication extends NativeProfileApplication {
-  constructor(root,options={}){super(root,{...options,readOperations:REVIEW_NATIVE_READS,operations:REVIEW_NATIVE_OPERATIONS});this.verificationReceiptRoot=options.verificationReceiptRoot??null;}
+  constructor(root,options={}){super(root,{...options,readOperations:REVIEW_NATIVE_READS,operations:REVIEW_NATIVE_OPERATIONS});}
   claimCheck(claim){return claimCheck(this,claim);}
   verificationSummary(candidateId){
     const candidate=this.get(candidateId,'candidate');
@@ -42,15 +41,6 @@ export class ReviewNativeApplication extends NativeProfileApplication {
   }
   mutate(operation,input){
     switch(operation){
-      case'verification.record':{
-        const data=validateVerification(input),candidate=this.get(data.candidate_id,'candidate');
-        const artifactSet=new Set(candidate.data.manifest.artifact_ids);
-        for(const id of data.artifact_ids)ensure(artifactSet.has(id),'Verification artifact is outside candidate','PermissionDenied');
-        if(data.target_id){const target=this.get(data.target_id,'target');ensure(target.data.release_id===candidate.data.release_id,'Verification target belongs to another release','PermissionDenied');}
-        const runtimeAdmission=data.verifier.authority==='canonical'?admitCanonicalVerifierRuntime(this,candidate,data):null;
-        const admission=data.verifier.authority==='canonical'?'canonical-owner-admitted':data.verifier.authority==='heuristic'?'heuristic-report':'local-review-record';
-        return{entity:this.store.create('verification',{release_id:candidate.data.release_id,name:data.dimension+' verification',...data,admission,runtime_admission:runtimeAdmission,recorded_by:this.principal,recorded_at:iso()})};
-      }
       case'waiver.record':{
         const data=validateWaiver(input),candidate=this.get(data.candidate_id,'candidate'),verification=this.get(data.verification_id,'verification');
         ensure(verification.data.candidate_id===candidate.id&&verification.data.release_id===candidate.data.release_id,'Waiver verification belongs to another candidate','PermissionDenied');

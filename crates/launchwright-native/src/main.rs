@@ -15,6 +15,7 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 const CORE_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_CORE_BUNDLE_SHA256");
 const PRODUCTION_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_PRODUCTION_BUNDLE_SHA256");
 const REVIEW_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_REVIEW_BUNDLE_SHA256");
+const VERIFIER_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_VERIFIER_BUNDLE_SHA256");
 const INTEGRATIONS_BUNDLE: Option<&str> =
     option_env!("LAUNCHWRIGHT_NATIVE_INTEGRATIONS_BUNDLE_SHA256");
 const EXTENSIONS_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_EXTENSIONS_BUNDLE_SHA256");
@@ -29,6 +30,7 @@ enum Profile {
     Core,
     Production,
     Review,
+    Verifier,
     Integrations,
     Extensions,
     Work,
@@ -248,7 +250,7 @@ const OPERATIONS: &[Operation] = &[
         suffix: "verification-record",
         read: false,
         consent: false,
-        profile: Profile::Review,
+        profile: Profile::Verifier,
     },
     Operation {
         suffix: "waiver-record",
@@ -646,9 +648,10 @@ fn bridge(file: &str, sha: Option<&str>) -> Result<Arc<NodeBridge>> {
 async fn main() -> Result<()> {
     let core = bridge("launchwright-core.cjs", CORE_BUNDLE)?;
     let production = bridge("launchwright-production.cjs", PRODUCTION_BUNDLE)?;
-    let review = bridge_with_output(
-        "launchwright-review.cjs",
-        REVIEW_BUNDLE,
+    let review = bridge("launchwright-review.cjs", REVIEW_BUNDLE)?;
+    let verifier = bridge_with_output(
+        "launchwright-verifier.cjs",
+        VERIFIER_BUNDLE,
         Some("verification-receipts"),
     )?;
     let integrations = bridge("launchwright-integrations.cjs", INTEGRATIONS_BUNDLE)?;
@@ -669,6 +672,7 @@ async fn main() -> Result<()> {
             Profile::Core => core.clone(),
             Profile::Production => production.clone(),
             Profile::Review => review.clone(),
+            Profile::Verifier => verifier.clone(),
             Profile::Integrations => integrations.clone(),
             Profile::Extensions => extensions.clone(),
             Profile::Work => work.clone(),
@@ -700,7 +704,7 @@ mod tests {
         for spec in OPERATIONS {
             assert!(names.insert(spec.suffix));
         }
-        assert_eq!(names.len(), 84);
+        assert_eq!(names.len(), 86);
     }
     #[test]
     fn profile_partition_counts_are_stable() {
@@ -710,8 +714,9 @@ mod tests {
         }
         assert_eq!(counts.get(&Profile::Core), Some(&13));
         assert_eq!(counts.get(&Profile::Production), Some(&6));
-        assert_eq!(counts.get(&Profile::Review), Some(&8));
-        assert_eq!(counts.get(&Profile::Integrations), Some(&7));
+        assert_eq!(counts.get(&Profile::Review), Some(&7));
+        assert_eq!(counts.get(&Profile::Verifier), Some(&1));
+        assert_eq!(counts.get(&Profile::Integrations), Some(&9));
         assert_eq!(counts.get(&Profile::Extensions), Some(&13));
         assert_eq!(counts.get(&Profile::Work), Some(&11));
         assert_eq!(counts.get(&Profile::Media), Some(&5));
