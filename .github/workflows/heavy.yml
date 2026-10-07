@@ -295,22 +295,11 @@ jobs:
           LAUNCHWRIGHT_EVIDENCE_DIR: ${{ github.workspace }}/evidence/deltadesk
         run: |
           set -euo pipefail
-          cp acceptance/chromium_deltadesk_broker.rs .ci-semwright/crates/core/tests/launchwright_deltadesk_broker.rs
-          python3 - <<'PY'
-          from pathlib import Path
-          path=Path('.ci-semwright/crates/core/Cargo.toml')
-          text=path.read_text()
-          marker='[dev-dependencies]\n'
-          addition='semwright-adapters.workspace = true\n'
-          if addition not in text:
-              if marker not in text:
-                  raise SystemExit('Semwright core dev-dependencies marker missing')
-              text=text.replace(marker,marker+addition,1)
-              path.write_text(text)
-          PY
+          mkdir -p .ci-semwright/crates/daemon/tests
+          cp acceptance/chromium_deltadesk_broker.rs .ci-semwright/crates/daemon/tests/launchwright_deltadesk_broker.rs
           (
             cd .ci-semwright
-            cargo test --locked -p semwright-core --test launchwright_deltadesk_broker \
+            cargo test --locked -p semwright-daemon --test launchwright_deltadesk_broker \
               real_semwright_broker_policy_captures_deltadesk_a_and_b \
               -- --ignored --exact --nocapture
           ) 2>&1 | tee evidence/deltadesk/semwright-browser-broker.log

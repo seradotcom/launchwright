@@ -37,12 +37,12 @@ test('R23 fixture approver is bounded to sensitive browser acceptance only',()=>
 });
 
 test('R23 heavy lane builds against exact pinned Semwright without changing product source',()=>{
-  assert.ok(workflow.includes('cp acceptance/chromium_deltadesk_broker.rs .ci-semwright/crates/core/tests/launchwright_deltadesk_broker.rs'));
-  assert.ok(workflow.includes('semwright-adapters.workspace = true'));
-  assert.ok(workflow.includes('cargo test --locked -p semwright-core --test launchwright_deltadesk_broker'));
+  assert.ok(workflow.includes('cp acceptance/chromium_deltadesk_broker.rs .ci-semwright/crates/daemon/tests/launchwright_deltadesk_broker.rs'));
+  assert.ok(workflow.includes('cargo test --locked -p semwright-daemon --test launchwright_deltadesk_broker'));
+  assert.ok(!workflow.includes('semwright-adapters.workspace = true'),'R23 must not mutate the pinned Semwright manifest/lock');
   assert.ok(workflow.includes('REAL_DELTADESK_BROKER_ACCEPTANCE_PASS'));
   assert.ok(workflow.includes('semwright-deltadesk-broker.json'));
-  assert.ok(!workflow.includes('cargo test --release -p semwright-core --test launchwright_deltadesk_broker'));
+  assert.ok(!workflow.includes('cargo test --release -p semwright-daemon --test launchwright_deltadesk_broker'));
 });
 
 test('R23 ingestion preserves Broker evidence without manufacturing canonical capture PASS',()=>{
