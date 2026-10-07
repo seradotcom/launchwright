@@ -37,3 +37,19 @@ test('R19 evidence cannot promote Host acceptance into external Platform authori
   assert.match(harness,/"chatgpt_host_acceptance": False/u);
   assert.match(harness,/"public_channel_acceptance": False/u);
 });
+
+test('R20 Host harness exercises extension lifecycle without promoting external fixture execution',()=>{
+  assert.match(harness,/class HostClient/u);
+  assert.match(harness,/extension_lifecycle_flow/u);
+  assert.match(harness,/extension-register/u);
+  assert.match(harness,/extension-prepare_use/u);
+  assert.match(harness,/extension-result_record/u);
+  assert.match(harness,/source-cli_ingest/u);
+  assert.match(harness,/compatibility-lock/u);
+  assert.match(harness,/compatibility-negotiate/u);
+  assert.match(harness,/"control_plane_driver_host_admitted": True/u);
+  assert.match(harness,/"fixture_process_driver_host_isolated": False/u);
+  assert.match(harness,/"technical_state_promoted": False/u);
+  assert.match(harness,/"extension_control_plane_driver_host_accepted": True/u);
+  assert.match(harness,/"extension_fixture_execution_host_isolation_accepted": False/u);
+});

@@ -52,9 +52,9 @@ Synthetic data is never described as a real product capture.
 - portable snapshot/restore v2 that preserves exact stored revision history, rotates workspace generation/request epoch, suspends uncertain intents, and accepts older snapshots without fabricating historical revisions;
 - read-only `doctor` diagnostics plus a clean-room operator rehearsal that checks the pinned Native SDK, local state safety and portable restore without inheriting author secrets or machine paths;
 - application-side usage reservations and idempotent usage receipts, with measured/estimated/BYO separation, auditable corrections, explicit overrun visibility and test-only billing callbacks; these records are projections and never claim Platform billing authority;
-- bounded extension runtime receipts for owner-controlled renderer/importer fixtures, with exact preparation pins, rights checks, output budgets, retirement-aware freshness and explicit UNKNOWN technical state until canonical Host admission.
+- bounded extension runtime receipts for owner-controlled renderer/importer fixtures, with exact preparation pins, rights checks, output budgets, retirement-aware freshness and explicit UNKNOWN technical state; R20 admits the extension **control plane** through canonical Driver Host without falsely claiming the separately executed fixture processes themselves are Host-isolated or technical PASS.
 - public HTTP client, browser UI, CLI and Native Application bridge sharing the same dispatcher and SQLite transaction model.
-- selective exact-SHA Driver Host acceptance that runs the real Launchwright NativeDriver through Semwright daemon/Broker/Policy, a sealed Node runtime and owner-pinned NodeBridge bundles; this establishes the local Host boundary only and does not promote external Platform/Publish/ChatGPT authority.
+- selective exact-SHA Driver Host acceptance that runs the real Launchwright NativeDriver through Semwright daemon/Broker/Policy, a sealed Node runtime and owner-pinned NodeBridge bundles; the R20 lane additionally exercises extension discovery, result custody, compatibility negotiation and retirement through that path while keeping external fixture execution outside Host authority. This establishes the local Host boundary only and does not promote external Platform/Publish/ChatGPT authority.
 
 ## Semwright Native SDK
 
