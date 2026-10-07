@@ -30,3 +30,6 @@ private-support/
 .ci-tools/
 evidence/browser/*.png
 evidence/browser/*.zip
+
+__pycache__/
+*.pyc
