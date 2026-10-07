@@ -39,7 +39,8 @@ const semwrightSha=gitHead(semwrightRoot);
 assert.equal(semwrightSha,expectedSemwrightSha,'Semwright checkout differs from Launchwright SOURCE_LOCK');
 const browserSha=await fileSha(chromiumBin);
 const receipt=JSON.parse(readFileSync(receiptPath,'utf8'));
-assert.equal(receipt.schema_version,'launchwright-deltadesk-browser-driver/1');
+const brokered=receipt.schema_version==='launchwright-deltadesk-browser-broker/1';
+assert.ok(brokered||receipt.schema_version==='launchwright-deltadesk-browser-driver/1','Unexpected DeltaDesk browser receipt schema');
 assert.equal(receipt.semwright_sha,semwrightSha,'Driver receipt references another Semwright SHA');
 assert.equal(receipt.provider,'chromium');
 assert.equal(receipt.browser_executable_sha256,browserSha,'Driver receipt browser digest differs from executable bytes');
@@ -47,6 +48,17 @@ assert.equal(receipt.real_semwright_adapter,true);
 assert.equal(receipt.agent_javascript,false);
 assert.equal(receipt.raw_cdp_exposed,false);
 assert.equal(receipt.platform_job_receipt,false,'This lane must not fabricate a Platform receipt');
+if(brokered){
+  assert.equal(receipt.broker_policy_path_observed,true,'R23 must traverse the real Broker + Policy path');
+  assert.equal(receipt.fixture_approver,true,'R23 CI approval must remain explicitly fixture-scoped');
+  assert.deepEqual(receipt.fixture_approvals,['browser.launch','browser.screenshot','browser.screenshot']);
+  assert.equal(receipt.human_operator_approval,false,'Fixture approval must not be described as human approval');
+  assert.equal(receipt.driver_host_isolation,false,'Chromium backend evidence must not claim Driver Host isolation');
+  assert.equal(receipt.platform_execution_authority,false,'Browser Broker evidence must not invent Platform authority');
+  assert.equal(receipt.owned_artifact_cleanup_verified,true);
+  assert.equal(receipt.negative_controls?.missing_browser_modify_denied,true);
+  assert.equal(receipt.negative_controls?.forbidden_origin_denied,true);
+}
 assert.equal(receipt.oracle.checkout_cta_changed,true);
 assert.equal(receipt.oracle.basic_operator_availability_changed,true);
 assert.equal(receipt.oracle.pro_operator_availability_preserved,true);
@@ -85,7 +97,7 @@ try{
       locator:`${receipt.origin}/build-${key}/login`,
       build:build.id,
       coverage:'declared',
-      purpose:'Owned Semwright Chromium adapter acceptance on synthetic release fixture',
+      purpose:brokered?'Owned Semwright Chromium Broker/Policy acceptance on synthetic release fixture':'Owned Semwright Chromium adapter acceptance on synthetic release fixture',
       approval:'approved'
     });
     const target=await create('target',{
@@ -141,8 +153,9 @@ try{
         state:'UNKNOWN',
         checks:[
           {name:'semwright-adapter-execution',state:'PASS',detail:'Exact pinned Chromium adapter completed the semantic oracle.'},
-          {name:'platform-job-correlation',state:'UNKNOWN',detail:'Direct CI adapter acceptance intentionally has no Platform job receipt.'},
-          {name:'driver-host-isolation',state:'UNKNOWN',detail:'This acceptance does not establish canonical Driver Host isolation.'}
+          {name:'broker-policy-routing',state:brokered?'PASS':'UNKNOWN',detail:brokered?'Exact pinned Chromium execution traversed Semwright Broker + Policy with fail-closed controls.':'Legacy direct-adapter evidence does not establish Broker routing.'},
+          {name:'platform-job-correlation',state:'UNKNOWN',detail:'CI browser acceptance intentionally has no Platform job receipt.'},
+          {name:'driver-host-isolation',state:'UNKNOWN',detail:'Chromium is a Semwright backend; this acceptance does not claim Driver Host isolation.'}
         ]
       },
       anchors:[],
@@ -153,7 +166,7 @@ try{
         {kind:'semantic-oracle',key:'checkout-cta',value:row.checkout_cta,source:'imported'},
         {kind:'semantic-oracle',key:'basic-operator-export',value:row.basic_operator_export,source:'imported'},
         {kind:'screenshot-sha256',key:row.screenshot.file,value:row.screenshot.sha256,source:'imported'},
-        {kind:'driver-receipt-sha256',key:'semwright-deltadesk-driver',value:receiptSha,source:'imported'}
+        {kind:'driver-receipt-sha256',key:brokered?'semwright-deltadesk-broker':'semwright-deltadesk-driver',value:receiptSha,source:'imported'}
       ]
     })).entity;
     assert.equal(stored.data.capture_contract,'launchwright-capture/2');
@@ -174,7 +187,7 @@ try{
   }
 
   const evidence={
-    schema_version:'launchwright-deltadesk-browser-acceptance/2',
+    schema_version:'launchwright-deltadesk-browser-acceptance/3',
     launchwright_sha:process.env.GITHUB_SHA??null,
     semwright_sha:semwrightSha,
     native_sdk:expectedSdkVersion,
@@ -189,11 +202,14 @@ try{
     launchwright_capture_records:admitted,
     cross_system_real_browser:true,
     semantic_provider_execution:true,
+    broker_policy_path_observed:brokered,
+    fixture_approval_only:brokered,
+    human_operator_approval_admitted:false,
     platform_receipt_admitted:false,
     canonical_capture_admitted:false,
     driver_host_isolation_accepted:false,
     technical_pass_claimed:false,
-    note:'Real DeltaDesk A/B browser execution is preserved in launchwright-capture/2 as IMPORTED_UNVERIFIED. No Platform job receipt, canonical capture admission, Driver Host isolation, or technical PASS is fabricated.'
+    note:brokered?'Real DeltaDesk A/B Chromium execution traversed Semwright Broker + Policy with fixture-scoped sensitive-action approval and fail-closed negative controls. It remains IMPORTED_UNVERIFIED: no human-operator approval, Platform job receipt, canonical capture admission, Driver Host isolation, or technical PASS is fabricated.':'Legacy real-adapter evidence remains IMPORTED_UNVERIFIED without Broker/Platform authority.'
   };
   mkdirSync('evidence/deltadesk',{recursive:true});
   writeFileSync('evidence/deltadesk/launchwright-deltadesk-browser-acceptance.json',JSON.stringify(evidence,null,2)+'\n');
