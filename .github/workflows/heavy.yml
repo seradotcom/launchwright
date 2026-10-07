@@ -508,6 +508,7 @@ jobs:
           python3 scripts/prepare-composition-single-recipe.py \
             .ci-semwright/crates/av-composition/tests/combined_native.rs \
             .ci-semwright/crates/av-composition/tests/launchwright_deltadesk_single_recipe.rs
+          rustup run 1.98.1 rustfmt --edition 2024 .ci-semwright/crates/av-composition/tests/launchwright_deltadesk_single_recipe.rs
           rustup run 1.98.1 rustfmt --edition 2024 --check .ci-semwright/crates/av-composition/tests/launchwright_deltadesk_single_recipe.rs
           sha256sum \
             .ci-semwright/crates/av-composition/tests/combined_native.rs \
