@@ -104,6 +104,7 @@ class HostFixture:
             "launchwright-data",
             "verification-receipts",
             "extension-receipts",
+            "effects-receipts",
             "project-graph-fixture",
         ):
             path = self.root / name
@@ -156,6 +157,7 @@ class HostFixture:
             "integrations",
             "extensions",
             "extension_runtime",
+            "effects_runtime",
             "work",
             "media",
             "publish",
@@ -188,6 +190,10 @@ class HostFixture:
         shutil.copyfile(source_node, extension_node)
         extension_node.chmod(0o500)
         self.extension_node = extension_node
+        effects_node = self.paths["binary"] / "node-effects-runtime"
+        shutil.copyfile(source_node, effects_node)
+        effects_node.chmod(0o500)
+        self.effects_node = effects_node
 
     def _provision_workspace(self) -> None:
         result = subprocess.run(
@@ -243,6 +249,7 @@ class HostFixture:
                 {"root": "launchwright-data", "read_only": False, "execute": False},
                 {"root": "verification-receipts", "read_only": True, "execute": False},
                 {"root": "extension-receipts", "read_only": True, "execute": False},
+                {"root": "effects-receipts", "read_only": True, "execute": False},
             ],
             "tools": [
                 {
@@ -262,6 +269,12 @@ class HostFixture:
                     "name": "node-extension-runtime",
                     "sha256": sha256(self.extension_node),
                     "mounts": ["launchwright-data", "extension-receipts"],
+                },
+                {
+                    "root": "launchwright-effects-runtime-node",
+                    "name": "node-effects-runtime",
+                    "sha256": sha256(self.effects_node),
+                    "mounts": ["launchwright-data", "effects-receipts"],
                 },
             ],
             "resources": {
@@ -304,9 +317,11 @@ class HostFixture:
             ("launchwright-data", self.paths["launchwright-data"], True),
             ("verification-receipts", self.paths["verification-receipts"], False),
             ("extension-receipts", self.paths["extension-receipts"], False),
+            ("effects-receipts", self.paths["effects-receipts"], False),
             ("launchwright-node", self.node, False),
             ("launchwright-verifier-node", self.verifier_node, False),
             ("launchwright-extension-runtime-node", self.extension_node, False),
+            ("launchwright-effects-runtime-node", self.effects_node, False),
             ("project-graph-fixture", self.paths["project-graph-fixture"], False),
         ]
         for name, path, writable in grants:
@@ -328,6 +343,7 @@ class HostFixture:
                 "node_runtime": sha256(self.node),
                 "verifier_node_runtime": sha256(self.verifier_node),
                 "extension_node_runtime": sha256(self.extension_node),
+                "effects_node_runtime": sha256(self.effects_node),
                 "semwright_cli": sha256(require_binary("semwright")),
                 "semwright_daemon": sha256(require_binary("semwrightd")),
                 "semwright_sandbox": sha256(require_binary("semwright-sandbox")),

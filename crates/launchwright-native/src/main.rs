@@ -26,6 +26,8 @@ const MEDIA_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_MEDIA_BUNDLE
 const PUBLISH_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_PUBLISH_BUNDLE_SHA256");
 const GRAPH_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_GRAPH_BUNDLE_SHA256");
 const EFFECTS_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_EFFECTS_BUNDLE_SHA256");
+const EFFECTS_RUNTIME_BUNDLE: Option<&str> =
+    option_env!("LAUNCHWRIGHT_NATIVE_EFFECTS_RUNTIME_BUNDLE_SHA256");
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd)]
 enum Profile {
@@ -41,6 +43,7 @@ enum Profile {
     Publish,
     Graph,
     Effects,
+    EffectsRuntime,
 }
 #[derive(Clone, Copy)]
 struct Operation {
@@ -211,7 +214,7 @@ const OPERATIONS: &[Operation] = &[
         suffix: "effects-record",
         read: false,
         consent: false,
-        profile: Profile::Effects,
+        profile: Profile::EffectsRuntime,
     },
     Operation {
         suffix: "evidence-import",
@@ -672,6 +675,12 @@ async fn main() -> Result<()> {
     let publish = bridge("launchwright-publish.cjs", PUBLISH_BUNDLE)?;
     let graph = bridge("launchwright-graph.cjs", GRAPH_BUNDLE)?;
     let effects = bridge("launchwright-effects.cjs", EFFECTS_BUNDLE)?;
+    let effects_runtime = bridge_with_tool(
+        "node-effects-runtime",
+        "launchwright-effects-runtime.cjs",
+        EFFECTS_RUNTIME_BUNDLE,
+        Some("effects-receipts"),
+    )?;
     let mut app = Application::new("launchwright", VERSION)?
         .require_host_tools()
         .with_observer(core.clone())
@@ -692,6 +701,7 @@ async fn main() -> Result<()> {
             Profile::Publish => publish.clone(),
             Profile::Graph => graph.clone(),
             Profile::Effects => effects.clone(),
+            Profile::EffectsRuntime => effects_runtime.clone(),
         };
         app = app.register(contract, provider.operation(name))?;
     }
@@ -735,7 +745,8 @@ mod tests {
         assert_eq!(counts.get(&Profile::Media), Some(&5));
         assert_eq!(counts.get(&Profile::Publish), Some(&10));
         assert_eq!(counts.get(&Profile::Graph), Some(&9));
-        assert_eq!(counts.get(&Profile::Effects), Some(&2));
+        assert_eq!(counts.get(&Profile::Effects), Some(&1));
+        assert_eq!(counts.get(&Profile::EffectsRuntime), Some(&1));
     }
     #[test]
     fn canonical_effects_readback_is_linked_without_execution_authority() {

@@ -34,11 +34,11 @@ test('RS-EFX-01 stored canonical PASS remains UNKNOWN without explicit owner adm
   assert.equal(status.scenario_effects_authority,false);
 });
 
-test('RS-EFX-02 admitted PASS is exact-artifact scoped and revision drift makes it UNKNOWN',async t=>{
-  const{app}=setup(t,{capabilities:{canonical_effect_admission:true}}),b=await baseline(app),{artifact}=await jsonArtifact(app,b);
-  await execute(app,'effects.record',{release_id:b.release.id,artifact_ids:[artifact.id],spec_text:SPEC_TEXT,result_text:resultFor(artifact.data.sha256),admit:true});
+test('RS-EFX-02 unadmitted PASS remains exact-artifact scoped and revision drift stays UNKNOWN',async t=>{
+  const{app}=setup(t),b=await baseline(app),{artifact}=await jsonArtifact(app,b);
+  await execute(app,'effects.record',{release_id:b.release.id,artifact_ids:[artifact.id],spec_text:SPEC_TEXT,result_text:resultFor(artifact.data.sha256)});
   let status=await execute(app,'effects.inspect',{release_id:b.release.id});
-  assert.equal(status.state,'PASS');
+  assert.equal(status.state,'UNKNOWN');
   assert.equal(status.receipts[0].current,true);
   await update(app,b.source,{coverage:'partial'});
   status=await execute(app,'effects.inspect',{release_id:b.release.id});
@@ -47,9 +47,9 @@ test('RS-EFX-02 admitted PASS is exact-artifact scoped and revision drift makes 
   assert.ok(status.receipts[0].drift.some(d=>d.reason==='artifact-input-changed'));
 });
 
-test('RS-EFX-03 canonical FAIL remains a failure when admitted and never grants execution authority',async t=>{
-  const{app}=setup(t,{capabilities:{canonical_effect_admission:true}}),b=await baseline(app),{artifact}=await jsonArtifact(app,b);
-  const receipt=(await execute(app,'effects.record',{release_id:b.release.id,artifact_ids:[artifact.id],spec_text:SPEC_TEXT,result_text:resultFor(artifact.data.sha256,{verdict:'FAIL',status:'completed'}),admit:true})).entity;
+test('RS-EFX-03 canonical FAIL remains fail-closed without granting execution authority',async t=>{
+  const{app}=setup(t),b=await baseline(app),{artifact}=await jsonArtifact(app,b);
+  const receipt=(await execute(app,'effects.record',{release_id:b.release.id,artifact_ids:[artifact.id],spec_text:SPEC_TEXT,result_text:resultFor(artifact.data.sha256,{verdict:'FAIL',status:'completed'})})).entity;
   assert.equal(receipt.data.execution_authority,false);
   const status=await execute(app,'effects.inspect',{release_id:b.release.id});
   assert.equal(status.state,'FAIL');
