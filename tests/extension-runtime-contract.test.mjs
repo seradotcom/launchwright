@@ -8,7 +8,7 @@ const harness=readFileSync(new URL('../scripts/verify-extension-runtime.py',impo
 const driver=readFileSync(new URL('../crates/launchwright-extension-driver/src/main.rs',import.meta.url),'utf8');
 const nativeDriver=readFileSync(new URL('../crates/launchwright-native/src/main.rs',import.meta.url),'utf8');
 const runtime=readFileSync(new URL('../src/extension-runtime.mjs',import.meta.url),'utf8');
-const semwrightSha='8fa191250ae68274182570c65f067f7a60f85625';
+const semwrightSha='d2da9a495a53fe279a1ca4de61f0e24646350f22';
 
 test('R28 extension lane is exact-SHA Driver Host execution with isolated Native admission',()=>{
   assert.match(workflow,/options: \[all, native, host, verifier, extension, browser,/u);

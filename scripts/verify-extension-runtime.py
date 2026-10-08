@@ -161,9 +161,11 @@ class ExtensionFixture(host.HostFixture):
             ("launchwright-data", self.paths["launchwright-data"], True),
             ("verification-receipts", self.paths["verification-receipts"], False),
             ("extension-receipts", self.paths["extension-receipts"], False),
+            ("effects-receipts", self.paths["effects-receipts"], False),
             ("launchwright-node", self.node, False),
             ("launchwright-verifier-node", self.verifier_node, False),
             ("launchwright-extension-runtime-node", self.extension_node, False),
+            ("launchwright-effects-runtime-node", self.effects_node, False),
             ("launchwright-extension-provider-node", self.provider_node, False),
             ("project-graph-fixture", self.paths["project-graph-fixture"], False),
         ]

@@ -6,7 +6,7 @@ import { integer, object, requireCondition as ensure, validateValue } from '@sem
 import { array, choice, idText, sha, str } from './contracts.mjs';
 import { digest } from './base.mjs';
 
-export const PINNED_SEMWRIGHT_SHA='8fa191250ae68274182570c65f067f7a60f85625';
+export const PINNED_SEMWRIGHT_SHA='d2da9a495a53fe279a1ca4de61f0e24646350f22';
 export const VERIFIER_PROVIDER='driver:launchwright-verifier';
 export const VERIFIER_ID='launchwright-verifier';
 export const VERIFIER_RECEIPT_SCHEMA='launchwright-canonical-verifier-runtime/1';

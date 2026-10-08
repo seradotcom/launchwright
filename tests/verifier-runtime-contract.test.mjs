@@ -11,7 +11,7 @@ const runtime=readFileSync(new URL('../src/verification-runtime.mjs',import.meta
 const verifierEntry=readFileSync(new URL('../src/native-verifier-entry.mjs',import.meta.url),'utf8');
 const nativeDriver=readFileSync(new URL('../crates/launchwright-native/src/main.rs',import.meta.url),'utf8');
 const lock=JSON.parse(readFileSync(new URL('../SOURCE_LOCK.json',import.meta.url),'utf8'));
-const semwrightSha='8fa191250ae68274182570c65f067f7a60f85625';
+const semwrightSha='d2da9a495a53fe279a1ca4de61f0e24646350f22';
 
 test('R26 verifier lane is exact-SHA and uses real Driver Host plus Native SDK',()=>{
   assert.equal(lock.native_sdk.sha,semwrightSha);

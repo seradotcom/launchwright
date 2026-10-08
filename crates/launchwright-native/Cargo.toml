@@ -8,8 +8,8 @@ description = "Launchwright canonical Semwright Native SDK NodeBridge driver"
 publish = false
 
 [dependencies]
-semwright-native-sdk = { git = "https://github.com/seradotcom/semwright", rev = "8fa191250ae68274182570c65f067f7a60f85625", features = ["driver", "process-bridge", "graph", "effects"] }
+semwright-native-sdk = { git = "https://github.com/seradotcom/semwright", rev = "d2da9a495a53fe279a1ca4de61f0e24646350f22", features = ["driver", "process-bridge", "graph", "effects"] }
 tokio = { version = "1", features = ["rt", "macros"] }
 
 [dev-dependencies]
-semwright-project-graph = { git = "https://github.com/seradotcom/semwright", rev = "8fa191250ae68274182570c65f067f7a60f85625" }
+semwright-project-graph = { git = "https://github.com/seradotcom/semwright", rev = "d2da9a495a53fe279a1ca4de61f0e24646350f22" }

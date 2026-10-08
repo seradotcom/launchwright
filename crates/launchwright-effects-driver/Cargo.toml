@@ -1,0 +1,18 @@
+[package]
+name = "launchwright-effects-driver"
+version = "0.2.0-dev.1"
+edition = "2024"
+rust-version = "1.88"
+license = "AGPL-3.0-only"
+publish = false
+
+[dependencies]
+async-trait = "0.1"
+serde_json = "1"
+sha2 = "0.11"
+hex = "0.4"
+tokio = { version = "1", features = ["rt", "macros"] }
+semwright-driver-sdk = { git = "https://github.com/seradotcom/semwright", rev = "d2da9a495a53fe279a1ca4de61f0e24646350f22" }
+semwright-types = { git = "https://github.com/seradotcom/semwright", rev = "d2da9a495a53fe279a1ca4de61f0e24646350f22" }
+semwright-native-sdk = { git = "https://github.com/seradotcom/semwright", rev = "d2da9a495a53fe279a1ca4de61f0e24646350f22", features = ["effects"] }
+semwright-effect-conformance = { git = "https://github.com/seradotcom/semwright", rev = "d2da9a495a53fe279a1ca4de61f0e24646350f22" }

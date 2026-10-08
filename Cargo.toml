@@ -1,3 +1,3 @@
 [workspace]
-members = ["crates/launchwright-native", "crates/launchwright-verifier-driver", "crates/launchwright-extension-driver"]
+members = ["crates/launchwright-native", "crates/launchwright-verifier-driver", "crates/launchwright-extension-driver", "crates/launchwright-effects-driver"]
 resolver = "2"

@@ -1,0 +1,36 @@
+{
+  "schema_version": "launchwright-ci-evidence/1",
+  "pass": "R28",
+  "source_sha": "1a6b2313e3abcad317c0796fb89a57fd69c5e530",
+  "merge_commit": "29eaa4c439993a3d6830b5893fcd5eb594c815bd",
+  "application_checks": 37715709634,
+  "selective_runs": {
+    "verifier": 37715717023,
+    "host": 37715714456,
+    "native": 37715711554,
+    "extension": 37715708271
+  },
+  "final_all_run": 37720793885,
+  "final_all_artifacts": {
+    "composition": 11526375862,
+    "effects": 11526365287,
+    "stress": 11526355251,
+    "native": 11526270802,
+    "browser": 11526165931,
+    "extension_runtime": 11526082494,
+    "deltadesk": 11526070688,
+    "godot": 11525886041,
+    "host": 11525802977,
+    "verifier": 11525787586
+  },
+  "authority": {
+    "owned_deltarender_driver_host_isolated": true,
+    "owned_deltacli_status_driver_host_isolated": true,
+    "arbitrary_extension_execution": false,
+    "third_party_extension_execution_authority": false,
+    "mobile_device_execution_authority": false,
+    "platform_execution_authority": false,
+    "external_customer_acceptance": false,
+    "publication_authority": false
+  }
+}

@@ -96,7 +96,7 @@ test('split native profiles preserve canonical mutation transactions across one 
   assert.equal(publish.entity.data.state,'DRAFT');
 
   const graph=await readProfile(GraphNativeApplication,seeded.root,'graph.contract',{});
-  assert.equal(graph.source.sha,'8fa191250ae68274182570c65f067f7a60f85625');
+  assert.equal(graph.source.sha,'d2da9a495a53fe279a1ca4de61f0e24646350f22');
   assert.equal(graph.query.budget.nodes,20000);
   const proposal=await invokeProfile(GraphNativeApplication,seeded.root,'impact.plan',{release_id:b.release.id,cause_ids:[b.source.id],note:'Native graph profile'});
   assert.equal(proposal.entity.kind,'impact_proposal');

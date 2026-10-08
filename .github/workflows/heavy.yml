@@ -73,6 +73,7 @@ jobs:
           export LAUNCHWRIGHT_NATIVE_PUBLISH_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.publish.sha256')"
           export LAUNCHWRIGHT_NATIVE_GRAPH_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.graph.sha256')"
           export LAUNCHWRIGHT_NATIVE_EFFECTS_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.effects.sha256')"
+          export LAUNCHWRIGHT_NATIVE_EFFECTS_RUNTIME_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.effects_runtime.sha256')"
           mkdir -p evidence/native
           rustc -Vv | tee evidence/native/compiler.txt
           cargo test -p launchwright-native 2>&1 | tee evidence/native/cargo-test.log
@@ -97,7 +98,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 50
     env:
-      SEMWRIGHT_SHA: 8fa191250ae68274182570c65f067f7a60f85625
+      SEMWRIGHT_SHA: d2da9a495a53fe279a1ca4de61f0e24646350f22
       CARGO_INCREMENTAL: '0'
       CARGO_TERM_COLOR: never
       CARGO_PROFILE_DEV_DEBUG: '0'
@@ -152,6 +153,7 @@ jobs:
           export LAUNCHWRIGHT_NATIVE_PUBLISH_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.publish.sha256')"
           export LAUNCHWRIGHT_NATIVE_GRAPH_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.graph.sha256')"
           export LAUNCHWRIGHT_NATIVE_EFFECTS_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.effects.sha256')"
+          export LAUNCHWRIGHT_NATIVE_EFFECTS_RUNTIME_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.effects_runtime.sha256')"
           # Launchwright intentionally follows the existing Native lane policy: its binary
           # lockfile is generated on the disposable runner. Semwright itself remains --locked.
           cargo build -p launchwright-native
@@ -191,7 +193,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 55
     env:
-      SEMWRIGHT_SHA: 8fa191250ae68274182570c65f067f7a60f85625
+      SEMWRIGHT_SHA: d2da9a495a53fe279a1ca4de61f0e24646350f22
       CARGO_INCREMENTAL: '0'
       CARGO_TERM_COLOR: never
       CARGO_PROFILE_DEV_DEBUG: '0'
@@ -246,6 +248,7 @@ jobs:
           export LAUNCHWRIGHT_NATIVE_PUBLISH_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.publish.sha256')"
           export LAUNCHWRIGHT_NATIVE_GRAPH_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.graph.sha256')"
           export LAUNCHWRIGHT_NATIVE_EFFECTS_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.effects.sha256')"
+          export LAUNCHWRIGHT_NATIVE_EFFECTS_RUNTIME_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.effects_runtime.sha256')"
           cargo test -p launchwright-verifier-driver
           cargo build -p launchwright-native -p launchwright-verifier-driver
           sha256sum target/debug/launchwright-native target/debug/launchwright-verifier-driver > evidence/verifier-runtime/launchwright-binaries.sha256
@@ -285,7 +288,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
-      SEMWRIGHT_SHA: 8fa191250ae68274182570c65f067f7a60f85625
+      SEMWRIGHT_SHA: d2da9a495a53fe279a1ca4de61f0e24646350f22
       CARGO_INCREMENTAL: '0'
       CARGO_TERM_COLOR: never
       CARGO_PROFILE_DEV_DEBUG: '0'
@@ -340,6 +343,7 @@ jobs:
           export LAUNCHWRIGHT_NATIVE_PUBLISH_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.publish.sha256')"
           export LAUNCHWRIGHT_NATIVE_GRAPH_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.graph.sha256')"
           export LAUNCHWRIGHT_NATIVE_EFFECTS_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.effects.sha256')"
+          export LAUNCHWRIGHT_NATIVE_EFFECTS_RUNTIME_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.effects_runtime.sha256')"
           cargo test -p launchwright-extension-driver
           cargo build -p launchwright-native -p launchwright-extension-driver
           sha256sum target/debug/launchwright-native target/debug/launchwright-extension-driver > evidence/extension-runtime/launchwright-binaries.sha256
@@ -376,11 +380,13 @@ jobs:
   effects:
     if: inputs.lane == 'all' || inputs.lane == 'effects'
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 60
     env:
-      SEMWRIGHT_SHA: 8fa191250ae68274182570c65f067f7a60f85625
+      SEMWRIGHT_SHA: d2da9a495a53fe279a1ca4de61f0e24646350f22
       CARGO_INCREMENTAL: '0'
       CARGO_TERM_COLOR: never
+      CARGO_PROFILE_DEV_DEBUG: '0'
+      CARGO_PROFILE_TEST_DEBUG: '0'
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -389,6 +395,11 @@ jobs:
         with:
           node-version: '24.21.0'
       - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Build canonical TypeScript SDK and bounded Launchwright bundles
+        run: |
+          set -euo pipefail
+          (cd vendor/semwright-native-sdk && npm ci --ignore-scripts --no-audit --no-fund && npm run build)
+          node scripts/build-native-bundle.mjs
       - name: Checkout exact reviewed Semwright source
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -396,36 +407,68 @@ jobs:
           ref: ${{ env.SEMWRIGHT_SHA }}
           path: .ci-semwright
           persist-credentials: false
-      - name: Build canonical Native SDK Effects reader
-        run: |
-          rustup toolchain install 1.98.1 --profile minimal
-          (cd .ci-semwright && rustup override set 1.98.1)
-          (cd .ci-semwright && cargo build --locked -p semwright-native-sdk --features effects --bin semwright-native-effects)
-      - name: Prepare exact Launchwright-owned artifact fixture
-        run: |
-          mkdir -p evidence/effects/protected
-          node scripts/prepare-effects-acceptance.mjs | tee evidence/effects/prepare.log
-      - name: Evaluate with the real canonical Effects CLI
+      - name: Pin Rust and prepare canonical disposable-runner sandbox
         run: |
           set -euo pipefail
-          BIN="$GITHUB_WORKSPACE/.ci-semwright/target/debug/semwright-native-effects"
-          "$BIN" --prepare < evidence/effects/definition.json > evidence/effects/protected/spec.json
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path('evidence/effects/protected/spec.json')
-          p.write_bytes(p.read_bytes().rstrip(b'\n'))
-          p.chmod(0o600)
-          PY
-          SPEC_SHA="$(sha256sum evidence/effects/protected/spec.json | cut -d' ' -f1)"
-          printf '%s\n' "$SPEC_SHA" > evidence/effects/protected/spec.sha256
-          "$BIN" --spec "$GITHUB_WORKSPACE/evidence/effects/protected/spec.json" --spec-sha256 "$SPEC_SHA" --artifact-root "$GITHUB_WORKSPACE/evidence/effects/artifacts" </dev/null > evidence/effects/result.json
-          jq -e '.schema_version == "semwright-native-effects-result/1" and .verdict == "PASS" and .execution_authority == false and .scope == "immutable_native_sdk_artifact_properties_only"' evidence/effects/result.json
-          node scripts/verify-effects-acceptance.mjs | tee evidence/effects/launchwright-verifier.log
+          rustup toolchain install 1.98.1 --profile minimal
+          rustup override set 1.98.1
+          (cd .ci-semwright && rustup override set 1.98.1)
+          mkdir -p evidence/effects-runtime
+          test "$(git -C .ci-semwright rev-parse HEAD)" = "$SEMWRIGHT_SHA"
+          test "$(sysctl -n kernel.unprivileged_userns_clone)" = 1
+          test "$(cat /proc/sys/kernel/apparmor_restrict_unprivileged_userns)" = 1
+          bash .ci-semwright/scripts/dev/ci-driver-bwrap-profile.sh evidence/effects-runtime/host-sandbox-profile.txt
+      - name: Install canonical daemon build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y libpipewire-0.3-dev pkg-config clang
+      - name: Build exact NativeDriver and canonical Effects provider
+        run: |
+          set -euo pipefail
+          export LAUNCHWRIGHT_NATIVE_CORE_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.core.sha256')"
+          export LAUNCHWRIGHT_NATIVE_PRODUCTION_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.production.sha256')"
+          export LAUNCHWRIGHT_NATIVE_REVIEW_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.review.sha256')"
+          export LAUNCHWRIGHT_NATIVE_VERIFIER_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.verifier.sha256')"
+          export LAUNCHWRIGHT_NATIVE_INTEGRATIONS_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.integrations.sha256')"
+          export LAUNCHWRIGHT_NATIVE_EXTENSIONS_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.extensions.sha256')"
+          export LAUNCHWRIGHT_NATIVE_EXTENSION_RUNTIME_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.extension_runtime.sha256')"
+          export LAUNCHWRIGHT_NATIVE_WORK_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.work.sha256')"
+          export LAUNCHWRIGHT_NATIVE_MEDIA_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.media.sha256')"
+          export LAUNCHWRIGHT_NATIVE_PUBLISH_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.publish.sha256')"
+          export LAUNCHWRIGHT_NATIVE_GRAPH_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.graph.sha256')"
+          export LAUNCHWRIGHT_NATIVE_EFFECTS_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.effects.sha256')"
+          export LAUNCHWRIGHT_NATIVE_EFFECTS_RUNTIME_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.effects_runtime.sha256')"
+          cargo test -p launchwright-effects-driver
+          cargo build -p launchwright-native -p launchwright-effects-driver
+          sha256sum target/debug/launchwright-native target/debug/launchwright-effects-driver > evidence/effects-runtime/launchwright-binaries.sha256
+      - name: Build exact Semwright daemon CLI sandbox Host and Effects preparation CLI
+        working-directory: .ci-semwright
+        run: |
+          set -euo pipefail
+          cargo build --locked -p semwright-daemon -p semwright-cli --bins
+          cargo build --locked -p semwright-plugin-host --bin semwright-sandbox
+          cargo build --locked -p semwright-native-sdk --features effects --bin semwright-native-effects
+          sha256sum target/debug/semwright target/debug/semwrightd target/debug/semwright-sandbox target/debug/semwright-native-effects > "${{ github.workspace }}/evidence/effects-runtime/semwright-binaries.sha256"
+      - name: Real Effects Broker Policy Driver Host Native SDK admission
+        env:
+          SEMWRIGHT_CHECKOUT: ${{ github.workspace }}/.ci-semwright
+          LAUNCHWRIGHT_NATIVE_BINARY: ${{ github.workspace }}/target/debug/launchwright-native
+          LAUNCHWRIGHT_EFFECTS_BINARY: ${{ github.workspace }}/target/debug/launchwright-effects-driver
+          SEMWRIGHT_TEST_DRIVER_SANDBOX: '1'
+          SEMWRIGHT_TEST_SANDBOX_HELPER: ${{ github.workspace }}/.ci-semwright/target/debug/semwright-sandbox
+        run: |
+          set -euo pipefail
+          python3 scripts/verify-effects-runtime.py | tee evidence/effects-runtime/acceptance.log
+          grep -q '^LAUNCHWRIGHT_EFFECTS_RUNTIME_ACCEPTANCE_PASS ' evidence/effects-runtime/acceptance.log
+          jq -e '.passed == true and .authority.effects_provider_driver_host_isolation_accepted == true and .authority.effects_evaluation_driver_host_isolation_accepted == true and .authority.effects_owner_admission_accepted == true and .authority.exact_spec_result_binding == true and .authority.runtime_digest_provider_binding == true and .authority.policy_denied_without_provider_authority == true and .authority.execution_authority == false and .authority.scenario_effects_authority == false and .authority.native_browser_godot_mutation_effect_authority == false and .authority.platform_execution_authority == false and .authority.external_customer_acceptance == false and .authority.publication_authority == false' evidence/effects-runtime/report.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: launchwright-effects-${{ github.sha }}
-          path: evidence/effects/
+          name: launchwright-effects-runtime-${{ github.sha }}
+          path: |
+            evidence/effects-runtime/
+            dist/native-bundle.json
+            Cargo.lock
           if-no-files-found: error
           retention-days: 14
 
@@ -434,7 +477,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     env:
-      SEMWRIGHT_SHA: 8fa191250ae68274182570c65f067f7a60f85625
+      SEMWRIGHT_SHA: d2da9a495a53fe279a1ca4de61f0e24646350f22
       CARGO_INCREMENTAL: '0'
       CARGO_TERM_COLOR: never
       CARGO_PROFILE_DEV_DEBUG: '0'
@@ -565,7 +608,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     env:
-      SEMWRIGHT_SHA: 8fa191250ae68274182570c65f067f7a60f85625
+      SEMWRIGHT_SHA: d2da9a495a53fe279a1ca4de61f0e24646350f22
       CARGO_INCREMENTAL: '0'
       CARGO_TERM_COLOR: never
     steps:
@@ -653,7 +696,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 75
     env:
-      SEMWRIGHT_SHA: 8fa191250ae68274182570c65f067f7a60f85625
+      SEMWRIGHT_SHA: d2da9a495a53fe279a1ca4de61f0e24646350f22
       CARGO_INCREMENTAL: '0'
       CARGO_TERM_COLOR: never
       PLAYWRIGHT_BROWSERS_PATH: '0'

@@ -62,8 +62,12 @@ function receiptCurrent(app,receipt){
   return drift;
 }
 
-export function recordEffectResult(app,input){
-  inputObject(input,['release_id','scenario_id','artifact_ids','spec_text','result_text','admit'],['release_id','artifact_ids','spec_text','result_text']);
+export function recordEffectResult(app,input,runtimeAdmission=null){
+  inputObject(input,['release_id','scenario_id','artifact_ids','spec_text','result_text','admit','runtime_receipt'],['release_id','artifact_ids','spec_text','result_text']);
+  if(input.runtime_receipt!==undefined){object(input.runtime_receipt,['file','sha256'],['file','sha256']);str(input.runtime_receipt.file,160);sha(input.runtime_receipt.sha256);}
+  ensure(!input.runtime_receipt||runtimeAdmission,'Canonical Effects runtime receipt requires the isolated Native Effects runtime','PolicyDenied');
+  ensure(!runtimeAdmission||input.admit===true,'Canonical Effects runtime admission requires explicit admit=true','InvalidArgument');
+  if(input.admit===true)ensure(runtimeAdmission,'Canonical Effects PASS admission requires an exact Driver Host evaluator receipt','PolicyDenied');
   const release=app.get(input.release_id,'release');
   const artifactIds=array(input.artifact_ids,16);
   ensure(artifactIds.length>0&&new Set(artifactIds).size===artifactIds.length,'Effects receipt requires unique bound artifacts');
@@ -94,7 +98,6 @@ export function recordEffectResult(app,input){
     }
   }
   if(['PASS','FAIL'].includes(result.verdict)){ensure(result.inspection_state==='EVALUATED','Decisive Effects verdict requires an evaluated canonical inspection','Conflict');ensure([...localDigests].every(hash=>observedDigests.has(hash)),'Decisive Effects verdict does not cover every bound artifact','Conflict');}
-  if(input.admit===true)ensure(app.capabilities.canonical_effect_admission===true,'Canonical Effects admission is unavailable in this session','PolicyDenied');
   const specBlob=app.store.blob(specBytes,'application/json',{maxBytes:512*1024,label:'Effects spec'});
   ensure(specBlob===specSha,'Effects spec blob digest mismatch','Conflict');
   const bytes=textBytes(input.result_text),resultBlob=app.store.blob(bytes,'application/json',{maxBytes:192000,label:'Effects result'});
@@ -102,7 +105,7 @@ export function recordEffectResult(app,input){
   const bindingIds=artifacts.map(a=>a.id).sort(),scenarioId=scenario?.id??null;
   const duplicate=app.list('effect_result',release.id).find(row=>row.data.result_sha256===resultSha&&row.data.scenario_id===scenarioId&&JSON.stringify(row.data.artifact_pins.map(p=>p.id).sort())===JSON.stringify(bindingIds));
   if(duplicate)return{entity:duplicate,reused:true};
-  const admitted=input.admit===true&&app.capabilities.canonical_effect_admission===true;
+  const admitted=input.admit===true&&!!runtimeAdmission;
   return{entity:app.store.create('effect_result',{
     release_id:release.id,name:'Effects readback · '+result.verdict,
     scenario_id:scenario?.id??null,scenario_pin:scenario?{id:scenario.id,version:scenario.version}:null,
@@ -110,7 +113,8 @@ export function recordEffectResult(app,input){
     result_sha256:resultSha,result_blob_sha256:resultBlob,spec_sha256:specSha,spec_blob_sha256:specBlob,
     source_digest:result.source_digest,runtime_digest:result.runtime_digest,
     reported_verdict:result.verdict,inspection_state:result.inspection_state,
-    scope:result.scope,admission:admitted?'canonical-owner-admitted':'canonical-result-not-admitted',
+    scope:result.scope,admission:admitted?'canonical-driver-host-admitted':'canonical-result-not-admitted',
+    ...(input.runtime_receipt?{runtime_receipt:input.runtime_receipt,runtime_admission:runtimeAdmission}:{}),
     execution_authority:false,scenario_effects_covered:false,
     recorded_by:app.principal,recorded_at:iso()
   }),reused:false};
@@ -122,12 +126,12 @@ export function inspectEffects(app,input){
   const receipts=app.list('effect_result',release.id)
     .filter(row=>input.scenario_id===undefined||row.data.scenario_id===input.scenario_id)
     .map(row=>{
-      const drift=receiptCurrent(app,row),current=drift.length===0,admitted=row.data.admission==='canonical-owner-admitted';
+      const drift=receiptCurrent(app,row),current=drift.length===0,admitted=row.data.admission==='canonical-driver-host-admitted'&&row.data.runtime_admission?.evaluator_driver_host_isolated===true;
       const effective=!current?'UNKNOWN':row.data.reported_verdict==='FAIL'?'FAIL':admitted&&row.data.reported_verdict==='PASS'?'PASS':'UNKNOWN';
       return{id:row.id,version:row.version,result_sha256:row.data.result_sha256,spec_sha256:row.data.spec_sha256,
         reported_verdict:row.data.reported_verdict,effective_verdict:effective,inspection_state:row.data.inspection_state,
         admission:row.data.admission,current,drift,artifact_pins:row.data.artifact_pins,scenario_id:row.data.scenario_id,
-        scope:row.data.scope,execution_authority:false,scenario_effects_covered:false};
+        scope:row.data.scope,execution_authority:false,scenario_effects_covered:false,verified_evaluator_execution:admitted,evaluator_driver_host_isolated:row.data.runtime_admission?.evaluator_driver_host_isolated===true};
     });
   const state=receipts.some(r=>r.effective_verdict==='FAIL')?'FAIL':receipts.length&&receipts.every(r=>r.effective_verdict==='PASS')?'PASS':'UNKNOWN';
   return{schema_version:'launchwright-effects-status/1',release_id:release.id,scenario_id:input.scenario_id??null,state,receipts,

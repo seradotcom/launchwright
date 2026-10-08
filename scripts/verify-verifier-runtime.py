@@ -154,9 +154,11 @@ class VerifierFixture(host.HostFixture):
             ("launchwright-data", self.paths["launchwright-data"], True),
             ("verification-receipts", self.paths["verification-receipts"], False),
             ("extension-receipts", self.paths["extension-receipts"], False),
+            ("effects-receipts", self.paths["effects-receipts"], False),
             ("launchwright-node", self.node, False),
             ("launchwright-verifier-node", self.verifier_node, False),
             ("launchwright-extension-runtime-node", self.extension_node, False),
+            ("launchwright-effects-runtime-node", self.effects_node, False),
             ("verification-input", self.paths["project-graph-fixture"], False),
         ]
         for name, path, writable in grants:
