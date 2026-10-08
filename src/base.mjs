@@ -2,7 +2,7 @@
 import { randomUUID } from 'node:crypto';
 import { exactRequestDigest } from '@semwright/native-sdk';
 
-export const APP_VERSION='0.2.0-dev.19';
+export const APP_VERSION='0.2.0-dev.20';
 export const RESOURCE='launchwright:workspace';
 export const iso=()=>new Date().toISOString();
 export const digest=(domain,value)=>exactRequestDigest('launchwright/'+domain+'/1',value);

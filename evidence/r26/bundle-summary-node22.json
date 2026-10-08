@@ -1,0 +1,77 @@
+{
+  "schema_version": "launchwright-r26-local-bundle-check/1",
+  "supplemental_only": true,
+  "node": "v22.22.0",
+  "supported_engine": false,
+  "reason": "The workstation Node 22 runtime is outside the Native SDK supported Node 24.21 engine; exact acceptance belongs to GitHub CI.",
+  "max_bundle_bytes": 49152,
+  "operations": 86,
+  "profiles": {
+    "core": {
+      "bytes": 46167,
+      "sha256": "406570119248103298e3dc76a431eb3fc36e3b274ee333dffcaa2e5a03601995",
+      "operations": 13,
+      "within_limit": true
+    },
+    "production": {
+      "bytes": 42652,
+      "sha256": "4fd067f891671fd8d096283ae4af965b9c16e4647a946318d8636401e582647e",
+      "operations": 6,
+      "within_limit": true
+    },
+    "review": {
+      "bytes": 45067,
+      "sha256": "51273858b2cf553ff2e89fc45a61c67c4e075ce75bc542c63850c39d1f51d600",
+      "operations": 7,
+      "within_limit": true
+    },
+    "verifier": {
+      "bytes": 33895,
+      "sha256": "35b7f6fed2630d57f81931e01b462c27297ebdad648483b6a0dc2ff5e6dddfcc",
+      "operations": 1,
+      "within_limit": true
+    },
+    "integrations": {
+      "bytes": 40733,
+      "sha256": "85ecb563d52677f9b22ed0ed3b28a1829f284dcfd6270663381d7d85bb3d3370",
+      "operations": 9,
+      "within_limit": true
+    },
+    "extensions": {
+      "bytes": 42958,
+      "sha256": "a9559895f63e8368a77fe5aeb36c4cdd8c51ddd9790bb1179d3bee552b549636",
+      "operations": 13,
+      "within_limit": true
+    },
+    "work": {
+      "bytes": 42280,
+      "sha256": "8c8f82c873644f27d689bc97d856eab5274089f570a9f1bfa3e63057895d07b8",
+      "operations": 11,
+      "within_limit": true
+    },
+    "media": {
+      "bytes": 40093,
+      "sha256": "58867cdc11e34b7057a7fcdb4085c24b554500f47a8ac6912e0188aca207a3af",
+      "operations": 5,
+      "within_limit": true
+    },
+    "publish": {
+      "bytes": 48593,
+      "sha256": "1cd87f537ddfef7b475150762e2530c08991e8be1fb375af8026e8fee4f9bcc4",
+      "operations": 10,
+      "within_limit": true
+    },
+    "graph": {
+      "bytes": 48290,
+      "sha256": "2c17f0bc54238c7b29f38703fdd000069c47ad80d6407778e66bf2d846d23fb7",
+      "operations": 9,
+      "within_limit": true
+    },
+    "effects": {
+      "bytes": 31778,
+      "sha256": "0384def758e6db08f82a999fe0bbd2d8e2e8fd84bf86b97418c03e8db1e7d0e8",
+      "operations": 2,
+      "within_limit": true
+    }
+  }
+}

@@ -30,6 +30,11 @@ LAUNCHWRIGHT_DRIVER = Path(os.environ["LAUNCHWRIGHT_NATIVE_BINARY"]).resolve()
 BUNDLE_MANIFEST = ROOT / "dist" / "native-bundle.json"
 SEMWRIGHT_BINS = SEMWRIGHT / "target" / "debug"
 EVIDENCE = ROOT / "evidence" / "native-host"
+# Two independently scoped Node tools are each digest-verified and sealed by Driver Host.
+# GitHub-hosted runners can spend more than 20s materializing the Node executables
+# before the daemon publishes its owner socket. This budget covers bootstrap only;
+# request/tool execution timeouts remain unchanged.
+DAEMON_START_TIMEOUT_SECONDS = 60
 RESOURCE = "launchwright:workspace"
 
 
@@ -97,6 +102,7 @@ class HostFixture:
             "binary",
             "launchwright-runtime",
             "launchwright-data",
+            "verification-receipts",
             "project-graph-fixture",
         ):
             path = self.root / name
@@ -145,6 +151,7 @@ class HostFixture:
             "core",
             "production",
             "review",
+            "verifier",
             "integrations",
             "extensions",
             "work",
@@ -171,6 +178,10 @@ class HostFixture:
         shutil.copyfile(source_node, node)
         node.chmod(0o500)
         self.node = node
+        verifier_node = self.paths["binary"] / "node-verifier-runtime"
+        shutil.copyfile(source_node, verifier_node)
+        verifier_node.chmod(0o500)
+        self.verifier_node = verifier_node
 
     def _provision_workspace(self) -> None:
         result = subprocess.run(
@@ -224,6 +235,7 @@ class HostFixture:
             "mounts": [
                 {"root": "launchwright-runtime", "read_only": True, "execute": False},
                 {"root": "launchwright-data", "read_only": False, "execute": False},
+                {"root": "verification-receipts", "read_only": True, "execute": False},
             ],
             "tools": [
                 {
@@ -231,7 +243,13 @@ class HostFixture:
                     "name": "node",
                     "sha256": sha256(self.node),
                     "mounts": ["launchwright-data"],
-                }
+                },
+                {
+                    "root": "launchwright-verifier-node",
+                    "name": "node-verifier",
+                    "sha256": sha256(self.verifier_node),
+                    "mounts": ["launchwright-data", "verification-receipts"],
+                },
             ],
             "resources": {
                 "open_files": 256,
@@ -271,7 +289,9 @@ class HostFixture:
         grants = [
             ("launchwright-runtime", self.paths["launchwright-runtime"], False),
             ("launchwright-data", self.paths["launchwright-data"], True),
+            ("verification-receipts", self.paths["verification-receipts"], False),
             ("launchwright-node", self.node, False),
+            ("launchwright-verifier-node", self.verifier_node, False),
             ("project-graph-fixture", self.paths["project-graph-fixture"], False),
         ]
         for name, path, writable in grants:
@@ -291,6 +311,7 @@ class HostFixture:
             {
                 "launchwright_driver": sha256(self.driver),
                 "node_runtime": sha256(self.node),
+                "verifier_node_runtime": sha256(self.verifier_node),
                 "semwright_cli": sha256(require_binary("semwright")),
                 "semwright_daemon": sha256(require_binary("semwrightd")),
                 "semwright_sandbox": sha256(require_binary("semwright-sandbox")),
@@ -327,7 +348,7 @@ class HostFixture:
             stderr=self.log,
             start_new_session=True,
         )
-        deadline = time.monotonic() + 20
+        deadline = time.monotonic() + DAEMON_START_TIMEOUT_SECONDS
         while time.monotonic() < deadline:
             if self.process.poll() is not None:
                 self.log.flush()

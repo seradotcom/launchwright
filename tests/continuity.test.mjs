@@ -63,7 +63,7 @@ test('heuristic PASS remains UNKNOWN and a waiver preserves a recorded failure',
   const heuristic=(await execute(app,'verification.record',{...common,state:'PASS',verifier:verifier('heuristic')})).entity;
   let summary=await execute(app,'verification.summary',{candidate_id:c.id});
   assert.equal(summary.state,'UNKNOWN');assert.equal(summary.checks[0].reported_state,'PASS');assert.equal(summary.checks[0].effective_state,'UNKNOWN');
-  await assert.rejects(execute(app,'verification.record',{...common,state:'PASS',verifier:verifier('canonical')}),{code:'PolicyDenied'});
+  await assert.rejects(execute(app,'verification.record',{...common,state:'PASS',verifier:verifier('canonical')}),{code:'InvalidArgument'});
   const failed=(await execute(app,'verification.record',{...common,dimension:'privacy',state:'FAIL',verifier:verifier('independent'),findings:[{code:'CANARY',severity:'blocker',message:'Synthetic negative control'}]})).entity;
   const waiver=(await execute(app,'waiver.record',{candidate_id:c.id,verification_id:failed.id,reason:'Synthetic exception for review only',scope:'private-draft',expires_at:'2099-01-01T00:00:00.000Z'})).entity;
   assert.equal(waiver.data.changes_verification_state,false);
@@ -73,11 +73,11 @@ test('heuristic PASS remains UNKNOWN and a waiver preserves a recorded failure',
   assert.equal(heuristic.kind,'verification');
 });
 
-test('canonical verifier PASS is only admitted behind the explicit owner capability', async t => {
+test('canonical verifier PASS cannot be manufactured from a session capability alone', async t => {
   const {app}=setup(t,{capabilities:{canonical_verifier_admission:true}});const b=await baseline(app),{artifact,candidate:c}=await candidate(app,b);
-  await execute(app,'verification.record',{candidate_id:c.id,dimension:'format',state:'PASS',verifier:verifier('canonical'),artifact_ids:[artifact.id],coverage:{checked:1,total:1},omissions:[],findings:[],observed_at:'2026-10-04T20:00:00.000Z'});
+  await assert.rejects(execute(app,'verification.record',{candidate_id:c.id,dimension:'format',state:'PASS',verifier:verifier('canonical'),artifact_ids:[artifact.id],coverage:{checked:1,total:1},omissions:[],findings:[],observed_at:'2026-10-04T20:00:00.000Z'}),{code:'InvalidArgument'});
   const summary=await execute(app,'verification.summary',{candidate_id:c.id});
-  assert.equal(summary.state,'PASS');assert.equal(summary.canonical_passes,1);
+  assert.equal(summary.state,'UNKNOWN');assert.equal(summary.canonical_passes,0);
 });
 
 test('channel packaging freezes exact bytes separately from external delivery state', async t => {

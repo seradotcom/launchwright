@@ -5,7 +5,7 @@ on:
       lane:
         description: Select only the lane affected by the change
         type: choice
-        options: [all, native, host, browser, deltadesk, composition, effects, godot, stress]
+        options: [all, native, host, verifier, browser, deltadesk, composition, effects, godot, stress]
         default: all
         required: true
 permissions:
@@ -64,6 +64,7 @@ jobs:
           export LAUNCHWRIGHT_NATIVE_CORE_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.core.sha256')"
           export LAUNCHWRIGHT_NATIVE_PRODUCTION_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.production.sha256')"
           export LAUNCHWRIGHT_NATIVE_REVIEW_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.review.sha256')"
+          export LAUNCHWRIGHT_NATIVE_VERIFIER_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.verifier.sha256')"
           export LAUNCHWRIGHT_NATIVE_INTEGRATIONS_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.integrations.sha256')"
           export LAUNCHWRIGHT_NATIVE_EXTENSIONS_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.extensions.sha256')"
           export LAUNCHWRIGHT_NATIVE_WORK_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.work.sha256')"
@@ -141,6 +142,7 @@ jobs:
           export LAUNCHWRIGHT_NATIVE_CORE_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.core.sha256')"
           export LAUNCHWRIGHT_NATIVE_PRODUCTION_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.production.sha256')"
           export LAUNCHWRIGHT_NATIVE_REVIEW_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.review.sha256')"
+          export LAUNCHWRIGHT_NATIVE_VERIFIER_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.verifier.sha256')"
           export LAUNCHWRIGHT_NATIVE_INTEGRATIONS_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.integrations.sha256')"
           export LAUNCHWRIGHT_NATIVE_EXTENSIONS_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.extensions.sha256')"
           export LAUNCHWRIGHT_NATIVE_WORK_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.work.sha256')"
@@ -178,6 +180,99 @@ jobs:
           path: |
             evidence/native-host/
             dist/native-bundle.json
+          if-no-files-found: error
+          retention-days: 14
+
+
+  verifier:
+    if: inputs.lane == 'all' || inputs.lane == 'verifier'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    env:
+      SEMWRIGHT_SHA: 4d291de26724810017ce7b6d185326514cb79fa6
+      CARGO_INCREMENTAL: '0'
+      CARGO_TERM_COLOR: never
+      CARGO_PROFILE_DEV_DEBUG: '0'
+      CARGO_PROFILE_TEST_DEBUG: '0'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Build canonical TypeScript SDK and bounded Launchwright bundles
+        run: |
+          set -euo pipefail
+          (cd vendor/semwright-native-sdk && npm ci --ignore-scripts --no-audit --no-fund && npm run build)
+          node scripts/build-native-bundle.mjs
+      - name: Checkout exact reviewed Semwright source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: seradotcom/semwright
+          ref: ${{ env.SEMWRIGHT_SHA }}
+          path: .ci-semwright
+          persist-credentials: false
+      - name: Pin Rust and prepare canonical disposable-runner sandbox
+        run: |
+          set -euo pipefail
+          rustup toolchain install 1.98.1 --profile minimal
+          rustup override set 1.98.1
+          (cd .ci-semwright && rustup override set 1.98.1)
+          mkdir -p evidence/verifier-runtime
+          test "$(git -C .ci-semwright rev-parse HEAD)" = "$SEMWRIGHT_SHA"
+          test "$(sysctl -n kernel.unprivileged_userns_clone)" = 1
+          test "$(cat /proc/sys/kernel/apparmor_restrict_unprivileged_userns)" = 1
+          bash .ci-semwright/scripts/dev/ci-driver-bwrap-profile.sh evidence/verifier-runtime/host-sandbox-profile.txt
+      - name: Install canonical daemon build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y libpipewire-0.3-dev pkg-config clang
+      - name: Build exact NativeDriver and bounded verifier provider
+        run: |
+          set -euo pipefail
+          export LAUNCHWRIGHT_NATIVE_CORE_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.core.sha256')"
+          export LAUNCHWRIGHT_NATIVE_PRODUCTION_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.production.sha256')"
+          export LAUNCHWRIGHT_NATIVE_REVIEW_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.review.sha256')"
+          export LAUNCHWRIGHT_NATIVE_VERIFIER_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.verifier.sha256')"
+          export LAUNCHWRIGHT_NATIVE_INTEGRATIONS_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.integrations.sha256')"
+          export LAUNCHWRIGHT_NATIVE_EXTENSIONS_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.extensions.sha256')"
+          export LAUNCHWRIGHT_NATIVE_WORK_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.work.sha256')"
+          export LAUNCHWRIGHT_NATIVE_MEDIA_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.media.sha256')"
+          export LAUNCHWRIGHT_NATIVE_PUBLISH_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.publish.sha256')"
+          export LAUNCHWRIGHT_NATIVE_GRAPH_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.graph.sha256')"
+          export LAUNCHWRIGHT_NATIVE_EFFECTS_BUNDLE_SHA256="$(node -p 'JSON.parse(require("fs").readFileSync("dist/native-bundle.json","utf8")).profiles.effects.sha256')"
+          cargo test -p launchwright-verifier-driver
+          cargo build -p launchwright-native -p launchwright-verifier-driver
+          sha256sum target/debug/launchwright-native target/debug/launchwright-verifier-driver > evidence/verifier-runtime/launchwright-binaries.sha256
+      - name: Build exact Semwright daemon CLI and sandbox Host
+        working-directory: .ci-semwright
+        run: |
+          set -euo pipefail
+          cargo build --locked -p semwright-daemon -p semwright-cli --bins
+          cargo build --locked -p semwright-plugin-host --bin semwright-sandbox
+          sha256sum target/debug/semwright target/debug/semwrightd target/debug/semwright-sandbox > "$GITHUB_WORKSPACE/evidence/verifier-runtime/semwright-binaries.sha256"
+      - name: Real verifier Broker Policy Driver Host Native SDK admission
+        env:
+          SEMWRIGHT_CHECKOUT: ${{ github.workspace }}/.ci-semwright
+          LAUNCHWRIGHT_NATIVE_BINARY: ${{ github.workspace }}/target/debug/launchwright-native
+          LAUNCHWRIGHT_VERIFIER_BINARY: ${{ github.workspace }}/target/debug/launchwright-verifier-driver
+          SEMWRIGHT_TEST_DRIVER_SANDBOX: '1'
+          SEMWRIGHT_TEST_SANDBOX_HELPER: ${{ github.workspace }}/.ci-semwright/target/debug/semwright-sandbox
+        run: |
+          set -euo pipefail
+          python3 scripts/verify-verifier-runtime.py | tee evidence/verifier-runtime/acceptance.log
+          grep -q '^LAUNCHWRIGHT_VERIFIER_RUNTIME_ACCEPTANCE_PASS ' evidence/verifier-runtime/acceptance.log
+          jq -e '.passed == true and .authority.canonical_verifier_runtime_admitted == true and .authority.broker_policy_path_observed == true and .authority.driver_host_isolation_accepted == true and .authority.native_sdk_review_recorded == true and .authority.artifact_substitution_rejected == true and .authority.receipt_candidate_substitution_rejected == true and .authority.platform_execution_authority == false and .authority.external_customer_acceptance == false and .authority.semantic_authority == false and .authority.editorial_authority == false and .authority.publication_authority == false' evidence/verifier-runtime/report.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: launchwright-verifier-runtime-${{ github.sha }}
+          path: |
+            evidence/verifier-runtime/
+            dist/native-bundle.json
+            Cargo.lock
           if-no-files-found: error
           retention-days: 14
 

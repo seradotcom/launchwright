@@ -64,7 +64,7 @@ The public `@semwright/native-sdk` source is vendored unchanged under its upstre
 - Native SDK `0.9.0-dev.1`
 - exact SHA-256 hashes for the redistributed SDK files/archive
 
-The canonical `NodeBridge` allows at most 48 KiB per owner-pinned executable bundle. Launchwright therefore maps all 84 public operations exactly once across ten bounded profiles (`core`, `production`, `review`, `integrations`, `extensions`, `work`, `media`, `publish`, `graph`, `effects`) instead of weakening that upstream limit. `scripts/build-native-bundle.mjs` hashes each exact bundle and rejects missing/duplicate operations or oversized output. `crates/launchwright-native` pins all ten hashes at build time. The caller cannot choose arbitrary executable code, mounts or runtime paths; the dedicated `graph` profile is the only Native profile provisioned for owner-admitted Graph projections.
+The canonical `NodeBridge` allows at most 48 KiB per owner-pinned executable bundle. Launchwright therefore maps all 86 public operations exactly once across eleven bounded profiles (`core`, `production`, `review`, `verifier`, `integrations`, `extensions`, `work`, `media`, `publish`, `graph`, `effects`) instead of weakening that upstream limit. `scripts/build-native-bundle.mjs` hashes each exact bundle and rejects missing/duplicate operations or oversized output. `crates/launchwright-native` pins all eleven hashes at build time. The caller cannot choose arbitrary executable code, mounts or runtime paths; the dedicated `graph` profile is the only Native profile provisioned for owner-admitted Graph projections.
 
 The optional Platform adapter consumes an owner-supplied byte-pinned package. The inspected Platform source is not licensed for redistribution, so it is not copied into this public repository.
 
@@ -97,14 +97,16 @@ node scripts/verify.mjs
 node src/main.mjs doctor --state .state
 ```
 
-GitHub Actions runs the supported Node 24.21 runtime on Linux, Windows and macOS. The manual heavy workflow has seven independently selectable lanes:
+GitHub Actions runs the supported Node 24.21 runtime on Linux, Windows and macOS. The manual heavy workflow has nine independently selectable lanes:
 
-- **native** — builds the pinned TypeScript SDK, all ten owner-pinned bundles and real Rust NativeDriver with Graph + Effects SDK features;
+- **native** — builds the pinned TypeScript SDK, all eleven owner-pinned bundles and real Rust NativeDriver with Graph + Effects SDK features;
 - **host** — checks out the exact pinned Semwright SHA and runs Launchwright through the real daemon → Broker/Policy → Driver Host → sealed Node runtime → owner-pinned NodeBridge bundle path, including durable mutation/readback, stale-ref invalidation across restart and a policy-denied negative control; a green exact-SHA run establishes this Host boundary only, not Platform/Publish/ChatGPT authority;
+- **verifier** — builds the bounded Driver SDK format verifier and routes its exact candidate/artifact-bound receipt through Broker/Policy/Driver Host into the dedicated Native `verifier` profile; it proves canonical format admission only and explicitly carries no semantic/editorial/Platform/publication authority;
 - **effects** — builds the real pinned `semwright-native-effects` helper, evaluates an exact Launchwright-owned immutable artifact, and rechecks the canonical result through Launchwright without granting execution authority;
 - **browser** — installs Chromium on the runner and exercises the real Launchwright UI;
 - **deltadesk** — executes the owned DeltaDesk A/B fixture through the exact pinned Semwright Broker + Policy + Chromium backend, requires fail-closed denial without `browser.modify` and for a forbidden origin, retains screenshot/receipt hashes and ingests them as `IMPORTED_UNVERIFIED`; the bounded CI fixture approver is not human approval and the lane does not fabricate Platform, Driver Host or canonical capture authority;
 - **composition** — recaptures owned DeltaDesk A/B through the exact pinned Semwright Broker + Policy + Chromium path, hashes the retained PNG bytes, fail-closed transforms the reviewed pinned Semwright `combined_native` acceptance test, imports those exact bytes as managed Motion Canvas assets, and runs one canonical Composition + Audio AV plan through Driver Host/MLT to a retained MP4 and publication manifest. The verifier requires exact Broker→Film→Motion plan→AV plan→master lineage and keeps capture authority `IMPORTED_UNVERIFIED`, human approval false, Platform authority false, customer acceptance false and editorial state pending. R24 exact source SHA `635bf1c4d02b44bd2da5ab357f408f78aa85388d` passed selective heavy run `37582490691`.
+- **godot** — exercises the bounded owned Godot execution profile through the pinned Semwright Godot/Native/Host path without extending that evidence to arbitrary customer projects or Platform authority;
 - **stress** — bounded high-volume persistence, observation and portable-restore acceptance.
 
 Run expensive dependencies on GitHub Actions rather than the development workstation.

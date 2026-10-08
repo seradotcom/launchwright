@@ -10,7 +10,7 @@ const semwrightSha='4d291de26724810017ce7b6d185326514cb79fa6';
 
 test('R19 Host lane stays pinned to the canonical Semwright source lock',()=>{
   assert.equal(lock.native_sdk.sha,semwrightSha);
-  assert.match(workflow,/options: \[all, native, host, browser,/u);
+  assert.match(workflow,/options: \[all, native, host, verifier, browser,/u);
   assert.match(workflow,new RegExp('SEMWRIGHT_SHA: '+semwrightSha,'u'));
   assert.match(workflow,/SEMWRIGHT_TEST_DRIVER_SANDBOX: '1'/u);
   assert.match(workflow,/SEMWRIGHT_TEST_SANDBOX_HELPER:/u);
@@ -25,6 +25,11 @@ test('R19 Host harness requires real Broker policy and a Host-mediated Node runt
   assert.match(harness,/"launchwright-runtime", "read_only": True/u);
   assert.match(harness,/"launchwright-data", "read_only": False/u);
   assert.match(harness,/"launchwright-node"/u);
+  assert.match(harness,/"launchwright-verifier-node"/u);
+  assert.match(harness,/"name": "node-verifier"/u);
+  assert.match(harness,/"mounts": \["launchwright-data", "verification-receipts"\]/u);
+  assert.match(harness,/DAEMON_START_TIMEOUT_SECONDS = 60/u);
+  assert.match(harness,/time\.monotonic\(\) \+ DAEMON_START_TIMEOUT_SECONDS/u);
   assert.match(harness,/allow_driver=False/u);
   assert.match(harness,/fixture\.session\.unlink\(missing_ok=True\)/u);
 });
