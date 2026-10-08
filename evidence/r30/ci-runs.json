@@ -1,0 +1,269 @@
+{
+  "schema_version": "launchwright-r30-ci-evidence/1",
+  "source_sha": "af717a760f28e56a086c53295d6c070d375c05e0",
+  "merge_commit_sha": "bf19d35ab96d0f4391ab97e90fe6143e9d693b45",
+  "semwright_sha": "d2da9a495a53fe279a1ca4de61f0e24646350f22",
+  "native_sdk": "1.0.0",
+  "application_checks": {
+    "run_id": 37801793658,
+    "head_sha": "af717a760f28e56a086c53295d6c070d375c05e0",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37801793658",
+    "jobs": {
+      "light (windows-latest)": {
+        "job_id": 113395613294,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37801793658/job/113395613294"
+      },
+      "light (ubuntu-latest)": {
+        "job_id": 113395613638,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37801793658/job/113395613638"
+      },
+      "light (macos-latest)": {
+        "job_id": 113395613838,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37801793658/job/113395613838"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-macOS-391358d411f78fb5664df5703913dc5fb7f1f87c": {
+        "id": 11560839086,
+        "bytes": 698,
+        "expired": false
+      },
+      "launchwright-clean-room-Windows-391358d411f78fb5664df5703913dc5fb7f1f87c": {
+        "id": 11560512988,
+        "bytes": 734,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-391358d411f78fb5664df5703913dc5fb7f1f87c": {
+        "id": 11560199351,
+        "bytes": 693,
+        "expired": false
+      }
+    }
+  },
+  "selective": {
+    "verifier": {
+      "run_id": 37801783570,
+      "head_sha": "af717a760f28e56a086c53295d6c070d375c05e0",
+      "conclusion": "success",
+      "url": "https://github.com/seradotcom/launchwright/actions/runs/37801783570",
+      "jobs": {
+        "verifier": {
+          "job_id": 113395577267,
+          "conclusion": "success",
+          "url": "https://github.com/seradotcom/launchwright/actions/runs/37801783570/job/113395577267"
+        }
+      },
+      "artifacts": {
+        "launchwright-verifier-runtime-af717a760f28e56a086c53295d6c070d375c05e0": {
+          "id": 11562005067,
+          "bytes": 29702,
+          "expired": false
+        }
+      }
+    },
+    "native": {
+      "run_id": 37801787399,
+      "head_sha": "af717a760f28e56a086c53295d6c070d375c05e0",
+      "conclusion": "success",
+      "url": "https://github.com/seradotcom/launchwright/actions/runs/37801787399",
+      "jobs": {
+        "native": {
+          "job_id": 113395592372,
+          "conclusion": "success",
+          "url": "https://github.com/seradotcom/launchwright/actions/runs/37801787399/job/113395592372"
+        }
+      },
+      "artifacts": {
+        "launchwright-native-af717a760f28e56a086c53295d6c070d375c05e0": {
+          "id": 11561417027,
+          "bytes": 3190836,
+          "expired": false
+        }
+      }
+    },
+    "host": {
+      "run_id": 37801791732,
+      "head_sha": "af717a760f28e56a086c53295d6c070d375c05e0",
+      "conclusion": "success",
+      "url": "https://github.com/seradotcom/launchwright/actions/runs/37801791732",
+      "jobs": {
+        "host": {
+          "job_id": 113396516408,
+          "conclusion": "success",
+          "url": "https://github.com/seradotcom/launchwright/actions/runs/37801791732/job/113396516408"
+        }
+      },
+      "artifacts": {
+        "launchwright-native-host-af717a760f28e56a086c53295d6c070d375c05e0": {
+          "id": 11563355060,
+          "bytes": 128582,
+          "expired": false
+        }
+      }
+    }
+  },
+  "heavy_all": {
+    "run_id": 37825149878,
+    "head_sha": "af717a760f28e56a086c53295d6c070d375c05e0",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37825149878",
+    "jobs": {
+      "verifier": {
+        "job_id": 113475978904,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37825149878/job/113475978904"
+      },
+      "deltadesk": {
+        "job_id": 113475979098,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37825149878/job/113475979098"
+      },
+      "browser": {
+        "job_id": 113475979149,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37825149878/job/113475979149"
+      },
+      "host": {
+        "job_id": 113475979176,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37825149878/job/113475979176"
+      },
+      "extension": {
+        "job_id": 113475979245,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37825149878/job/113475979245"
+      },
+      "effects": {
+        "job_id": 113475979320,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37825149878/job/113475979320"
+      },
+      "godot": {
+        "job_id": 113475979411,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37825149878/job/113475979411"
+      },
+      "composition": {
+        "job_id": 113475979414,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37825149878/job/113475979414"
+      },
+      "stress": {
+        "job_id": 113475979447,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37825149878/job/113475979447"
+      },
+      "native": {
+        "job_id": 113475979738,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37825149878/job/113475979738"
+      }
+    },
+    "artifacts": {
+      "launchwright-extension-runtime-af717a760f28e56a086c53295d6c070d375c05e0": {
+        "id": 11572060613,
+        "bytes": 33937,
+        "expired": false
+      },
+      "launchwright-effects-runtime-af717a760f28e56a086c53295d6c070d375c05e0": {
+        "id": 11571990531,
+        "bytes": 35598,
+        "expired": false
+      },
+      "launchwright-native-host-af717a760f28e56a086c53295d6c070d375c05e0": {
+        "id": 11571892027,
+        "bytes": 128700,
+        "expired": false
+      },
+      "launchwright-godot-profile-af717a760f28e56a086c53295d6c070d375c05e0": {
+        "id": 11571251547,
+        "bytes": 70472,
+        "expired": false
+      },
+      "launchwright-native-af717a760f28e56a086c53295d6c070d375c05e0": {
+        "id": 11570963198,
+        "bytes": 3190835,
+        "expired": false
+      },
+      "launchwright-stress-af717a760f28e56a086c53295d6c070d375c05e0": {
+        "id": 11570898109,
+        "bytes": 767,
+        "expired": false
+      },
+      "launchwright-verifier-runtime-af717a760f28e56a086c53295d6c070d375c05e0": {
+        "id": 11570849476,
+        "bytes": 29722,
+        "expired": false
+      },
+      "launchwright-composition-single-recipe-af717a760f28e56a086c53295d6c070d375c05e0": {
+        "id": 11570534773,
+        "bytes": 112312,
+        "expired": false
+      },
+      "launchwright-browser-af717a760f28e56a086c53295d6c070d375c05e0": {
+        "id": 11570438877,
+        "bytes": 605585,
+        "expired": false
+      },
+      "launchwright-deltadesk-af717a760f28e56a086c53295d6c070d375c05e0": {
+        "id": 11570209504,
+        "bytes": 89949,
+        "expired": false
+      }
+    }
+  },
+  "authority": {
+    "scope": "owner-staged-format-and-credential-patterns-only",
+    "canonical_verifier_runtime_admitted": true,
+    "credential_pattern_scan_admitted": true,
+    "general_privacy_authority": false,
+    "broker_policy_path_observed": true,
+    "driver_host_isolation_accepted": true,
+    "native_sdk_review_recorded": true,
+    "artifact_substitution_rejected": true,
+    "receipt_candidate_substitution_rejected": true,
+    "platform_execution_authority": false,
+    "external_customer_acceptance": false,
+    "semantic_authority": false,
+    "editorial_authority": false,
+    "publication_authority": false
+  },
+  "credential_control": {
+    "dimension": "credential-exposure",
+    "receipt_sha256": "3105aec8dbe90603d02bdfac913cea8d93d54210c4afb92d12f1af67427a86af",
+    "effective_state": "PASS",
+    "exact_candidate_artifact_bound": true,
+    "secret_pattern_negative_control": true,
+    "secret_finding_redacted": true,
+    "cross_dimension_rejected": true,
+    "general_privacy_authority": false
+  },
+  "authority_note": "R30 accepts only bounded, deterministic credential-pattern screening for owned exact text candidates through Semwright Broker, Policy, Driver Host and Native receipt admission. It cannot grant general privacy, PII, customer, Platform or publication authority.",
+  "main_push_application_checks": {
+    "run_id": 37827771759,
+    "head_sha": "bf19d35ab96d0f4391ab97e90fe6143e9d693b45",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37827771759",
+    "jobs": {
+      "light (windows-latest)": {
+        "job_id": 113484933107,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37827771759/job/113484933107"
+      },
+      "light (macos-latest)": {
+        "job_id": 113484933397,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37827771759/job/113484933397"
+      },
+      "light (ubuntu-latest)": {
+        "job_id": 113484933406,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37827771759/job/113484933406"
+      }
+    }
+  }
+}
