@@ -27,7 +27,7 @@ The caller cannot select an executable, code, argv, environment, network access,
 - protected spec mount: `effects-protected`;
 - artifact mount: `effects-artifacts`;
 - protected spec filename: `spec.json`;
-- evaluator: the Semwright v1.0.0 `effects_readback` library linked into the reviewed provider binary.
+- evaluator: the Semwright Native SDK 1.0.0 `effects_readback` implementation linked from exact Semwright source `d2da9a495a53fe279a1ca4de61f0e24646350f22` into the reviewed provider binary.
 
 The provider can execute the evaluator only through an authenticated Driver Host execution context. Launchwright separately binds the protected spec's declared runtime digest to the exact staged provider/evaluator executable SHA-256 before admitting a PASS.
 
@@ -35,7 +35,7 @@ The provider can execute the evaluator only through an authenticated Driver Host
 
 The manual `effects` lane in `.github/workflows/heavy.yml` now:
 
-1. checks out exact Semwright v1.0.0 source;
+1. checks out exact Semwright source `d2da9a495a53fe279a1ca4de61f0e24646350f22`, the reviewed post-v1.0.0 revision pinned by `SOURCE_LOCK.json` while the Native SDK package remains `1.0.0`;
 2. builds all thirteen bounded Launchwright Native profiles plus the fixed Effects provider;
 3. builds the real Semwright daemon, CLI, Driver Host sandbox helper and `semwright-native-effects` preparation CLI;
 4. uses the canonical CLI only to prepare the owner-protected spec with the exact provider runtime digest;
@@ -45,4 +45,4 @@ The manual `effects` lane in `.github/workflows/heavy.yml` now:
 8. proves wrong spec digest, result substitution, runtime-digest substitution, external-authority escalation and missing provider policy all fail closed;
 9. mutates a pinned Launchwright source and requires the previously admitted PASS to become `UNKNOWN`.
 
-Before a green exact-SHA R29 CI run, this is candidate behavior only. Even after that acceptance it will establish only immutable-artifact Effects evaluation inside Driver Host. It will **not** establish native/browser/Godot mutation-effect correctness, noninterference, scenario-effects authority, Platform execution, real-customer acceptance or publication authority.
+R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` passed Application checks, selective Effects/Native/Host/Verifier runs and final all-lanes run `37727269373`. That acceptance establishes only the fixed immutable-artifact Effects provider/evaluator and exact receipt-admission path inside Driver Host. It does **not** establish native/browser/Godot mutation-effect correctness, noninterference, scenario-effects authority, Platform execution, real-customer acceptance or publication authority.
