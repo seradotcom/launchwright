@@ -163,16 +163,23 @@ are executed and no Project Graph, Driver Host extension, Platform,
 customer or publication authority is inferred. Exact CI job and artifact
 identities are retained in `evidence/r35/ci-runs.json`.
 
-## R36 candidate — read-only filesystem capacity preflight
+## R36 accepted — read-only filesystem capacity preflight
 
-R36 augments local doctor with separate capacity diagnoses for the process
-temporary volume and workspace volume. Less than 16 MiB free reports a
-blocking condition; less than 256 MiB is a warning. Unsupported platform
-capacity yields UNKNOWN, never assumed OK. No filesystem deletions, workspace
-initialization, SDK mutation or automatic cleanup is performed. Injected
-zero/low/unknown/large-space fixtures establish deterministic diagnostics;
-supported Node 24 Linux/Windows/macOS CI acceptance is pending. This does
-not establish Native Driver Host, Platform or customer authority.
+R36 is accepted at exact source SHA `af133e77cf064c49618d141d572afc333878ef7d` after Node 24
+Linux/Windows/macOS Application checks run `37855899556`
+passed, and PR #55 merged as `1b2456056965de624abcff762d0bfbe72a58ab89`. The corresponding
+main-push run `37856094190` also passed all three OSes.
+The local doctor now reports process-temporary and workspace
+filesystem free space separately, with EXHAUSTED below 16 MiB,
+LOW below 256 MiB and UNKNOWN when the capacity probe is
+unavailable. Injected capacity tests prove no incorrect OK from
+zero/invalid/unsupported statfs results and no file mutation.
+An actual supplemental Node 22 diagnosis showed root /tmp exhausted
+and the workspace filesystem with available space; selecting a
+private TMPDIR on /home resolved the temporary-space warning without
+deleting unrelated user files. Native Host/Platform/customer authority
+is unchanged. Exact CI job/artifact receipts are retained in
+`evidence/r36/ci-runs.json`.
 
 ## Explicitly not established
 
