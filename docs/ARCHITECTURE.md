@@ -24,6 +24,16 @@ Immutable outputs include artifacts, candidates, verification records, waivers, 
 
 Artifacts store exact SHA-256-addressed bytes. Candidate v2 freezes artifact hashes plus media metadata, target fingerprints, protected input revisions, claims, ReleaseContract, selected localization/glossary revisions, channel profiles, declared rights, destination and review policy. A protected change makes the old candidate stale rather than silently updating it.
 
+## Editorial release outline from imported Git metadata
+
+R33 generates a deterministic Markdown inventory for human revision from the
+already-imported R32 observation. Its preview defaults to counts; including
+filenames requires explicit operator acknowledgement and a bounded budget.
+Creation uses the existing Native SDK editable deliverable operation with
+approved source/evidence revision binding. Human edits are not overwritten.
+No product-feature truth, runtime acceptance or Graph authority is inferred.
+See the Git release outline guide.
+
 ## Existing Git project source metadata
 
 The R32 operator-controlled adapter accepts only two existing full commit SHAs

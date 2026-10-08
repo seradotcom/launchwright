@@ -113,6 +113,17 @@ R31 implementation acceptance is complete at exact source SHA `5a34632d982110d09
 
 R32 implementation acceptance is complete at exact source SHA `cc56dd5fb34829ed308c70161c20c6ed5a1e2368`. Native SDK integration and disposable local real Git fixture tests pass on supported Node 24 Linux, Windows and macOS in runs `37836538487` and `37836544605`. The initial source SHA `8630bf541d388eb1736776e846770eb71712eb56` failed on Windows because Git path normalization differed from Node's filesystem path, and this was corrected before acceptance. PR #49 merged as `a0c846fb21b7d55a30ad5fc05e9a8c324bad3222`, with main-push three-OS checks `37836921050` passing. The adapter observes pinned base/head commit and tree SHAs, bounded changed filename/status inventory and commit counts **without executing the repository, fetching remotes or reading code/patches/commit messages**. Its operator-approved Native SDK evidence import remains `technical: UNKNOWN` and imported-declaration only, not Project Graph, Driver Host, Platform or customer-production authority. Complete SHA/job/artefact evidence: `evidence/r32/ci-runs.json`.
 
+## R33 candidate — Git-derived editorial outlines
+
+R33 converts exact imported R32 Git observations to source-linked editable
+Markdown through the existing Native SDK application dispatcher. The default
+outline gives factual path counts; filenames require separate operator
+disclosure acknowledgement and size limits. Source, target, build, imported
+evidence and observation digest are checked. Human edits are protected,
+repeated creation is idempotent, and the result is a DRAFT with technical
+UNKNOWN. No feature/runtime/customer/Project Graph/Platform/publication claim
+is inferred. Exact-SHA supported Node24 CI is pending.
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;

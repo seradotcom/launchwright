@@ -34,6 +34,7 @@ Synthetic data is never described as a real product capture.
 - durable exact entity revision history with bounded get/list/diff operations, explicit legacy migration, and no invented pre-migration revisions;
 - build/source/target/feature/scenario/anchor modeling with explicit source authorization;
 - R32 (accepted exact source SHA `cc56dd5fb34829ed308c70161c20c6ed5a1e2368`) operator-owned Git committed-metadata import: reads an exact base/head SHA and bounded changed-file inventory from an existing project without fetching, reading patch contents or executing that project, then records only imported UNKNOWN evidence through the canonical Native SDK dispatcher. No Project Graph or Host authority is inferred;
+- R33 Git observation to human-editable Markdown outline: deterministic counts, source/evidence SHA pinning, default filename redaction, explicit disclosure consent and idempotent Native SDK deliverable creation. The draft remains UNKNOWN and cannot stand in for behavior/feature verification;
 - claims, CopyBlocks, availability rules and ReleaseContract readiness denominators;
 - immutable Markdown, safe HTML, JSON, email-draft and VTT artifacts with SHA-256-addressed bytes;
 - explicit relation provenance plus an immutable, owner-admitted Semwright Project Graph projection with bounded visible-node impact, preserved UNKNOWN frontiers, exact-revision impact proposals/coalescing, conservative reuse assessment and rebuild/finalization receipts; local heuristics never promote themselves to Graph authority;
@@ -125,6 +126,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [Native SDK integration](docs/NATIVE_SDK.md)
 - [Project Graph projection and impact](docs/PROJECT_GRAPH.md)
 - [Read-only Git change sources for existing projects](docs/GIT_CHANGE_SOURCE.md)
+- [Git metadata to editorial release-note outlines](docs/GIT_RELEASE_OUTLINE.md)
 - [Canonical Effects readback custody](docs/EFFECTS.md)
 - [DeltaDesk real-browser laboratory](docs/DELTADESK_LAB.md)
 - [GitHub Release draft operator integration](docs/GITHUB_RELEASE_DRAFT.md)

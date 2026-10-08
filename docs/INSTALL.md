@@ -25,6 +25,14 @@ and exact immutable bundle. This creates a GitHub **draft**, never publishes a
 release. It does not establish Semwright Platform Publish authority.
 See [GitHub draft instructions](GITHUB_RELEASE_DRAFT.md).
 
+## Editable release outlines from Git evidence
+
+After importing an approved R32 observation, an operator may use
+scripts/git-release-outline.mjs to preview a bounded inventory and create
+an editable Markdown deliverable. Preview makes no domain changes; creation
+requires a human-review-only acknowledgement.
+See the Git release outline guide.
+
 ## Importing source metadata from an existing Git project
 
 An operator can scan two exact local commit SHAs without fetching or
