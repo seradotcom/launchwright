@@ -1,0 +1,91 @@
+{
+  "schema_version": "launchwright-native-host-acceptance/4",
+  "passed": true,
+  "launchwright_sha": "4b0a437ef2fbd67d199dcf33e0d0d405ef91e0ad",
+  "semwright_sha": "4d291de26724810017ce7b6d185326514cb79fa6",
+  "native_sdk": "0.9.0-dev.1",
+  "authority": {
+    "driver_host_isolation_accepted": true,
+    "broker_policy_path_observed": true,
+    "host_mediated_node_runtime": true,
+    "extension_control_plane_driver_host_accepted": true,
+    "extension_fixture_execution_host_isolation_accepted": false,
+    "project_graph_live_broker_admitted": true,
+    "project_graph_native_projection_recorded": true,
+    "project_graph_platform_job_authority": false,
+    "effects_canonical_readback_host_custody_accepted": true,
+    "effects_owner_admission_accepted": false,
+    "effects_evaluation_driver_host_isolation_accepted": false,
+    "effects_execution_authority": false,
+    "platform_external_acceptance": false,
+    "chatgpt_host_acceptance": false,
+    "public_channel_acceptance": false
+  },
+  "allowed_flow": {
+    "product_id": "product_ee5befa8-34c5-45f9-8099-3a7e9c6e6620",
+    "initial_revision": {
+      "generation": "0e11174a-4240-4e66-bf30-fab30483d6ae",
+      "resource": "launchwright:workspace",
+      "revision": "9007199254740993"
+    },
+    "final_revision": {
+      "generation": "0e11174a-4240-4e66-bf30-fab30483d6ae",
+      "resource": "launchwright:workspace",
+      "revision": "9007199254741019"
+    },
+    "restart_persistence": true,
+    "stale_reference_rejected": true,
+    "bad_request_rejected": true,
+    "extension_lifecycle": {
+      "renderer_extension_id": "extension_package_d6765dbf-1d60-4724-97ef-11012604ca23",
+      "renderer_result_id": "extension_result_dc1c5836-fd4d-4d11-ba44-63cd84c063d1",
+      "cli_extension_id": "extension_package_e045c08a-1e09-4d7f-b8f1-0be792dbb953",
+      "cli_observation_id": "cli_observation_925c99c7-4d9b-4cce-a8d3-e6ccc5e4a295",
+      "compatibility_lock_id": "compatibility_lock_0fdba617-6cda-4fc7-ac95-e7afdacae342",
+      "discovery_visible": true,
+      "generic_view_safe": true,
+      "unsupported_major_rejected": true,
+      "retirement_preserved_history": true,
+      "compatibility_retirement_drift_visible": true,
+      "control_plane_driver_host_admitted": true,
+      "fixture_process_driver_host_isolated": false,
+      "technical_state_promoted": false
+    },
+    "project_graph": {
+      "project_id": "prj_0f1771f419e9448f96479dfdfed69b3c",
+      "graph_observation_id": "graph_observation_11ab43a8-6bfd-4516-a12a-8c57016f763f",
+      "release_id": "release_2dc06620-363e-44c5-8da3-78ea0870f4a7",
+      "source_asset_id": "asset_c9199584d67b4cf4b3ca29622128da9b",
+      "deliverable_asset_id": "asset_d49ac3c7e93645be93272552ea01e0f2",
+      "snapshot": 7,
+      "transcript_sha256": "9b6d4ce9d1f65034e82e0757f39c3eae64b6c4fe31b8527468ab3829286bce0c",
+      "broker_project_graph_live": true,
+      "native_driver_projection_recorded": true,
+      "restart_persistence": true,
+      "platform_job_authority": false,
+      "external_publish_authority": false
+    },
+    "effects_custody": {
+      "release_id": "release_4c35864e-e806-4417-9c12-7f14cf5a24b8",
+      "artifact_id": "artifact_c44dfbd9-7d3a-49c9-9191-b2d8ddf50e46",
+      "artifact_sha256": "334d7d48a4a1763ac7ce3962e1343e121451f1f4d81f4f5907b48f2dbef9ec2b",
+      "spec_sha256": "b07300bd98817316b7d87d52e2c59170934b689badd6067791d70854653ae1b3",
+      "canonical_result_sha256": "a11b7551f671498a8ed89e1d2930bbabc64e484c9f28454af99fe85d74412749",
+      "canonical_reader_reported_verdict": "PASS",
+      "effective_launchwright_state": "UNKNOWN",
+      "host_custody_recorded": true,
+      "owner_admission_rejected": true,
+      "canonical_reader_execution_inside_driver_host": false,
+      "execution_authority": false,
+      "scenario_effects_authority": false
+    }
+  },
+  "policy_denied_flow": {
+    "provider_allowlisted": false,
+    "execution_rejected": true
+  },
+  "project_graph_policy_denied_flow": {
+    "project_manage_allowlisted": false,
+    "execution_rejected": true
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "schema_version": "launchwright-r26-ci-evidence/1",
+  "launchwright_sha": "4b0a437ef2fbd67d199dcf33e0d0d405ef91e0ad",
+  "semwright_sha": "4d291de26724810017ce7b6d185326514cb79fa6",
+  "application_checks": {
+    "run_id": 37702867268,
+    "jobs": {
+      "ubuntu": 113070211944,
+      "windows": 113070211868,
+      "macos": 113070212150
+    },
+    "conclusion": "success"
+  },
+  "native": {
+    "run_id": 37702865584,
+    "job_id": 113070211681,
+    "artifact_id": 11518232674,
+    "artifact_name": "launchwright-native-4b0a437ef2fbd67d199dcf33e0d0d405ef91e0ad",
+    "conclusion": "success"
+  },
+  "verifier": {
+    "run_id": 37702863007,
+    "job_id": 113070204438,
+    "artifact_id": 11519045202,
+    "artifact_name": "launchwright-verifier-runtime-4b0a437ef2fbd67d199dcf33e0d0d405ef91e0ad",
+    "conclusion": "success"
+  },
+  "host": {
+    "run_id": 37702869177,
+    "job_id": 113070223304,
+    "artifact_id": 11519066904,
+    "artifact_name": "launchwright-native-host-4b0a437ef2fbd67d199dcf33e0d0d405ef91e0ad",
+    "conclusion": "success"
+  },
+  "retained_reports": {
+    "ci-verifier-report.json": {
+      "sha256": "ff1b84fdf42d1e52b04374e2380a691415285da805bcbf72322d7069468e20c3",
+      "bytes": 2021
+    },
+    "ci-host-report.json": {
+      "sha256": "6fc1a5639ce2b820ddc640c2870f537208a395232cd54c0063e5e2eaad62a338",
+      "bytes": 4050
+    },
+    "ci-native-bundle.json": {
+      "sha256": "8baa0d161f3f80db1cddb02cfed2edac21e994fc12ce347902e335afa5068686",
+      "bytes": 5901
+    },
+    "ci-native-bundle-smoke.json": {
+      "sha256": "fc764cb338f90abb479a49794185bfea274f0100202d412e7497372d9fbd6067",
+      "bytes": 1957
+    }
+  }
+}

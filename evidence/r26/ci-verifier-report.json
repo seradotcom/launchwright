@@ -1,0 +1,49 @@
+{
+  "schema_version": "launchwright-verifier-runtime-acceptance/1",
+  "passed": true,
+  "launchwright_sha": "4b0a437ef2fbd67d199dcf33e0d0d405ef91e0ad",
+  "semwright_sha": "4d291de26724810017ce7b6d185326514cb79fa6",
+  "native_sdk": "0.9.0-dev.1",
+  "authority": {
+    "scope": "owner-staged-format-only",
+    "canonical_verifier_runtime_admitted": true,
+    "broker_policy_path_observed": true,
+    "driver_host_isolation_accepted": true,
+    "native_sdk_review_recorded": true,
+    "artifact_substitution_rejected": true,
+    "receipt_candidate_substitution_rejected": true,
+    "platform_execution_authority": false,
+    "external_customer_acceptance": false,
+    "semantic_authority": false,
+    "editorial_authority": false,
+    "publication_authority": false
+  },
+  "allowed_flow": {
+    "manifest_validated": true,
+    "conformance": {
+      "capabilities": 2,
+      "executed_read_only": true,
+      "health": true,
+      "namespace": "driver.launchwright-verifier.",
+      "persistent_process": true,
+      "provider": "driver:launchwright-verifier",
+      "sandboxed": true,
+      "shutdown": true,
+      "version": "0.2.0-dev.1"
+    },
+    "candidate_id": "candidate_ce0a6334-1e5d-4b92-84dc-30d5b4d1e393",
+    "candidate_sha256": "a1059a6c73526a264d06c0cb9495102c36230ec430cecf14acc66f6338044e87",
+    "candidate_manifest_sha256": "f4af7fb4f1a23d8f1ea5e7251222a82a4d522008956163ee816aa229a71635a1",
+    "artifact_sha256": "bfb7bb87104bf6a9b7e7762a7ef442a05ab60158b48e49e99609d7f4c33a8220",
+    "verifier_executable_sha256": "98f09146124edfded78d94e90cc3f2dbc188ee7e1439917e18ec6b95d1e489d4",
+    "verifier_descriptor_sha256": "144c4c9c7c2b537be7626303db0bcd8a96067ebe57a9a260a978ede98db50688",
+    "receipt_sha256": "f48fdccc3d32f8c592f6b513dafa0e031e08cefbb902399cb159fe276176e024",
+    "effective_state": "PASS",
+    "artifact_substitution_rejected": true,
+    "receipt_candidate_substitution_rejected": true
+  },
+  "policy_denied_flow": {
+    "driver_allowlisted": false,
+    "execution_rejected": true
+  }
+}

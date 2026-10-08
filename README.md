@@ -41,7 +41,7 @@ Synthetic data is never described as a real product capture.
 - exact candidate manifests that pin artifact bytes, target context, ReleaseContract, localization/glossary revisions, channel profiles and declared rights, with input freshness and review-race isolation;
 - capture contract v2 tied to source + build + target + scenario, with Platform/native receipt correlation, readiness checks, anchor cardinality, build-drift detection, isolation/cleanup bounds, provenance classes and derived-material lineage while technical state stays UNKNOWN;
 - owned DeltaDesk A/B browser laboratory exercised through the exact pinned Semwright Broker + Policy + Chromium path in a dedicated heavy CI lane; its real Broker-routed receipts and screenshot hashes are preserved as `IMPORTED_UNVERIFIED` capture records, fixture approval remains explicitly non-human, and no canonical Platform/Host authority is inferred;
-- immutable verifier identity/version/digest, coverage, omissions and findings;
+- immutable verifier identity/version/digest, coverage, omissions and findings; R26 exact SHA `4b0a437ef2fbd67d199dcf33e0d0d405ef91e0ad` additionally admits the bounded owner-staged `format` verifier through the real Broker/Policy/Driver Host path without extending that authority to semantic/editorial/Platform/publication claims;
 - waivers that annotate failures without changing verifier truth;
 - versioned channel profiles, exact package generation, authenticated deterministic private ZIP bundles, and receipt/recovery state without performing the external send;
 - source-linked localization with glossary revision pins, explicit rebase, RTL/font-rights/critical-term blockers and no invented language/layout PASS;
