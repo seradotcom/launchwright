@@ -36,6 +36,6 @@ fix the original, rerender, freeze a new candidate and repeat. Waivers do not
 convert FAIL to PASS. A separate text-only candidate does not grant authority
 to the full release candidate.
 
-The exact-SHA R30 CI lane must prove driver validate/conformance, clean PASS,
+The exact-SHA R30 CI lane proved driver validate/conformance, clean PASS,
 contaminated fixture FAIL with redacted finding, wrong dimension rejection,
 policy denial, SHA and candidate/artifact binding and real Native admission.

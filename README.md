@@ -75,7 +75,7 @@ The optional Platform adapter consumes an owner-supplied byte-pinned package. Th
 
 Launchwright keeps **production, verification, review and delivery** separate.
 
-R30 adds a fixed credential-pattern exposure check for exact text candidate bytes using Semwright Driver Host. This is not a general privacy audit. See [scope and limits](docs/CREDENTIAL_VERIFIER.md).
+R30 (accepted at exact SHA `af717a760f28e56a086c53295d6c070d375c05e0`) adds a fixed credential-pattern exposure check for exact text candidate bytes using Semwright Driver Host. This is not a general privacy audit. See [scope and limits](docs/CREDENTIAL_VERIFIER.md).
 
 A successful capture contract can establish that an authorized receipt, readiness conditions, unique anchors and provenance were recorded; it does not establish semantic correctness or Driver Host acceptance. Generated/editorial/imported material is never eligible to stand in for observed product state, and a sanitized derivative only preserves that eligibility when its exact parent capture did and every declared transformation preserves observed state. A heuristic/model/local PASS remains effective UNKNOWN unless admitted by canonical verifier authority. A waiver records an exception but never turns FAIL into PASS. A channel package says bytes are ready; it does not mean they were uploaded or published. A local ReleaseTemplate/ProductVersion/deployment contract likewise does not prove a remote consumer job ran. Public activation requires a canonical Publish receipt.
 

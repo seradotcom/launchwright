@@ -42,6 +42,6 @@ A green `host` lane is exact-SHA evidence for this Driver Host/Broker/Policy bou
 
 The optional Platform adapter consumes an owner-supplied, byte-pinned client because the inspected Platform package is not licensed for redistribution in this public repository.
 
-## R30 credential-pattern verifier (acceptance pending)
+## R30 credential-pattern verifier (accepted exact SHA)
 
 The existing verifier Native profile can admit fixed credential-exposure reports from their own pinned Host descriptor and read-only grant. This cannot establish general privacy or publication authority. See [scope and blind spots](CREDENTIAL_VERIFIER.md).
