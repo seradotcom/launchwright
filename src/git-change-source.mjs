@@ -52,9 +52,15 @@ function pathInput(value){
     'Repository path must be an explicit bounded absolute path');
   const real=realpathSync(value);
   ensure(statSync(real).isDirectory(),'Git repository root must be a directory');
-  // Reject passing a nested directory: origin must be unambiguous.
-  const declared=gitText(real,['rev-parse','--show-toplevel'],2048);
-  ensure(realpathSync(declared)===real,
+  // Validate logical worktree root WITHOUT comparing Git's path string with
+  // Node's realpath. Git for Windows may emit slash-normalized/drive-cased paths
+  // that do not compare byte-for-byte to Win32 canonical filesystem paths.
+  // --show-prefix is empty only at the top of the selected working tree.
+  ensure(gitText(real,['rev-parse','--is-inside-work-tree'],8)==='true' &&
+    gitText(real,['rev-parse','--is-bare-repository'],8)==='false',
+    'Source must be a non-bare Git worktree','InvalidArgument');
+  const prefix=gitRun(real,['rev-parse','--show-prefix'],{limit:1024}).stdout.toString('utf8').trim();
+  ensure(prefix.length===0,
     'Source path must name the exact working tree root','InvalidArgument');
   return real;
 }
