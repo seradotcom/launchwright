@@ -11,7 +11,7 @@ import {setup,baseline,update} from './helpers.mjs';
 
 const sha=value=>createHash('sha256').update(value).digest('hex');
 const executableSha='e'.repeat(64);
-const sourceSha='215295d2a2510c24864d4226e6b78c1abe3de04601c85c59a99543d8ef1336ff';
+const sourceSha='21c04e7ee35f0f77bd1858077a435c2b11e38e21a7e2e48d07c052665e49c530';
 const SPEC_TEXT=JSON.stringify({schema_version:'semwright-native-effects-spec/1'});
 const SPEC_SHA=sha(SPEC_TEXT);
 

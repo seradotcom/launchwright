@@ -6,7 +6,7 @@ import { object, integer, requireCondition as ensure, validateValue } from '@sem
 import { sha, str, lines } from './contracts.mjs';
 import { digest } from './base.mjs';
 
-export const EXTENSION_RUNTIME_SEMWRIGHT_SHA='8fa191250ae68274182570c65f067f7a60f85625';
+export const EXTENSION_RUNTIME_SEMWRIGHT_SHA='d2da9a495a53fe279a1ca4de61f0e24646350f22';
 export const EXTENSION_RUNTIME_PROVIDER='driver:launchwright-extension';
 export const EXTENSION_RUNTIME_PROVIDER_VERSION='0.2.0-dev.1';
 export const EXTENSION_RUNTIME_SCHEMA='launchwright-extension-runtime/1';

@@ -1,6 +1,6 @@
 # Canonical Project Graph projection
 
-Launchwright does not implement a second dependency graph, traversal engine, freshness authority or effect evaluator. It consumes and stores bounded projections from Semwright Project Graph at the pinned Semwright v1.0.0 source SHA `8fa191250ae68274182570c65f067f7a60f85625`.
+Launchwright does not implement a second dependency graph, traversal engine, freshness authority or effect evaluator. It consumes and stores bounded projections from Semwright Project Graph at the pinned reviewed Semwright source SHA `d2da9a495a53fe279a1ca4de61f0e24646350f22` (Native SDK API line 1.0.0; base release `8fa191250ae68274182570c65f067f7a60f85625`).
 
 The machine-readable lock is `contracts/project-graph-contract.json`. JavaScript tests compare the public application contract with that file, while the Rust NativeDriver test compiles against `semwright-project-graph` at the same Git revision and checks the canonical relation serialization, schema version, traversal limits and presentation labels.
 

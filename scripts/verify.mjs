@@ -10,6 +10,7 @@ for(const[path,expected]of Object.entries(lock.native_sdk.files)){
  const bytes=readFileSync(join('vendor/semwright-native-sdk',path));if(createHash('sha256').update(bytes).digest('hex')!==expected)throw Error('Canonical Native SDK bytes changed: '+path);
 }
 if(lock.native_sdk.version!=='1.0.0'||lock.native_sdk.release_tag!=='v1.0.0')throw Error('Canonical Native SDK release lock changed');
+if(lock.native_sdk.sha!=='d2da9a495a53fe279a1ca4de61f0e24646350f22'||lock.native_sdk.release_tag_sha!=='8fa191250ae68274182570c65f067f7a60f85625'||lock.native_sdk.source_revision_kind!=='post-v1.0.0-reviewed-main'||lock.native_sdk.source_fix_pr!==250)throw Error('Canonical Semwright source/release split changed');
 const archive=readFileSync(join('vendor','semwright-native-sdk-'+lock.native_sdk.version+'.tgz'));if(createHash('sha256').update(archive).digest('hex')!==lock.native_sdk.archive_sha256)throw Error('Canonical Native SDK package archive changed');
 function walk(dir){for(const name of readdirSync(dir)){if(['node_modules','.git','.state','.ci-tools','target','dist','private-reference'].includes(name)||name.startsWith('.state-'))continue;const path=join(dir,name),st=lstatSync(path);if(st.isSymbolicLink())throw Error('Unexpected repository symlink');if(st.isDirectory())walk(path);else if(path.endsWith('.mjs')){const result=spawnSync(process.execPath,['--check',path],{encoding:'utf8'});if(result.status!==0)throw Error(result.stderr);count++;}}}
 walk('.');

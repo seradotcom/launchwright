@@ -1,6 +1,6 @@
 # Canonical Semwright Native SDK integration
 
-Launchwright pins the published Semwright `v1.0.0` release at commit `8fa191250ae68274182570c65f067f7a60f85625` and Native SDK `1.0.0`. Exact public SDK source hashes are in `../SOURCE_LOCK.json`. On 2026-10-07 the release tag and `origin/main` were independently verified to resolve to the same commit; later upstream commits are not inherited implicitly.
+Launchwright vendors the published `@semwright/native-sdk` 1.0.0 TypeScript package from Semwright `v1.0.0` (`8fa191250ae68274182570c65f067f7a60f85625`), while Rust/Driver Host integration is pinned independently to reviewed Semwright source `d2da9a495a53fe279a1ca4de61f0e24646350f22`. That post-release main snapshot includes PR #250, which makes the canonical Effects reader compatible with exact Driver Host/Landlock mounts without granting parent-directory ReadDir authority. Exact package/source identities are recorded separately in `../SOURCE_LOCK.json`; later upstream commits are not inherited implicitly.
 
 The JavaScript application imports the real `@semwright/native-sdk` package for application contexts, exact request digests, JSON budgets, cancellation, observations, recovery and dispatch. The vendored SDK keeps its upstream MIT OR Apache-2.0 licensing.
 

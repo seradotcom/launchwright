@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 const workflow=readFileSync(new URL('../.github/workflows/heavy.yml',import.meta.url),'utf8');
 const harness=readFileSync(new URL('../scripts/verify-native-host.py',import.meta.url),'utf8');
 const lock=JSON.parse(readFileSync(new URL('../SOURCE_LOCK.json',import.meta.url),'utf8'));
-const semwrightSha='8fa191250ae68274182570c65f067f7a60f85625';
+const semwrightSha='d2da9a495a53fe279a1ca4de61f0e24646350f22';
 
 test('R19 Host lane stays pinned to the canonical Semwright source lock',()=>{
   assert.equal(lock.native_sdk.sha,semwrightSha);

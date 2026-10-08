@@ -2,9 +2,9 @@
   "schema_version": "launchwright-source-lock/1",
   "native_sdk": {
     "repository": "https://github.com/seradotcom/semwright",
-    "sha": "8fa191250ae68274182570c65f067f7a60f85625",
+    "sha": "d2da9a495a53fe279a1ca4de61f0e24646350f22",
     "version": "1.0.0",
-    "observed_via": "Semwright v1.0.0 release tag and origin/main verified at the same commit; canonical TypeScript source/package byte equality confirmed",
+    "observed_via": "Vendored @semwright/native-sdk package remains the published v1.0.0 TypeScript bytes; Rust/Host integration is pinned to Semwright main after reviewed PR #250 fixed descriptor-relative Effects traversal under Driver Host/Landlock",
     "live_main_verified": true,
     "archive_sha256": "4421585d4e583eebd8d80d73a4eadd5f7ad43ead8ebe3ec7eaef2090cdc2b911",
     "files": {
@@ -17,10 +17,13 @@
       "tsconfig.json": "de3b36bb52f84b4b08cf87436e6111c621a2364038b3e953f7b8bae49e889faa"
     },
     "prior_archive_sha": "4d291de26724810017ce7b6d185326514cb79fa6",
-    "live_observed_at": "2026-10-07T23:37:38Z",
+    "live_observed_at": "2026-10-08T04:01:26Z",
     "release_tag": "v1.0.0",
     "release_published_at": "2026-10-07T17:48:42Z",
-    "archive_kind": "vendored-npm-package"
+    "archive_kind": "vendored-npm-package",
+    "release_tag_sha": "8fa191250ae68274182570c65f067f7a60f85625",
+    "source_revision_kind": "post-v1.0.0-reviewed-main",
+    "source_fix_pr": 250
   },
   "platform_client": {
     "version": "0.3.5-dev.1",

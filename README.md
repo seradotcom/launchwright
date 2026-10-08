@@ -60,7 +60,8 @@ Synthetic data is never described as a real product capture.
 
 The public `@semwright/native-sdk` source is vendored unchanged under its upstream **MIT OR Apache-2.0** license. `SOURCE_LOCK.json` pins:
 
-- Semwright v1.0.0 commit/tag `8fa191250ae68274182570c65f067f7a60f85625` / `v1.0.0`
+- Semwright source `d2da9a495a53fe279a1ca4de61f0e24646350f22` (post-v1.0.0 reviewed main; includes PR #250 Effects/Landlock fix)
+- base Native SDK package/release `v1.0.0` at `8fa191250ae68274182570c65f067f7a60f85625`
 - Native SDK `1.0.0`
 - exact SHA-256 hashes for the redistributed SDK files/archive
 

@@ -8,7 +8,7 @@ const harness=readFileSync(new URL('../scripts/verify-effects-runtime.py',import
 const driver=readFileSync(new URL('../crates/launchwright-effects-driver/src/main.rs',import.meta.url),'utf8');
 const nativeDriver=readFileSync(new URL('../crates/launchwright-native/src/main.rs',import.meta.url),'utf8');
 const runtime=readFileSync(new URL('../src/effects-runtime.mjs',import.meta.url),'utf8');
-const semwrightSha='8fa191250ae68274182570c65f067f7a60f85625';
+const semwrightSha='d2da9a495a53fe279a1ca4de61f0e24646350f22';
 
 test('R29 effects lane runs the canonical reader inside exact-SHA Driver Host',()=>{
   assert.match(workflow,/inputs.lane == 'all' || inputs.lane == 'effects'/u);
@@ -39,7 +39,7 @@ test('R29 isolates effects.record behind a receipt-aware Native profile',()=>{
   assert.match(nativeDriver,/"node-effects-runtime"/u);
   assert.match(nativeDriver,/Some\("effects-receipts"\)/u);
   assert.match(runtime,/EFFECTS_RUNTIME_PROVIDER='driver:launchwright-effects'/u);
-  assert.match(runtime,/EFFECTS_READER_SOURCE_SHA256='215295d2a2510c24864d4226e6b78c1abe3de04601c85c59a99543d8ef1336ff'/u);
+  assert.match(runtime,/EFFECTS_READER_SOURCE_SHA256='21c04e7ee35f0f77bd1858077a435c2b11e38e21a7e2e48d07c052665e49c530'/u);
   assert.match(runtime,/evaluator_executable_sha256===receipt\.provider_executable_sha256/u);
   assert.match(runtime,/result\.runtime_digest===receipt\.evaluator_executable_sha256/u);
   assert.match(runtime,/platform_execution_authority===false/u);

@@ -5,13 +5,13 @@ import {join,sep} from 'node:path';
 import {object,requireCondition as ensure,validateValue,integer} from '@semwright/native-sdk';
 import {sha,str} from './contracts.mjs';
 
-export const EFFECTS_RUNTIME_SEMWRIGHT_SHA='8fa191250ae68274182570c65f067f7a60f85625';
+export const EFFECTS_RUNTIME_SEMWRIGHT_SHA='d2da9a495a53fe279a1ca4de61f0e24646350f22';
 export const EFFECTS_RUNTIME_PROVIDER='driver:launchwright-effects';
 export const EFFECTS_RUNTIME_PROVIDER_VERSION='0.2.0-dev.1';
 export const EFFECTS_RUNTIME_RECEIPT_SCHEMA='launchwright-effects-runtime/1';
 export const EFFECTS_DRIVER_RESULT_SCHEMA='launchwright-effects-driver-result/1';
 export const EFFECTS_RUNTIME_COMMAND='driver.launchwright-effects.verify';
-export const EFFECTS_READER_SOURCE_SHA256='215295d2a2510c24864d4226e6b78c1abe3de04601c85c59a99543d8ef1336ff';
+export const EFFECTS_READER_SOURCE_SHA256='21c04e7ee35f0f77bd1858077a435c2b11e38e21a7e2e48d07c052665e49c530';
 
 const hashBytes=bytes=>createHash('sha256').update(bytes).digest('hex');
 const hashText=text=>hashBytes(Buffer.from(text,'utf8'));

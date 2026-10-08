@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { validateSingleRecipeCompositionEvidence } from '../src/composition-single-recipe.mjs';
 
-const semwright='8fa191250ae68274182570c65f067f7a60f85625';
+const semwright='d2da9a495a53fe279a1ca4de61f0e24646350f22';
 const launchwright='1'.repeat(40);
 const a='a'.repeat(64),b='b'.repeat(64),c='c'.repeat(64),d='d'.repeat(64),e='e'.repeat(64),f='f'.repeat(64),g='0'.repeat(64);
 

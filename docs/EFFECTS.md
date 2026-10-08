@@ -1,6 +1,6 @@
 # Canonical Effects readback and Driver Host admission
 
-Launchwright uses the Effects surface from the exact pinned Semwright v1.0.0 Native SDK at commit `8fa191250ae68274182570c65f067f7a60f85625` (`v1.0.0`). It does **not** implement another effects evaluator.
+Launchwright uses the Native SDK 1.0.0 Effects surface with exact Semwright source `d2da9a495a53fe279a1ca4de61f0e24646350f22`. The vendored TypeScript package remains the published `v1.0.0` bytes from `8fa191250ae68274182570c65f067f7a60f85625`; the Rust/Host source pin advances to reviewed PR #250 so descriptor-relative Effects reads work under Driver Host/Landlock without parent-directory ReadDir authority. It does **not** implement another effects evaluator.
 
 ## Scope
 

@@ -2,7 +2,7 @@
 import { requireCondition as ensure, object, integer, validateValue } from '@semwright/native-sdk';
 import { inputObject, str, array, choice, sha, digest, iso, RIGHTS, noSecrets } from './contracts.mjs';
 
-export const GRAPH_SOURCE_SHA='8fa191250ae68274182570c65f067f7a60f85625';
+export const GRAPH_SOURCE_SHA='d2da9a495a53fe279a1ca4de61f0e24646350f22';
 export const GRAPH_SCHEMA_VERSION=1;
 export const GRAPH_RELATIONS=Object.freeze(['contains','references','derived_from','produced_by','consumed_by','realizes','published_as','verified_by']);
 export const GRAPH_EDGE_EVIDENCE=Object.freeze(['declared','observed','executed']);

@@ -773,7 +773,7 @@ mod tests {
         .unwrap();
         assert_eq!(
             lock["source"]["sha"],
-            "8fa191250ae68274182570c65f067f7a60f85625"
+            "d2da9a495a53fe279a1ca4de61f0e24646350f22"
         );
         assert_eq!(
             lock["source"]["schema_version"].as_u64(),

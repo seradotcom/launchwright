@@ -98,7 +98,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 50
     env:
-      SEMWRIGHT_SHA: 8fa191250ae68274182570c65f067f7a60f85625
+      SEMWRIGHT_SHA: d2da9a495a53fe279a1ca4de61f0e24646350f22
       CARGO_INCREMENTAL: '0'
       CARGO_TERM_COLOR: never
       CARGO_PROFILE_DEV_DEBUG: '0'
@@ -193,7 +193,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 55
     env:
-      SEMWRIGHT_SHA: 8fa191250ae68274182570c65f067f7a60f85625
+      SEMWRIGHT_SHA: d2da9a495a53fe279a1ca4de61f0e24646350f22
       CARGO_INCREMENTAL: '0'
       CARGO_TERM_COLOR: never
       CARGO_PROFILE_DEV_DEBUG: '0'
@@ -288,7 +288,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
-      SEMWRIGHT_SHA: 8fa191250ae68274182570c65f067f7a60f85625
+      SEMWRIGHT_SHA: d2da9a495a53fe279a1ca4de61f0e24646350f22
       CARGO_INCREMENTAL: '0'
       CARGO_TERM_COLOR: never
       CARGO_PROFILE_DEV_DEBUG: '0'
@@ -382,7 +382,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
-      SEMWRIGHT_SHA: 8fa191250ae68274182570c65f067f7a60f85625
+      SEMWRIGHT_SHA: d2da9a495a53fe279a1ca4de61f0e24646350f22
       CARGO_INCREMENTAL: '0'
       CARGO_TERM_COLOR: never
       CARGO_PROFILE_DEV_DEBUG: '0'
@@ -477,7 +477,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     env:
-      SEMWRIGHT_SHA: 8fa191250ae68274182570c65f067f7a60f85625
+      SEMWRIGHT_SHA: d2da9a495a53fe279a1ca4de61f0e24646350f22
       CARGO_INCREMENTAL: '0'
       CARGO_TERM_COLOR: never
       CARGO_PROFILE_DEV_DEBUG: '0'
@@ -608,7 +608,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     env:
-      SEMWRIGHT_SHA: 8fa191250ae68274182570c65f067f7a60f85625
+      SEMWRIGHT_SHA: d2da9a495a53fe279a1ca4de61f0e24646350f22
       CARGO_INCREMENTAL: '0'
       CARGO_TERM_COLOR: never
     steps:
@@ -696,7 +696,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 75
     env:
-      SEMWRIGHT_SHA: 8fa191250ae68274182570c65f067f7a60f85625
+      SEMWRIGHT_SHA: d2da9a495a53fe279a1ca4de61f0e24646350f22
       CARGO_INCREMENTAL: '0'
       CARGO_TERM_COLOR: never
       PLAYWRIGHT_BROWSERS_PATH: '0'
