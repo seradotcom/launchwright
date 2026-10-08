@@ -105,6 +105,21 @@ R29 Effects-runtime acceptance is complete for exact source SHA `ac83fc358215ec6
 
 R30 bounded credential-pattern verifier acceptance is complete for exact source SHA `af717a760f28e56a086c53295d6c070d375c05e0`. Application checks run `37801793658` passed on Linux, Windows and macOS; selective Verifier `37801783570` (artifact `11562005067`), Native `37801787399` (artifact `11561417027`) and Host `37801791732` (artifact `11563355060`) all passed. Final heavy `lane=all` run `37825149878` passed all ten jobs: Verifier, Native, Host, Effects, Extension, Godot, Browser, DeltaDesk, Composition and Stress. The retained R30 Verifier receipt records `canonical_verifier_runtime_admitted=true`, `credential_pattern_scan_admitted=true`, `broker_policy_path_observed=true`, `driver_host_isolation_accepted=true`, `secret_pattern_negative_control=true`, `secret_finding_redacted=true` and `cross_dimension_rejected=true`, while `general_privacy_authority=false`, Platform execution and external-customer acceptance remain false. It admits a *separate* `credential-exposure` PASS bound to an exact frozen text candidate, not a broad privacy/PII certificate, a scan of opaque media or publication authority. The provider stays pinned to Semwright source `d2da9a495a53fe279a1ca4de61f0e24646350f22` with vendored Native SDK `1.0.0`. PR #46 merged as `bf19d35ab96d0f4391ab97e90fe6143e9d693b45`, whose main-push Application checks run `37827771759` also passed Linux, Windows and macOS. Full exact job and artifact metadata are retained in `evidence/r30/ci-runs.json`.
 
+## R31 candidate — operator GitHub Release draft transport
+
+R31 introduces a byte-pinned, operator-controlled GitHub Releases **draft**
+transport from exact Launchwright channel packages. It uses a saved private
+intent, existing tag/commit verification, no shell interpolation, no tag
+creation, no asset clobber, remote asset download and SHA-256 verification,
+explicit operator confirmation, and recover-first semantics. A local
+DRAFT_CREATED record is operator-reported custody, not a canonical Platform
+Publish or public publication receipt. The GitHub API transport is exercised
+through deterministic injected mocks; **no external live GitHub upload or
+public release is claimed**. Acceptance requires an exact-SHA supported Node
+24 Linux/Windows/macOS CI pass, CLI/mock failure and recovery controls, and
+selective native/host regression. Broader Platform, customer, activation,
+multi-tenant and billing authority remain external.
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;

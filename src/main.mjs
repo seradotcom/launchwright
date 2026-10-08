@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // SPDX-License-Identifier: AGPL-3.0-only
 import { resolve, join } from 'node:path';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, lstatSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { LaunchwrightApplication, execute } from './application.mjs';
@@ -16,7 +16,19 @@ function option(name,fallback){const i=args.indexOf('--'+name);if(i>=0){if(!args
 const root=resolve(option('state',process.env.LAUNCHWRIGHT_STATE??'.state'));
 const print=value=>process.stdout.write(JSON.stringify(value,null,2)+'\n');
 async function main(){
-  if(command==='help'){console.log(`Launchwright ${APP_VERSION} — AGPL-3.0-only\n\nCommands:\n  init [--state DIR]                 Create an empty local workspace\n  migrate-history [--state DIR]      Explicitly install durable entity history\n  serve [--state DIR] [--port 4317] [--consumer-auth FILE]\n                                      Serve on loopback; optional bounded consumer identities\n  doctor [--state DIR]               Report actual capabilities; no repairs\n  snapshot --out FILE [--state DIR]  Export a portable offline recovery snapshot\n  restore --snapshot FILE --state DIR Restore into a new workspace; old request receipts stay inactive\n  list [--kind KIND] [--state DIR]   Read paginated native observations\n  call --operation NAME --input FILE [--request KEY] [--state DIR]\n  prepare --operation NAME --input FILE --out FILE [--state DIR]\n  send --prepared FILE [--state DIR]  Send exactly one saved native intent\n  recover --prepared FILE [--state DIR]\n  demo [--state DIR]                 Create synthetic editorial examples, NOT captures\n  platform --work ID [--recover] [--state DIR]\n\nHeavy compilation, browser tests and Host conformance belong to GitHub Actions.\n`);return;}
+  if(command==='help'){console.log(`Launchwright ${APP_VERSION} — AGPL-3.0-only\n\nCommands:\n  init [--state DIR]                 Create an empty local workspace\n  migrate-history [--state DIR]      Explicitly install durable entity history\n  serve [--state DIR] [--port 4317] [--consumer-auth FILE]\n                                      Serve on loopback; optional bounded consumer identities\n  doctor [--state DIR]               Report actual capabilities; no repairs\n  snapshot --out FILE [--state DIR]  Export a portable offline recovery snapshot\n  restore --snapshot FILE --state DIR Restore into a new workspace; old request receipts stay inactive\n  list [--kind KIND] [--state DIR]   Read paginated native observations\n  call --operation NAME --input FILE [--request KEY] [--state DIR]\n  prepare --operation NAME --input FILE --out FILE [--state DIR]\n  send --prepared FILE [--state DIR]  Send exactly one saved native intent\n  recover --prepared FILE [--state DIR]\n  demo [--state DIR]                 Create synthetic editorial examples, NOT captures\n  platform --work ID [--recover] [--state DIR]
+  github-draft-plan --delivery ID --repo OWNER/REPO --tag TAG --commit SHA
+                    --title TITLE --notes-artifact ID --out FILE --acknowledge-draft-only
+                    [--acknowledge-unverified] [--state DIR]
+                    Create a private intent only; NO external network action
+  github-draft-send --intent FILE --confirm-repo OWNER/REPO
+                    --confirm-tag TAG --confirm-candidate SHA [--state DIR]
+                    With operator approval, create or recover a GitHub RELEASE DRAFT only
+  github-draft-recover --intent FILE --confirm-repo OWNER/REPO
+                    --confirm-tag TAG --confirm-candidate SHA [--state DIR]
+                    Read-only GitHub recovery; NEVER create/upload a release
+
+Heavy compilation, browser tests and Host conformance belong to GitHub Actions.\n`);return;}
   if(command==='init'){const app=new LaunchwrightApplication(root,{initialize:true});const schema_version=app.store.meta().schema_version,history_ready=app.store.hasHistory;app.close();localToken(root);print({state:root,created_or_opened:true,schema_version,history_ready,session_token_file:join(root,'session-token')});return;}
   if(command==='migrate-history'){const app=new LaunchwrightApplication(root);try{print({...app.store.installHistory(),state:root});}finally{app.close();}return;}
   if(command==='doctor'){print(inspectDoctor(root,here));return;}
@@ -32,6 +44,47 @@ async function main(){
     const close=async()=>{await service.close();app.close();process.exit(0);};process.once('SIGINT',close);process.once('SIGTERM',close);return;
   }
   const app=new LaunchwrightApplication(root);try{
+    if(command==='github-draft-plan'){
+      const out=option('out',null);
+      if(!out)throw Error('--out FILE is required to save the draft intent before an external send');
+      const {prepareGithubDraft}=await import('./github-release-draft.mjs');
+      const intent=prepareGithubDraft(app,{
+        delivery_id:option('delivery',null),repository:option('repo',null),
+        tag:option('tag',null),tag_commit_sha:option('commit',null),
+        title:option('title',null),notes_artifact_id:option('notes-artifact',null),
+        acknowledge_draft_only:args.includes('--acknowledge-draft-only'),
+        acknowledge_unverified:args.includes('--acknowledge-unverified')
+      });
+      const saved=resolve(out);
+      writeFileSync(saved,JSON.stringify(intent,null,2)+'\n',{flag:'wx',mode:0o600});
+      print({saved,delivery_id:intent.delivery_id,candidate_sha256:intent.candidate_sha256,
+        intent_sha256:intent.intent_sha256,repository:intent.repository,tag:intent.tag,
+        remote_action_performed:false,publication_authority:false});
+      return;
+    }
+    if(command==='github-draft-send'||command==='github-draft-recover'){
+      const file=option('intent',null);
+      if(!file)throw Error('--intent FILE is required');
+      const path=resolve(file),stat=lstatSync(path);
+      if(stat.isSymbolicLink()||!stat.isFile()||stat.size>8192||
+        (process.platform!=='win32'&&(stat.mode&0o077)!==0))
+        throw Error('The GitHub draft intent must be a private regular file (0600, max 8 KiB)');
+      const intent=JSON.parse(readFileSync(path,'utf8'));
+      const {sendGithubDraft,githubCliTransport}=await import('./github-release-draft.mjs');
+      const observed=await sendGithubDraft(app,intent,githubCliTransport(),{
+        confirm_repository:option('confirm-repo',null),
+        confirm_tag:option('confirm-tag',null),
+        confirm_candidate_sha256:option('confirm-candidate',null),
+        recover_only:command==='github-draft-recover'
+      });
+      print({state:'DRAFT_CREATED',external_id:observed.record.data.external_id,
+        delivery_id:observed.record.id,receipt_digest:observed.record.data.receipt_digest,
+        bundle_sha256:observed.proof.bundle_sha256,recovered:observed.recovered,
+        remote_send_attempted:command==='github-draft-send',
+        remote_mutation_performed:observed.external_send_performed,
+        published:false,platform_authority:false});
+      return;
+    }
     if(command==='snapshot'){
       const out=option('out',null);if(!out)throw Error('--out is required');const target=resolve(out);const snapshot=exportSnapshot(app);
       writeFileSync(target,JSON.stringify(snapshot,null,2)+'\n',{flag:'wx',mode:0o600});print({saved:target,digest:snapshot.digest,entities:snapshot.entities.length,blobs:snapshot.blobs.length,pending:snapshot.pending.length});return;

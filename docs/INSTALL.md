@@ -16,6 +16,15 @@ The server binds loopback only. Read the generated `.state/session-token` locall
 
 For a local consumer-identity rehearsal, create a private JSON file outside the repository with mode `0600` on POSIX and schema `launchwright-consumer-auth/1`. Its `principals` array contains `{token, principal, scopes}` records and this consumer-only surface accepts only the `consume` scope. Start with `node src/main.mjs serve --state .state --consumer-auth /private/path/launchwright.consumer-auth.json`. The file is read only at server start, is not stored in SQLite or snapshots, and `*.consumer-auth.json` is ignored by git. This remains a loopback development boundary, not remote tenant authentication.
 
+## Optional GitHub Release draft workflow
+
+Launchwright does not send packages to GitHub automatically. A repository owner
+can install/authenticate GitHub CLI and use a two-step operator-authorized
+prepare/send workflow, bound to an existing remote Git tag, approved candidate,
+and exact immutable bundle. This creates a GitHub **draft**, never publishes a
+release. It does not establish Semwright Platform Publish authority.
+See [GitHub draft instructions](GITHUB_RELEASE_DRAFT.md).
+
 ## Empty and synthetic workspaces
 
 `init` creates an empty workspace. `demo` adds only synthetic editorial data and does not represent native product capture.

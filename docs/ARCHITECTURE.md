@@ -56,6 +56,19 @@ Launchwright deliberately does not implement a second media clock, effects kerne
 
 A `channel_profile` is versioned product-owned configuration. `channel.package` generates an immutable package manifest pinned to candidate and profile versions but performs no network send. The authenticated loopback download route reconstructs a deterministic ZIP from that manifest, the frozen candidate manifest and content-addressed artifact blobs; repeated downloads therefore preserve exact bytes without storing another mutable archive. External outcomes are separate receipt records. UNKNOWN on non-idempotent/recover-first profiles requires recovery before retry. Public activation requires canonical Publish receipt admission.
 
+## Operator-owned GitHub draft channel
+
+R31 provides an explicit external *draft-only* transport for owned GitHub
+repositories, separate from canonical Semwright Platform Publish. Its operator
+first commits a private, digest-bound intent, then explicitly confirms repo,
+pre-existing tag and exact target commit before any remote API mutation. The
+candidate, profile revision and deterministic ZIP bytes are revalidated both
+before and after the remote request. The GitHub asset is re-downloaded for an
+exact SHA-256 check; wrong tag, reused foreign release, published release or
+mismatched asset fails closed. A DRAFT_CREATED outcome is operator-reported
+custody only and does not confer public availability or Platform authority.
+See [GitHub draft operator flow](GITHUB_RELEASE_DRAFT.md).
+
 ## Publish product contracts
 
 A `release_template` is an editable application-owned contract over explicitly authorized source/scenario/claim IDs, bounded public parameters, output classes, destinations, verification dimensions, disclosures, budgets and retention. `publish.version_freeze` creates an immutable `product_version` with exact resource revision pins and a digest; later template edits do not alter that version.

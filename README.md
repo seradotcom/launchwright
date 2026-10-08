@@ -44,6 +44,7 @@ Synthetic data is never described as a real product capture.
 - immutable verifier identity/version/digest, coverage, omissions and findings;
 - waivers that annotate failures without changing verifier truth;
 - versioned channel profiles, exact package generation, authenticated deterministic private ZIP bundles, and receipt/recovery state without performing the external send;
+- R31 operator-controlled GitHub Release **draft** transport: exact candidate/profile/tag/commit confirmations, deterministic ZIP upload plus remote download/hash revalidation, recover-first behavior and operator-observed DRAFT_CREATED custody. It never publishes the release or claims Semwright Platform Publish;
 - source-linked localization with glossary revision pins, explicit rebase, RTL/font-rights/critical-term blockers and no invented language/layout PASS;
 - bounded extension descriptors, discovery, retirement, source-profile preflight and compatibility locks without executing remote extension code;
 - versioned media plans with exact rational timing, source/claim pins, video/screenshot/interactive variants, per-variant reuse detection, sanitized interactive-source policy and independent technical/editorial state; historical R11 evidence preserves the separate 20-second real-capture MLT derivative, while accepted R24 exact-SHA evidence binds the exact Broker A/B PNG hashes as managed Motion Canvas assets in a single canonical Semwright AV recipe and retains the resulting MP4 plus publication lineage without promoting fixture capture into customer/Platform authority;
@@ -102,11 +103,11 @@ node scripts/verify.mjs
 node src/main.mjs doctor --state .state
 ```
 
-GitHub Actions runs the supported Node 24.21 runtime on Linux, Windows and macOS. The manual heavy workflow has nine independently selectable lanes:
+GitHub Actions runs the supported Node 24.21 runtime on Linux, Windows and macOS. The manual heavy workflow has ten independently selectable lanes:
 
 - **native** — builds the pinned TypeScript SDK, all thirteen owner-pinned bundles and real Rust NativeDriver with Graph + Effects SDK features;
 - **host** — checks out the exact pinned Semwright SHA and runs Launchwright through the real daemon → Broker/Policy → Driver Host → sealed Node runtime → owner-pinned NodeBridge bundle path, including durable mutation/readback, stale-ref invalidation across restart and a policy-denied negative control; a green exact-SHA run establishes this Host boundary only, not Platform/Publish/ChatGPT authority;
-- **verifier** — builds the bounded Driver SDK format verifier and routes its exact candidate/artifact-bound receipt through Broker/Policy/Driver Host into the dedicated Native `verifier` profile; it proves canonical format admission only and explicitly carries no semantic/editorial/Platform/publication authority;
+- **verifier** — builds the bounded Driver SDK format and credential-pattern verifier and routes its exact candidate/artifact-bound receipt through Broker/Policy/Driver Host into the dedicated Native `verifier` profile; it proves canonical format admission only and explicitly carries no semantic/editorial/Platform/publication authority;
 - **effects** — builds the fixed Launchwright Effects Driver SDK provider and the thirteen-bundle NativeDriver, links the canonical Semwright v1 Effects reader into that provider, evaluates only an owner-staged protected spec/artifact root inside Driver Host, admits the exact Host receipt through `effects_runtime`, and proves substitution/policy/drift controls while preserving `execution_authority:false` and no scenario-mutation authority;
 - **browser** — installs Chromium on the runner and exercises the real Launchwright UI;
 - **deltadesk** — executes the owned DeltaDesk A/B fixture through the exact pinned Semwright Broker + Policy + Chromium backend, requires fail-closed denial without `browser.modify` and for a forbidden origin, retains screenshot/receipt hashes and ingests them as `IMPORTED_UNVERIFIED`; the bounded CI fixture approver is not human approval and the lane does not fabricate Platform, Driver Host or canonical capture authority;
@@ -124,6 +125,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [Project Graph projection and impact](docs/PROJECT_GRAPH.md)
 - [Canonical Effects readback custody](docs/EFFECTS.md)
 - [DeltaDesk real-browser laboratory](docs/DELTADESK_LAB.md)
+- [GitHub Release draft operator integration](docs/GITHUB_RELEASE_DRAFT.md)
 - [Known SDK/platform gaps](docs/SDK_GAPS.md)
 - [Storage and portability](docs/PORTABILITY.md)
 - [Operations, metering and cost projection](docs/OPERATIONS_AND_COSTS.md)

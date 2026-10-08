@@ -33,7 +33,7 @@ export class IntegrationsNativeApplication extends NativeProfileApplication {
     this.get(releaseId,'release');
     const rows=this.list('channel_delivery',releaseId).sort((a,b)=>a.created.localeCompare(b.created)),latest=new Map();
     for(const row of rows)latest.set(row.data.profile_id+'\0'+row.data.participant,row);
-    return{release_id:releaseId,deliveries:rows,latest:[...latest.values()],profiles:this.list('channel_profile').filter(p=>rows.some(r=>r.data.profile_id===p.id)).map(p=>({id:p.id,name:p.data.name,channel:p.data.channel,profile_version:p.data.profile_version,destination_class:p.data.destination_class,idempotency:p.data.idempotency})),external_send_performed:false};
+    return{release_id:releaseId,deliveries:rows,latest:[...latest.values()],profiles:this.list('channel_profile').filter(p=>rows.some(r=>r.data.profile_id===p.id)).map(p=>({id:p.id,name:p.data.name,channel:p.data.channel,profile_version:p.data.profile_version,destination_class:p.data.destination_class,idempotency:p.data.idempotency})),operator_reported_github_drafts:rows.filter(row=>row.data.external_state==='DRAFT_CREATED'&&row.data.external_id?.startsWith('github:')).length,external_send_performed:false};
   }
   read(operation,input){
     switch(operation){
