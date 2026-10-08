@@ -148,21 +148,20 @@ GitHub release, publication or Platform Publish deployment. Complete
 job/artifact identities and authority limits remain in
 `evidence/r34/ci-runs.json`.
 
-## R35 candidate — recoverable Git project onboarding
+## R35 accepted — recoverable existing Git project onboarding
 
-R35 adds a two-phase, operator-owned onboarding workflow to create or reuse
-Product, draft Release, approved CLI Source, Target, imported Evidence and
-editable Markdown from an exact R32 observation. It uses the canonical
-Semwright Native SDK local dispatcher, requires independently confirmed
-plan/head SHA plus source/rights/import/editorial acknowledgements, and
-refuses incompatible names, source revisions and edited documents. A
-simulated crash after four native mutations is reconciled without duplicate
-records. A private CLI lock refuses parallel operations. Nothing is fetched,
-executed, deployed or published. Imported Git evidence remains technical
-UNKNOWN and does not acquire Project Graph, Host, Platform or customer
-authority. Exact-SHA Node 24 Linux/Windows/macOS CI is required before R35
-is accepted.
-
+R35 is accepted at source SHA `7c8862aeffeebeecef9e0a58313dc85961bbd16d` on Node24 Linux/Windows/macOS
+Application checks run `37855188445` and exact-SHA Native lane
+`37855203030`. PR #54 merged as `a886c80590fa58d10b4283606e414a470686f54f`;
+main-push checks `37855651604` also passed all three OSes.
+The explicit private prepare/apply workflow reconciles six local resources
+via the existing Semwright Native SDK dispatcher, rejects incompatible
+revisions, recovers an injected mid-flow crash without duplicated records
+and requires explicit source/rights/import/editorial consent and an operator
+lock. Imported Git evidence remains technically UNKNOWN; no source scripts
+are executed and no Project Graph, Driver Host extension, Platform,
+customer or publication authority is inferred. Exact CI job and artifact
+identities are retained in `evidence/r35/ci-runs.json`.
 
 ## R36 candidate — read-only filesystem capacity preflight
 
