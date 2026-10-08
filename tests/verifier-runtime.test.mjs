@@ -29,7 +29,7 @@ function exactReceipt(c,artifact,overrides={}){
     observed_at:observedAt,
     semwright_sha:PINNED_SEMWRIGHT_SHA,
     provider:'driver:launchwright-verifier',
-    provider_version:'0.2.0-dev.1',
+    provider_version:'0.2.0-dev.2',
     provider_generation:7,
     descriptor_sha256:'c'.repeat(64),
     executable_sha256:executableSha,

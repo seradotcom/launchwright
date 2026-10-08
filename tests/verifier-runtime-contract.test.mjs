@@ -81,6 +81,8 @@ test('R30 uses a separate bounded credential command without fabricating general
   assert.match(runtime,/owner-granted-driver-host-text-credential-patterns-only/u);
   assert.match(harness,/credential_pattern_scan_admitted/u);
   assert.match(harness,/secret_finding_redacted/u);
+  assert.match(harness,/"provider_version": provenance\["provider_version"\]/u);
+  assert.match(harness,/provenance\.get\("provider_version"\) != manifest_version/u);
   assert.match(harness,/cross_dimension_rejected/u);
   assert.match(workflow,/general_privacy_authority == false/u);
 });

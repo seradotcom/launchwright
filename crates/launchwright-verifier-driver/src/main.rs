@@ -182,6 +182,35 @@ fn exact_sha(value: &Value, key: &str) -> Result<String> {
     Ok(text.to_owned())
 }
 
+/// IDs are echoed in findings. Restrict them to Launchwright's identifier
+/// grammar so an untrusted verifier manifest cannot put secret content there.
+fn exact_resource_id(value: &Value, key: &str) -> Result<String> {
+    let id = exact_string(value, key, 96)?;
+    let prefix = if key == "candidate_id" {
+        "candidate_"
+    } else {
+        "artifact_"
+    };
+    let uuid = id
+        .strip_prefix(prefix)
+        .ok_or_else(|| invalid("Verifier resource identity has an unexpected kind"))?;
+    let raw = uuid.as_bytes();
+    if raw.len() != 36
+        || raw.iter().enumerate().any(|(i, b)| {
+            if [8, 13, 18, 23].contains(&i) {
+                *b != b'-'
+            } else {
+                !b.is_ascii_digit() && !(b'a'..=b'f').contains(b)
+            }
+        })
+    {
+        return Err(invalid(
+            "Verifier resource identity is not a canonical UUID",
+        ));
+    }
+    Ok(id.to_owned())
+}
+
 fn sha256(bytes: &[u8]) -> String {
     hex::encode(Sha256::digest(bytes))
 }
@@ -482,7 +511,7 @@ fn verify(args: &Value, dimension: &str) -> Result<Value> {
         ));
     }
 
-    let candidate_id = exact_string(&manifest, "candidate_id", 96)?.to_owned();
+    let candidate_id = exact_resource_id(&manifest, "candidate_id")?;
     let candidate_sha256 = exact_sha(&manifest, "candidate_sha256")?;
     let candidate_manifest_sha256 = exact_sha(&manifest, "candidate_manifest_sha256")?;
     let artifacts = manifest
@@ -508,7 +537,7 @@ fn verify(args: &Value, dimension: &str) -> Result<Value> {
         if map.keys().any(|key| !allowed.contains(&key.as_str())) || map.len() != allowed.len() {
             return Err(invalid("Verifier artifact binding shape is not exact"));
         }
-        let id = exact_string(artifact, "id", 96)?.to_owned();
+        let id = exact_resource_id(artifact, "id")?;
         if !seen.insert(id.clone()) {
             return Err(invalid("Verifier artifact IDs must be unique"));
         }
@@ -673,6 +702,14 @@ async fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn findings_never_echo_caller_supplied_secret_as_resource_id() {
+        assert!(exact_resource_id(&json!({"id":"artifact_a-11"}), "id").is_ok());
+        let bad = format!("ghp_{}", "A".repeat(36));
+        assert!(exact_resource_id(&json!({"id":bad}), "id").is_err());
+        assert!(exact_resource_id(&json!({"id":"artifact/../secret"}), "id").is_err());
+    }
 
     #[test]
     fn text_media_type_parameters_are_accepted() {

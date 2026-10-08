@@ -339,6 +339,11 @@ def verifier_execute(
             raise AssertionError("verifier descriptor digest is missing")
         if provenance.get("provider_generation") is None:
             raise AssertionError("verifier provider generation is missing")
+        manifest_version = json.loads(
+            fixture.verifier_manifest_path.read_text(encoding="utf-8")
+        )["version"]
+        if provenance.get("provider_version") != manifest_version:
+            raise AssertionError("verifier Provider Host version differs from pinned manifest")
     return envelope
 
 
@@ -354,7 +359,7 @@ def write_runtime_receipt(
         "observed_at": observed_at,
         "semwright_sha": SEMWRIGHT_SHA,
         "provider": "driver:launchwright-verifier",
-        "provider_version": "0.2.0-dev.1",
+        "provider_version": provenance["provider_version"],
         "provider_generation": provenance["provider_generation"],
         "descriptor_sha256": provenance["descriptor_sha256"],
         "executable_sha256": host.sha256(fixture.verifier),
