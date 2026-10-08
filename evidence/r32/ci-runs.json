@@ -1,0 +1,136 @@
+{
+  "schema_version": "launchwright-r32-ci-evidence/1",
+  "source_sha": "cc56dd5fb34829ed308c70161c20c6ed5a1e2368",
+  "merge_commit_sha": "a0c846fb21b7d55a30ad5fc05e9a8c324bad3222",
+  "semwright_sha": "d2da9a495a53fe279a1ca4de61f0e24646350f22",
+  "native_sdk": "1.0.0",
+  "application_checks": {
+    "run_id": 37836544605,
+    "head_sha": "cc56dd5fb34829ed308c70161c20c6ed5a1e2368",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37836544605",
+    "jobs": {
+      "light (windows-latest)": {
+        "job_id": 113515114426,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37836544605/job/113515114426"
+      },
+      "light (ubuntu-latest)": {
+        "job_id": 113515114820,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37836544605/job/113515114820"
+      },
+      "light (macos-latest)": {
+        "job_id": 113515114869,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37836544605/job/113515114869"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Windows-41f8c6a973b2af97c1ebbc07dac29c468913ca09": {
+        "id": 11575996651,
+        "bytes": 732,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-41f8c6a973b2af97c1ebbc07dac29c468913ca09": {
+        "id": 11575378308,
+        "bytes": 692,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-41f8c6a973b2af97c1ebbc07dac29c468913ca09": {
+        "id": 11574789717,
+        "bytes": 696,
+        "expired": false
+      }
+    }
+  },
+  "manual_application_checks": {
+    "run_id": 37836538487,
+    "head_sha": "cc56dd5fb34829ed308c70161c20c6ed5a1e2368",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37836538487",
+    "jobs": {
+      "light (ubuntu-latest)": {
+        "job_id": 113514881816,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37836538487/job/113514881816"
+      },
+      "light (macos-latest)": {
+        "job_id": 113514882170,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37836538487/job/113514882170"
+      },
+      "light (windows-latest)": {
+        "job_id": 113514882207,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37836538487/job/113514882207"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Linux-cc56dd5fb34829ed308c70161c20c6ed5a1e2368": {
+        "id": 11575607722,
+        "bytes": 693,
+        "expired": false
+      },
+      "launchwright-clean-room-Windows-cc56dd5fb34829ed308c70161c20c6ed5a1e2368": {
+        "id": 11574809368,
+        "bytes": 733,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-cc56dd5fb34829ed308c70161c20c6ed5a1e2368": {
+        "id": 11574779702,
+        "bytes": 695,
+        "expired": false
+      }
+    }
+  },
+  "main_push_checks": {
+    "run_id": 37836921050,
+    "head_sha": "a0c846fb21b7d55a30ad5fc05e9a8c324bad3222",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37836921050",
+    "jobs": {
+      "light (macos-latest)": {
+        "job_id": 113516193095,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37836921050/job/113516193095"
+      },
+      "light (ubuntu-latest)": {
+        "job_id": 113516193343,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37836921050/job/113516193343"
+      },
+      "light (windows-latest)": {
+        "job_id": 113516193482,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37836921050/job/113516193482"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-macOS-a0c846fb21b7d55a30ad5fc05e9a8c324bad3222": {
+        "id": 11576355492,
+        "bytes": 696,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-a0c846fb21b7d55a30ad5fc05e9a8c324bad3222": {
+        "id": 11575688270,
+        "bytes": 693,
+        "expired": false
+      },
+      "launchwright-clean-room-Windows-a0c846fb21b7d55a30ad5fc05e9a8c324bad3222": {
+        "id": 11574994072,
+        "bytes": 732,
+        "expired": false
+      }
+    }
+  },
+  "authority": {
+    "local_git_cli_commits_tested": true,
+    "git_metadata_observation_admitted_only_as_imported_unknown": true,
+    "project_graph_authority": false,
+    "driver_host_git_execution_accepted": false,
+    "semwright_platform_execution": false,
+    "external_customer_acceptance": false
+  },
+  "scope_note": "Real disposable local Git repo tests on Node24 Linux/Windows/macOS; SHA-pinned committed metadata/CLI import only. Earlier SHA 8630bf5 had a Windows failure, corrected and retested on cc56dd5."
+}

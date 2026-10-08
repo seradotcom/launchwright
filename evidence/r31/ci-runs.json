@@ -1,0 +1,138 @@
+{
+  "schema_version": "launchwright-r31-ci-evidence/1",
+  "source_sha": "5a34632d982110d093371103c0cab6073b2126e8",
+  "merge_commit_sha": "513b27e109cf5e1c72abdd422cb9976c3ada31ed",
+  "semwright_sha": "d2da9a495a53fe279a1ca4de61f0e24646350f22",
+  "native_sdk": "1.0.0",
+  "application_checks": {
+    "run_id": 37834669900,
+    "head_sha": "5a34632d982110d093371103c0cab6073b2126e8",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37834669900",
+    "jobs": {
+      "light (windows-latest)": {
+        "job_id": 113508544402,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37834669900/job/113508544402"
+      },
+      "light (ubuntu-latest)": {
+        "job_id": 113508544541,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37834669900/job/113508544541"
+      },
+      "light (macos-latest)": {
+        "job_id": 113508544593,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37834669900/job/113508544593"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-macOS-e795d0a82366e40ff1761cd561955f6ca08e46e6": {
+        "id": 11574802239,
+        "bytes": 696,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-e795d0a82366e40ff1761cd561955f6ca08e46e6": {
+        "id": 11574269812,
+        "bytes": 692,
+        "expired": false
+      },
+      "launchwright-clean-room-Windows-e795d0a82366e40ff1761cd561955f6ca08e46e6": {
+        "id": 11574249970,
+        "bytes": 731,
+        "expired": false
+      }
+    }
+  },
+  "selective": {
+    "native": {
+      "run_id": 37834721338,
+      "head_sha": "5a34632d982110d093371103c0cab6073b2126e8",
+      "conclusion": "success",
+      "url": "https://github.com/seradotcom/launchwright/actions/runs/37834721338",
+      "jobs": {
+        "native": {
+          "job_id": 113508723324,
+          "conclusion": "success",
+          "url": "https://github.com/seradotcom/launchwright/actions/runs/37834721338/job/113508723324"
+        }
+      },
+      "artifacts": {
+        "launchwright-native-5a34632d982110d093371103c0cab6073b2126e8": {
+          "id": 11574996750,
+          "bytes": 3190864,
+          "expired": false
+        }
+      }
+    },
+    "host": {
+      "run_id": 37834725299,
+      "head_sha": "5a34632d982110d093371103c0cab6073b2126e8",
+      "conclusion": "success",
+      "url": "https://github.com/seradotcom/launchwright/actions/runs/37834725299",
+      "jobs": {
+        "host": {
+          "job_id": 113508737226,
+          "conclusion": "success",
+          "url": "https://github.com/seradotcom/launchwright/actions/runs/37834725299/job/113508737226"
+        }
+      },
+      "artifacts": {
+        "launchwright-native-host-5a34632d982110d093371103c0cab6073b2126e8": {
+          "id": 11574904143,
+          "bytes": 128790,
+          "expired": false
+        }
+      }
+    }
+  },
+  "main_push_checks": {
+    "run_id": 37836252583,
+    "head_sha": "513b27e109cf5e1c72abdd422cb9976c3ada31ed",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37836252583",
+    "jobs": {
+      "light (macos-latest)": {
+        "job_id": 113513900322,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37836252583/job/113513900322"
+      },
+      "light (ubuntu-latest)": {
+        "job_id": 113513900481,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37836252583/job/113513900481"
+      },
+      "light (windows-latest)": {
+        "job_id": 113513900715,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37836252583/job/113513900715"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-macOS-513b27e109cf5e1c72abdd422cb9976c3ada31ed": {
+        "id": 11575921912,
+        "bytes": 694,
+        "expired": false
+      },
+      "launchwright-clean-room-Windows-513b27e109cf5e1c72abdd422cb9976c3ada31ed": {
+        "id": 11575622469,
+        "bytes": 732,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-513b27e109cf5e1c72abdd422cb9976c3ada31ed": {
+        "id": 11575158913,
+        "bytes": 693,
+        "expired": false
+      }
+    }
+  },
+  "authority": {
+    "real_driver_host_isolation_accepted": true,
+    "broker_policy_path_observed": true,
+    "operator_github_live_api_tested": false,
+    "public_release_published": false,
+    "semwright_platform_publish": false,
+    "customer_acceptance": false
+  },
+  "scope_note": "GitHub Release DRAFT path tested via deterministic local GitHub mocks and fixed gh CLI argv; external live GitHub API effects deliberately not executed. Native/Host exact-SHA regression establishes prior canonical path only."
+}
