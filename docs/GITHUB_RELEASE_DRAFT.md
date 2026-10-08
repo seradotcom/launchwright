@@ -85,6 +85,12 @@ from unreviewed GitHub repository contents.
 The draft body includes the explicitly selected release-notes artifact plus
 a private SHA-256 intent marker. A pre-existing unrelated release, or one
 that is already published, cannot be adopted or modified.
+R34 also compares the **exact approved release title and full Markdown notes**
+against the GitHub draft at every admission boundary, not just the embedded
+intent marker. CRLF versus LF line-ending normalization is permitted; extra
+text, deleted text or title changes fail closed, including if another operator
+edits the draft during an asset upload. The existing asset is not clobbered
+and no local success is recorded after remote content drift.
 
 The deterministic ZIP is uploaded without --clobber. Afterward the CLI
 downloads the actual asset, compares the bytes and SHA-256, then rechecks

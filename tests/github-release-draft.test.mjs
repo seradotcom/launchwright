@@ -60,7 +60,7 @@ class FakeGithub{
   }
   async createDraft(repo,tag,title,body){
     this.calls.push('create');
-    this.release={id:42,draft:true,tag_name:tag,body,title,assets:[]};
+    this.release={id:42,draft:true,tag_name:tag,body,name:title,assets:[]};
   }
   async uploadAsset(repo,tag,name,bytes){
     this.calls.push('upload');
@@ -157,7 +157,12 @@ test('R31 recover-only never creates a draft nor uploads a missing asset',async 
   const x=await fixture(t),intent=prepareGithubDraft(x.app,x.planInput),remote=new FakeGithub();
   await assert.rejects(sendGithubDraft(x.app,intent,remote,{...approvedConfirm(intent),recover_only:true}),{code:'NotFound'});
   assert.equal(remote.calls.filter(x=>x==='create').length,0);
-  await remote.createDraft(intent.repository,intent.tag,intent.title,'<!-- launchwright-github-draft-sha256:'+intent.intent_sha256+' -->');
+  const notes=x.app.store.readBlob(x.artifact.data.sha256).bytes.toString('utf8').trimEnd();
+  const exactBody=notes+'\n\n---\n\nDraft prepared by Launchwright for candidate '+
+    intent.candidate_id+'; byte-pinned release asset SHA-256: '+intent.bundle_sha256+
+    '. This draft does not establish public publication or Semwright Platform authority.\n\n'+
+    '<!-- launchwright-github-draft-sha256:'+intent.intent_sha256+' -->\n';
+  await remote.createDraft(intent.repository,intent.tag,intent.title,exactBody);
   await assert.rejects(sendGithubDraft(x.app,intent,remote,{...approvedConfirm(intent),recover_only:true}),{code:'NotFound'});
   assert.equal(remote.calls.filter(x=>x==='upload').length,0);
 });
@@ -281,4 +286,57 @@ test('R31 aborts if GitHub tag or release identity changes during upload',async 
 test('R31 a title cannot be interpreted as a GitHub option prefix',async t=>{
   const x=await fixture(t);
   assert.throws(()=>prepareGithubDraft(x.app,{...x.planInput,title:'--publish-now'}),{code:'InvalidArgument'});
+});
+
+
+test('R34 recovery rejects a GitHub draft whose title or release notes changed but marker stayed intact',async t=>{
+  const x=await fixture(t),intent=prepareGithubDraft(x.app,x.planInput),github=new FakeGithub();
+  const sent=await sendGithubDraft(x.app,intent,github,approvedConfirm(intent));
+  assert.equal(sent.proof.publicly_published,false);
+  const saved=github.release.body;
+  const savedName=github.release.name;
+  github.release.name=savedName+' — edited externally';
+  await assert.rejects(sendGithubDraft(x.app,intent,github,{
+    ...approvedConfirm(intent),recover_only:true
+  }),{code:'Conflict'});
+  github.release.name=savedName;
+  github.release.body=saved.replace('#','##');
+  await assert.rejects(sendGithubDraft(x.app,intent,github,{
+    ...approvedConfirm(intent),recover_only:true
+  }),{code:'Conflict'});
+  github.release.body=saved;
+  const existing=await sendGithubDraft(x.app,intent,github,{
+    ...approvedConfirm(intent),recover_only:true
+  });
+  assert.equal(existing.recovered,true);
+  assert.equal(existing.record.id,sent.record.id);
+  assert.equal(github.calls.filter(x=>x==='upload').length,1);
+});
+
+test('R34 rejects altered release body after asset upload even when remote hash and intent marker match',async t=>{
+  const x=await fixture(t),intent=prepareGithubDraft(x.app,x.planInput),github=new FakeGithub();
+  const base=github.uploadAsset.bind(github);
+  github.uploadAsset=async(...args)=>{
+    await base(...args);
+    github.release.body=github.release.body.replace('Draft prepared','DRAFT ALTERED: Draft prepared');
+  };
+  await assert.rejects(sendGithubDraft(x.app,intent,github,approvedConfirm(intent)),{code:'Conflict'});
+  assert.equal(x.app.list('channel_delivery').length,1);
+  assert.equal(github.release.draft,true);
+  assert.equal(github.calls.filter(x=>x==='upload').length,1);
+});
+
+test('R34 tolerates CRLF normalization only; arbitrary content changes remain rejected',async t=>{
+  const x=await fixture(t),intent=prepareGithubDraft(x.app,x.planInput),github=new FakeGithub();
+  const base=github.createDraft.bind(github);
+  github.createDraft=async(...args)=>{
+    await base(...args);
+    github.release.body=github.release.body.replaceAll('\\n','\\r\\n');
+  };
+  const prepared=await sendGithubDraft(x.app,intent,github,approvedConfirm(intent));
+  assert.equal(prepared.record.data.external_state,'DRAFT_CREATED');
+  github.release.body+='EXTRA';
+  await assert.rejects(sendGithubDraft(x.app,intent,github,{
+    ...approvedConfirm(intent),recover_only:true
+  }),{code:'Conflict'});
 });
