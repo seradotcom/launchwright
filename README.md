@@ -64,6 +64,8 @@ The public `@semwright/native-sdk` source is vendored unchanged under its upstre
 - Native SDK `1.0.0`
 - exact SHA-256 hashes for the redistributed SDK files/archive
 
+R27 exact source SHA `aad7d4f744d5067b920f0befdaf4a6238a29dd65` passed Linux/Windows/macOS Application checks and heavy `lane=all` against Semwright `v1.0.0`; browser, verifier, stress, host, native, Godot, Effects, Composition and DeltaDesk all passed. Those results preserve each lane's existing authority boundary rather than extending it.
+
 The canonical `NodeBridge` allows at most 48 KiB per owner-pinned executable bundle. Launchwright therefore maps all 86 public operations exactly once across eleven bounded profiles (`core`, `production`, `review`, `verifier`, `integrations`, `extensions`, `work`, `media`, `publish`, `graph`, `effects`) instead of weakening that upstream limit. `scripts/build-native-bundle.mjs` hashes each exact bundle and rejects missing/duplicate operations or oversized output. `crates/launchwright-native` pins all eleven hashes at build time. The caller cannot choose arbitrary executable code, mounts or runtime paths; the dedicated `graph` profile is the only Native profile provisioned for owner-admitted Graph projections.
 
 The optional Platform adapter consumes an owner-supplied byte-pinned package. The inspected Platform source is not licensed for redistribution, so it is not copied into this public repository.

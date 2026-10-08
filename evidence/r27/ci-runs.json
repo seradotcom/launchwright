@@ -1,0 +1,158 @@
+{
+  "schema_version": "launchwright-r27-ci-evidence/1",
+  "source_sha": "aad7d4f744d5067b920f0befdaf4a6238a29dd65",
+  "merge_commit_sha": "ae352f041e7fa0f253df449e4a314b9dccfb73bf",
+  "semwright_sha": "8fa191250ae68274182570c65f067f7a60f85625",
+  "semwright_release": "v1.0.0",
+  "native_sdk": "1.0.0",
+  "application_checks": {
+    "run_id": 37707563112,
+    "conclusion": "success",
+    "jobs": {
+      "light (windows-latest)": {
+        "job_id": 113085463455,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37707563112/job/113085463455"
+      },
+      "light (macos-latest)": {
+        "job_id": 113085463650,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37707563112/job/113085463650"
+      },
+      "light (ubuntu-latest)": {
+        "job_id": 113085463690,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37707563112/job/113085463690"
+      }
+    }
+  },
+  "heavy_all": {
+    "run_id": 37707577491,
+    "conclusion": "success",
+    "jobs": {
+      "browser": {
+        "job_id": 113085515091,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37707577491/job/113085515091"
+      },
+      "verifier": {
+        "job_id": 113085515316,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37707577491/job/113085515316"
+      },
+      "stress": {
+        "job_id": 113085515327,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37707577491/job/113085515327"
+      },
+      "host": {
+        "job_id": 113085515344,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37707577491/job/113085515344"
+      },
+      "native": {
+        "job_id": 113085515389,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37707577491/job/113085515389"
+      },
+      "godot": {
+        "job_id": 113085515401,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37707577491/job/113085515401"
+      },
+      "effects": {
+        "job_id": 113085515409,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37707577491/job/113085515409"
+      },
+      "composition": {
+        "job_id": 113085515415,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37707577491/job/113085515415"
+      },
+      "deltadesk": {
+        "job_id": 113085515615,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37707577491/job/113085515615"
+      }
+    },
+    "artifacts": {
+      "native-host": {
+        "id": 11520892353,
+        "name": "launchwright-native-host-aad7d4f744d5067b920f0befdaf4a6238a29dd65",
+        "bytes": 127746,
+        "expired": false
+      },
+      "native": {
+        "id": 11520218959,
+        "name": "launchwright-native-aad7d4f744d5067b920f0befdaf4a6238a29dd65",
+        "bytes": 2781723,
+        "expired": false
+      },
+      "stress": {
+        "id": 11520665738,
+        "name": "launchwright-stress-aad7d4f744d5067b920f0befdaf4a6238a29dd65",
+        "bytes": 765,
+        "expired": false
+      },
+      "verifier-runtime": {
+        "id": 11520174551,
+        "name": "launchwright-verifier-runtime-aad7d4f744d5067b920f0befdaf4a6238a29dd65",
+        "bytes": 27692,
+        "expired": false
+      },
+      "godot-profile": {
+        "id": 11520174065,
+        "name": "launchwright-godot-profile-aad7d4f744d5067b920f0befdaf4a6238a29dd65",
+        "bytes": 70706,
+        "expired": false
+      },
+      "deltadesk": {
+        "id": 11520162660,
+        "name": "launchwright-deltadesk-aad7d4f744d5067b920f0befdaf4a6238a29dd65",
+        "bytes": 89889,
+        "expired": false
+      },
+      "effects": {
+        "id": 11520134017,
+        "name": "launchwright-effects-aad7d4f744d5067b920f0befdaf4a6238a29dd65",
+        "bytes": 15279,
+        "expired": false
+      },
+      "composition-single-recipe": {
+        "id": 11520104842,
+        "name": "launchwright-composition-single-recipe-aad7d4f744d5067b920f0befdaf4a6238a29dd65",
+        "bytes": 112223,
+        "expired": false
+      },
+      "browser": {
+        "id": 11519379333,
+        "name": "launchwright-browser-aad7d4f744d5067b920f0befdaf4a6238a29dd65",
+        "bytes": 605588,
+        "expired": false
+      }
+    }
+  },
+  "main_push_application_checks": {
+    "run_id": 37709905534,
+    "conclusion": "success",
+    "jobs": {
+      "light (ubuntu-latest)": {
+        "job_id": 113093130948,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37709905534/job/113093130948"
+      },
+      "light (windows-latest)": {
+        "job_id": 113093131142,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37709905534/job/113093131142"
+      },
+      "light (macos-latest)": {
+        "job_id": 113093131263,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37709905534/job/113093131263"
+      }
+    }
+  },
+  "authority_note": "Passing these lanes revalidates their existing bounded acceptance scopes against Semwright v1.0.0; it does not add Platform, customer, tenant, publication, billing or human-approval authority."
+}
