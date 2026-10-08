@@ -3,8 +3,9 @@
 """R26 exact-SHA verifier admission through Semwright Broker/Policy/Driver Host.
 
 CI-only. The accepted authority is intentionally narrow: an owner-staged Launchwright
-candidate, format verification only, on the pinned Semwright source. It does not claim
-Platform execution, customer acceptance, semantic/editorial correctness or publication.
+candidate, format or narrow credential-pattern verification only, on the pinned
+Semwright source. It does not claim general privacy, Platform execution, customer
+acceptance, semantic/editorial correctness or publication.
 """
 from __future__ import annotations
 
@@ -87,7 +88,7 @@ class VerifierFixture(host.HostFixture):
             "manifest_version": 1,
             "protocol": 5,
             "id": "launchwright-verifier",
-            "version": "0.2.0-dev.1",
+            "version": "0.2.0-dev.2",
             "publisher": "launchwright-owned-verifier-r26",
             "executable": str(self.verifier),
             "sha256": host.sha256(self.verifier),
@@ -318,11 +319,14 @@ def stage_verifier_input(
 
 
 def verifier_execute(
-    fixture: VerifierFixture, *, expected_ok: bool
+    fixture: VerifierFixture, *, expected_ok: bool,
+    dimension: str = "format", manifest_rel: str = "r26-verifier-input.json"
 ) -> dict[str, Any]:
+    command = ("driver.launchwright-verifier.format" if dimension == "format"
+               else "driver.launchwright-verifier.credential-exposure")
     envelope = fixture.invoke(
-        "driver.launchwright-verifier.format",
-        {"manifest_rel": "r26-verifier-input.json"},
+        command,
+        {"manifest_rel": manifest_rel},
         ok=expected_ok,
     )
     if expected_ok:
@@ -335,12 +339,17 @@ def verifier_execute(
             raise AssertionError("verifier descriptor digest is missing")
         if provenance.get("provider_generation") is None:
             raise AssertionError("verifier provider generation is missing")
+        manifest_version = json.loads(
+            fixture.verifier_manifest_path.read_text(encoding="utf-8")
+        )["version"]
+        if provenance.get("provider_version") != manifest_version:
+            raise AssertionError("verifier Provider Host version differs from pinned manifest")
     return envelope
 
 
 def write_runtime_receipt(
     fixture: VerifierFixture,
-    verifier_envelope: dict[str, Any],
+    verifier_envelope: dict[str, Any], filename: str = "r26-driver-host.json"
 ) -> tuple[dict[str, Any], str, str]:
     provenance = verifier_envelope["execution"]["provenance"]
     report = verifier_envelope["data"]
@@ -350,7 +359,7 @@ def write_runtime_receipt(
         "observed_at": observed_at,
         "semwright_sha": SEMWRIGHT_SHA,
         "provider": "driver:launchwright-verifier",
-        "provider_version": "0.2.0-dev.1",
+        "provider_version": provenance["provider_version"],
         "provider_generation": provenance["provider_generation"],
         "descriptor_sha256": provenance["descriptor_sha256"],
         "executable_sha256": host.sha256(fixture.verifier),
@@ -360,7 +369,7 @@ def write_runtime_receipt(
         "external_customer_acceptance": False,
         "report": report,
     }
-    path = fixture.paths["verification-receipts"] / "r26-driver-host.json"
+    path = fixture.paths["verification-receipts"] / filename
     host.write_private_json(path, receipt)
     return receipt, path.name, host.sha256(path)
 
@@ -419,7 +428,7 @@ def allowed_flow() -> dict[str, Any]:
             raise AssertionError("production verifier manifest did not validate")
         if (
             conformance.get("provider") != "driver:launchwright-verifier"
-            or conformance.get("capabilities") != 2
+            or conformance.get("capabilities") != 3
             or conformance.get("sandboxed") is not True
             or conformance.get("executed_read_only") is not True
             or conformance.get("shutdown") is not True
@@ -479,6 +488,96 @@ def allowed_flow() -> dict[str, Any]:
         if summary.get("state") != "PASS" or summary.get("canonical_passes") != 1:
             raise AssertionError("canonical Host verification did not become effective PASS")
 
+        # R30: a second, precisely named credential-pattern dimension. It never
+        # becomes general "privacy" authority. The source bytes and every binding
+        # are identical to the already frozen, exact candidate.
+        credential_manifest = json.loads(json.dumps(verifier_input))
+        credential_manifest["dimension"] = "credential-exposure"
+        credential_filename = "r30-credential-input.json"
+        credential_path = fixture.paths["project-graph-fixture"] / credential_filename
+        host.write_private_json(credential_path, credential_manifest)
+        credential_envelope = verifier_execute(
+            fixture, expected_ok=True, dimension="credential-exposure",
+            manifest_rel=credential_filename
+        )
+        if (credential_envelope["data"]["state"] != "PASS"
+                or credential_envelope["data"]["dimension"] != "credential-exposure"):
+            raise AssertionError("Host credential-pattern scan did not pass the exact clean artifact")
+        credential_receipt, credential_file, credential_sha = write_runtime_receipt(
+            fixture, credential_envelope, "r30-credential-driver-host.json"
+        )
+        credential_input = {
+            **verification_input,
+            "dimension": "credential-exposure",
+            "state": credential_receipt["report"]["state"],
+            "coverage": credential_receipt["report"]["coverage"],
+            "findings": credential_receipt["report"]["findings"],
+            "observed_at": credential_receipt["observed_at"],
+            "runtime_receipt": {"file": credential_file, "sha256": credential_sha},
+        }
+        recorded_credential = client.mutate(
+            "verification.record", "verification-record", credential_input,
+            key_hint="record-credential-pass"
+        )["entity"]
+        if (recorded_credential["data"]["runtime_admission"]["scope"]
+                != "owner-granted-driver-host-text-credential-patterns-only"):
+            raise AssertionError("credential verifier scope was widened during admission")
+        summary_with_scan = client.read(
+            "verification-summary", {"candidate_id": candidate["id"]}
+        )
+        credential_checks = [
+            check for check in summary_with_scan["checks"]
+            if check["dimension"] == "credential-exposure"
+        ]
+        if (summary_with_scan["canonical_passes"] != 2
+                or len(credential_checks) != 1
+                or credential_checks[0]["effective_state"] != "PASS"):
+            raise AssertionError("credential PASS was not independently recorded through Native SDK")
+
+        # Negative control: even perfectly re-hashed staged content must trigger
+        # a sanitized finding when it contains a supported credential marker.
+        marker = "ghp_" + "Z" * 36
+        contaminated = original_bytes + ("\n" + marker + "\n").encode("utf-8")
+        artifact_path.write_bytes(contaminated)
+        artifact_path.chmod(0o600)
+        credential_manifest["artifacts"][0]["sha256"] = sha256_bytes(contaminated)
+        credential_manifest["artifacts"][0]["bytes"] = len(contaminated)
+        host.write_private_json(credential_path, credential_manifest)
+        rejected_marker = verifier_execute(
+            fixture, expected_ok=True, dimension="credential-exposure",
+            manifest_rel=credential_filename
+        )["data"]
+        if (rejected_marker.get("state") != "FAIL" or not any(
+                finding.get("code") == "CREDENTIAL_GITHUB_TOKEN"
+                for finding in rejected_marker.get("findings", []))):
+            raise AssertionError("Host credential scan accepted a detectable token")
+        if marker in json.dumps(rejected_marker):
+            raise AssertionError("verifier leaked candidate secret bytes in its findings")
+        artifact_path.write_bytes(original_bytes)
+        artifact_path.chmod(0o600)
+        credential_manifest["artifacts"][0]["sha256"] = sha256_bytes(original_bytes)
+        credential_manifest["artifacts"][0]["bytes"] = len(original_bytes)
+        host.write_private_json(credential_path, credential_manifest)
+
+        # A format-issued capability must not accept a credential dimension (or
+        # vice versa), even with the same candidate and unmodified artifact bytes.
+        wrong_command = verifier_execute(
+            fixture, expected_ok=False, dimension="format",
+            manifest_rel=credential_filename
+        )
+        if wrong_command.get("ok") is not False:
+            raise AssertionError("format descriptor accepted a credential-exposure manifest")
+        credential_evidence = {
+            "dimension": "credential-exposure",
+            "receipt_sha256": credential_sha,
+            "effective_state": credential_checks[0]["effective_state"],
+            "exact_candidate_artifact_bound": True,
+            "secret_pattern_negative_control": True,
+            "secret_finding_redacted": True,
+            "cross_dimension_rejected": True,
+            "general_privacy_authority": False,
+        }
+
         # Negative control 1: mutate the owner-staged bytes after the frozen binding.
         artifact_path.write_bytes(original_bytes + b"tamper\n")
         artifact_path.chmod(0o600)
@@ -520,7 +619,8 @@ def allowed_flow() -> dict[str, Any]:
             "verifier_executable_sha256": host.sha256(fixture.verifier),
             "verifier_descriptor_sha256": receipt["descriptor_sha256"],
             "receipt_sha256": receipt_sha,
-            "effective_state": summary["state"],
+            "effective_state": summary_with_scan["state"],
+            "credential_exposure": credential_evidence,
             "artifact_substitution_rejected": True,
             "receipt_candidate_substitution_rejected": True,
         }
@@ -561,8 +661,10 @@ def main() -> None:
         "semwright_sha": observed_sha,
         "native_sdk": "1.0.0",
         "authority": {
-            "scope": "owner-staged-format-only",
+            "scope": "owner-staged-format-and-credential-patterns-only",
             "canonical_verifier_runtime_admitted": True,
+            "credential_pattern_scan_admitted": True,
+            "general_privacy_authority": False,
             "broker_policy_path_observed": True,
             "driver_host_isolation_accepted": True,
             "native_sdk_review_recorded": True,

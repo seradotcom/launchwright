@@ -92,7 +92,7 @@ export function validateVerification(raw) {
     ['candidate_id','dimension','state','verifier','artifact_ids','target_id','coverage','omissions','findings','observed_at','runtime_receipt'],
     ['candidate_id','dimension','state','verifier','artifact_ids','coverage','omissions','findings','observed_at']);
   idText(d.candidate_id); if(d.target_id) idText(d.target_id);
-  choice(d.dimension,['format','semantic','editorial','privacy','rights','accessibility','product-evidence','permissions']);
+  choice(d.dimension,['format','credential-exposure','semantic','editorial','privacy','rights','accessibility','product-evidence','permissions']);
   choice(d.state,['PASS','FAIL','UNKNOWN','ERROR']);
   object(d.verifier,['id','version','digest','authority','model'],['id','version','digest','authority']);
   str(d.verifier.id,160); str(d.verifier.version,96); sha(d.verifier.digest);

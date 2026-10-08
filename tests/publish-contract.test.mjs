@@ -137,3 +137,17 @@ test('RS-PUB-04 bound outbound work becomes stale if its deployment lifecycle ch
   let sends=0;const client={async verifyIdentity(){},async negotiate(){},prepareRequest(){return{};},exportPending(r){return JSON.stringify(r);},async sendPrepared(){sends++;return{};}};
   await assert.rejects(runPlatformWork(app,work.id,{client}),{code:'StaleReference'});assert.equal(sends,0);
 });
+
+
+test('R30 Publish contracts can require credential-pattern scan without silently replacing privacy',async t=>{
+  const{app}=setup(t),b=await baseline(app),p=await publishFixture(app,b);
+  const dimensions=['format','credential-exposure','privacy'];
+  const updated=(await execute(app,'publish.template_update',{
+    id:p.template.id,expected:p.template.version,data:{...p.data,verification_dimensions:dimensions}
+  })).entity;
+  assert.deepEqual(updated.data.verification_dimensions,dimensions);
+  const version=(await execute(app,'publish.version_freeze',{
+    template_id:updated.id,template_version:updated.version,version_label:'credential-bound'
+  })).entity;
+  assert.deepEqual(version.data.contract.verification_dimensions,dimensions);
+});

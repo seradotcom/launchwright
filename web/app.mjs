@@ -229,7 +229,7 @@ root.addEventListener('click',async event=>{
   }
   if(action==='verify-candidate'){
    const c=get(id);
-   openForm('Record verifier result',[selectField('dimension','Dimension',['format','semantic','editorial','privacy','rights','accessibility','product-evidence','permissions'],'semantic'),selectField('state','Reported state',['PASS','FAIL','UNKNOWN','ERROR'],'UNKNOWN'),jsonField('verifier','Verifier identity',{id:'local-independent-verifier',version:'1',digest:'',authority:'independent'},'Enter the verifier binary/config SHA-256. Browser records cannot self-assign canonical authority.'),jsonField('artifact_ids','Candidate artifact IDs',c.data.manifest.artifact_ids),jsonField('coverage','Coverage',{checked:c.data.manifest.artifact_ids.length,total:c.data.manifest.artifact_ids.length}),jsonField('omissions','Omissions',[]),jsonField('findings','Findings',[],'Objects: code, severity, message, optional resource_id.'),textField('observed_at','Observed at (ISO)',new Date().toISOString())],async d=>mutate('verification.record',{...d,candidate_id:c.id}),'Record result');return;
+   openForm('Record verifier result',[selectField('dimension','Dimension',['format','credential-exposure','semantic','editorial','privacy','rights','accessibility','product-evidence','permissions'],'semantic'),selectField('state','Reported state',['PASS','FAIL','UNKNOWN','ERROR'],'UNKNOWN'),jsonField('verifier','Verifier identity',{id:'local-independent-verifier',version:'1',digest:'',authority:'independent'},'Enter the verifier binary/config SHA-256. Browser records cannot self-assign canonical authority.'),jsonField('artifact_ids','Candidate artifact IDs',c.data.manifest.artifact_ids),jsonField('coverage','Coverage',{checked:c.data.manifest.artifact_ids.length,total:c.data.manifest.artifact_ids.length}),jsonField('omissions','Omissions',[]),jsonField('findings','Findings',[],'Objects: code, severity, message, optional resource_id.'),textField('observed_at','Observed at (ISO)',new Date().toISOString())],async d=>mutate('verification.record',{...d,candidate_id:c.id}),'Record result');return;
   }
   if(action==='waive-verification'){
    const v=get(id);
@@ -257,7 +257,7 @@ root.addEventListener('click',async event=>{
     textField('contract_version','Review policy version','editorial-v2'),
     textField('required_reviewers','Required editorial reviewers','1'),
     {key:'require_claims_verified',label:'Require verified claims before private delivery.',type:'checkbox',value:true},
-    multiSelectField('required_verification_dimensions','Required verification dimensions',['format','semantic','editorial','privacy','rights','accessibility','product-evidence','permissions'],[]),
+    multiSelectField('required_verification_dimensions','Required verification dimensions',['format','credential-exposure','semantic','editorial','privacy','rights','accessibility','product-evidence','permissions'],[]),
     {key:'allow_partial_delivery',label:'Allow explicitly documented partial channel packages.',type:'checkbox',value:false}
    ],async d=>{
      const payload={release_id:releaseId,name:d.name,artifact_ids:d.artifact_ids,destination:d.destination,

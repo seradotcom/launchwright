@@ -43,18 +43,18 @@ function validateReport(report,candidate,data){
   ensure(report.schema_version===VERIFIER_RESULT_SCHEMA,'Verifier result schema is not admitted','Conflict');
   choice(report.state,['PASS','FAIL']);
   idText(report.candidate_id);sha(report.candidate_sha256);sha(report.candidate_manifest_sha256);
-  ensure(report.dimension==='format','Canonical Launchwright verifier is admitted only for format','PolicyDenied');
+  ensure(['format','credential-exposure'].includes(report.dimension),'Canonical Launchwright verifier dimension is outside its declared scope','PolicyDenied');
   ensure(report.candidate_id===candidate.id,'Verifier receipt belongs to another candidate','PermissionDenied');
   ensure(report.candidate_sha256===candidate.data.candidate_sha256,'Verifier receipt candidate digest is stale','StaleReference');
   ensure(report.candidate_manifest_sha256===candidateManifestDigest(candidate),'Verifier receipt manifest digest is stale','StaleReference');
   ensure(data.dimension===report.dimension&&data.state===report.state,'Verification record differs from the Host verifier result','Conflict');
-  ensure(data.target_id===undefined,'Candidate-wide format verifier cannot be narrowed to one target','InvalidArgument');
+  ensure(data.target_id===undefined,'Candidate-wide verifier cannot be narrowed to one target','InvalidArgument');
 
   object(report.coverage,['checked','total'],['checked','total']);
   integer(report.coverage.checked,0,1000000);integer(report.coverage.total,0,1000000);
-  ensure(report.coverage.checked===report.coverage.total&&report.coverage.total>0,'Canonical format verification requires exhaustive artifact coverage','PolicyDenied');
+  ensure(report.coverage.checked===report.coverage.total&&report.coverage.total>0,'Canonical verifier requires exhaustive artifact coverage','PolicyDenied');
   ensure(same(data.coverage,report.coverage),'Recorded verification coverage differs from Host output','Conflict');
-  ensure(Array.isArray(data.omissions)&&data.omissions.length===0,'Canonical format verification cannot omit candidate artifacts','PolicyDenied');
+  ensure(Array.isArray(data.omissions)&&data.omissions.length===0,'Canonical verifier cannot omit candidate artifacts','PolicyDenied');
   ensure(same(data.findings,report.findings),'Recorded verification findings differ from Host output','Conflict');
 
   const manifestArtifacts=candidate.data.manifest?.artifacts;
@@ -101,5 +101,5 @@ export function admitCanonicalVerifierRuntime(app,candidate,data){
   ensure(receipt.platform_execution_authority===false&&receipt.external_customer_acceptance===false,'Verifier receipt may not manufacture external authority','Conflict');
   ensure(data.verifier.id===VERIFIER_ID&&data.verifier.version===receipt.provider_version&&data.verifier.digest===receipt.executable_sha256,'Verifier identity differs from the admitted Host executable','Conflict');
   const report=validateReport(receipt.report,candidate,data);
-  return{receipt_sha256,provider:receipt.provider,provider_version:receipt.provider_version,provider_generation:receipt.provider_generation,descriptor_sha256:receipt.descriptor_sha256,executable_sha256:receipt.executable_sha256,semwright_sha:receipt.semwright_sha,broker_policy_path_observed:true,driver_host_isolation_accepted:true,platform_execution_authority:false,external_customer_acceptance:false,scope:'owner-granted-driver-host-format-only',report};
+  return{receipt_sha256,provider:receipt.provider,provider_version:receipt.provider_version,provider_generation:receipt.provider_generation,descriptor_sha256:receipt.descriptor_sha256,executable_sha256:receipt.executable_sha256,semwright_sha:receipt.semwright_sha,broker_policy_path_observed:true,driver_host_isolation_accepted:true,platform_execution_authority:false,external_customer_acceptance:false,scope:report.dimension==='format'?'owner-granted-driver-host-format-only':'owner-granted-driver-host-text-credential-patterns-only',report};
 }
