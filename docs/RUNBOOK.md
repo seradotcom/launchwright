@@ -1,5 +1,17 @@
 # Operator runbook
 
+## R36 filesystem capacity preflight
+
+Use node src/main.mjs doctor --state <DIR> before importing or rendering
+artifacts. The report distinguishes process-temporary space from workspace
+space. Free space below 16 MiB reports BLOCKED; below 256 MiB reports
+ATTENTION. If the host temporary volume is exhausted but the workspace has
+capacity, select a private TMPDIR on an adequately provisioned filesystem
+(POSIX) and re-run doctor. Do not delete unknown files, worktrees, CI
+receipts, customer data or unrelated caches to make tests pass. Doctor never
+performs automatic cleanup, migrations or Native/Host acceptance.
+
+
 ## Before changing the application
 
 1. Confirm the Semwright pin in `SOURCE_LOCK.json` still matches the intended upstream snapshot.

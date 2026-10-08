@@ -51,6 +51,22 @@ UNKNOWN evidence via the Native SDK. Requires Git installed and an approved
 CLI source/build/target. No automatic capture or canonical Graph claims.
 See [Git source adapter](GIT_CHANGE_SOURCE.md).
 
+## Local disk capacity diagnostics
+
+Run node src/main.mjs doctor --state .state before working with large
+captures/imports. R36 separately reports the process temporary filesystem
+and the workspace filesystem, including conservative free-MiB thresholds.
+Below 16 MiB is a blocking error; below 256 MiB is a warning. If the
+process temporary filesystem is full, choose a private alternative TMPDIR
+(on POSIX) on a filesystem with available space and run doctor again.
+Do not remove unrelated project or user files automatically.
+
+The doctor is observational only; it neither creates state directories
+nor cleans caches, downloads, artifacts, credentials or workspaces.
+Unsupported filesystem capacity probes return UNKNOWN rather than a
+fabricated OK. On Windows, if capacity reporting is unavailable, check
+the location and free space manually before heavy operations.
+
 ## Empty and synthetic workspaces
 
 `init` creates an empty workspace. `demo` adds only synthetic editorial data and does not represent native product capture.
