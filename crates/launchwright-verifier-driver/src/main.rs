@@ -705,7 +705,13 @@ mod tests {
 
     #[test]
     fn findings_never_echo_caller_supplied_secret_as_resource_id() {
-        assert!(exact_resource_id(&json!({"id":"artifact_a-11"}), "id").is_ok());
+        assert!(
+            exact_resource_id(
+                &json!({"id":"artifact_00000000-0000-4000-8000-000000000000"}),
+                "id"
+            )
+            .is_ok()
+        );
         let bad = format!("ghp_{}", "A".repeat(36));
         assert!(exact_resource_id(&json!({"id":bad}), "id").is_err());
         assert!(exact_resource_id(&json!({"id":"artifact/../secret"}), "id").is_err());
