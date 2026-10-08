@@ -19,6 +19,8 @@ const VERIFIER_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_VERIFIER_
 const INTEGRATIONS_BUNDLE: Option<&str> =
     option_env!("LAUNCHWRIGHT_NATIVE_INTEGRATIONS_BUNDLE_SHA256");
 const EXTENSIONS_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_EXTENSIONS_BUNDLE_SHA256");
+const EXTENSION_RUNTIME_BUNDLE: Option<&str> =
+    option_env!("LAUNCHWRIGHT_NATIVE_EXTENSION_RUNTIME_BUNDLE_SHA256");
 const WORK_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_WORK_BUNDLE_SHA256");
 const MEDIA_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_MEDIA_BUNDLE_SHA256");
 const PUBLISH_BUNDLE: Option<&str> = option_env!("LAUNCHWRIGHT_NATIVE_PUBLISH_BUNDLE_SHA256");
@@ -33,6 +35,7 @@ enum Profile {
     Verifier,
     Integrations,
     Extensions,
+    ExtensionRuntime,
     Work,
     Media,
     Publish,
@@ -394,13 +397,13 @@ const OPERATIONS: &[Operation] = &[
         suffix: "extension-result_record",
         read: false,
         consent: false,
-        profile: Profile::Extensions,
+        profile: Profile::ExtensionRuntime,
     },
     Operation {
         suffix: "source-cli_ingest",
         read: false,
         consent: false,
-        profile: Profile::Extensions,
+        profile: Profile::ExtensionRuntime,
     },
     Operation {
         suffix: "compatibility-lock",
@@ -658,6 +661,12 @@ async fn main() -> Result<()> {
     )?;
     let integrations = bridge("launchwright-integrations.cjs", INTEGRATIONS_BUNDLE)?;
     let extensions = bridge("launchwright-extensions.cjs", EXTENSIONS_BUNDLE)?;
+    let extension_runtime = bridge_with_tool(
+        "node-extension-runtime",
+        "launchwright-extension-runtime.cjs",
+        EXTENSION_RUNTIME_BUNDLE,
+        Some("extension-receipts"),
+    )?;
     let work = bridge("launchwright-work.cjs", WORK_BUNDLE)?;
     let media = bridge("launchwright-media.cjs", MEDIA_BUNDLE)?;
     let publish = bridge("launchwright-publish.cjs", PUBLISH_BUNDLE)?;
@@ -677,6 +686,7 @@ async fn main() -> Result<()> {
             Profile::Verifier => verifier.clone(),
             Profile::Integrations => integrations.clone(),
             Profile::Extensions => extensions.clone(),
+            Profile::ExtensionRuntime => extension_runtime.clone(),
             Profile::Work => work.clone(),
             Profile::Media => media.clone(),
             Profile::Publish => publish.clone(),
@@ -719,7 +729,8 @@ mod tests {
         assert_eq!(counts.get(&Profile::Review), Some(&7));
         assert_eq!(counts.get(&Profile::Verifier), Some(&1));
         assert_eq!(counts.get(&Profile::Integrations), Some(&9));
-        assert_eq!(counts.get(&Profile::Extensions), Some(&13));
+        assert_eq!(counts.get(&Profile::Extensions), Some(&11));
+        assert_eq!(counts.get(&Profile::ExtensionRuntime), Some(&2));
         assert_eq!(counts.get(&Profile::Work), Some(&11));
         assert_eq!(counts.get(&Profile::Media), Some(&5));
         assert_eq!(counts.get(&Profile::Publish), Some(&10));

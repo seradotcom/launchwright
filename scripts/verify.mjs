@@ -17,7 +17,8 @@ if(!readFileSync('LICENSE','utf8').includes('GNU AFFERO GENERAL PUBLIC LICENSE')
 const expected=new Map();
 for(const [profile,meta] of Object.entries(NATIVE_PROFILES))for(const operation of meta.operations)expected.set(operation.replaceAll('.','-'),profile);
 const rust=readFileSync('crates/launchwright-native/src/main.rs','utf8'),observed=new Map();
-for(const match of rust.matchAll(/Operation\s*\{\s*suffix:\s*"([^"]+)"[\s\S]*?profile:\s*Profile::(\w+),\s*\}/g))observed.set(match[1],match[2].toLowerCase());
+const rustProfile=value=>value.replace(/([a-z0-9])([A-Z])/gu,'$1_$2').toLowerCase();
+for(const match of rust.matchAll(/Operation\s*\{\s*suffix:\s*"([^"]+)"[\s\S]*?profile:\s*Profile::(\w+),\s*\}/g))observed.set(match[1],rustProfile(match[2]));
 const missing=[...expected].filter(([suffix])=>!observed.has(suffix)).map(([suffix])=>suffix);
 const extra=[...observed].filter(([suffix])=>!expected.has(suffix)).map(([suffix])=>suffix);
 const misplaced=[...expected].filter(([suffix,profile])=>observed.has(suffix)&&observed.get(suffix)!==profile).map(([suffix,profile])=>({suffix,expected:profile,observed:observed.get(suffix)}));

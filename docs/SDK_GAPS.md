@@ -14,6 +14,7 @@ These are explicit integration gaps, not implied application successes.
 | Public delivery | Exact channel packages and receipt ledger | Canonical Publish action/receipt and destination-specific authority |
 | Teams | Principal/scopes work locally | Remote authentication, tenant isolation and multi-user approvals |
 | Mobile/Godot | Mobile remains provenance/import oriented. R25 exact SHA `6c41a0b1187057f72d4e4ecdf2cd3c5c8be478fb` added the bounded Godot execution profile and passed real pinned Semwright Godot, Native and Host lanes on the owned fixture. | Real-customer Godot projects, arbitrary-project mutation/effect/noninterference acceptance, mobile device execution and external Platform/customer authority remain external. |
+| Extension execution | R20 accepted the extension control plane while external DeltaRender/DeltaCLI fixture processes remained outside Driver Host. R28 adds a candidate fixed Driver SDK provider for only those two repository-owned fixtures plus isolated Native receipt admission; application-side tests are green but exact CI acceptance is pending. | Arbitrary/third-party extension execution, caller-selected code/argv/environment, mobile-device execution, Platform/customer authority and publication remain external. |
 | Plugin/ChatGPT host | Native Application bridge is implemented | Host-side product acceptance |
 
 No application-side schema should be promoted to an upstream Semwright API merely because it is useful locally.

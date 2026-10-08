@@ -5,17 +5,16 @@ import { KINDS, OPERATION_SCOPES, inputObject, str, choice, array, lines } from 
 import { iso } from './base.mjs';
 import {
   validateExtensionManifest, validateCompatibilityLock, prepareExtensionUse,
-  inspectExtensionPreparation, genericExtensionView, recordExtensionResult, inspectExtensionResult
+  inspectExtensionPreparation, genericExtensionView, inspectExtensionResult
 } from './extensions.mjs';
-import { recordCliObservation, inspectCliObservation } from './cli-source.mjs';
+import { inspectCliObservation } from './cli-source.mjs';
 
 export const EXTENSIONS_NATIVE_READS=Object.freeze([
   'extension.discovery','extension.generic_view','extension.preparation_status','extension.result_inspect',
   'source.cli_inspect','compatibility.negotiate','compatibility.inspect'
 ]);
 export const EXTENSIONS_NATIVE_MUTATIONS=Object.freeze([
-  'extension.register','extension.retire','extension.prepare_use','extension.result_record',
-  'source.cli_ingest','compatibility.lock'
+  'extension.register','extension.retire','extension.prepare_use','compatibility.lock'
 ]);
 export const EXTENSIONS_NATIVE_OPERATIONS=Object.freeze([...EXTENSIONS_NATIVE_READS,...EXTENSIONS_NATIVE_MUTATIONS]);
 
@@ -65,8 +64,6 @@ export class ExtensionsNativeApplication extends NativeProfileApplication {
   mutate(operation,input){
     switch(operation){
       case'extension.prepare_use':return{entity:prepareExtensionUse(this,input)};
-      case'extension.result_record':return{entity:recordExtensionResult(this,input)};
-      case'source.cli_ingest':return{entity:recordCliObservation(this,input)};
       case'extension.register':{
         const data=validateExtensionManifest(input);ensure(data.schema_major===1,'Unsupported extension schema major','ProtocolMismatch');
         const duplicate=this.list('extension_package').find(e=>e.data.type===data.type&&e.data.name===data.name&&e.data.package_version===data.package_version&&e.data.status==='active');

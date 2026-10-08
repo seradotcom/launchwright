@@ -83,9 +83,10 @@ export function genericExtensionView(ext){
 
 
 export function validateExtensionResult(raw){
-  inputObject(raw,['preparation_id','input_sha256','output_type','outcome','started_at','finished_at','output'],
+  inputObject(raw,['preparation_id','input_sha256','output_type','outcome','started_at','finished_at','output','runtime_receipt'],
     ['preparation_id','input_sha256','output_type','outcome','started_at','finished_at','output']);
   const d=structuredClone(raw);noSecrets(d);idText(d.preparation_id);sha(d.input_sha256);str(d.output_type,160);
+  if(d.runtime_receipt!==undefined){object(d.runtime_receipt,['file','sha256'],['file','sha256']);str(d.runtime_receipt.file,160);sha(d.runtime_receipt.sha256);}
   choice(d.outcome,['SUCCESS','FAILURE']);str(d.started_at,64);str(d.finished_at,64);
   ensure(Number.isFinite(Date.parse(d.started_at))&&Number.isFinite(Date.parse(d.finished_at)),'Extension receipt timestamps must be ISO dates');
   ensure(Date.parse(d.finished_at)>=Date.parse(d.started_at),'Extension receipt timestamps are reversed');
@@ -94,20 +95,23 @@ export function validateExtensionResult(raw){
   return{...d,output_bytes:bytes};
 }
 
-export function recordExtensionResult(app,raw){
+export function recordExtensionResult(app,raw,runtimeAdmission=null){
   const d=validateExtensionResult(raw),prep=app.get(d.preparation_id,'extension_preparation');
   const status=inspectExtensionPreparation(app,prep.id);ensure(status.start_allowed,'Extension preparation is no longer valid','Conflict');
   const ext=app.get(prep.data.extension_id,'extension_package');
   ensure(d.output_type===prep.data.output_type,'Extension result output type differs from preparation','ProtocolMismatch');
   ensure(d.output_bytes<=ext.data.limits.max_output_bytes,'Extension output exceeds package budget','ResourceExhausted');
+  ensure(!d.runtime_receipt||runtimeAdmission,'Canonical runtime receipt requires the isolated Native extension runtime','PolicyDenied');
+  const admitted=!!runtimeAdmission;
   const payload={
     schema_version:'launchwright-extension-result/1',preparation_id:prep.id,preparation_version:prep.version,
     extension_id:ext.id,extension_version:prep.data.extension_version,extension_digest:prep.data.digest,
     package_version:prep.data.package_version,license:prep.data.license,rights:prep.data.rights,
     input_sha256:d.input_sha256,output_type:d.output_type,output:d.output,output_bytes:d.output_bytes,
     output_sha256:digest('extension-output-v1',d.output),started_at:d.started_at,finished_at:d.finished_at,
-    process_outcome:d.outcome,technical_state:'UNKNOWN',host_isolation_verified:false,
-    recorded_by:app.principal,recorded_at:new Date().toISOString(),authority:'application-recorded-extension-receipt'
+    process_outcome:d.outcome,technical_state:admitted?'PASS':'UNKNOWN',host_isolation_verified:admitted,
+    ...(d.runtime_receipt?{runtime_receipt:d.runtime_receipt,runtime_admission:runtimeAdmission}:{}),
+    recorded_by:app.principal,recorded_at:new Date().toISOString(),authority:admitted?'canonical-driver-host-admitted':'application-recorded-extension-receipt'
   };
   return app.store.create('extension_result',payload);
 }
@@ -126,6 +130,8 @@ export function inspectExtensionResult(app,id){
   if(reasons.includes('extension-retired'))freshness='REVOKED_EXTENSION';
   else if(reasons.some(x=>x.endsWith('-missing')))freshness='MISSING_REFERENCE';
   else if(reasons.length)freshness='STALE';
-  return{result,freshness,reasons,process_outcome:d.process_outcome,technical_state:'UNKNOWN',verified_execution:false,host_isolation_verified:false,
-    note:'A process receipt is preserved evidence, not canonical Host admission or verifier PASS.'};
+  const admitted=d.authority==='canonical-driver-host-admitted'&&d.host_isolation_verified===true;
+  const technical_state=freshness==='CURRENT'&&admitted?d.technical_state:'UNKNOWN';
+  return{result,freshness,reasons,process_outcome:d.process_outcome,technical_state,verified_execution:admitted,host_isolation_verified:d.host_isolation_verified===true,
+    note:admitted?'Exact Driver Host execution receipt is preserved; drift can invalidate current technical PASS without rewriting history.':'A process receipt is preserved evidence, not canonical Host admission or verifier PASS.'};
 }

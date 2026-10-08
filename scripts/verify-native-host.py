@@ -30,11 +30,11 @@ LAUNCHWRIGHT_DRIVER = Path(os.environ["LAUNCHWRIGHT_NATIVE_BINARY"]).resolve()
 BUNDLE_MANIFEST = ROOT / "dist" / "native-bundle.json"
 SEMWRIGHT_BINS = SEMWRIGHT / "target" / "debug"
 EVIDENCE = ROOT / "evidence" / "native-host"
-# Two independently scoped Node tools are each digest-verified and sealed by Driver Host.
-# GitHub-hosted runners can spend more than 20s materializing the Node executables
-# before the daemon publishes its owner socket. This budget covers bootstrap only;
-# request/tool execution timeouts remain unchanged.
-DAEMON_START_TIMEOUT_SECONDS = 60
+# Multiple independently scoped Node tools are each digest-verified and sealed by Driver Host.
+# R28 adds another isolated Native runtime and its dedicated acceptance provider, so
+# GitHub-hosted runners may spend substantial time materializing Node before the owner
+# socket appears. This budget covers bootstrap only; request/tool timeouts are unchanged.
+DAEMON_START_TIMEOUT_SECONDS = 120
 RESOURCE = "launchwright:workspace"
 
 
@@ -103,6 +103,7 @@ class HostFixture:
             "launchwright-runtime",
             "launchwright-data",
             "verification-receipts",
+            "extension-receipts",
             "project-graph-fixture",
         ):
             path = self.root / name
@@ -154,6 +155,7 @@ class HostFixture:
             "verifier",
             "integrations",
             "extensions",
+            "extension_runtime",
             "work",
             "media",
             "publish",
@@ -182,6 +184,10 @@ class HostFixture:
         shutil.copyfile(source_node, verifier_node)
         verifier_node.chmod(0o500)
         self.verifier_node = verifier_node
+        extension_node = self.paths["binary"] / "node-extension-runtime"
+        shutil.copyfile(source_node, extension_node)
+        extension_node.chmod(0o500)
+        self.extension_node = extension_node
 
     def _provision_workspace(self) -> None:
         result = subprocess.run(
@@ -236,6 +242,7 @@ class HostFixture:
                 {"root": "launchwright-runtime", "read_only": True, "execute": False},
                 {"root": "launchwright-data", "read_only": False, "execute": False},
                 {"root": "verification-receipts", "read_only": True, "execute": False},
+                {"root": "extension-receipts", "read_only": True, "execute": False},
             ],
             "tools": [
                 {
@@ -249,6 +256,12 @@ class HostFixture:
                     "name": "node-verifier",
                     "sha256": sha256(self.verifier_node),
                     "mounts": ["launchwright-data", "verification-receipts"],
+                },
+                {
+                    "root": "launchwright-extension-runtime-node",
+                    "name": "node-extension-runtime",
+                    "sha256": sha256(self.extension_node),
+                    "mounts": ["launchwright-data", "extension-receipts"],
                 },
             ],
             "resources": {
@@ -290,8 +303,10 @@ class HostFixture:
             ("launchwright-runtime", self.paths["launchwright-runtime"], False),
             ("launchwright-data", self.paths["launchwright-data"], True),
             ("verification-receipts", self.paths["verification-receipts"], False),
+            ("extension-receipts", self.paths["extension-receipts"], False),
             ("launchwright-node", self.node, False),
             ("launchwright-verifier-node", self.verifier_node, False),
+            ("launchwright-extension-runtime-node", self.extension_node, False),
             ("project-graph-fixture", self.paths["project-graph-fixture"], False),
         ]
         for name, path, writable in grants:
@@ -312,6 +327,7 @@ class HostFixture:
                 "launchwright_driver": sha256(self.driver),
                 "node_runtime": sha256(self.node),
                 "verifier_node_runtime": sha256(self.verifier_node),
+                "extension_node_runtime": sha256(self.extension_node),
                 "semwright_cli": sha256(require_binary("semwright")),
                 "semwright_daemon": sha256(require_binary("semwrightd")),
                 "semwright_sandbox": sha256(require_binary("semwright-sandbox")),
