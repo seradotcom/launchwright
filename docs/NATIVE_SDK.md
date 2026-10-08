@@ -1,6 +1,6 @@
 # Canonical Semwright Native SDK integration
 
-Launchwright pins Semwright commit `4d291de26724810017ce7b6d185326514cb79fa6` and Native SDK `0.9.0-dev.1`. Exact public SDK source hashes are in `../SOURCE_LOCK.json`. The pin was rechecked against `origin/main` on 2026-10-06 and still exactly matches the current Semwright main SHA.
+Launchwright pins the published Semwright `v1.0.0` release at commit `8fa191250ae68274182570c65f067f7a60f85625` and Native SDK `1.0.0`. Exact public SDK source hashes are in `../SOURCE_LOCK.json`. On 2026-10-07 the release tag and `origin/main` were independently verified to resolve to the same commit; later upstream commits are not inherited implicitly.
 
 The JavaScript application imports the real `@semwright/native-sdk` package for application contexts, exact request digests, JSON budgets, cancellation, observations, recovery and dispatch. The vendored SDK keeps its upstream MIT OR Apache-2.0 licensing.
 
@@ -22,7 +22,7 @@ The canonical `NodeBridge` limits an owner-pinned executable bundle to 48 KiB an
 | `graph` | 9 | 48,166 | Project Graph contract/inspection, owner-admitted observation custody, impact/reuse proposals and rebuild receipts |
 | `effects` | 2 | n/a — introduced in R12 | canonical immutable-artifact Effects result custody and inspection, without execution authority |
 
-The numeric byte counts above are exact historical R9 workstation evidence, not current bundle acceptance and not Driver Host acceptance. R12 added the isolated `effects` profile and R26 adds the isolated `verifier` profile. Their current compacted sizes and all eleven current bundle hashes are accepted only from an exact-SHA `native` CI lane. The 48 KiB canonical limit is unchanged and must not be bypassed.
+The numeric byte counts above are exact historical R9 workstation evidence, not current bundle acceptance and not Driver Host acceptance. R12 added the isolated `effects` profile and R26 adds the isolated `verifier` profile. Their current compacted sizes and all eleven current bundle hashes are accepted only from an exact-SHA `native` CI lane. The 48 KiB canonical limit is unchanged and must not be bypassed. R26 subsequently earned exact-SHA Native, Verifier and Host acceptance at `4b0a437ef2fbd67d199dcf33e0d0d405ef91e0ad`; the R27 move to Semwright/Native SDK v1.0.0 changes the source lock, so those results remain historical and R27 must rerun the affected lanes.
 
 `scripts/build-native-bundle.mjs` refuses to build if an operation is missing, duplicated or if any compacted profile exceeds the canonical 48 KiB maximum. It emits a manifest containing the exact SHA-256 and byte count of every profile. The Rust driver pins all eleven hashes at build time and maps each `driver.launchwright.*` operation to exactly one `NodeBridge`.
 

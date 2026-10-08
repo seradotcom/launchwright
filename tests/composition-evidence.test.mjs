@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { validateCompositionEvidence } from '../src/composition-evidence.mjs';
 
-const semwright='4d291de26724810017ce7b6d185326514cb79fa6';
+const semwright='8fa191250ae68274182570c65f067f7a60f85625';
 const a='a'.repeat(64),b='b'.repeat(64),c='c'.repeat(64),d='d'.repeat(64),e='e'.repeat(64),f='f'.repeat(64);
 function fixture(){
   return{

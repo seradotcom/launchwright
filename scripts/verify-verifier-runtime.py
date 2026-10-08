@@ -555,7 +555,7 @@ def main() -> None:
         "passed": True,
         "launchwright_sha": os.environ.get("GITHUB_SHA"),
         "semwright_sha": observed_sha,
-        "native_sdk": "0.9.0-dev.1",
+        "native_sdk": "1.0.0",
         "authority": {
             "scope": "owner-staged-format-only",
             "canonical_verifier_runtime_admitted": True,

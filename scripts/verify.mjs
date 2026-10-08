@@ -9,6 +9,8 @@ const lock=JSON.parse(readFileSync('SOURCE_LOCK.json','utf8'));let count=0;
 for(const[path,expected]of Object.entries(lock.native_sdk.files)){
  const bytes=readFileSync(join('vendor/semwright-native-sdk',path));if(createHash('sha256').update(bytes).digest('hex')!==expected)throw Error('Canonical Native SDK bytes changed: '+path);
 }
+if(lock.native_sdk.version!=='1.0.0'||lock.native_sdk.release_tag!=='v1.0.0')throw Error('Canonical Native SDK release lock changed');
+const archive=readFileSync(join('vendor','semwright-native-sdk-'+lock.native_sdk.version+'.tgz'));if(createHash('sha256').update(archive).digest('hex')!==lock.native_sdk.archive_sha256)throw Error('Canonical Native SDK package archive changed');
 function walk(dir){for(const name of readdirSync(dir)){if(['node_modules','.git','.state','.ci-tools','target','dist','private-reference'].includes(name)||name.startsWith('.state-'))continue;const path=join(dir,name),st=lstatSync(path);if(st.isSymbolicLink())throw Error('Unexpected repository symlink');if(st.isDirectory())walk(path);else if(path.endsWith('.mjs')){const result=spawnSync(process.execPath,['--check',path],{encoding:'utf8'});if(result.status!==0)throw Error(result.stderr);count++;}}}
 walk('.');
 if(!readFileSync('LICENSE','utf8').includes('GNU AFFERO GENERAL PUBLIC LICENSE'))throw Error('Full AGPL license missing');

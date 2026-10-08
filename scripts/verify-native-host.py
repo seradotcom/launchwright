@@ -1452,7 +1452,7 @@ def allowed_flow() -> dict[str, Any]:
         )["data"]
         if description.get("app") != "Launchwright":
             raise AssertionError("unexpected application identity")
-        if description.get("native_sdk") != "0.9.0-dev.1":
+        if description.get("native_sdk") != "1.0.0":
             raise AssertionError("unexpected Native SDK identity")
 
         operation = "entity.create"
@@ -1638,7 +1638,7 @@ def main() -> None:
         "passed": True,
         "launchwright_sha": os.environ.get("GITHUB_SHA"),
         "semwright_sha": semwright_sha,
-        "native_sdk": "0.9.0-dev.1",
+        "native_sdk": "1.0.0",
         "authority": {
             "driver_host_isolation_accepted": True,
             "broker_policy_path_observed": True,

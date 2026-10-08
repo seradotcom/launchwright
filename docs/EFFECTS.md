@@ -1,6 +1,6 @@
 # Canonical Effects readback custody
 
-Launchwright uses the Effects surface from the exact pinned Semwright Native SDK at commit `4d291de26724810017ce7b6d185326514cb79fa6`. It does **not** implement another effects evaluator.
+Launchwright uses the Effects surface from the exact pinned Semwright v1.0.0 Native SDK at commit `8fa191250ae68274182570c65f067f7a60f85625` (`v1.0.0`). It does **not** implement another effects evaluator.
 
 ## Scope
 

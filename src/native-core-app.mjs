@@ -51,7 +51,7 @@ export class CoreNativeApplication {
     if(row){ensure(row.digest===identity.request_sha256&&row.principal===this.principal,'Recovery identity differs from its durable binding','Conflict');return{state:'recorded',identity,result:JSON.parse(row.result)};}
     const epoch=this.store.meta().epoch;return identity.epoch<epoch?{state:'retention_expired',identity,current_epoch:epoch}:{state:'outcome_unknown',identity};
   }
-  describe(){return{app:'Launchwright',version:APP_VERSION,schema_version:'launchwright/1',native_profile:'core',workspace_version:this.store.version(),request_epoch:this.store.meta().epoch,principal:this.principal,operations:CORE_NATIVE_OPERATIONS,native_sdk:'0.9.0-dev.1',authority:'application-domain-only'};}
+  describe(){return{app:'Launchwright',version:APP_VERSION,schema_version:'launchwright/1',native_profile:'core',workspace_version:this.store.version(),request_epoch:this.store.meta().epoch,principal:this.principal,operations:CORE_NATIVE_OPERATIONS,native_sdk:'1.0.0',authority:'application-domain-only'};}
   read(op,input){
     if(op==='workspace.describe'){inputObject(input,[]);return this.describe();}
     if(op==='resource.get'){inputObject(input,['id']);return this.get(input.id);}
