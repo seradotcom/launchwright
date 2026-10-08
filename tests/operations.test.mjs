@@ -56,7 +56,8 @@ test('RS-OPS-07 doctor reports unsafe local permissions but does not repair them
 test('doctor reports unsupported local engines as diagnostic rather than acceptance',()=>{
   const root=mkdtempSync(join(tmpdir(),'launchwright-doctor-engine-'));
   try{
-    const report=inspectDoctor(root,repoRoot,{nodeVersion:'22.22.0',env:{}});
+    const report=inspectDoctor(root,repoRoot,{nodeVersion:'22.22.0',env:{},
+      capacityReader:()=>({bsize:4096n,bavail:1048576n})});
     assert.equal(report.canonical_sdk_engine_supported,false);
     assert.equal(report.state,'ATTENTION');
     assert.ok(report.issues.some(issue=>issue.code==='NODE_UNSUPPORTED'));

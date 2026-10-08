@@ -164,6 +164,17 @@ authority. Exact-SHA Node 24 Linux/Windows/macOS CI is required before R35
 is accepted.
 
 
+## R36 candidate — read-only filesystem capacity preflight
+
+R36 augments local doctor with separate capacity diagnoses for the process
+temporary volume and workspace volume. Less than 16 MiB free reports a
+blocking condition; less than 256 MiB is a warning. Unsupported platform
+capacity yields UNKNOWN, never assumed OK. No filesystem deletions, workspace
+initialization, SDK mutation or automatic cleanup is performed. Injected
+zero/low/unknown/large-space fixtures establish deterministic diagnostics;
+supported Node 24 Linux/Windows/macOS CI acceptance is pending. This does
+not establish Native Driver Host, Platform or customer authority.
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;
