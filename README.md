@@ -41,7 +41,7 @@ Synthetic data is never described as a real product capture.
 - exact candidate manifests that pin artifact bytes, target context, ReleaseContract, localization/glossary revisions, channel profiles and declared rights, with input freshness and review-race isolation;
 - capture contract v2 tied to source + build + target + scenario, with Platform/native receipt correlation, readiness checks, anchor cardinality, build-drift detection, isolation/cleanup bounds, provenance classes and derived-material lineage while technical state stays UNKNOWN;
 - owned DeltaDesk A/B browser laboratory exercised through the exact pinned Semwright Broker + Policy + Chromium path in a dedicated heavy CI lane; its real Broker-routed receipts and screenshot hashes are preserved as `IMPORTED_UNVERIFIED` capture records, fixture approval remains explicitly non-human, and no canonical Platform/Host authority is inferred;
-- immutable verifier identity/version/digest, coverage, omissions and findings;
+- immutable verifier identity/version/digest, coverage, omissions and findings; R30 adds a pending exact-SHA candidate for four deterministic scopes (`format`, secret-pattern `privacy`, frozen-declaration `rights`, static-HTML `accessibility`) while explicitly excluding semantic/editorial judgment, privacy compliance, legal-rights validity and WCAG conformance;
 - waivers that annotate failures without changing verifier truth;
 - versioned channel profiles, exact package generation, authenticated deterministic private ZIP bundles, and receipt/recovery state without performing the external send;
 - source-linked localization with glossary revision pins, explicit rebase, RTL/font-rights/critical-term blockers and no invented language/layout PASS;
@@ -100,11 +100,12 @@ node scripts/verify.mjs
 node src/main.mjs doctor --state .state
 ```
 
-GitHub Actions runs the supported Node 24.21 runtime on Linux, Windows and macOS. The manual heavy workflow has nine independently selectable lanes:
+GitHub Actions runs the supported Node 24.21 runtime on Linux, Windows and macOS. The manual heavy workflow has ten independently selectable lanes:
 
 - **native** — builds the pinned TypeScript SDK, all thirteen owner-pinned bundles and real Rust NativeDriver with Graph + Effects SDK features;
 - **host** — checks out the exact pinned Semwright SHA and runs Launchwright through the real daemon → Broker/Policy → Driver Host → sealed Node runtime → owner-pinned NodeBridge bundle path, including durable mutation/readback, stale-ref invalidation across restart and a policy-denied negative control; a green exact-SHA run establishes this Host boundary only, not Platform/Publish/ChatGPT authority;
-- **verifier** — builds the bounded Driver SDK format verifier and routes its exact candidate/artifact-bound receipt through Broker/Policy/Driver Host into the dedicated Native `verifier` profile; it proves canonical format admission only and explicitly carries no semantic/editorial/Platform/publication authority;
+- **verifier** — builds the bounded Driver SDK verifier and routes exact frozen-candidate/artifact-bound receipts through Broker/Policy/Driver Host into the dedicated Native `verifier` profile. R26 accepted `format`; R30 is the pending exact-SHA candidate for secret-pattern `privacy`, frozen-declaration `rights` and static-HTML `accessibility` scopes. Those narrow scopes are not privacy compliance, legal-rights validity or WCAG conformance, and the lane carries no semantic/editorial/Platform/customer/publication authority;
+- **extension** — executes only the fixed repository-owned DeltaRender/DeltaCLI provider path through Driver Host and exact `extension_runtime` receipt admission; arbitrary or third-party extension execution remains outside that acceptance;
 - **effects** — builds the fixed Launchwright Effects Driver SDK provider and the thirteen-bundle NativeDriver, links the canonical Semwright v1 Effects reader into that provider, evaluates only an owner-staged protected spec/artifact root inside Driver Host, admits the exact Host receipt through `effects_runtime`, and proves substitution/policy/drift controls while preserving `execution_authority:false` and no scenario-mutation authority;
 - **browser** — installs Chromium on the runner and exercises the real Launchwright UI;
 - **deltadesk** — executes the owned DeltaDesk A/B fixture through the exact pinned Semwright Broker + Policy + Chromium backend, requires fail-closed denial without `browser.modify` and for a forbidden origin, retains screenshot/receipt hashes and ingests them as `IMPORTED_UNVERIFIED`; the bounded CI fixture approver is not human approval and the lane does not fabricate Platform, Driver Host or canonical capture authority;

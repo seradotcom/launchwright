@@ -5,21 +5,23 @@ import { createHash } from 'node:crypto';
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { execute } from '../src/application.mjs';
-import { candidateManifestDigest, PINNED_SEMWRIGHT_SHA } from '../src/verification-runtime.mjs';
+import { candidateManifestDigest, PINNED_SEMWRIGHT_SHA, VERIFIER_SCOPES } from '../src/verification-runtime.mjs';
 import { setup, baseline, candidate } from './helpers.mjs';
 
 const observedAt='2026-10-07T08:00:00.000Z';
 const executableSha='d'.repeat(64);
 
 function exactReceipt(c,artifact,overrides={}){
+  const dimension=overrides.report?.dimension??'format';
   const frozen=c.data.manifest.artifacts.find(item=>item.id===artifact.id);
   const report={
-    schema_version:'launchwright-verifier-result/1',
+    schema_version:'launchwright-verifier-result/2',
     state:'PASS',
     candidate_id:c.id,
     candidate_sha256:c.data.candidate_sha256,
     candidate_manifest_sha256:candidateManifestDigest(c),
-    dimension:'format',
+    dimension,
+    scope:VERIFIER_SCOPES[dimension],
     coverage:{checked:1,total:1},
     artifact_bindings:[{id:frozen.id,sha256:frozen.sha256,bytes:frozen.bytes,mime:frozen.mime,result:'PASS'}],
     findings:[]
@@ -29,7 +31,7 @@ function exactReceipt(c,artifact,overrides={}){
     observed_at:observedAt,
     semwright_sha:PINNED_SEMWRIGHT_SHA,
     provider:'driver:launchwright-verifier',
-    provider_version:'0.2.0-dev.1',
+    provider_version:'0.2.0-dev.2',
     provider_generation:7,
     descriptor_sha256:'c'.repeat(64),
     executable_sha256:executableSha,
@@ -52,7 +54,7 @@ function pinReceipt(root,name,receipt){
 function recordInput(c,artifact,receiptRef,receipt){
   return{
     candidate_id:c.id,
-    dimension:'format',
+    dimension:receipt.report.dimension,
     state:receipt.report.state,
     verifier:{id:'launchwright-verifier',version:receipt.provider_version,digest:receipt.executable_sha256,authority:'canonical'},
     artifact_ids:[artifact.id],
@@ -72,7 +74,8 @@ test('exact Driver Host receipt admits one candidate-wide canonical format PASS'
   assert.equal(stored.data.runtime_admission.provider,'driver:launchwright-verifier');
   assert.equal(stored.data.runtime_admission.driver_host_isolation_accepted,true);
   assert.equal(stored.data.runtime_admission.receipt_sha256,ref.sha256);
-  assert.equal(stored.data.runtime_admission.scope,'owner-granted-driver-host-format-only');
+  assert.equal(stored.data.runtime_admission.scope,VERIFIER_SCOPES.format);
+  assert.equal(stored.data.runtime_admission.dimension,'format');
   const summary=await execute(app,'verification.summary',{candidate_id:c.id});
   assert.equal(summary.state,'PASS');
   assert.equal(summary.canonical_passes,1);
@@ -97,4 +100,22 @@ test('receipt digest is checked before semantic admission and cannot be attached
   const receipt=exactReceipt(c,artifact),ref=pinReceipt(verificationReceiptRoot,'r26-digest.json',receipt);
   await assert.rejects(execute(app,'verification.record',recordInput(c,artifact,{...ref,sha256:'0'.repeat(64)},receipt)),{code:'Conflict'});
   await assert.rejects(execute(app,'verification.record',{...recordInput(c,artifact,ref,receipt),verifier:{id:'independent',version:'1',digest:'1'.repeat(64),authority:'independent'}}),{code:'InvalidArgument'});
+});
+
+test('canonical verifier preserves explicit bounded scopes for structural dimensions',async t=>{
+  const {app,verificationReceiptRoot}=setup(t),b=await baseline(app),{artifact,candidate:c}=await candidate(app,b);
+  for(const dimension of ['privacy','rights','accessibility']){
+    const receipt=exactReceipt(c,artifact,{report:{dimension,scope:VERIFIER_SCOPES[dimension]}}),ref=pinReceipt(verificationReceiptRoot,'r30-'+dimension+'.json',receipt);
+    const stored=(await execute(app,'verification.record',recordInput(c,artifact,ref,receipt))).entity;
+    assert.equal(stored.data.runtime_admission.dimension,dimension);
+    assert.equal(stored.data.runtime_admission.scope,VERIFIER_SCOPES[dimension]);
+  }
+  const summary=await execute(app,'verification.summary',{candidate_id:c.id});
+  assert.equal(summary.canonical_passes,3);
+});
+
+test('canonical verifier rejects a dimension receipt whose bounded scope is spoofed',async t=>{
+  const {app,verificationReceiptRoot}=setup(t),b=await baseline(app),{artifact,candidate:c}=await candidate(app,b);
+  const receipt=exactReceipt(c,artifact,{report:{dimension:'privacy',scope:VERIFIER_SCOPES.rights}}),ref=pinReceipt(verificationReceiptRoot,'r30-scope-spoof.json',receipt);
+  await assert.rejects(execute(app,'verification.record',recordInput(c,artifact,ref,receipt)),{code:'Conflict'});
 });

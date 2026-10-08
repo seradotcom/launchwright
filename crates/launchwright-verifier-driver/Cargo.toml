@@ -1,6 +1,6 @@
 [package]
 name = "launchwright-verifier-driver"
-version = "0.2.0-dev.1"
+version = "0.2.0-dev.2"
 edition = "2024"
 rust-version = "1.88"
 license = "AGPL-3.0-only"
@@ -11,6 +11,7 @@ publish = false
 async-trait = "0.1"
 hex = "0.4"
 semwright-driver-sdk = { git = "https://github.com/seradotcom/semwright", rev = "d2da9a495a53fe279a1ca4de61f0e24646350f22" }
+semwright-native-sdk = { git = "https://github.com/seradotcom/semwright", rev = "d2da9a495a53fe279a1ca4de61f0e24646350f22" }
 semwright-types = { git = "https://github.com/seradotcom/semwright", rev = "d2da9a495a53fe279a1ca4de61f0e24646350f22" }
 serde_json = "1"
 sha2 = "0.11"

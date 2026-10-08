@@ -10,7 +10,13 @@ export const PINNED_SEMWRIGHT_SHA='d2da9a495a53fe279a1ca4de61f0e24646350f22';
 export const VERIFIER_PROVIDER='driver:launchwright-verifier';
 export const VERIFIER_ID='launchwright-verifier';
 export const VERIFIER_RECEIPT_SCHEMA='launchwright-canonical-verifier-runtime/1';
-export const VERIFIER_RESULT_SCHEMA='launchwright-verifier-result/1';
+export const VERIFIER_RESULT_SCHEMA='launchwright-verifier-result/2';
+export const VERIFIER_SCOPES=Object.freeze({
+  format:'owner-staged-artifact-format-only',
+  privacy:'owner-staged-artifact-secret-patterns-only',
+  rights:'frozen-rights-declarations-only',
+  accessibility:'owner-staged-html-static-structure-only'
+});
 
 const deepDigest=(domain,value)=>digest(domain,value);
 const same=(a,b)=>deepDigest('verifier-compare',a)===deepDigest('verifier-compare',b);
@@ -38,23 +44,25 @@ function readPinnedReceipt(root,reference){
 
 function validateReport(report,candidate,data){
   object(report,
-    ['schema_version','state','candidate_id','candidate_sha256','candidate_manifest_sha256','dimension','coverage','artifact_bindings','findings'],
-    ['schema_version','state','candidate_id','candidate_sha256','candidate_manifest_sha256','dimension','coverage','artifact_bindings','findings']);
+    ['schema_version','state','candidate_id','candidate_sha256','candidate_manifest_sha256','dimension','scope','coverage','artifact_bindings','findings'],
+    ['schema_version','state','candidate_id','candidate_sha256','candidate_manifest_sha256','dimension','scope','coverage','artifact_bindings','findings']);
   ensure(report.schema_version===VERIFIER_RESULT_SCHEMA,'Verifier result schema is not admitted','Conflict');
   choice(report.state,['PASS','FAIL']);
   idText(report.candidate_id);sha(report.candidate_sha256);sha(report.candidate_manifest_sha256);
-  ensure(report.dimension==='format','Canonical Launchwright verifier is admitted only for format','PolicyDenied');
+  choice(report.dimension,Object.keys(VERIFIER_SCOPES));
+  str(report.scope,160);
+  ensure(report.scope===VERIFIER_SCOPES[report.dimension],'Verifier result scope does not match its bounded dimension','Conflict');
   ensure(report.candidate_id===candidate.id,'Verifier receipt belongs to another candidate','PermissionDenied');
   ensure(report.candidate_sha256===candidate.data.candidate_sha256,'Verifier receipt candidate digest is stale','StaleReference');
   ensure(report.candidate_manifest_sha256===candidateManifestDigest(candidate),'Verifier receipt manifest digest is stale','StaleReference');
   ensure(data.dimension===report.dimension&&data.state===report.state,'Verification record differs from the Host verifier result','Conflict');
-  ensure(data.target_id===undefined,'Candidate-wide format verifier cannot be narrowed to one target','InvalidArgument');
+  ensure(data.target_id===undefined,'Candidate-wide canonical verifier cannot be narrowed to one target','InvalidArgument');
 
   object(report.coverage,['checked','total'],['checked','total']);
   integer(report.coverage.checked,0,1000000);integer(report.coverage.total,0,1000000);
-  ensure(report.coverage.checked===report.coverage.total&&report.coverage.total>0,'Canonical format verification requires exhaustive artifact coverage','PolicyDenied');
+  ensure(report.coverage.checked===report.coverage.total&&report.coverage.total>0,'Canonical verification requires exhaustive artifact binding coverage','PolicyDenied');
   ensure(same(data.coverage,report.coverage),'Recorded verification coverage differs from Host output','Conflict');
-  ensure(Array.isArray(data.omissions)&&data.omissions.length===0,'Canonical format verification cannot omit candidate artifacts','PolicyDenied');
+  ensure(Array.isArray(data.omissions)&&data.omissions.length===0,'Canonical verification cannot omit candidate artifacts','PolicyDenied');
   ensure(same(data.findings,report.findings),'Recorded verification findings differ from Host output','Conflict');
 
   const manifestArtifacts=candidate.data.manifest?.artifacts;
@@ -76,9 +84,9 @@ function validateReport(report,candidate,data){
     if(report.state==='PASS')ensure(binding.result==='PASS','PASS verifier receipt contains a failing artifact','Conflict');
   }
   array(report.findings,128).forEach(finding=>{
-    object(finding,['code','severity','message','resource_id'],['code','severity','message','resource_id']);
-    str(finding.code,96);choice(finding.severity,['info','warning','error','blocker']);str(finding.message,4000);idText(finding.resource_id);
-    ensure(seen.has(finding.resource_id),'Verifier finding references an artifact outside the candidate','PermissionDenied');
+    object(finding,['code','severity','message','resource_id'],['code','severity','message']);
+    str(finding.code,96);choice(finding.severity,['info','warning','error','blocker']);str(finding.message,4000);
+    if(finding.resource_id!==undefined){idText(finding.resource_id);ensure(seen.has(finding.resource_id),'Verifier finding references an artifact outside the candidate','PermissionDenied');}
   });
   if(report.state==='PASS')ensure(report.findings.every(f=>!['error','blocker'].includes(f.severity)),'PASS verifier receipt contains blocking findings','Conflict');
   return report;
@@ -101,5 +109,5 @@ export function admitCanonicalVerifierRuntime(app,candidate,data){
   ensure(receipt.platform_execution_authority===false&&receipt.external_customer_acceptance===false,'Verifier receipt may not manufacture external authority','Conflict');
   ensure(data.verifier.id===VERIFIER_ID&&data.verifier.version===receipt.provider_version&&data.verifier.digest===receipt.executable_sha256,'Verifier identity differs from the admitted Host executable','Conflict');
   const report=validateReport(receipt.report,candidate,data);
-  return{receipt_sha256,provider:receipt.provider,provider_version:receipt.provider_version,provider_generation:receipt.provider_generation,descriptor_sha256:receipt.descriptor_sha256,executable_sha256:receipt.executable_sha256,semwright_sha:receipt.semwright_sha,broker_policy_path_observed:true,driver_host_isolation_accepted:true,platform_execution_authority:false,external_customer_acceptance:false,scope:'owner-granted-driver-host-format-only',report};
+  return{receipt_sha256,provider:receipt.provider,provider_version:receipt.provider_version,provider_generation:receipt.provider_generation,descriptor_sha256:receipt.descriptor_sha256,executable_sha256:receipt.executable_sha256,semwright_sha:receipt.semwright_sha,broker_policy_path_observed:true,driver_host_isolation_accepted:true,platform_execution_authority:false,external_customer_acceptance:false,scope:report.scope,dimension:report.dimension,report};
 }
