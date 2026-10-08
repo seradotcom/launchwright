@@ -120,6 +120,19 @@ public release is claimed**. Acceptance requires an exact-SHA supported Node
 selective native/host regression. Broader Platform, customer, activation,
 multi-tenant and billing authority remain external.
 
+## R32 candidate — read-only existing-project Git metadata
+
+R32 adds an operator-controlled local Git metadata source over an exact
+base/head commit pair. It reads deterministic tree/commit identities and
+bounded changed-file/status metadata, without network fetch, script execution,
+patch contents or commit messages. The saved observation is locally
+digest-bound and imported through canonical Native SDK evidence.import only
+after an approved CLI source, exact release/target/head-build match and
+explicit operator acknowledgement. The imported record remains
+technical UNKNOWN with no driver-host, Project Graph, Platform, or
+customer-capture authority. Supported-engine Linux/Windows/macOS CI and
+operator CLI replay must pass before R32 is accepted at an exact SHA.
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;
