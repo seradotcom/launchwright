@@ -113,28 +113,40 @@ R31 implementation acceptance is complete at exact source SHA `5a34632d982110d09
 
 R32 implementation acceptance is complete at exact source SHA `cc56dd5fb34829ed308c70161c20c6ed5a1e2368`. Native SDK integration and disposable local real Git fixture tests pass on supported Node 24 Linux, Windows and macOS in runs `37836538487` and `37836544605`. The initial source SHA `8630bf541d388eb1736776e846770eb71712eb56` failed on Windows because Git path normalization differed from Node's filesystem path, and this was corrected before acceptance. PR #49 merged as `a0c846fb21b7d55a30ad5fc05e9a8c324bad3222`, with main-push three-OS checks `37836921050` passing. The adapter observes pinned base/head commit and tree SHAs, bounded changed filename/status inventory and commit counts **without executing the repository, fetching remotes or reading code/patches/commit messages**. Its operator-approved Native SDK evidence import remains `technical: UNKNOWN` and imported-declaration only, not Project Graph, Driver Host, Platform or customer-production authority. Complete SHA/job/artefact evidence: `evidence/r32/ci-runs.json`.
 
-## R33 candidate — Git-derived editorial outlines
+## R33 accepted — Git evidence to editorial release outline
 
-R33 converts exact imported R32 Git observations to source-linked editable
-Markdown through the existing Native SDK application dispatcher. The default
-outline gives factual path counts; filenames require separate operator
-disclosure acknowledgement and size limits. Source, target, build, imported
-evidence and observation digest are checked. Human edits are protected,
-repeated creation is idempotent, and the result is a DRAFT with technical
-UNKNOWN. No feature/runtime/customer/Project Graph/Platform/publication claim
-is inferred. Exact-SHA supported Node24 CI is pending.
+R33 is accepted at exact source SHA `c01be5d99f8edc907a4ebb96acc20c8db113773b`.
+Supported Node 24 Application checks run `37840690916` completed
+successfully on Linux, Windows and macOS. PR #51 merged as
+`a08232b6a80d29c2fa90791816ddcd61990644a4`, whose main-push
+checks `37840935212` also passed all three operating systems.
+The real Launchwright Native SDK/SQLite application stores editable Markdown
+drafts from R32 imported Git observations, with exact observation digest and
+approved source/evidence/target/release/build bindings. By default filenames
+are redacted; opt-in inclusion requires operator disclosure acknowledgement.
+Human edits are not overwritten by repeats, and technical state remains
+UNKNOWN. Git filenames and commit counts are never promoted into product
+feature, behavior, customer acceptance, Driver Host, Project Graph or Platform
+Publish authority. Exact run, job and artifact identities are recorded in
+`evidence/r33/ci-runs.json`. This acceptance does not test a live customer
+repository or claim actual public release.
 
-## R34 candidate — exact remote draft content reconciliation
+## R34 accepted — remote draft content reconciliation
 
-R34 prevents a GitHub Release draft carrying a matching Launchwright intent
-marker from being accepted if the title or full Markdown body differs from
-the approved frozen notes. It checks before asset modification, after upload
-and at final receipt readback, allowing only CRLF normalization. Tests inject
-external title/content changes before recovery and during upload, verify
-conflict without local success or clobber, and preserve the existing draft.
-The external GitHub API remains mocked in tests; supported Node 24
-Linux/Windows/macOS acceptance is pending, without claiming a live remote
-release, public publication or Semwright Platform Publish authority.
+R34 is accepted at exact source SHA `1e7a700e6d4ea2b9104ceb76ca0b15650a5d30d9` with supported Node 24
+Application checks `37841533294` passing Linux, Windows and macOS.
+PR #52 merged as `1dd4903c45548f3aac14c7c0a02178f3a71d54ab`; main-push checks `37841858225`
+passed all three OSes. The adapter no longer admits a GitHub Release
+draft merely because its embedded Launchwright intent marker matches:
+the remote draft name/title and complete approved Markdown body must
+match the saved immutable intent (only CRLF versus LF normalization
+is accepted). Changed title/notes on recovery or during upload fail
+without creating a local DRAFT_CREATED success or clobbering an asset.
+The exact Native SDK dispatcher has no new operations. GitHub transport
+effects were validated with injected mocks, not a real external
+GitHub release, publication or Platform Publish deployment. Complete
+job/artifact identities and authority limits remain in
+`evidence/r34/ci-runs.json`.
 
 ## Explicitly not established
 

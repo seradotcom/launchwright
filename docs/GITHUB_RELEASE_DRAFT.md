@@ -91,6 +91,8 @@ intent marker. CRLF versus LF line-ending normalization is permitted; extra
 text, deleted text or title changes fail closed, including if another operator
 edits the draft during an asset upload. The existing asset is not clobbered
 and no local success is recorded after remote content drift.
+R34 acceptance passed on exact SHA 1e7a700e6d4ea2b9104ceb76ca0b15650a5d30d9 in the Node 24 Linux/Windows/macOS matrix. This covers mocked GitHub transport, not a live GitHub API draft.
+
 
 The deterministic ZIP is uploaded without --clobber. Afterward the CLI
 downloads the actual asset, compares the bytes and SHA-256, then rechecks

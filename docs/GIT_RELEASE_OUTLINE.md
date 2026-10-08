@@ -10,4 +10,4 @@ The default preview contains counts of added, modified, deleted and type-changed
 
 Repeated creation with unchanged inputs reuses the same deliverable. Editing an existing draft prevents automatic replacement. Observed source/target revision drift or a different imported evidence hash fails closed.
 
-This workflow does not publish, send data to GitHub, certify product behavior, or supply Semwright Project Graph, Driver Host or Platform authority. CI validates the behavior on supported Node 24 for Linux, Windows and macOS using disposable Git fixtures and real SQLite-backed Launchwright resources.
+This workflow does not publish, send data to GitHub, certify product behavior, or supply Semwright Project Graph, Driver Host or Platform authority. Supported Node 24 Linux, Windows and macOS CI passed on exact SHA c01be5d99f8edc907a4ebb96acc20c8db113773b, including real disposable Git fixtures and SQLite-backed Launchwright resources. Details are recorded in evidence/r33/ci-runs.json.
