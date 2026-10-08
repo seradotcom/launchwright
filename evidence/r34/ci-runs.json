@@ -1,0 +1,98 @@
+{
+  "schema_version": "launchwright-r34-ci-evidence/1",
+  "source_sha": "1e7a700e6d4ea2b9104ceb76ca0b15650a5d30d9",
+  "merge_commit_sha": "1dd4903c45548f3aac14c7c0a02178f3a71d54ab",
+  "native_sdk": "1.0.0",
+  "semwright_sha": "d2da9a495a53fe279a1ca4de61f0e24646350f22",
+  "application_checks": {
+    "run_id": 37841533294,
+    "head_sha": "1e7a700e6d4ea2b9104ceb76ca0b15650a5d30d9",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37841533294",
+    "jobs": {
+      "light (windows-latest)": {
+        "job_id": 113531832617,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37841533294/job/113531832617"
+      },
+      "light (ubuntu-latest)": {
+        "job_id": 113531832832,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37841533294/job/113531832832"
+      },
+      "light (macos-latest)": {
+        "job_id": 113531832920,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37841533294/job/113531832920"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Linux-ae8ee481f1d3bbd8bea4c0650f593c65c422f554": {
+        "id": 11578550710,
+        "bytes": 693,
+        "expired": false
+      },
+      "launchwright-clean-room-Windows-ae8ee481f1d3bbd8bea4c0650f593c65c422f554": {
+        "id": 11577687616,
+        "bytes": 731,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-ae8ee481f1d3bbd8bea4c0650f593c65c422f554": {
+        "id": 11577104923,
+        "bytes": 695,
+        "expired": false
+      }
+    }
+  },
+  "main_push_checks": {
+    "run_id": 37841858225,
+    "head_sha": "1dd4903c45548f3aac14c7c0a02178f3a71d54ab",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37841858225",
+    "jobs": {
+      "light (ubuntu-latest)": {
+        "job_id": 113532928141,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37841858225/job/113532928141"
+      },
+      "light (windows-latest)": {
+        "job_id": 113532928502,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37841858225/job/113532928502"
+      },
+      "light (macos-latest)": {
+        "job_id": 113532928682,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37841858225/job/113532928682"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-macOS-1dd4903c45548f3aac14c7c0a02178f3a71d54ab": {
+        "id": 11578301309,
+        "bytes": 695,
+        "expired": false
+      },
+      "launchwright-clean-room-Windows-1dd4903c45548f3aac14c7c0a02178f3a71d54ab": {
+        "id": 11577817872,
+        "bytes": 733,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-1dd4903c45548f3aac14c7c0a02178f3a71d54ab": {
+        "id": 11577817619,
+        "bytes": 693,
+        "expired": false
+      }
+    }
+  },
+  "scope": {
+    "remote_release_title_verified": true,
+    "full_remote_notes_verified": true,
+    "line_ending_normalization_only": true,
+    "preexisting_and_mid_upload_drift_negative_controls": true,
+    "asset_clobber_performed": false,
+    "real_github_api_released": false,
+    "semwright_platform_authority": false,
+    "native_driver_host_new_acceptance": false
+  },
+  "note": "Operator GitHub Release draft reconciliation hardening uses mocked Github REST/gh transport and the local Native SDK ledger. No live GitHub release or public publication claimed."
+}

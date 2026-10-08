@@ -131,17 +131,22 @@ Publish authority. Exact run, job and artifact identities are recorded in
 `evidence/r33/ci-runs.json`. This acceptance does not test a live customer
 repository or claim actual public release.
 
-## R34 candidate — exact remote draft content reconciliation
+## R34 accepted — remote draft content reconciliation
 
-R34 prevents a GitHub Release draft carrying a matching Launchwright intent
-marker from being accepted if the title or full Markdown body differs from
-the approved frozen notes. It checks before asset modification, after upload
-and at final receipt readback, allowing only CRLF normalization. Tests inject
-external title/content changes before recovery and during upload, verify
-conflict without local success or clobber, and preserve the existing draft.
-The external GitHub API remains mocked in tests; supported Node 24
-Linux/Windows/macOS acceptance is pending, without claiming a live remote
-release, public publication or Semwright Platform Publish authority.
+R34 is accepted at exact source SHA `1e7a700e6d4ea2b9104ceb76ca0b15650a5d30d9` with supported Node 24
+Application checks `37841533294` passing Linux, Windows and macOS.
+PR #52 merged as `1dd4903c45548f3aac14c7c0a02178f3a71d54ab`; main-push checks `37841858225`
+passed all three OSes. The adapter no longer admits a GitHub Release
+draft merely because its embedded Launchwright intent marker matches:
+the remote draft name/title and complete approved Markdown body must
+match the saved immutable intent (only CRLF versus LF normalization
+is accepted). Changed title/notes on recovery or during upload fail
+without creating a local DRAFT_CREATED success or clobbering an asset.
+The exact Native SDK dispatcher has no new operations. GitHub transport
+effects were validated with injected mocks, not a real external
+GitHub release, publication or Platform Publish deployment. Complete
+job/artifact identities and authority limits remain in
+`evidence/r34/ci-runs.json`.
 
 ## Explicitly not established
 
