@@ -1,0 +1,103 @@
+{
+  "schema_version": "launchwright-r36-ci-evidence/1",
+  "source_sha": "af133e77cf064c49618d141d572afc333878ef7d",
+  "merge_commit_sha": "1b2456056965de624abcff762d0bfbe72a58ab89",
+  "semwright_sha": "d2da9a495a53fe279a1ca4de61f0e24646350f22",
+  "native_sdk": "1.0.0",
+  "application_checks": {
+    "run_id": 37855899556,
+    "head_sha": "af133e77cf064c49618d141d572afc333878ef7d",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37855899556",
+    "jobs": {
+      "light (macos-latest)": {
+        "job_id": 113579870912,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37855899556/job/113579870912"
+      },
+      "light (windows-latest)": {
+        "job_id": 113579871221,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37855899556/job/113579871221"
+      },
+      "light (ubuntu-latest)": {
+        "job_id": 113579871230,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37855899556/job/113579871230"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Windows-50a5409f3e2055cf176417d489c8f4b6228684cd": {
+        "id": 11584680277,
+        "bytes": 730,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-50a5409f3e2055cf176417d489c8f4b6228684cd": {
+        "id": 11584161354,
+        "bytes": 694,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-50a5409f3e2055cf176417d489c8f4b6228684cd": {
+        "id": 11583229948,
+        "bytes": 696,
+        "expired": false
+      }
+    }
+  },
+  "main_push_checks": {
+    "run_id": 37856094190,
+    "head_sha": "1b2456056965de624abcff762d0bfbe72a58ab89",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37856094190",
+    "jobs": {
+      "light (macos-latest)": {
+        "job_id": 113580512224,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37856094190/job/113580512224"
+      },
+      "light (windows-latest)": {
+        "job_id": 113580512416,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37856094190/job/113580512416"
+      },
+      "light (ubuntu-latest)": {
+        "job_id": 113580512532,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37856094190/job/113580512532"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Windows-1b2456056965de624abcff762d0bfbe72a58ab89": {
+        "id": 11584635981,
+        "bytes": 732,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-1b2456056965de624abcff762d0bfbe72a58ab89": {
+        "id": 11584026878,
+        "bytes": 693,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-1b2456056965de624abcff762d0bfbe72a58ab89": {
+        "id": 11583534152,
+        "bytes": 694,
+        "expired": false
+      }
+    }
+  },
+  "authority": {
+    "doctor_read_only": true,
+    "temporary_and_workspace_capacity_separate": true,
+    "no_cleanup_performed": true,
+    "unavailable_capacity_never_assumed_healthy": true,
+    "new_host_isolation_accepted": false,
+    "platform_execution_authority": false,
+    "external_customer_acceptance": false
+  },
+  "local_supplemental_observation": {
+    "root_temporary_free_mib": 0,
+    "home_workspace_free_mib_approx": 2600,
+    "private_home_TMPDIR_allows_local_testing": true,
+    "local_node_supported": false
+  },
+  "scope_note": "Filesystem diagnostic only. Thresholds and injected fault paths are tested on Node 24 Windows/macOS/Linux; no automatic deletion, migration, NativeDriver mutation or customer authority."
+}

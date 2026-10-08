@@ -1,0 +1,119 @@
+{
+  "schema_version": "launchwright-r35-ci-evidence/1",
+  "source_sha": "7c8862aeffeebeecef9e0a58313dc85961bbd16d",
+  "merge_commit_sha": "a886c80590fa58d10b4283606e414a470686f54f",
+  "native_sdk": "1.0.0",
+  "semwright_sha": "d2da9a495a53fe279a1ca4de61f0e24646350f22",
+  "application_checks": {
+    "run_id": 37855188445,
+    "head_sha": "7c8862aeffeebeecef9e0a58313dc85961bbd16d",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37855188445",
+    "jobs": {
+      "light (windows-latest)": {
+        "job_id": 113577557317,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37855188445/job/113577557317"
+      },
+      "light (ubuntu-latest)": {
+        "job_id": 113577557483,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37855188445/job/113577557483"
+      },
+      "light (macos-latest)": {
+        "job_id": 113577557489,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37855188445/job/113577557489"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Windows-b23623990928c812c2d44a872f3d08215bb17edf": {
+        "id": 11584390105,
+        "bytes": 730,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-b23623990928c812c2d44a872f3d08215bb17edf": {
+        "id": 11583771606,
+        "bytes": 696,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-b23623990928c812c2d44a872f3d08215bb17edf": {
+        "id": 11583622367,
+        "bytes": 694,
+        "expired": false
+      }
+    }
+  },
+  "native_lane": {
+    "run_id": 37855203030,
+    "head_sha": "7c8862aeffeebeecef9e0a58313dc85961bbd16d",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37855203030",
+    "jobs": {
+      "native": {
+        "job_id": 113577608007,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37855203030/job/113577608007"
+      }
+    },
+    "artifacts": {
+      "launchwright-native-7c8862aeffeebeecef9e0a58313dc85961bbd16d": {
+        "id": 11583697478,
+        "bytes": 3190863,
+        "expired": false
+      }
+    }
+  },
+  "main_push_checks": {
+    "run_id": 37855651604,
+    "head_sha": "a886c80590fa58d10b4283606e414a470686f54f",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37855651604",
+    "jobs": {
+      "light (macos-latest)": {
+        "job_id": 113579053743,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37855651604/job/113579053743"
+      },
+      "light (windows-latest)": {
+        "job_id": 113579053950,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37855651604/job/113579053950"
+      },
+      "light (ubuntu-latest)": {
+        "job_id": 113579054017,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37855651604/job/113579054017"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Windows-a886c80590fa58d10b4283606e414a470686f54f": {
+        "id": 11584655113,
+        "bytes": 732,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-a886c80590fa58d10b4283606e414a470686f54f": {
+        "id": 11583921856,
+        "bytes": 695,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-a886c80590fa58d10b4283606e414a470686f54f": {
+        "id": 11583548364,
+        "bytes": 694,
+        "expired": false
+      }
+    }
+  },
+  "authority": {
+    "recoverable_operator_onboarding_local_tested": true,
+    "native_sdk_dispatcher_used": true,
+    "source_and_rights_operator_declarations": true,
+    "technical_state_unknown": true,
+    "project_graph_authority": false,
+    "real_customer_acceptance": false,
+    "platform_execution_authority": false,
+    "external_publication": false,
+    "new_driver_host_acceptance": false
+  },
+  "scope_note": "Six-resource local onboarding using R32/R33 and Semwright Native SDK transaction; real synthetic Git fixtures, no customer source execution or external publication."
+}
