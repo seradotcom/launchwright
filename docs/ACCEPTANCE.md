@@ -105,33 +105,13 @@ R29 Effects-runtime acceptance is complete for exact source SHA `ac83fc358215ec6
 
 R30 bounded credential-pattern verifier acceptance is complete for exact source SHA `af717a760f28e56a086c53295d6c070d375c05e0`. Application checks run `37801793658` passed on Linux, Windows and macOS; selective Verifier `37801783570` (artifact `11562005067`), Native `37801787399` (artifact `11561417027`) and Host `37801791732` (artifact `11563355060`) all passed. Final heavy `lane=all` run `37825149878` passed all ten jobs: Verifier, Native, Host, Effects, Extension, Godot, Browser, DeltaDesk, Composition and Stress. The retained R30 Verifier receipt records `canonical_verifier_runtime_admitted=true`, `credential_pattern_scan_admitted=true`, `broker_policy_path_observed=true`, `driver_host_isolation_accepted=true`, `secret_pattern_negative_control=true`, `secret_finding_redacted=true` and `cross_dimension_rejected=true`, while `general_privacy_authority=false`, Platform execution and external-customer acceptance remain false. It admits a *separate* `credential-exposure` PASS bound to an exact frozen text candidate, not a broad privacy/PII certificate, a scan of opaque media or publication authority. The provider stays pinned to Semwright source `d2da9a495a53fe279a1ca4de61f0e24646350f22` with vendored Native SDK `1.0.0`. PR #46 merged as `bf19d35ab96d0f4391ab97e90fe6143e9d693b45`, whose main-push Application checks run `37827771759` also passed Linux, Windows and macOS. Full exact job and artifact metadata are retained in `evidence/r30/ci-runs.json`.
 
-## R31 candidate — operator GitHub Release draft transport
+## R31 accepted — owner GitHub Release draft transport
 
-R31 introduces a byte-pinned, operator-controlled GitHub Releases **draft**
-transport from exact Launchwright channel packages. It uses a saved private
-intent, existing tag/commit verification, no shell interpolation, no tag
-creation, no asset clobber, remote asset download and SHA-256 verification,
-explicit operator confirmation, and recover-first semantics. A local
-DRAFT_CREATED record is operator-reported custody, not a canonical Platform
-Publish or public publication receipt. The GitHub API transport is exercised
-through deterministic injected mocks; **no external live GitHub upload or
-public release is claimed**. Acceptance requires an exact-SHA supported Node
-24 Linux/Windows/macOS CI pass, CLI/mock failure and recovery controls, and
-selective native/host regression. Broader Platform, customer, activation,
-multi-tenant and billing authority remain external.
+R31 implementation acceptance is complete at exact source SHA `5a34632d982110d093371103c0cab6073b2126e8`. The Node 24 Application checks run `37834669900` passed on Linux, Windows and macOS; Native `37834721338` and full Broker/Policy/Driver Host `37834725299` passed on the same SHA. PR #48 merged as `513b27e109cf5e1c72abdd422cb9976c3ada31ed`, and main-push checks `37836252583` passed on all three OSes. The local GitHub adapter requires a saved digest-bound operator intent, existing pinned tag/commit, approved exact candidate and review, remote asset ZIP SHA-256 download verification, recover-first semantics and no automatic publishing, tag creation or clobber. Its GitHub API tests use a deterministic mock, so **live remote release creation, GitHub account acceptance and public publication remain unestablished**. Native/Host regressions exercise existing pinned Semwright paths, not canonical Platform Publish. Complete job/artifact identifiers and scope are retained in `evidence/r31/ci-runs.json`.
 
-## R32 candidate — read-only existing-project Git metadata
+## R32 accepted — read-only Git project change source
 
-R32 adds an operator-controlled local Git metadata source over an exact
-base/head commit pair. It reads deterministic tree/commit identities and
-bounded changed-file/status metadata, without network fetch, script execution,
-patch contents or commit messages. The saved observation is locally
-digest-bound and imported through canonical Native SDK evidence.import only
-after an approved CLI source, exact release/target/head-build match and
-explicit operator acknowledgement. The imported record remains
-technical UNKNOWN with no driver-host, Project Graph, Platform, or
-customer-capture authority. Supported-engine Linux/Windows/macOS CI and
-operator CLI replay must pass before R32 is accepted at an exact SHA.
+R32 implementation acceptance is complete at exact source SHA `cc56dd5fb34829ed308c70161c20c6ed5a1e2368`. Native SDK integration and disposable local real Git fixture tests pass on supported Node 24 Linux, Windows and macOS in runs `37836538487` and `37836544605`. The initial source SHA `8630bf541d388eb1736776e846770eb71712eb56` failed on Windows because Git path normalization differed from Node's filesystem path, and this was corrected before acceptance. PR #49 merged as `a0c846fb21b7d55a30ad5fc05e9a8c324bad3222`, with main-push three-OS checks `37836921050` passing. The adapter observes pinned base/head commit and tree SHAs, bounded changed filename/status inventory and commit counts **without executing the repository, fetching remotes or reading code/patches/commit messages**. Its operator-approved Native SDK evidence import remains `technical: UNKNOWN` and imported-declaration only, not Project Graph, Driver Host, Platform or customer-production authority. Complete SHA/job/artefact evidence: `evidence/r32/ci-runs.json`.
 
 ## Explicitly not established
 
