@@ -124,6 +124,18 @@ repeated creation is idempotent, and the result is a DRAFT with technical
 UNKNOWN. No feature/runtime/customer/Project Graph/Platform/publication claim
 is inferred. Exact-SHA supported Node24 CI is pending.
 
+## R34 candidate — exact remote draft content reconciliation
+
+R34 prevents a GitHub Release draft carrying a matching Launchwright intent
+marker from being accepted if the title or full Markdown body differs from
+the approved frozen notes. It checks before asset modification, after upload
+and at final receipt readback, allowing only CRLF normalization. Tests inject
+external title/content changes before recovery and during upload, verify
+conflict without local success or clobber, and preserve the existing draft.
+The external GitHub API remains mocked in tests; supported Node 24
+Linux/Windows/macOS acceptance is pending, without claiming a live remote
+release, public publication or Semwright Platform Publish authority.
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;

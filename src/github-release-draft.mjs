@@ -161,10 +161,14 @@ function expectedBody(intent,notes) {
     '. This draft does not establish public publication or Semwright Platform authority.\n\n'+
     REMOTE_MARKER+intent.intent_sha256+' -->\n';
 }
-function releaseIsOwnedDraft(release,intent) {
+function releaseIsOwnedDraft(release,intent,expectedBody) {
+  // An intent marker alone is not sufficient: another GitHub actor may have
+  // changed the title or body while leaving the marker intact.
   ensure(release && release.draft===true && release.tag_name===intent.tag &&
-    typeof release.body==='string' && release.body.includes(REMOTE_MARKER+intent.intent_sha256+' -->'),
-    'Remote release is not this exact private Launchwright draft; no mutation is authorized','Conflict');
+    release.name===intent.title &&
+    typeof release.body==='string' &&
+    release.body.replace(/\r\n/gu,'\n')===expectedBody,
+    'Remote draft title/body differs from the exact approved Launchwright intent; no mutation is authorized','Conflict');
   ensure(Number.isSafeInteger(release.id) && release.id>0,
     'Remote draft does not have a stable GitHub release ID','Conflict');
   ensure(Array.isArray(release.assets),'GitHub release assets are unavailable','Conflict');
@@ -203,7 +207,7 @@ export async function sendGithubDraft(app,intent,github,{
     remoteMutationPerformed=true;
     release=await github.getRelease(intent.repository,intent.tag);
   }
-  releaseIsOwnedDraft(release,intent);
+  releaseIsOwnedDraft(release,intent,body);
   const releaseId=release.id;
   let asset=getAsset(release,name);
   if(!asset) {
@@ -211,7 +215,7 @@ export async function sendGithubDraft(app,intent,github,{
     await github.uploadAsset(intent.repository,intent.tag,name,ctx.bundle.bytes);
     remoteMutationPerformed=true;
     release=await github.getRelease(intent.repository,intent.tag);
-    releaseIsOwnedDraft(release,intent);
+    releaseIsOwnedDraft(release,intent,body);
     asset=getAsset(release,name);
   }
   ensure(!!asset,'GitHub did not expose the uploaded draft asset','Unavailable');
@@ -221,7 +225,7 @@ export async function sendGithubDraft(app,intent,github,{
     sha256(remoteBytes)===ctx.bundle.sha256,
     'Authenticated GitHub asset bytes differ from the immutable Launchwright bundle','Conflict');
   const after=await github.getRelease(intent.repository,intent.tag);
-  releaseIsOwnedDraft(after,intent);
+  releaseIsOwnedDraft(after,intent,body);
   ensure(after.id===releaseId,'Remote draft identity changed during asset upload','Conflict');
   ensure(await github.getTagCommit(intent.repository,intent.tag)===intent.tag_commit_sha,
     'Remote tag moved during draft preparation','StaleReference');
