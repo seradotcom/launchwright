@@ -33,6 +33,16 @@ an editable Markdown deliverable. Preview makes no domain changes; creation
 requires a human-review-only acknowledgement.
 See the Git release outline guide.
 
+## First-time bootstrap from a preexisting Git project
+
+The operator can create an exact, private two-phase onboarding plan from
+an R32 Git observation, then confirm the plan/head SHA and independently
+approve source purpose, rights declaration, imported data and editorial
+draft status before creating the six local Native SDK domain resources.
+It is crash-recoverable and never fetches or executes the source project.
+See [Git project bootstrap](GIT_PROJECT_BOOTSTRAP.md).
+
+
 ## Importing source metadata from an existing Git project
 
 An operator can scan two exact local commit SHAs without fetching or

@@ -148,6 +148,22 @@ GitHub release, publication or Platform Publish deployment. Complete
 job/artifact identities and authority limits remain in
 `evidence/r34/ci-runs.json`.
 
+## R35 candidate — recoverable Git project onboarding
+
+R35 adds a two-phase, operator-owned onboarding workflow to create or reuse
+Product, draft Release, approved CLI Source, Target, imported Evidence and
+editable Markdown from an exact R32 observation. It uses the canonical
+Semwright Native SDK local dispatcher, requires independently confirmed
+plan/head SHA plus source/rights/import/editorial acknowledgements, and
+refuses incompatible names, source revisions and edited documents. A
+simulated crash after four native mutations is reconciled without duplicate
+records. A private CLI lock refuses parallel operations. Nothing is fetched,
+executed, deployed or published. Imported Git evidence remains technical
+UNKNOWN and does not acquire Project Graph, Host, Platform or customer
+authority. Exact-SHA Node 24 Linux/Windows/macOS CI is required before R35
+is accepted.
+
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;

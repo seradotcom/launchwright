@@ -34,6 +34,20 @@ approved source/evidence revision binding. Human edits are not overwritten.
 No product-feature truth, runtime acceptance or Graph authority is inferred.
 See the Git release outline guide.
 
+## Existing-project Git bootstrap (R35)
+
+The R35 operator CLI binds an imported R32 Git snapshot to a private, digest-
+verified onboarding plan, requires independent commit and plan confirmations,
+and reconciles six local domain resources through the existing Native SDK
+dispatcher. The product/release/source/target identities and imported evidence
+are exact; successful retries reuse records instead of duplicating them.
+The saved plan contains no absolute Git path or filenames; no project code is
+executed, no upstream Project Graph authority is implied and no Platform/remote
+release action is performed. An exclusive CLI lock prevents concurrent
+bootstrap attempts, with explicit human stale-lock recovery. See the
+[Git project bootstrap guide](GIT_PROJECT_BOOTSTRAP.md).
+
+
 ## Existing Git project source metadata
 
 The R32 operator-controlled adapter accepts only two existing full commit SHAs
