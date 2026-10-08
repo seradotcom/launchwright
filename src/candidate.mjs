@@ -3,7 +3,7 @@ import { requireCondition as ensure, object, integer } from '@semwright/native-s
 import { inputObject, str, array, choice, lines, sha, digest, iso } from './contracts.mjs';
 import { assessLocalization } from './localization.mjs';
 
-const VERIFICATION_DIMENSIONS=['format','semantic','editorial','privacy','rights','accessibility','product-evidence','permissions'];
+const VERIFICATION_DIMENSIONS=['format','credential-exposure','semantic','editorial','privacy','rights','accessibility','product-evidence','permissions'];
 const pin=entity=>({id:entity.id,kind:entity.kind,version:entity.version});
 
 function uniqueIds(value,max,label){

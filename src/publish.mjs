@@ -5,7 +5,7 @@ import { preparePublicationWork } from './publish-work.mjs';
 
 const SOURCE_TYPES=['web','cli','mobile-import','godot','document'];
 const OUTPUTS=['artifact','media-video','media-screenshots','media-interactive','channel-package'];
-const VERIFY_DIMENSIONS=['format','semantic','editorial','privacy','rights','accessibility','product-evidence','permissions'];
+const VERIFY_DIMENSIONS=['format','credential-exposure','semantic','editorial','privacy','rights','accessibility','product-evidence','permissions'];
 const AUDIENCES=['private','invited','organization'];
 const PARAM_TYPES=['text','choice','resource'];
 const RESOURCE_PARAM_KINDS=['source','scenario','claim'];

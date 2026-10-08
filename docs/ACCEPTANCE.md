@@ -103,6 +103,17 @@ Durable identity/revisions; exact archived entity history with get/list/diff; ex
 
 R29 Effects-runtime acceptance is complete for exact source SHA `ac83fc358215ec629bf5d7b8abc9de699064862c`. Application checks run `37725666770` passed on Linux, Windows and macOS. Selective Effects run `37725663304`, Native run `37725665684`, Host run `37725667936` and Verifier run `37725670048` all passed. Final heavy run `37727269373` then executed all ten current lanes on that same SHA—Effects, Native, Extension, Stress, Host, Composition, DeltaDesk, Verifier, Godot and Browser—and every lane passed. Effects artifact `11527709701` records `effects_provider_driver_host_isolation_accepted=true`, `effects_evaluation_driver_host_isolation_accepted=true`, `effects_owner_admission_accepted=true`, exact spec/result and runtime/provider binding, plus policy denial without provider authority; it keeps `execution_authority=false`, scenario-effects authority false, native/browser/Godot mutation-effect authority false, Platform/customer authority false and publication authority false. The accepted flow proves wrong-spec, result-substitution, runtime-digest and external-authority controls and turns the prior PASS to `UNKNOWN` after input drift. PR #44 merged as `2146f519c2b10e3682abe41cd2e3d6b8e14c9b48`. This acceptance uses Semwright source `d2da9a495a53fe279a1ca4de61f0e24646350f22`, a reviewed post-v1.0.0 main revision required for Host-compatible Effects traversal, while the vendored Native SDK package remains version `1.0.0`. Exact run/job/artifact identities are retained in `evidence/r29/ci-runs.json`.
 
+## R30 candidate — credential-pattern verification
+
+R30 adds a narrow credential-exposure dimension distinct from general privacy.
+The fixed read-only Semwright Driver SDK provider checks frozen text bytes through
+Broker/Policy/Driver Host and sends redacted findings into the isolated Native
+SDK verifier profile. Opaque artifacts and invalid text fail closed. R30 remains
+pending exact-SHA supported-engine Application checks and selective Verifier,
+Native and Host lanes with positive/negative scan, policy, cross-dimension and
+receipt-substitution controls. No general privacy, Platform or publication
+authority is claimed.
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;

@@ -36,7 +36,7 @@ test('R26 provider is bounded read-only format verification with a conformance p
   assert.match(driver,/canonical\.starts_with\(&root\)/u);
   assert.match(driver,/Risk::ReadOnly/u);
   assert.match(driver,/dry_run: true/u);
-  assert.match(driver,/owner-staged-format-only/u);
+  assert.match(driver,/owner-staged-format-and-credential-patterns-only/u);
 });
 
 test('R26 canonical admission reads pinned bytes from a separate Host mount',()=>{
@@ -67,4 +67,20 @@ test('R26 CI proves Broker policy, Driver Host provenance and substitution rejec
   assert.match(harness,/"external_customer_acceptance": False/u);
   assert.match(harness,/"semantic_authority": False/u);
   assert.match(harness,/"publication_authority": False/u);
+});
+
+
+test('R30 uses a separate bounded credential command without fabricating general privacy authority',()=>{
+  assert.match(driver,/CREDENTIAL_COMMAND: &str = "driver\.launchwright-verifier\.credential-exposure"/u);
+  assert.match(driver,/credential_capability\(\)/u);
+  assert.match(driver,/inspect_credentials\(&mime, &bytes, &id, &mut findings\)/u);
+  assert.match(driver,/CREDENTIAL_UNSUPPORTED_MIME/u);
+  assert.match(driver,/CREDENTIAL_GITHUB_TOKEN/u);
+  assert.match(driver,/Potential credential marker found; inspect the original privately/u);
+  assert.match(runtime,/\['format','credential-exposure'\]/u);
+  assert.match(runtime,/owner-granted-driver-host-text-credential-patterns-only/u);
+  assert.match(harness,/credential_pattern_scan_admitted/u);
+  assert.match(harness,/secret_finding_redacted/u);
+  assert.match(harness,/cross_dimension_rejected/u);
+  assert.match(workflow,/general_privacy_authority == false/u);
 });

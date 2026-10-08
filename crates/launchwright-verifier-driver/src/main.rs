@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-//! Bounded, read-only Launchwright format verifier executed by Semwright Driver Host.
+//! Bounded, read-only Launchwright format and credential-pattern verifier executed by Semwright Driver Host.
 //! It verifies only owner-staged candidate artifact bytes. It does not confer Platform,
 //! customer, editorial, publication, or general semantic authority.
 
@@ -17,6 +17,7 @@ use std::{
 
 const PROVIDER_ID: &str = "launchwright-verifier";
 const COMMAND: &str = "driver.launchwright-verifier.format";
+const CREDENTIAL_COMMAND: &str = "driver.launchwright-verifier.credential-exposure";
 const PROBE_COMMAND: &str = "driver.launchwright-verifier.probe";
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const MAX_MANIFEST_BYTES: u64 = 1_048_576;
@@ -68,6 +69,23 @@ fn capability() -> Capability {
     }
 }
 
+/// An independently named descriptor: a lexical credential scan is NOT a general
+/// privacy, security, rights, or accessibility certification.
+fn credential_capability() -> Capability {
+    let mut c = capability();
+    c.descriptor.name = CREDENTIAL_COMMAND.into();
+    c.descriptor.description =
+        "Scan exact owner-staged text candidate bytes for a fixed, bounded set of credential markers; no general privacy authority".into();
+    c.descriptor.output_schema["properties"]["dimension"] = json!({"const":"credential-exposure"});
+    c.aliases = vec!["launchwright-credential-exposure".into()];
+    c.tags = vec![
+        "verification".into(),
+        "launchwright".into(),
+        "credential-exposure".into(),
+    ];
+    c
+}
+
 fn probe_capability() -> Capability {
     Capability {
         descriptor: CommandDescriptor {
@@ -81,7 +99,7 @@ fn probe_capability() -> Capability {
                 "type":"object",
                 "properties":{
                     "ok":{"const":true},
-                    "scope":{"const":"owner-staged-format-only"},
+                    "scope":{"const":"owner-staged-format-and-credential-patterns-only"},
                     "external_authority":{"const":false}
                 },
                 "required":["ok","scope","external_authority"],
@@ -231,7 +249,195 @@ fn inspect_format(mime: &str, bytes: &[u8], resource_id: &str, findings: &mut Ve
     }
 }
 
-fn verify(args: &Value) -> Result<Value> {
+fn media_type(mime: &str) -> String {
+    mime.split(';')
+        .next()
+        .unwrap_or_default()
+        .trim()
+        .to_ascii_lowercase()
+}
+
+fn token_suffix(bytes: &[u8], prefix: &[u8], min: usize, extra: &[u8]) -> bool {
+    let mut i = 0;
+    while i + prefix.len() <= bytes.len() {
+        if &bytes[i..i + prefix.len()] == prefix {
+            let start = i + prefix.len();
+            let mut end = start;
+            while end < bytes.len()
+                && (bytes[end].is_ascii_alphanumeric() || extra.contains(&bytes[end]))
+            {
+                end += 1;
+            }
+            if end - start >= min {
+                return true;
+            }
+            i = end.max(i + 1);
+        } else {
+            i += 1;
+        }
+    }
+    false
+}
+
+fn credential_pattern(text: &str) -> Option<&'static str> {
+    if text.lines().any(|line| {
+        let line = line.trim();
+        line.starts_with("-----BEGIN ")
+            && (line.ends_with(" PRIVATE KEY-----")
+                || line == "-----BEGIN PGP PRIVATE KEY BLOCK-----")
+    }) {
+        return Some("CREDENTIAL_PRIVATE_KEY_HEADER");
+    }
+    let bytes = text.as_bytes();
+    for prefix in [b"ghp_".as_slice(), b"gho_", b"ghu_", b"ghs_", b"ghr_"] {
+        if token_suffix(bytes, prefix, 30, b"_") {
+            return Some("CREDENTIAL_GITHUB_TOKEN");
+        }
+    }
+    if token_suffix(bytes, b"github_pat_", 30, b"_") {
+        return Some("CREDENTIAL_GITHUB_TOKEN");
+    }
+    if token_suffix(bytes, b"glpat-", 20, b"-_") {
+        return Some("CREDENTIAL_GITLAB_TOKEN");
+    }
+    for prefix in [b"sk_live_".as_slice(), b"sk_test_", b"sk-proj-"] {
+        if token_suffix(bytes, prefix, 16, b"-_") {
+            return Some("CREDENTIAL_SECRET_KEY");
+        }
+    }
+    for prefix in [b"xoxb-".as_slice(), b"xoxp-", b"xoxa-"] {
+        if token_suffix(bytes, prefix, 24, b"-_") {
+            return Some("CREDENTIAL_SLACK_TOKEN");
+        }
+    }
+    for i in 0..bytes.len().saturating_sub(19) {
+        let candidate = &bytes[i..i + 20];
+        if (candidate.starts_with(b"AKIA") || candidate.starts_with(b"ASIA"))
+            && candidate[4..]
+                .iter()
+                .all(|b| b.is_ascii_uppercase() || b.is_ascii_digit())
+            && (i == 0 || !bytes[i - 1].is_ascii_alphanumeric())
+            && (i + 20 == bytes.len() || !bytes[i + 20].is_ascii_alphanumeric())
+        {
+            return Some("CREDENTIAL_AWS_ACCESS_KEY_ID");
+        }
+    }
+    for line in text.lines() {
+        let lower = line.to_ascii_lowercase();
+        if let Some(pos) = lower.find("authorization:") {
+            let header = &line[pos + "authorization:".len()..];
+            let trimmed = header.trim_start();
+            if trimmed
+                .get(..7)
+                .is_some_and(|head| head.eq_ignore_ascii_case("bearer "))
+                && token_suffix(trimmed.as_bytes(), b" ", 24, b"-_.~+/=")
+            {
+                return Some("CREDENTIAL_BEARER_HEADER");
+            }
+        }
+    }
+    None
+}
+
+/// Never emit candidate source bytes, token fragments or line excerpts in
+/// findings. The scan is a deliberately conservative lexical control; passing
+/// it is NOT a privacy audit and covers no opaque media files.
+fn inspect_credentials(mime: &str, bytes: &[u8], resource_id: &str, findings: &mut Vec<Value>) {
+    let kind = media_type(mime);
+    if !matches!(
+        kind.as_str(),
+        "text/markdown" | "text/plain" | "text/html" | "text/vtt" | "application/json"
+    ) {
+        findings.push(format_finding(
+            "CREDENTIAL_UNSUPPORTED_MIME",
+            "error",
+            "Credential-pattern scan does not cover this media type",
+            resource_id,
+        ));
+        return;
+    }
+    let Ok(text) = std::str::from_utf8(bytes) else {
+        findings.push(format_finding(
+            "CREDENTIAL_INVALID_UTF8",
+            "error",
+            "Credential-pattern scan requires valid UTF-8",
+            resource_id,
+        ));
+        return;
+    };
+    if text.contains('\0') {
+        findings.push(format_finding(
+            "CREDENTIAL_NUL",
+            "error",
+            "Credential-pattern scan cannot certify text containing NUL",
+            resource_id,
+        ));
+        return;
+    }
+    if let Some(code) = credential_pattern(text) {
+        findings.push(format_finding(
+            code,
+            "blocker",
+            "Potential credential marker found; inspect the original privately",
+            resource_id,
+        ));
+        return;
+    }
+    if kind == "application/json" {
+        let Ok(json) = serde_json::from_slice::<Value>(bytes) else {
+            findings.push(format_finding(
+                "CREDENTIAL_INVALID_JSON",
+                "error",
+                "Credential-pattern scan requires valid JSON",
+                resource_id,
+            ));
+            return;
+        };
+        let mut todo = vec![(&json, 0usize)];
+        while let Some((value, depth)) = todo.pop() {
+            if depth > 32 {
+                findings.push(format_finding(
+                    "CREDENTIAL_JSON_DEPTH",
+                    "error",
+                    "JSON nesting exceeds the credential-pattern scan limit",
+                    resource_id,
+                ));
+                return;
+            }
+            match value {
+                Value::String(s) => {
+                    if let Some(code) = credential_pattern(s) {
+                        findings.push(format_finding(
+                            code,
+                            "blocker",
+                            "Potential encoded credential marker found; inspect privately",
+                            resource_id,
+                        ));
+                        return;
+                    }
+                }
+                Value::Array(items) => todo.extend(items.iter().map(|v| (v, depth + 1))),
+                Value::Object(items) => {
+                    for (key, value) in items {
+                        if let Some(code) = credential_pattern(key) {
+                            findings.push(format_finding(
+                                code,
+                                "blocker",
+                                "Potential encoded credential marker found; inspect privately",
+                                resource_id,
+                            ));
+                            return;
+                        }
+                        todo.push((value, depth + 1));
+                    }
+                }
+                _ => {}
+            }
+        }
+    }
+}
+
+fn verify(args: &Value, dimension: &str) -> Result<Value> {
     let object = args
         .as_object()
         .ok_or_else(|| invalid("Verifier arguments must be an object"))?;
@@ -270,9 +476,9 @@ fn verify(args: &Value) -> Result<Value> {
     if exact_string(&manifest, "schema_version", 64)? != "launchwright-verifier-input/1" {
         return Err(invalid("Unsupported verifier input schema"));
     }
-    if exact_string(&manifest, "dimension", 32)? != "format" {
+    if exact_string(&manifest, "dimension", 32)? != dimension {
         return Err(invalid(
-            "This verifier is authoritative only for the format dimension",
+            "Verifier manifest dimension differs from the selected pinned capability",
         ));
     }
 
@@ -343,7 +549,11 @@ fn verify(args: &Value) -> Result<Value> {
                 &id,
             ));
         }
-        inspect_format(&mime, &bytes, &id, &mut findings);
+        if dimension == "format" {
+            inspect_format(&mime, &bytes, &id, &mut findings);
+        } else {
+            inspect_credentials(&mime, &bytes, &id, &mut findings);
+        }
         bindings.push(json!({
             "id":id,
             "sha256":observed_sha,
@@ -370,7 +580,7 @@ fn verify(args: &Value) -> Result<Value> {
         "candidate_id":candidate_id,
         "candidate_sha256":candidate_sha256,
         "candidate_manifest_sha256":candidate_manifest_sha256,
-        "dimension":"format",
+        "dimension":dimension,
         "coverage":{"checked":bindings.len(),"total":artifacts.len()},
         "artifact_bindings":bindings,
         "findings":findings
@@ -397,13 +607,18 @@ impl Driver for LaunchwrightVerifier {
     }
 
     async fn capabilities(&mut self) -> Result<Vec<Capability>> {
-        Ok(vec![probe_capability(), capability()])
+        Ok(vec![
+            probe_capability(),
+            capability(),
+            credential_capability(),
+        ])
     }
 
     async fn execute(&mut self, command: &str, pinned_digest: &str, args: Value) -> Result<Value> {
         let selected = match command {
             PROBE_COMMAND => probe_capability(),
             COMMAND => capability(),
+            CREDENTIAL_COMMAND => credential_capability(),
             _ => {
                 return Err(Error::new(
                     ErrorCode::StaleReference,
@@ -423,11 +638,18 @@ impl Driver for LaunchwrightVerifier {
             }
             return Ok(json!({
                 "ok":true,
-                "scope":"owner-staged-format-only",
+                "scope":"owner-staged-format-and-credential-patterns-only",
                 "external_authority":false
             }));
         }
-        verify(&args)
+        verify(
+            &args,
+            if command == COMMAND {
+                "format"
+            } else {
+                "credential-exposure"
+            },
+        )
     }
 
     async fn health(&mut self) -> Result<Value> {
@@ -435,7 +657,7 @@ impl Driver for LaunchwrightVerifier {
             "healthy":true,
             "provider":PROVIDER_ID,
             "version":VERSION,
-            "scope":"owner-staged-format-only"
+            "scope":"owner-staged-format-and-credential-patterns-only"
         }))
     }
 }
@@ -488,5 +710,78 @@ mod tests {
         );
         assert_eq!(findings.len(), 1);
         assert_eq!(findings[0]["code"], "FORMAT_UNSUPPORTED_MIME");
+    }
+    #[test]
+    fn credential_markers_block_without_echoing_secret_bytes() {
+        let secret = format!("ghp_{}", "A".repeat(36));
+        let mut findings = Vec::new();
+        inspect_credentials(
+            "text/markdown; charset=utf-8",
+            format!("# Release\n{secret}\n").as_bytes(),
+            "artifact-1",
+            &mut findings,
+        );
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0]["code"], "CREDENTIAL_GITHUB_TOKEN");
+        assert!(!findings[0].to_string().contains(&secret));
+        assert_eq!(findings[0]["severity"], "blocker");
+    }
+
+    #[test]
+    fn credential_scan_accepts_supported_clean_text_and_rejects_opaque_bytes() {
+        let mut clean = Vec::new();
+        inspect_credentials(
+            "text/vtt; charset=utf-8",
+            b"WEBVTT\n\n00:00:01.000 --> 00:00:02.000\nHi!",
+            "artifact-2",
+            &mut clean,
+        );
+        assert!(clean.is_empty());
+        let mut opaque = Vec::new();
+        inspect_credentials("video/mp4", b"opaque", "artifact-3", &mut opaque);
+        assert_eq!(opaque[0]["code"], "CREDENTIAL_UNSUPPORTED_MIME");
+        let mut invalid = Vec::new();
+        inspect_credentials("text/html", b"\xff", "artifact-4", &mut invalid);
+        assert_eq!(invalid[0]["code"], "CREDENTIAL_INVALID_UTF8");
+    }
+
+    #[test]
+    fn credential_scan_detects_multiple_fixed_patterns() {
+        for (source, expected) in [
+            (
+                format!("-----BEGIN OPENSSH PRIVATE KEY-----\nabc"),
+                "CREDENTIAL_PRIVATE_KEY_HEADER",
+            ),
+            (
+                format!("glpat-{}", "A".repeat(24)),
+                "CREDENTIAL_GITLAB_TOKEN",
+            ),
+            (
+                format!("sk_live_{}", "A".repeat(24)),
+                "CREDENTIAL_SECRET_KEY",
+            ),
+            (format!("xoxb-{}", "A".repeat(35)), "CREDENTIAL_SLACK_TOKEN"),
+            (
+                format!("AKIA{}", "A".repeat(16)),
+                "CREDENTIAL_AWS_ACCESS_KEY_ID",
+            ),
+            (
+                format!("Authorization: Bearer {}", "A".repeat(35)),
+                "CREDENTIAL_BEARER_HEADER",
+            ),
+        ] {
+            let mut findings = Vec::new();
+            inspect_credentials("text/plain", source.as_bytes(), "artifact", &mut findings);
+            assert_eq!(findings[0]["code"], expected);
+            assert!(!findings[0].to_string().contains(&source));
+        }
+    }
+
+    #[test]
+    fn credential_scan_inspects_json_decoded_unicode_strings() {
+        let json = br#"{"value":"\u0067hp_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"}"#;
+        let mut findings = Vec::new();
+        inspect_credentials("application/json", json, "artifact-1", &mut findings);
+        assert_eq!(findings[0]["code"], "CREDENTIAL_GITHUB_TOKEN");
     }
 }
