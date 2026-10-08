@@ -24,6 +24,18 @@ Immutable outputs include artifacts, candidates, verification records, waivers, 
 
 Artifacts store exact SHA-256-addressed bytes. Candidate v2 freezes artifact hashes plus media metadata, target fingerprints, protected input revisions, claims, ReleaseContract, selected localization/glossary revisions, channel profiles, declared rights, destination and review policy. A protected change makes the old candidate stale rather than silently updating it.
 
+## Existing Git project source metadata
+
+The R32 operator-controlled adapter accepts only two existing full commit SHAs
+in an explicit local Git worktree root, reads bounded name/status metadata via
+read-only Git commands and writes a portable digest-bound observation. The
+repository path, file content and commit messages are not embedded in the
+snapshot. Import uses the canonical Native SDK evidence.import transaction only,
+with exact source/build/target/release bindings and an explicit imported-only
+acknowledgement. The result is an imported declaration with UNKNOWN technical
+state and no canonical Semwright Project Graph, Native Driver Host, Platform,
+rights or customer-capture authority. See [Git source contract](GIT_CHANGE_SOURCE.md).
+
 ## Project Graph projection and impact
 
 Launchwright consumes Semwright Project Graph through a versioned projection contract locked to the same Semwright source SHA as the Native SDK. It does not ship another graph traversal kernel. An admitted observation is immutable and carries project/snapshot identity, traversal budgets, visible asset mappings, canonical edges/evidence, known/possible impact, UNKNOWN frontier and explicit inventory denominator metadata. Hits and edges that refer to resources outside the authorized visible projection are rejected rather than leaking a hidden dependency path.

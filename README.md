@@ -33,6 +33,7 @@ Synthetic data is never described as a real product capture.
 - stable resource IDs, opaque generations, monotonic string revisions and optimistic concurrency;
 - durable exact entity revision history with bounded get/list/diff operations, explicit legacy migration, and no invented pre-migration revisions;
 - build/source/target/feature/scenario/anchor modeling with explicit source authorization;
+- R32 operator-owned Git committed-metadata import: reads an exact base/head SHA and bounded changed-file inventory from an existing project without fetching, reading patch contents or executing that project, then records only imported UNKNOWN evidence through the canonical Native SDK dispatcher. No Project Graph or Host authority is inferred;
 - claims, CopyBlocks, availability rules and ReleaseContract readiness denominators;
 - immutable Markdown, safe HTML, JSON, email-draft and VTT artifacts with SHA-256-addressed bytes;
 - explicit relation provenance plus an immutable, owner-admitted Semwright Project Graph projection with bounded visible-node impact, preserved UNKNOWN frontiers, exact-revision impact proposals/coalescing, conservative reuse assessment and rebuild/finalization receipts; local heuristics never promote themselves to Graph authority;
@@ -123,6 +124,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [Architecture and authority boundaries](docs/ARCHITECTURE.md)
 - [Native SDK integration](docs/NATIVE_SDK.md)
 - [Project Graph projection and impact](docs/PROJECT_GRAPH.md)
+- [Read-only Git change sources for existing projects](docs/GIT_CHANGE_SOURCE.md)
 - [Canonical Effects readback custody](docs/EFFECTS.md)
 - [DeltaDesk real-browser laboratory](docs/DELTADESK_LAB.md)
 - [GitHub Release draft operator integration](docs/GITHUB_RELEASE_DRAFT.md)

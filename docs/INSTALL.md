@@ -25,6 +25,14 @@ and exact immutable bundle. This creates a GitHub **draft**, never publishes a
 release. It does not establish Semwright Platform Publish authority.
 See [GitHub draft instructions](GITHUB_RELEASE_DRAFT.md).
 
+## Importing source metadata from an existing Git project
+
+An operator can scan two exact local commit SHAs without fetching or
+executing project contents and import the resulting digest-bound metadata as
+UNKNOWN evidence via the Native SDK. Requires Git installed and an approved
+CLI source/build/target. No automatic capture or canonical Graph claims.
+See [Git source adapter](GIT_CHANGE_SOURCE.md).
+
 ## Empty and synthetic workspaces
 
 `init` creates an empty workspace. `demo` adds only synthetic editorial data and does not represent native product capture.
