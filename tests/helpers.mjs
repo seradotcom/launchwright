@@ -14,12 +14,13 @@ export function setup(t,options={}){
   const root=mkdtempSync(join(tmpdir(),'launchwright-test-'));
   temporaryRoots.add(root);
   const verificationReceiptRoot=options.verificationReceiptRoot??join(root,'verification-receipts');
-  mkdirSync(verificationReceiptRoot,{recursive:true});
+  const extensionReceiptRoot=options.extensionReceiptRoot??join(root,'extension-receipts');
+  mkdirSync(verificationReceiptRoot,{recursive:true});mkdirSync(extensionReceiptRoot,{recursive:true});
   const app=new LaunchwrightApplication(root,{initialize:true,...options,verificationReceiptRoot});
   // Node's test after hooks are FIFO. Close the primary handle here, but remove the
   // directory only at process exit so later-registered secondary SQLite handles can close.
   t.after(()=>{try{app.close();}catch{}});
-  return{app,root,verificationReceiptRoot};
+  return{app,root,verificationReceiptRoot,extensionReceiptRoot};
 }
 export async function baseline(app){
  const create=async(kind,data)=>(await execute(app,'entity.create',{kind,data})).entity;

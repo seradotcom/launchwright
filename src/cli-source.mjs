@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-import { requireCondition as ensure, integer } from '@semwright/native-sdk';
-import { inputObject, idText, str, array, lines, noSecrets, digest } from './contracts.mjs';
+import { requireCondition as ensure, integer, object } from '@semwright/native-sdk';
+import { inputObject, idText, str, array, lines, noSecrets, digest, sha } from './contracts.mjs';
 
 function isoTime(value,label){
   str(value,64);
@@ -9,7 +9,7 @@ function isoTime(value,label){
 }
 
 export function validateCliObservation(raw){
-  inputObject(raw,['source_id','target_id','extension_id','command','args','observed_build','started_at','finished_at','exit_code','stdout','stderr'],
+  inputObject(raw,['source_id','target_id','extension_id','command','args','observed_build','started_at','finished_at','exit_code','stdout','stderr','runtime_receipt'],
     ['source_id','target_id','command','args','observed_build','started_at','finished_at','exit_code','stdout']);
   noSecrets(raw);
   const d=structuredClone(raw);
@@ -25,11 +25,13 @@ export function validateCliObservation(raw){
   ensure(Date.parse(d.finished_at)>=Date.parse(d.started_at),'CLI receipt timestamps are reversed');
   integer(d.exit_code,0,65535);
   lines(d.stdout,32768);if(d.stderr!==undefined)lines(d.stderr,8192);
+  if(d.runtime_receipt!==undefined){object(d.runtime_receipt,['file','sha256'],['file','sha256']);str(d.runtime_receipt.file,160);sha(d.runtime_receipt.sha256);}
   return d;
 }
 
-export function recordCliObservation(app,raw){
+export function recordCliObservation(app,raw,runtimeAdmission=null){
   const d=validateCliObservation(raw);
+  ensure(!d.runtime_receipt||runtimeAdmission,'Canonical runtime receipt requires the isolated Native extension runtime','PolicyDenied');
   const source=app.get(d.source_id,'source');
   ensure(source.data.type==='cli','CLI observation requires a cli source');
   ensure(source.data.approval==='approved'&&!!source.data.purpose,'CLI source must have an approved purpose','PermissionDenied');
@@ -55,8 +57,9 @@ export function recordCliObservation(app,raw){
     stdout:d.stdout,stderr:d.stderr??'',
     stdout_sha256:digest('cli-stdout',d.stdout),stderr_sha256:digest('cli-stderr',d.stderr??''),
     process_outcome:d.exit_code===0?'SUCCESS':'FAILURE',
-    technical_state:'UNKNOWN',host_isolation_verified:false,
-    authority:'application-recorded-external-process-receipt'
+    technical_state:runtimeAdmission?'PASS':'UNKNOWN',host_isolation_verified:!!runtimeAdmission,
+    ...(d.runtime_receipt?{runtime_receipt:d.runtime_receipt,runtime_admission:runtimeAdmission}:{}),
+    authority:runtimeAdmission?'canonical-driver-host-admitted':'application-recorded-external-process-receipt'
   };
   payload.receipt_sha256=digest('cli-observation-v1',payload);
   return app.store.create('cli_observation',payload);
@@ -80,6 +83,8 @@ export function inspectCliObservation(app,id){
   if(reasons.includes('extension-retired'))freshness='REVOKED_EXTENSION';
   else if(reasons.some(r=>r.includes('missing')))freshness='MISSING_REFERENCE';
   else if(reasons.length)freshness='STALE';
-  return{observation,freshness,reasons,process_outcome:d.process_outcome,technical_state:'UNKNOWN',host_isolation_verified:false,
-    note:'The process receipt is real application evidence, but canonical Driver Host isolation/admission has not been established.'};
+  const admitted=d.authority==='canonical-driver-host-admitted'&&d.host_isolation_verified===true;
+  const technical_state=freshness==='CURRENT'&&admitted?d.technical_state:'UNKNOWN';
+  return{observation,freshness,reasons,process_outcome:d.process_outcome,technical_state,host_isolation_verified:d.host_isolation_verified===true,verified_execution:admitted,
+    note:admitted?'Exact Driver Host execution receipt is preserved; drift can invalidate current technical PASS without rewriting history.':'The process receipt is real application evidence, but canonical Driver Host isolation/admission has not been established.'};
 }
