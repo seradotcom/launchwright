@@ -1,0 +1,127 @@
+{
+  "schema_version": "launchwright-r39-acceptance/1",
+  "source_sha": "eea822890820d114199f08f4d7356f4698956173",
+  "merge_commit_sha": "19a58cebd1cbcb6b4f1647438036a17d87179b8b",
+  "requirement_ids": 196,
+  "public_modules": 22,
+  "master_scenarios": 36,
+  "public_scenario_refs": 21,
+  "whole_master_status": "BLOCKED",
+  "whole_master_complete": false,
+  "source_checks": {
+    "run_id": 37872286075,
+    "head_sha": "eea822890820d114199f08f4d7356f4698956173",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37872286075",
+    "jobs": {
+      "light (ubuntu-latest)": {
+        "job_id": 113632872406,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37872286075/job/113632872406"
+      },
+      "light (macos-latest)": {
+        "job_id": 113632872492,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37872286075/job/113632872492"
+      },
+      "light (windows-latest)": {
+        "job_id": 113632872547,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37872286075/job/113632872547"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Windows-9ba9c90ee0866a1799c8514cf3536688e90d0810": {
+        "id": 11591018039,
+        "bytes": 734,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-9ba9c90ee0866a1799c8514cf3536688e90d0810": {
+        "id": 11590927964,
+        "bytes": 695,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-9ba9c90ee0866a1799c8514cf3536688e90d0810": {
+        "id": 11590539078,
+        "bytes": 693,
+        "expired": false
+      }
+    }
+  },
+  "main_push_checks": {
+    "run_id": 37874241906,
+    "head_sha": "19a58cebd1cbcb6b4f1647438036a17d87179b8b",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37874241906",
+    "jobs": {
+      "light (ubuntu-latest)": {
+        "job_id": 113639022328,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37874241906/job/113639022328"
+      },
+      "light (windows-latest)": {
+        "job_id": 113639022410,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37874241906/job/113639022410"
+      },
+      "light (macos-latest)": {
+        "job_id": 113639022514,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37874241906/job/113639022514"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Windows-19a58cebd1cbcb6b4f1647438036a17d87179b8b": {
+        "id": 11591766403,
+        "bytes": 729,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-19a58cebd1cbcb6b4f1647438036a17d87179b8b": {
+        "id": 11591412899,
+        "bytes": 697,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-19a58cebd1cbcb6b4f1647438036a17d87179b8b": {
+        "id": 11591208331,
+        "bytes": 691,
+        "expired": false
+      }
+    }
+  },
+  "source_transfer": {
+    "run_id": 37874243728,
+    "head_sha": "19a58cebd1cbcb6b4f1647438036a17d87179b8b",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37874243728",
+    "jobs": {
+      "source-transfer": {
+        "job_id": 113639031619,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37874243728/job/113639031619"
+      }
+    },
+    "artifacts": {
+      "launchwright-source-transfer-19a58cebd1cbcb6b4f1647438036a17d87179b8b": {
+        "id": 11591208364,
+        "bytes": 745753,
+        "expired": false
+      }
+    }
+  },
+  "verified_source_inner_zip": {
+    "filename": "launchwright-source-19a58cebd1cb.zip",
+    "bytes": 800505,
+    "sha256": "d8c44541444468cd9f6325a0c150efd6108cb3aafdfc3adf4c9517433c2168d3",
+    "tracked_git_records": 290,
+    "zip_entries": 339,
+    "zip_test_passed": true,
+    "content_secret_scan_performed": false
+  },
+  "authority": {
+    "private_master_embedded": false,
+    "platform_publish_accepted": false,
+    "external_customer_accepted": false,
+    "real_chatgpt_host_accepted": false,
+    "external_release_published": false
+  }
+}
