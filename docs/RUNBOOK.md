@@ -1,5 +1,18 @@
 # Operator runbook
 
+## R44 store asset package — private draft and integrity replay
+
+Choose a fresh editorial-approved Release Candidate, an exact store
+Channel Profile and approved sanitized capture IDs. Pin private PNG
+source bytes, make operator rights/pixel review declarations, and supply
+literal listing metadata. Plan without any store operation, then confirm
+the saved plan and Candidate SHA in a private output directory. These
+PNG/profile checks are not App Store or Google Play approval. On a lost
+reply, replay the same intent after inspecting existing files. Reject
+edited ZIPs, stale source/channel revisions, unsafe output paths and
+wrong screenshot dimensions/alpha. Never automatically resize, publish
+or contact external store accounts.
+
 ## R43 offline demo screenshot/privacy recovery
 
 Offline demos are static HTML tours of exact Media-backed sanitized

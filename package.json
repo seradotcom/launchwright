@@ -27,7 +27,10 @@
     "test:deck": "node --test --test-concurrency=1 tests/deck-pdf.test.mjs",
     "demo:plan": "node scripts/interactive-demo.mjs plan",
     "demo:export": "node scripts/interactive-demo.mjs export",
-    "test:demo": "node --test --test-concurrency=1 tests/interactive-demo.test.mjs"
+    "test:demo": "node --test --test-concurrency=1 tests/interactive-demo.test.mjs",
+    "store:plan": "node scripts/store-package.mjs plan",
+    "store:export": "node scripts/store-package.mjs export",
+    "test:store": "node --test --test-concurrency=1 tests/store-package.test.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",

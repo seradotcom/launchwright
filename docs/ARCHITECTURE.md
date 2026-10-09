@@ -34,6 +34,20 @@ approved source/evidence revision binding. Human edits are not overwritten.
 No product-feature truth, runtime acceptance or Graph authority is inferred.
 See the Git release outline guide.
 
+## R44 — Store-specific listing PNG profile validation
+
+R44 consumes the exact Native SDK Release, Target, approved frozen
+Candidate, versioned external-draft Channel Profile and SANITIZED_DERIVATIVE
+capture IDs linked to an approved source. A bounded October 2026 policy
+snapshot validates Apple iPhone Dynamic Island medium portrait screenshots
+and Google phone screenshots, icon (32-bit RGBA), feature graphic (24-bit
+RGB), plus operator-written metadata. The renderer strips PNG metadata
+without resizing or changing pixels, creates deterministic private ZIPs
+and an offline CSP preview. There is no parallel Native/capture backend,
+store-account upload, device-origin attestation or Platform authority.
+See [STORE_ASSETS](STORE_ASSETS.md).
+
+
 ## R43 — Script-free offline product screen tour from canonical Media records
 
 The bounded R43 operator CLI reads only a current Native Media plan with

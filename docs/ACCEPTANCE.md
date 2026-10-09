@@ -316,6 +316,21 @@ PII/rights review or canonical Driver Host/Platform execution.
 The Native Media output remains imported and technically UNKNOWN.
 Original master INTERACTIVE_DEMO remains PARTIAL.
 
+## R44 candidate — store-specific Apple/Google local asset packaging
+
+R44 adds a two-phase local ZIP packager with Apple iPhone Dynamic Island
+medium and Google Play phone portrait profiles based on official October
+2026 specifications. It checks candidate/channel/source/evidence scopes,
+metadata limits, PNG dimensions and channel semantics (store screenshots
+and feature RGB; Play icon RGBA), private SHA-locked plan/ZIP/HTML preview,
+and recovery without clobbering edited assets. Pixel-to-device/Host
+provenance, privacy and actual content rights remain operator declarations,
+not independently verified technical PASS. Real App Store/Play Console
+accounts, other devices, app binaries, submission and complete store policy
+review are not included. Node24 three-OS and owned real Chromium technical
+acceptance remain pending. STORE_PACKAGE is still PARTIAL.
+
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;

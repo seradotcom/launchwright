@@ -43,6 +43,15 @@ Client SDK and do not expose approvals or Publish actions. Follow
 [local MCP operator instructions](MCP_LOCAL.md). MCP interoperability in
 a local client is not host-side ChatGPT Plugin acceptance.
 
+## R44 local App Store / Google Play technical asset packs
+
+Launchwright can prepare private store-specific PNG/metadata bundles
+from exact approved Candidates and operator-selected sanitized screenshots.
+Follow [STORE_ASSETS](STORE_ASSETS.md). Source selection and outputs must
+remain private. No automatic screenshot resizing, Apple/Google network
+operation, actual mobile-device execution or Store approval is implied.
+
+
 ## Optional R43 offline interactive demo from existing Media Evidence
 
 Use [the offline walkthrough instructions](INTERACTIVE_DEMO.md) with an
