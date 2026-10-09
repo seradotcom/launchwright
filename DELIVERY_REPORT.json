@@ -35,7 +35,7 @@
     "DECK_PDF text-only PPTX/PDF owned-synthetic Node24 document rendering accepted; rich media, accessibility, customer branding and editorial visual QA remain open",
     "INTERACTIVE_DEMO static synthetic offline Chromium navigation accepted; customer interactive actions, pixel privacy, accessibility and independent source admission remain unaccepted",
     "STORE_PACKAGE R44 local Apple/Google technical listing subset; other devices/locales, live privacy/rights/content review and real store account uploads unaccepted",
-    "VIDEO second output/quality/accessibility acceptance",
+    "VIDEO R46 two aspect MP4 plus frozen WebVTT owned technical subset (source Media reviewed, vertical derivative UNKNOWN); alternate voice, burn-in captions, independent editorial/customer rights and acceptance remain open",
     "WEB and CLI customer-source capture",
     "PUBLISH_PRIVATE canonical Platform Publish/tenants/jobs/ACL",
     "DOCS_STATIC R45 accepted owned offline versioned site; rich docs, WCAG, user/source acceptance, production hosting and cross-release customer deployments remain open"

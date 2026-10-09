@@ -43,6 +43,19 @@ Client SDK and do not expose approvals or Publish actions. Follow
 [local MCP operator instructions](MCP_LOCAL.md). MCP interoperability in
 a local client is not host-side ChatGPT Plugin acceptance.
 
+## R46 two-format video and Native WebVTT review
+
+Install and authorize local FFmpeg/ffprobe (or use the selective owned
+video runner). Select only a real private H264/AAC source MP4 already
+SHA-bound to an editorial-approved Native Media output, and frozen
+human-reviewed Native WebVTT captions of the same Release and Target.
+Then run scripts/video-variants.mjs plan and export with independent exact
+source/plan SHA confirmations, to a private 0700 output directory.
+See VIDEO_VARIANTS.md. FFmpeg codec and source parser safety depend on the
+host's tooling and isolation; no alternate Composition or Platform is
+installed.
+
+
 ## R45 owned offline documentation sites
 
 After creating and obtaining editorial approval for at least two frozen

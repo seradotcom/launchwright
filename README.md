@@ -140,6 +140,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [R43: source-pinned offline interactive demo from sanitized Media Evidence](docs/INTERACTIVE_DEMO.md)
 - [R44: Apple/Google store-specific private screenshot, graphic and listing packages](docs/STORE_ASSETS.md)
 - [R45: offline versioned documentation site from exact frozen Markdown sources](docs/STATIC_DOCS.md)
+- [R46: two exact private MP4 aspect formats plus frozen WebVTT captions](docs/VIDEO_VARIANTS.md)
 - R42/R43 owned synthetic Node24 Linux/Windows/macOS application CI and independent document/Chromium E2E accepted at exact source SHAs; see [R42 evidence](evidence/r42/ci-runs.json) and [R43 evidence](evidence/r43/ci-runs.json). Customer-side quality/privacy/product execution and Platform Publish remain unaccepted.
 - R40 source `b69d17aafbb4badfd84d83205112244a994f02dc` and R41 source `b0016eaa23cc84cfdd9b290432ecee29cc9edae7` passed Node24 Linux/Windows/macOS; the latter tests GitHub DRAFT PR transport with a mocked remote only, not a live owner account.
 - [MCP local Client SDK adapter and operator instructions](docs/MCP_LOCAL.md)
@@ -206,6 +207,19 @@ require explicit review/consent before local output. A disposable Chromium
 E2E validates keyboard navigation and responsive layouts. This is **not**
 customer documentation acceptance, public deployment or technical PASS.
 See [the R45 docs guide](docs/STATIC_DOCS.md).
+
+
+## R46 video aspect variants (source-linked, no alternate timeline)
+
+An operator-reviewed Media 1280x720 H.264/AAC 30fps source with exact
+Native Media Output digest and frozen WebVTT captions can generate a private
+1280x720 master MP4 + derived 720x1280 MP4 without cropping, preserving the
+source AAC and caption timing. The two-phase plan/export is SHA-bound,
+idempotent and filesystem-safe; native Media records the portrait result
+as imported/UNKNOWN, not canonical Composition PASS. The owned technical
+FFmpeg CI validates actual MP4 frames, audio parity and screenshots. This
+does NOT generate alternate voice, burn captions, publish, or accept a
+customer marketing-video quality claim. See [R46 video variants](docs/VIDEO_VARIANTS.md).
 
 
 ## Original master scope and truthful transfer acceptance

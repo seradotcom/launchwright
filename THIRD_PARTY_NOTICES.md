@@ -37,3 +37,14 @@ JSZip 3.10.2 (dual MIT/GPL-3.0-or-later; MIT option) for
 deterministic private ZIP exports. No downloaded fonts,
 customer screenshots, store badges, external store SDK or uploader
 are bundled. Existing npm production audit gates remain active.
+
+R46 uses the **operator-installed external FFmpeg/ffprobe command-line
+tools**, not npm-redistributed codec binaries. FFmpeg and libx264 may
+carry GPL/LGPL codec and build-specific license obligations for their
+installer; operators must review their installed distribution and
+redistribution rules separately. R46 itself uses the pinned existing
+JSZip 3.10.2 (MIT choice) only for private, source-bound ZIP packaging.
+No paid fonts, customer videos, synthetic voice likenesses, FFmpeg
+binaries or third-party assets are distributed by the Launchwright
+source repository. Real owned technical acceptance uses FFmpeg provided
+on disposable Linux GitHub runners and marks all outputs as drafts.
