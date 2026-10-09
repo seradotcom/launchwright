@@ -68,6 +68,8 @@ test('R44 Apple iPhone Dynamic Island medium creates exact approved 1179x2556 24
   assert.equal(bundle.preview.includes('script-src &#39;none&#39;'),true);
   assert.ok(!bundle.preview.includes('<script'));
   assert.ok(!bundle.preview.includes(x.root));
+  assert.ok(bundle.preview.includes('overflow-wrap:anywhere'));
+  assert.ok(bundle.preview.includes('word-break:break-word'));
   const png=await bundle.zip.file('screenshots/01.png').async('nodebuffer');
   assert.equal(png.readUInt8(25),2,'Store screenshot must have no alpha channel');
   assert.equal(PNG.sync.read(png).width,1179);
