@@ -37,7 +37,8 @@
     "STORE_PACKAGE R44 local Apple/Google technical listing subset; other devices/locales, live privacy/rights/content review and real store account uploads unaccepted",
     "VIDEO second output/quality/accessibility acceptance",
     "WEB and CLI customer-source capture",
-    "PUBLISH_PRIVATE canonical Platform Publish/tenants/jobs/ACL"
+    "PUBLISH_PRIVATE canonical Platform Publish/tenants/jobs/ACL",
+    "DOCS_STATIC R45 local offline versioned site candidate; rich docs, WCAG, user/source acceptance, production hosting and cross-release customer deployments remain open"
   ],
   "outstanding_external": [
     "Authorized Android/iOS devices",

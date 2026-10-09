@@ -43,6 +43,16 @@ Client SDK and do not expose approvals or Publish actions. Follow
 [local MCP operator instructions](MCP_LOCAL.md). MCP interoperability in
 a local client is not host-side ChatGPT Plugin acceptance.
 
+## R45 owned offline documentation sites
+
+After creating and obtaining editorial approval for at least two frozen
+Markdown artifacts in the same Release/Target, use the R45 two-phase
+plan/export CLI to build a script-free site in a private owner directory.
+The site includes checked internal navigation, code examples, a static
+index and a source/build manifest. It is deliberately not deployed on a
+public hosting service. See [Static documentation](STATIC_DOCS.md).
+
+
 ## R44 local App Store / Google Play technical asset packs
 
 Launchwright can prepare private store-specific PNG/metadata bundles

@@ -66,7 +66,7 @@
       "evidence": "LOCAL_APPLICATION_CI",
       "source_sha": null,
       "run_id": null,
-      "remaining": "Version-bound complete static site, links, code samples, accessibility and cross-release regression acceptance"
+      "remaining": "R45 adds a real script-free version-bound multi-page HTML docs site with owned synthetic internal-link/code examples and two-release continuity; Node24/Chromium acceptance pending. Complex docs/media, WCAG audit, live customer/source approval and public hosting remain external."
     },
     {
       "profile": "DOCS_GIT",
