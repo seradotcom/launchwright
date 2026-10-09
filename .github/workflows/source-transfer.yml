@@ -1,0 +1,66 @@
+name: Exact source backup and master gate
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: source-transfer-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  source-transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Production dependency audit
+        run: npm audit --omit=dev --audit-level=high
+      - name: Actual Native Client SDK and local regressions
+        run: |
+          set -euo pipefail
+          npm test
+          node scripts/verify.mjs
+          node scripts/master-acceptance.mjs --check
+          node scripts/pack-source.mjs --inspect
+      - name: Source-only archive from exact committed SHA
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/source-transfer
+          node scripts/pack-source.mjs --out-dir "$GITHUB_WORKSPACE/evidence/source-transfer" | tee evidence/source-transfer/acceptance.json
+          python3 - <<'PY'
+          import hashlib,json,pathlib,zipfile,subprocess
+          root=pathlib.Path('evidence/source-transfer')
+          report=json.loads((root/'acceptance.json').read_text())
+          archive=root/report['file_name']
+          assert report['schema_version']=='launchwright-source-backup-intent/1'
+          assert report['sha']==subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+          assert report['tree']==subprocess.check_output(['git','rev-parse','HEAD^{tree}'],text=True).strip()
+          assert report['archive_created'] is True and report['publication_authority'] is False
+          assert report['content_secret_scan_performed'] is False
+          assert hashlib.sha256(archive.read_bytes()).hexdigest()==report['archive_sha256']
+          assert (root/(archive.stem+'.zip.sha256')).read_text().split()[0]==report['archive_sha256']
+          with zipfile.ZipFile(archive) as z:
+              names=z.namelist()
+              assert len(names)>=report['tracked_files']
+              assert any(n.endswith('/ACCEPTANCE_REPORT.json') for n in names)
+              assert any(n.endswith('/CAPABILITY_MATRIX.md') for n in names)
+              assert any(n.endswith('/docs/master-profiles.json') for n in names)
+              assert not any(any(segment in n.lower() for segment in
+                ('node_modules/','/.git/','/target/','session-token','/master_release_studio','/private-master')) for n in names)
+          master=json.loads(pathlib.Path('ACCEPTANCE_REPORT.json').read_text())
+          assert master['overall_status']=='BLOCKED' and master['integration_complete'] is False
+          print('LAUNCHWRIGHT_SOURCE_TRANSFER_EXACT_SHA_PASS',report['sha'],len(names))
+          PY
+      - name: Upload exact source archive + SHA and bounded non-authority receipt
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: launchwright-source-transfer-${{ github.sha }}
+          path: evidence/source-transfer/
+          if-no-files-found: error
+          retention-days: 14

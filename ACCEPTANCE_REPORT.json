@@ -1,0 +1,231 @@
+{
+  "schema_version": "launchwright-master-closeout/1",
+  "specification_edition": "Semwright Release Studio 0.1.0 (2026-10-02)",
+  "public_requirement_count": 196,
+  "public_requirement_modules": {
+    "API": 8,
+    "CAP": 10,
+    "CHN": 10,
+    "CLM": 10,
+    "DAT": 8,
+    "DOC": 8,
+    "DOM": 8,
+    "EXT": 8,
+    "GRF": 10,
+    "GTM": 6,
+    "LOC": 8,
+    "MED": 10,
+    "OPS": 10,
+    "PRO": 8,
+    "PUB": 8,
+    "QA": 8,
+    "REV": 10,
+    "SDK": 8,
+    "SEC": 12,
+    "SRC": 8,
+    "UX": 10,
+    "VER": 10
+  },
+  "master_scenario_count": 36,
+  "scenarios_referenced_by_requirements": 21,
+  "scenarios_without_public_requirement_reference": 15,
+  "complete_core_profiles": 0,
+  "total_core_profiles": 9,
+  "profile_state_counts": {
+    "COMPLETE": 0,
+    "PARTIAL": 9,
+    "MISSING": 7,
+    "BLOCKED_UPSTREAM": 1,
+    "OUT_OF_SCOPE": 1
+  },
+  "integration_complete": false,
+  "overall_status": "BLOCKED",
+  "why_not_complete": [
+    "Individual requirement E2E execution evidence is not established by the public ID-only index",
+    "Some CORE profile implementations remain partial, missing or blocked upstream",
+    "ChatGPT host, third-party accounts, customer projects and canonical Platform Publish require separate acceptance"
+  ],
+  "external_publish_authority": false,
+  "scenarios": [
+    {
+      "id": "RS-E2E-01",
+      "required_by_public_index": true,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-02",
+      "required_by_public_index": true,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-03",
+      "required_by_public_index": true,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-04",
+      "required_by_public_index": true,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-05",
+      "required_by_public_index": true,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-06",
+      "required_by_public_index": false,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-07",
+      "required_by_public_index": true,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-08",
+      "required_by_public_index": false,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-09",
+      "required_by_public_index": false,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-10",
+      "required_by_public_index": true,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-11",
+      "required_by_public_index": false,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-12",
+      "required_by_public_index": true,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-13",
+      "required_by_public_index": true,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-14",
+      "required_by_public_index": true,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-15",
+      "required_by_public_index": true,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-16",
+      "required_by_public_index": false,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-17",
+      "required_by_public_index": false,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-18",
+      "required_by_public_index": true,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-19",
+      "required_by_public_index": false,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-20",
+      "required_by_public_index": true,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-21",
+      "required_by_public_index": true,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-22",
+      "required_by_public_index": true,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-23",
+      "required_by_public_index": true,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-24",
+      "required_by_public_index": false,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-25",
+      "required_by_public_index": false,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-26",
+      "required_by_public_index": false,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-27",
+      "required_by_public_index": false,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-28",
+      "required_by_public_index": true,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-29",
+      "required_by_public_index": false,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-30",
+      "required_by_public_index": true,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-31",
+      "required_by_public_index": false,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-32",
+      "required_by_public_index": true,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-33",
+      "required_by_public_index": false,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-34",
+      "required_by_public_index": true,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-35",
+      "required_by_public_index": false,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    },
+    {
+      "id": "RS-E2E-36",
+      "required_by_public_index": true,
+      "acceptance": "NOT_ASSESSED_AT_THIS_AGGREGATE_LEVEL"
+    }
+  ]
+}

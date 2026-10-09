@@ -1,0 +1,171 @@
+{
+  "schema_version": "launchwright-master-profile-evidence/1",
+  "specification_edition": "Semwright Release Studio 0.1.0 (2026-10-02)",
+  "specification_publicly_redistributed": false,
+  "requirements_total": 196,
+  "scenario_catalog_total": 36,
+  "profiles": [
+    {
+      "profile": "WEB",
+      "scope": "CORE",
+      "implementation": "PARTIAL",
+      "evidence": "OWNED_FIXTURE_BROKER",
+      "source_sha": "ce92ffbd3402b8a374fa664f3da65b63c1d69193",
+      "run_id": 37569447808,
+      "remaining": "Human-authorized real product capture admission and Host/Platform integration; owned fixture capture remains imported UNKNOWN"
+    },
+    {
+      "profile": "CLI",
+      "scope": "CORE",
+      "implementation": "PARTIAL",
+      "evidence": "OWNED_FIXTURE_DRIVER_HOST",
+      "source_sha": "1a6b2313e3abcad317c0796fb89a57fd69c5e530",
+      "run_id": 37720793885,
+      "remaining": "Customer CLI run, provenance/capture acceptance and full output validation"
+    },
+    {
+      "profile": "GODOT",
+      "scope": "PROFILE",
+      "implementation": "PARTIAL",
+      "evidence": "OWNED_FIXTURE_HOST",
+      "source_sha": "6c41a0b1187057f72d4e4ecdf2cd3c5c8be478fb",
+      "run_id": 37584900091,
+      "remaining": "Real customer Godot project, scene state isolation and effect/noninterference acceptance"
+    },
+    {
+      "profile": "MOBILE_IMPORT",
+      "scope": "PROFILE",
+      "implementation": "PARTIAL",
+      "evidence": "LOCAL_CONTRACT_CI",
+      "source_sha": null,
+      "run_id": null,
+      "remaining": "Device-origin proof and operator-licensed mobile bundles; no device execution asserted"
+    },
+    {
+      "profile": "ANDROID_CAPTURE",
+      "scope": "EXTERNAL_ACCEPTANCE",
+      "implementation": "MISSING",
+      "evidence": "NOT_TESTED",
+      "source_sha": null,
+      "run_id": null,
+      "remaining": "Bounded Android runner/adapter implementation and authorized emulator/device acceptance"
+    },
+    {
+      "profile": "IOS_CAPTURE",
+      "scope": "EXTERNAL_ACCEPTANCE",
+      "implementation": "MISSING",
+      "evidence": "NOT_TESTED",
+      "source_sha": null,
+      "run_id": null,
+      "remaining": "Bounded iOS runner/adapter implementation and authorized macOS/simulator acceptance"
+    },
+    {
+      "profile": "DOCS_STATIC",
+      "scope": "CORE",
+      "implementation": "PARTIAL",
+      "evidence": "LOCAL_APPLICATION_CI",
+      "source_sha": null,
+      "run_id": null,
+      "remaining": "Version-bound complete static site, links, code samples, accessibility and cross-release regression acceptance"
+    },
+    {
+      "profile": "DOCS_GIT",
+      "scope": "CORE",
+      "implementation": "MISSING",
+      "evidence": "NOT_TESTED",
+      "source_sha": null,
+      "run_id": null,
+      "remaining": "Safe Git docs PR adapter with real branch/diff/conflict/local hosted test; R32 observation is not a docs writeback"
+    },
+    {
+      "profile": "VIDEO",
+      "scope": "CORE",
+      "implementation": "PARTIAL",
+      "evidence": "OWNED_FIXTURE_HOST",
+      "source_sha": "635bf1c4d02b44bd2da5ab357f408f78aa85388d",
+      "run_id": 37582490691,
+      "remaining": "Two output formats, independently inspected editorial quality, caption/voice variants and real customer/source acceptance"
+    },
+    {
+      "profile": "DECK_PDF",
+      "scope": "CORE",
+      "implementation": "MISSING",
+      "evidence": "NOT_TESTED",
+      "source_sha": null,
+      "run_id": null,
+      "remaining": "Editable deck/source plus real PDF renderer, visual inspection and exact candidate binding"
+    },
+    {
+      "profile": "INTERACTIVE_DEMO",
+      "scope": "CORE",
+      "implementation": "MISSING",
+      "evidence": "NOT_TESTED",
+      "source_sha": null,
+      "run_id": null,
+      "remaining": "Sanitized navigable product demo tied to real captured states, not merely Launchwright admin UI"
+    },
+    {
+      "profile": "STORE_PACKAGE",
+      "scope": "CORE",
+      "implementation": "PARTIAL",
+      "evidence": "LOCAL_APPLICATION_CI",
+      "source_sha": null,
+      "run_id": null,
+      "remaining": "Store-specific validated screenshots/metadata/preview package with channel/profile policy and sizing"
+    },
+    {
+      "profile": "APPLE_UPLOAD",
+      "scope": "EXTERNAL_ACCEPTANCE",
+      "implementation": "MISSING",
+      "evidence": "NOT_TESTED",
+      "source_sha": null,
+      "run_id": null,
+      "remaining": "Bounded App Store Connect draft upload adapter; external account/permission acceptance separately required"
+    },
+    {
+      "profile": "PLAY_UPLOAD",
+      "scope": "EXTERNAL_ACCEPTANCE",
+      "implementation": "MISSING",
+      "evidence": "NOT_TESTED",
+      "source_sha": null,
+      "run_id": null,
+      "remaining": "Bounded Google Play draft asset adapter; external account/permission acceptance separately required"
+    },
+    {
+      "profile": "PLUGIN_HOST",
+      "scope": "EXTERNAL_ACCEPTANCE",
+      "implementation": "PARTIAL",
+      "evidence": "LOCAL_MCP_CONSUMER",
+      "source_sha": "751f586d9c2ff4ae6facbc89d002804e9346e882",
+      "run_id": 37870767220,
+      "remaining": "Installed and authorized ChatGPT Plugin host, same-job Studio deep link and actual host interaction acceptance"
+    },
+    {
+      "profile": "PUBLISH_PRIVATE",
+      "scope": "CORE",
+      "implementation": "BLOCKED_UPSTREAM",
+      "evidence": "LOCAL_CONSUMER_REHEARSAL",
+      "source_sha": null,
+      "run_id": null,
+      "remaining": "Canonical Semwright Platform Publish API, ProductVersion deployment, authenticated tenant isolation, metered job and output ACL; current pinned SDK lacks that API"
+    },
+    {
+      "profile": "CUSTOM_CMS",
+      "scope": "PROFILE",
+      "implementation": "PARTIAL",
+      "evidence": "EXTENSION_CONTRACT_ONLY",
+      "source_sha": null,
+      "run_id": null,
+      "remaining": "Versioned runnable CMS destination adapter against operator-owned test endpoint and readback"
+    },
+    {
+      "profile": "PUBLIC_SOCIAL_POST",
+      "scope": "FUTURE_OPTION",
+      "implementation": "OUT_OF_SCOPE",
+      "evidence": "NOT_REQUIRED",
+      "source_sha": null,
+      "run_id": null,
+      "remaining": "Direct social auto-publication was explicitly not a core requirement"
+    }
+  ]
+}

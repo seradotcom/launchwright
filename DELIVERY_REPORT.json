@@ -1,0 +1,49 @@
+{
+  "schema_version": "launchwright-master-delivery-status/1",
+  "master_specification_basis": "Semwright Release Studio v0.1.0 (2026-10-02) private master; public-safe identifiers/status only",
+  "requirements_total": 196,
+  "public_module_ids": 22,
+  "mandatory_e2e_scenarios_total": 36,
+  "public_index_distinct_scenario_references": 21,
+  "capability_profile_count": 18,
+  "core_profiles_full_acceptance": 0,
+  "implementation_status": "PARTIAL",
+  "whole_master_status": "BLOCKED",
+  "platform_publish_authority": false,
+  "real_customer_acceptance": false,
+  "chatgpt_plugin_host_acceptance": false,
+  "external_store_account_acceptance": false,
+  "real_mobile_device_acceptance": false,
+  "source_backup": {
+    "mode": "CI_workflow_source_transfer",
+    "artifact_contains": "One committed source tree only",
+    "sha256_manifest_expected": true,
+    "auto_public_release": false
+  },
+  "local_application": {
+    "node_required": ">=24.21.0 <25",
+    "canonical_native_sdk": "1.0.0",
+    "public_http_client_available": true,
+    "local_mcp_client_available": true
+  },
+  "accepted_example_lanes": [
+    "R37 real owned Git onboarding UI Browser run 37868573105 on exact source SHA",
+    "R38 local stdio MCP independent client Node24 CI run 37870767220"
+  ],
+  "outstanding_core": [
+    "DOCS_GIT Git docs PR/writeback",
+    "DECK_PDF editable deck plus PDF export",
+    "INTERACTIVE_DEMO sanitized navigable product capture",
+    "STORE_PACKAGE store-specific policy and asset sizes",
+    "VIDEO second output/quality/accessibility acceptance",
+    "WEB and CLI customer-source capture",
+    "PUBLISH_PRIVATE canonical Platform Publish/tenants/jobs/ACL"
+  ],
+  "outstanding_external": [
+    "Authorized Android/iOS devices",
+    "Store account upload",
+    "ChatGPT Plugin host acceptance",
+    "Human source/editorial approval and live customer pilot"
+  ],
+  "statement": "Local owned-fixture tests and source ZIP are evidence of scoped implementation only. Do not claim whole master completion until each required CORE and external profile has exact independent accepted evidence."
+}
