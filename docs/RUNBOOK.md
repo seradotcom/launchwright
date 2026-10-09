@@ -1,5 +1,17 @@
 # Operator runbook
 
+## R40 owned Git docs branch incident and recovery
+
+R40 writes a NEW local Git branch, never a remote PR. On a lost CLI response,
+inspect the planned launchwright/docs- prefix branch against its recorded base
+parent, exact docs path and SHA-256 bytes; then replay the same original
+private plan only. Do not use git push --force or overwrite current human
+docs edits. If the base branch advanced or the candidate changed, the plan
+is stale and must undergo renewed editorial review and an explicit fresh
+plan. No external Git account authority or Platform Publish action exists
+in this local branch workflow.
+
+
 ## R38 private local MCP operation and recovery
 
 Launchwright's optional stdio MCP adapter is a **separate local process**
