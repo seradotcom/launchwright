@@ -76,7 +76,9 @@ test('R39 capability matrix is derived from the public profile evidence only, wi
   assert.match(md,/\| DECK_PDF \| CORE \| MISSING \|/u);
   assert.match(md,/21 referenced/u);
   assert.ok(!md.includes('Semwright Release Studio v0.1.0/'));
-  assert.equal(readFileSync(join(root,'CAPABILITY_MATRIX.md'),'utf8'),md);
+  // Git checkout may materialize tracked Markdown using Windows CRLF. The
+  // actual generated report content and every profile row must still match.
+  assert.equal(readFileSync(join(root,'CAPABILITY_MATRIX.md'),'utf8').replace(/\r\n/gu,'\n'),md);
 });
 
 test('R39 launcher enumerates actual selective CI lanes without running any suite or live publish',()=>{
