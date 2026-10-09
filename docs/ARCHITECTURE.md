@@ -34,6 +34,20 @@ approved source/evidence revision binding. Human edits are not overwritten.
 No product-feature truth, runtime acceptance or Graph authority is inferred.
 See the Git release outline guide.
 
+## R38 — Local MCP tool entry via the public client only
+
+R38 runs the official MCP TypeScript SDK in an owner-configured stdio process,
+using solely the public Launchwright HTTP Client SDK. It imports no application
+implementation or SQLite state. MCP read tools page inventory/events or
+inspect a single Release, impact, candidate or channel. Selected non-publishing
+mutations require durable private prepared-envelope custody, explicit key/SHA
+confirmation and Native SDK dispatcher validation; recovery looks up only the
+original receipt and never automatically resends. The process requires an
+owner-owned 0600 token file and a 0700 pending directory and connects only to
+the loopback Launchwright service. This is independent-client MCP
+interoperability, not ChatGPT Plugin host or Platform acceptance.
+See [local MCP adapter](MCP_LOCAL.md).
+
 ## R37 — Owner-scoped web onboarding of an existing project
 
 Launchwright's loopback-only web interface offers an opt-in Import Git project

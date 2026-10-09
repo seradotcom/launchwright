@@ -33,6 +33,16 @@ an editable Markdown deliverable. Preview makes no domain changes; creation
 requires a human-review-only acknowledgement.
 See the Git release outline guide.
 
+## Optional local MCP tool entry (R38)
+
+Start the normal owner-authenticated loopback Launchwright server. Configure
+a local MCP client to execute scripts/mcp-local.mjs using the explicit
+--url, private --token-file and private --pending-dir arguments. MCP input
+never receives the token itself. The ten bounded tools use the public HTTP
+Client SDK and do not expose approvals or Publish actions. Follow
+[local MCP operator instructions](MCP_LOCAL.md). MCP interoperability in
+a local client is not host-side ChatGPT Plugin acceptance.
+
 ## Optional R37 web onboarding for an existing project
 
 Start the local owner-authenticated UI, select Import Git project, and upload
