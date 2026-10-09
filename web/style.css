@@ -22,3 +22,15 @@
 .git-onboarding .fact-list>div,.git-onboarding .fact-list dd{min-width:0;overflow-wrap:anywhere}
 .git-onboarding .fact-list code{overflow-wrap:anywhere;word-break:break-word}
 @media(max-width:1080px){.git-onboarding .fact-list{grid-template-columns:minmax(0,1fr)}}
+
+/* R37: a long imported-product/release breadcrumb must never widen the
+   shared topbar at the tablet breakpoint. Other views benefit too. */
+.topbar{min-width:0}
+.topbar>.actions{flex:1 1 auto;min-width:0;flex-wrap:nowrap}
+.topbar>.actions .trail{flex:1 1 auto;min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.topbar-actions{flex:0 0 auto}
+@media (min-width:721px) and (max-width:1080px){
+  .topbar{gap:8px;padding:0 16px}
+  .topbar-actions{gap:8px}
+  .topbar-actions .connection{display:none}
+}

@@ -119,7 +119,7 @@ try{
    await page.setViewportSize({width,height:900});
    const overflow=await page.evaluate(()=>({
      viewport:innerWidth,document:document.documentElement.scrollWidth,
-     offenders:[...document.querySelectorAll('#view-content *')].filter(el=>
+     offenders:[...document.querySelectorAll('body *')].filter(el=>
        el.getBoundingClientRect().right>innerWidth+1).slice(0,8).map(el=>({
          tag:el.tagName,className:el.className?.baseVal??el.className,
          right:Math.ceil(el.getBoundingClientRect().right),
