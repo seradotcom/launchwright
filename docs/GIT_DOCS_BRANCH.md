@@ -62,3 +62,5 @@ A safe dry-run review command on the owned repository is `git diff main...launch
 The R40 tests use an actual disposable Git repository and real Launchwright Native SDK/SQLite candidate state. They exercise deterministic no-write plans, real branch/blob/commit creation, byte-for-byte Markdown readback, no current checkout/index modifications, exact idempotent recovery, rejected symlink entries and dangerous filenames, stale base, branch collision, human dirty target protection, missing review/technical acknowledgements, and the two-phase private CLI. Node 24 Linux/Windows/macOS CI is mandatory before acceptance; Node 22 local tests remain supplemental.
 
 This is **local docs branch conformance** only: no external GitHub PR, GitHub authentication, remote review/merge, Platform job, customer-source execution or cross-tenant authority.
+
+Accepted implementation source SHA `b69d17aafbb4badfd84d83205112244a994f02dc` passed Node24 Linux/Windows/macOS CI. Consult `evidence/r40/ci-runs.json` for exact job and non-authority boundaries. Remote GitHub live acceptance is not inferred.

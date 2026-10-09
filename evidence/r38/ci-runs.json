@@ -1,0 +1,97 @@
+{
+  "schema_version": "launchwright-r38-ci-evidence/1",
+  "source_sha": "751f586d9c2ff4ae6facbc89d002804e9346e882",
+  "merge_commit_sha": "f8f391f0c17ce9c4333e7fd9613003dce61a0e3a",
+  "mcp_sdk_version": "1.32.1",
+  "semwright_native_sdk": "1.0.0",
+  "application_checks": {
+    "run_id": 37870767220,
+    "head_sha": "751f586d9c2ff4ae6facbc89d002804e9346e882",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37870767220",
+    "jobs": {
+      "light (macos-latest)": {
+        "id": 113628089669,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37870767220/job/113628089669"
+      },
+      "light (ubuntu-latest)": {
+        "id": 113628089847,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37870767220/job/113628089847"
+      },
+      "light (windows-latest)": {
+        "id": 113628090145,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37870767220/job/113628090145"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Linux-509d2ac986240e65ed3d6cb8c8ca033f3b19e88e": {
+        "id": 11590381518,
+        "bytes": 692,
+        "expired": false
+      },
+      "launchwright-clean-room-Windows-509d2ac986240e65ed3d6cb8c8ca033f3b19e88e": {
+        "id": 11590091754,
+        "bytes": 730,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-509d2ac986240e65ed3d6cb8c8ca033f3b19e88e": {
+        "id": 11589829709,
+        "bytes": 695,
+        "expired": false
+      }
+    }
+  },
+  "main_push_checks": {
+    "run_id": 37871177610,
+    "head_sha": "f8f391f0c17ce9c4333e7fd9613003dce61a0e3a",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37871177610",
+    "jobs": {
+      "light (ubuntu-latest)": {
+        "id": 113629398677,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37871177610/job/113629398677"
+      },
+      "light (windows-latest)": {
+        "id": 113629398822,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37871177610/job/113629398822"
+      },
+      "light (macos-latest)": {
+        "id": 113629398923,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37871177610/job/113629398923"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-macOS-f8f391f0c17ce9c4333e7fd9613003dce61a0e3a": {
+        "id": 11590641863,
+        "bytes": 697,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-f8f391f0c17ce9c4333e7fd9613003dce61a0e3a": {
+        "id": 11590532125,
+        "bytes": 695,
+        "expired": false
+      },
+      "launchwright-clean-room-Windows-f8f391f0c17ce9c4333e7fd9613003dce61a0e3a": {
+        "id": 11589927951,
+        "bytes": 732,
+        "expired": false
+      }
+    }
+  },
+  "authority": {
+    "separate_local_mcp_stdio_client_accepted": true,
+    "public_client_sdk_only": true,
+    "read_only_recovery_tested": true,
+    "zero_high_production_advisories": true,
+    "chatgpt_plugin_host_accepted": false,
+    "external_git_account_accepted": false,
+    "semwright_platform_publish_accepted": false,
+    "customer_execution_accepted": false
+  }
+}

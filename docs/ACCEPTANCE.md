@@ -203,79 +203,79 @@ publication authority. Imported evidence is technical UNKNOWN.
 Exact source, run, job, artifact IDs and scope boundaries are
 recorded in `evidence/r37/ci-runs.json`.
 
-## R38 candidate — independent local MCP Client SDK consumer
+## R38 accepted — official local MCP stdio Client SDK consumer
 
-R38 implements a real official MCP stdio adapter whose runtime uses only
-the public Launchwright HTTP Client SDK, never the Native application or
-private database. The owner supplies an explicit loopback URL, private 0600
-token file and 0700 pending intent directory. Ten bounded tools list/read
-shared resources, events, candidate/impact/channel state, prepare selected
-local mutations, submit only after exact intent SHA/confirmation and recover
-a lost reply without resubmission. The separate official MCP SDK test client
-edits the same Release and Claim observed through the independent public
-HTTP Client SDK, and denies unsupported approvals/Publish, unsafe URLs,
-invalid token file permissions and unbounded pagination. The entire
-Node22 local suite passed 294/294 tests with 137 JS modules and 86 Native
-operations checked; this is supplemental only. npm audit initially rejected
-MCP SDK v1.29.0 (high-severity OAuth advisory); pinned 1.32.1 passed the
-production dependency audit with zero known vulnerabilities. Supported
-Node24 Linux/Windows/macOS tests and exact-SHA CI must pass before
-acceptance. Host-side ChatGPT Plugin installation/interactivity,
-remote OAuth/tenant identity, Platform Publish and customer acceptance
-remain separate and unestablished.
+Exact source SHA `751f586d9c2ff4ae6facbc89d002804e9346e882` passed supported Node24
+Linux/Windows/macOS Application checks run `37870767220`.
+PR #59 merged as `f8f391f0c17ce9c4333e7fd9613003dce61a0e3a`, whose main-push run
+`37871177610` passed on all three OSes. A real separate
+MCP SDK process used only the public Launchwright HTTP Client SDK
+to read and edit the same local Release and Claim as an independent
+HTTP client, with private 0600 token/journal, exact two-phase mutation
+confirmation and read-only unknown-ACK recovery. MCP SDK v1.29.0 was
+rejected by npm audit (high advisory); pinned 1.32.1 passed
+production audit with zero known advisories. Local acceptance does
+not establish ChatGPT Plugin host, external OAuth/tenant, Semwright
+Platform Publish or customer execution authority. Exact job/receipt
+data are in `evidence/r38/ci-runs.json`.
 
-## R39 candidate — original-master gates and reproducible source transfer
+## R39 accepted — original master audit and exact Git source ZIP
 
-The master-specific acceptance work enumerates the *original* 196 public-safe
-requirement IDs in **22** modules, 36 mandatory E2E scenario slots and all
-18 product source/output profiles. Only 21 distinct scenarios currently
-appear in the public requirement index. The machine-readable
-\`ACCEPTANCE_REPORT.json\`, \`CAPABILITY_MATRIX.md\` and
-\`docs/master-profiles.json\` therefore retain **whole-master BLOCKED**;
-neither a green local suite nor a Core/App API export can relabel missing
-docs Git PR, editable Deck/PDF, interactive product demo, store packs,
-multi-format video/customer evidence or upstream Publish as accepted.
+The original master gate remains `BLOCKED`: 196 public-safe
+requirement IDs in 22 modules and 36 mandatory E2E slots, only 21
+of which are referenced by the public requirements index. The
+R39 source SHA `eea822890820d114199f08f4d7356f4698956173`
+passed Node24 Linux/Windows/macOS run `37872286075`;
+PR #60 merged as `19a58cebd1cbcb6b4f1647438036a17d87179b8b`
+and main-push run `37874241906` passed all three OSes.
+The independently requested source-transfer workflow run
+`37874243728` passed on this exact merge SHA,
+retaining source-only ZIP
+`launchwright-source-19a58cebd1cb.zip`
+with independently checked SHA-256
+`d8c44541444468cd9f6325a0c150efd6108cb3aafdfc3adf4c9517433c2168d3`,
+800,505 bytes and 290 Git tracked records. The public committed
+archive includes the machine-readable BLOCKED report, preserves
+license notices and excludes untracked source credentials/caches.
+No content-level secret scan, customer/Platform acceptance or
+public GitHub Release is claimed. See `evidence/r39/ci-runs.json`.
 
-The source-transfer workflow is reproducible from one exact committed SHA:
-tests + production audit + source-lock verification run on disposable Node24
-runners, the package contains the public committed tree and source-declared
-licenses, a matching SHA-256 is retained, and no external account or
-GitHub Release is created. The private master, local tokens, caches and
-untracked customer state are not copied from the operator's workstation.
-No general *content-level* secret scan is certified. Exact source ZIP and
-job/artifact IDs will be recorded only **after** successful CI; no PASS
-is assumed from the existence of the workflow definition.
+## R40 accepted — reviewed Markdown to real local Git docs branch
 
-## R40 candidate — actual local Git docs branch writeback
+R40 exact source SHA `b69d17aafbb4badfd84d83205112244a994f02dc`
+passed Node24 Linux/Windows/macOS run `37874876016`.
+PR #61 merged as `802e8826ff6aa32cc4bc6802a27acc704293427e`;
+main-push run `37875187063` passed the same three OSes.
+The real disposable Git fixture and Native SDK candidate path
+proved an exact approved Markdown blob committed on one local
+docs branch using a separate temporary index, a pinned base
+parent, one changed file, byte-for-byte readback and CAS ref
+creation. No original checkout/index modification, filters or
+Git hooks were allowed. Missing review, technical UNKNOWN
+acknowledgement, dirty human target, symlink and stale base,
+malicious path and branch substitution fail closed. This is a
+**local branch** acceptance only: no real GitHub DRAFT PR,
+review/merge or customer/Platform Publish. See
+`evidence/r40/ci-runs.json`.
 
-The application now proposes a source-local docs change from an exact frozen
-Markdown candidate with recorded editorial approval. Its plan binds an exact
-base commit/tree, original docs blob, candidate/artifact SHA-256 and expected
-path. An explicitly confirmed operator command creates one Git blob and
-one new branch via isolated plumbing, verifies the commit affects only the
-requested docs Markdown file, and never checks out/pushes/creates a PR.
-Partial mutation recovery is exact-branch verification; candidate/base
-drift, uncommitted human target edits, symlink paths and branch collision
-fail closed. Real disposable Git/Native tests are required on supported
-Node24 Linux, Windows and macOS before R40 is accepted. The original master
-DOCS_GIT profile remains **PARTIAL** after local acceptance because live
-GitHub PR creation/review/remote target ownership are not covered.
+## R41 accepted — operator-only GitHub DRAFT PR protocol (mocked remote)
 
-## R41 candidate — GitHub DRAFT PR, remote consent and recover-first
-
-R41 adds an operator-owned GitHub Draft PR adapter after an exact, separately
-pushed and approved R40 local branch. Before any PR POST it verifies remote
-base and head SHAs against the local candidate/branch intent, searches all
-historical PRs and requires explicit source/repo/commit confirmation. It
-rejects altered PR title/body/draft status, head/base or owner, closed PRs,
-URL spoofing and stale Git/candidate source. If the remote create reply is
-lost, the code instructs read-only recover-only without blind resubmission;
-a verified DRAFT is never treated as publication. Tests use a real Git
-fixture/Native SDK workspace plus a bounded injected GitHub API. The real
-GitHub API/account and external reviewer/merge/deployment acceptance have
-NOT been performed in R41. Node24 Linux/Windows/macOS are still required
-before accepting the bounded implementation.
-
+Exact source SHA `b0016eaa23cc84cfdd9b290432ecee29cc9edae7` passed supported Node24
+Linux/Windows/macOS Application checks run `37875732057`,
+which includes the real local Git/Native candidate and deterministic
+injected GitHub DRAFT PR protocol regressions. PR #62 merged as
+`e577d17da46fd083b03034b80433754784b300d4`; main-push run `37876018118` passed on
+Linux, Windows and macOS. The bounded transport requires the
+operator to separately push the exact reviewed R40 branch, checks
+remote head/base SHA, source repo, open/DRAFT state, complete
+title/body and URL, historical PR collision and an explicit
+first-send acknowledgement; ambiguous remote outcomes are recovered
+read-only and never automatically re-created. No actual owner
+GitHub account PR or remote approver/merge/deployment was tested.
+The original DOCS_GIT master profile remains PARTIAL; Semwright
+Platform Publish and customer execution are not established.
+Exact run, job and evidence limits are in
+`evidence/r41/ci-runs.json`.
 
 ## Explicitly not established
 
