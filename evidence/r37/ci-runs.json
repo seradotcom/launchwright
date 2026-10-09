@@ -1,0 +1,137 @@
+{
+  "schema_version": "launchwright-r37-ci-evidence/1",
+  "source_sha": "a4af17f3551dc1067001bf48ec86b88d7fd14e32",
+  "merge_commit_sha": "c61d0645dde4532807a0fa6c84b5ed991516c13f",
+  "semwright_sha": "d2da9a495a53fe279a1ca4de61f0e24646350f22",
+  "native_sdk": "1.0.0",
+  "application_checks": {
+    "run_id": 37868576966,
+    "head_sha": "a4af17f3551dc1067001bf48ec86b88d7fd14e32",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37868576966",
+    "jobs": {
+      "light (windows-latest)": {
+        "job_id": 113621311215,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37868576966/job/113621311215"
+      },
+      "light (ubuntu-latest)": {
+        "job_id": 113621311793,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37868576966/job/113621311793"
+      },
+      "light (macos-latest)": {
+        "job_id": 113621312573,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37868576966/job/113621312573"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Windows-9015c04503b36e265284def521ab30e18ed3793e": {
+        "id": 11589795813,
+        "bytes": 733,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-9015c04503b36e265284def521ab30e18ed3793e": {
+        "id": 11589402321,
+        "bytes": 692,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-9015c04503b36e265284def521ab30e18ed3793e": {
+        "id": 11588983040,
+        "bytes": 696,
+        "expired": false
+      }
+    }
+  },
+  "browser_lane": {
+    "run_id": 37868573105,
+    "head_sha": "a4af17f3551dc1067001bf48ec86b88d7fd14e32",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37868573105",
+    "jobs": {
+      "browser": {
+        "job_id": 113621080843,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37868573105/job/113621080843"
+      }
+    },
+    "artifacts": {
+      "launchwright-browser-a4af17f3551dc1067001bf48ec86b88d7fd14e32": {
+        "id": 11589367187,
+        "bytes": 1930152,
+        "expired": false
+      }
+    }
+  },
+  "main_push_checks": {
+    "run_id": 37868842267,
+    "head_sha": "c61d0645dde4532807a0fa6c84b5ed991516c13f",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37868842267",
+    "jobs": {
+      "light (macos-latest)": {
+        "job_id": 113621939512,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37868842267/job/113621939512"
+      },
+      "light (windows-latest)": {
+        "job_id": 113621939694,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37868842267/job/113621939694"
+      },
+      "light (ubuntu-latest)": {
+        "job_id": 113621939792,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37868842267/job/113621939792"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-macOS-c61d0645dde4532807a0fa6c84b5ed991516c13f": {
+        "id": 11589582194,
+        "bytes": 697,
+        "expired": false
+      },
+      "launchwright-clean-room-Windows-c61d0645dde4532807a0fa6c84b5ed991516c13f": {
+        "id": 11589112572,
+        "bytes": 731,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-c61d0645dde4532807a0fa6c84b5ed991516c13f": {
+        "id": 11588998051,
+        "bytes": 695,
+        "expired": false
+      }
+    }
+  },
+  "browser_assertions": {
+    "real_chromium_owned_synthetic_git_onboarding_passed": true,
+    "local_authenticated_owner_flow_accepted": true,
+    "source_filenames_not_rendered": true,
+    "viewport_widths_tested": [
+      320,
+      390,
+      768
+    ],
+    "zero_page_errors": true,
+    "zero_network_failures": true,
+    "native_sdk_six_resources_imported_only_unknown": true,
+    "customer_project_acceptance": false,
+    "canonical_driver_host_acceptance": false,
+    "semwright_platform_publish_authority": false,
+    "external_release_created": false
+  },
+  "superseded_failed_browser_attempts": [
+    {
+      "run_id": 37868099888,
+      "sha": "f14c023ab2cda945f5d97b01646f489d2c97521d",
+      "problem": "R37 new UI at width 768 overflowed document"
+    },
+    {
+      "run_id": 37868437463,
+      "sha": "fa20724c064b197d632ff73ae545b8c3d77a90fc",
+      "problem": "Shared long topbar breadcrumb still overflowed at width 768; fixed in final source SHA"
+    }
+  ],
+  "scope_note": "Browser E2E tests only an owned disposable Git repository and exact local R32 snapshot, owner-authenticated R35 plan/apply and editable release workspace. Does not execute arbitrary customer source, grant Graph/Platform/Host authority, create external releases or establish customer acceptance."
+}
