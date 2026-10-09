@@ -90,6 +90,10 @@ export function parseStaticDocsMarkdown(bytes,validSlugs){
       continue;
     }
     if(line===''){flushParagraph();flushList();continue;}
+    // Canonical renderText emits a trailing "> " after its provenance
+    // blockquote. Markdown treats it as an empty quoted line, not a literal
+    // product-content paragraph. Ignore just that empty presentation marker.
+    if(line==='>'){flushParagraph();flushList();continue;}
     if(/^> /u.test(line)){
       // Native renderText includes the declared release/build/locale as
       // blockquotes. Keep it visible, but never mistake it for runtime truth.

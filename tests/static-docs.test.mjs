@@ -86,6 +86,8 @@ test('R45 exported offline ZIP has four valid no-script HTML pages, safe local l
   assert.ok(overview.includes('<pre><code data-language="bash">npm run start</code></pre>'));
   assert.ok(overview.includes('aria-current="page"'));
   assert.ok(overview.includes('source-note'));
+  assert.ok(!overview.includes('<p>&gt;</p>'),
+    'Native Markdown blockquote trailing marker is not a visible content item');
   assert.equal(f.app.list('channel_delivery').length,0);
 });
 test('R45 binary deterministic ZIP across independent runs and exact-source recovery after partial file loss',async t=>{
