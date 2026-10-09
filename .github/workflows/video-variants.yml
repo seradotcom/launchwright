@@ -29,6 +29,8 @@ jobs:
           ffmpeg -hide_banner -version | sed -n '1,3p'
           ffprobe -hide_banner -version | sed -n '1,2p'
       - name: Native/FFmpeg real two-variant and negative tests
+        env:
+          LAUNCHWRIGHT_VIDEO_REAL_TESTS: '1'
         run: |
           set -euo pipefail
           node scripts/verify.mjs

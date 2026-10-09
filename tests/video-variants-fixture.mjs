@@ -19,7 +19,9 @@ export const FFMPEG_AVAILABLE=(()=>{
   const probe=spawnSync('ffprobe',['-version'],{timeout:3000,encoding:'utf8'});
   // On hosts without libx264, portable Node contract tests still run.
   // The mandatory owned Linux CI smoke does not skip actual encoding.
-  return !f.error&&f.status===0&&!probe.error&&probe.status===0 &&
+  return process.platform==='linux' &&
+    process.env.LAUNCHWRIGHT_VIDEO_REAL_TESTS==='1' &&
+    !f.error&&f.status===0&&!probe.error&&probe.status===0 &&
     (f.stdout??'').includes('libx264')&&(f.stdout??'').includes('aac');
 })();;
 export async function ownedVideoFixture(t,{duration=4,addReview=true}={}){

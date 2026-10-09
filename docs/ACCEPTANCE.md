@@ -369,8 +369,8 @@ frames, audio, duration and dimensions. A real owned synthetic fixture
 exercises video encoding, byte-stable ZIP, WAV/PCM audio-parity,
 partial safe recovery and independent imported/UNKNOWN Native output
 custody without inventing canonical Composition execution.
-Node24 Linux/Windows/macOS CI, selective owned Linux video encoding/
-audio parity and human inspection of actual screenshots are required
+Node24 Linux/Windows/macOS CI (non-FFmpeg portable checks), selective owned Linux video encoding/
+audio parity with LAUNCHWRIGHT_VIDEO_REAL_TESTS=1 and human inspection of actual screenshots are required
 before accepting this bounded technical subset. Voice alternatives,
 burn-in captions, real customer source, editorial film quality,
 license/privacy acceptance and upstream Platform Publish remain open.
