@@ -119,7 +119,7 @@ export function createGitOnboardingController(client){
         '<div><dt>Evidence ID</dt><dd><code>'+html(result.evidence_id)+'</code></dd></div>'+
         '<div><dt>Editable notes</dt><dd><code>'+html(result.deliverable_id)+'</code></dd></div></dl>'+
         '<div class="actions"><button data-action="onboard-open-release">Open release workspace</button></div></div></section>':'';
-      return '<div class="callout"><strong>Local Git metadata only</strong>No repository access is performed by the browser or server, no scripts are executed and no feature or publication claim is inferred. Imported evidence stays UNKNOWN.</div>'+
+      return '<div class="git-onboarding"><div class="callout"><strong>Local Git metadata only</strong>No repository access is performed by the browser or server, no scripts are executed and no feature or publication claim is inferred. Imported evidence stays UNKNOWN.</div>'+
         '<section class="panel"><div class="panel-title"><h2>1 · Observe your existing project</h2></div>'+
         '<div class="panel-body"><p>Use the authorized local R32 CLI with an exact base/head commit pair. It creates a private JSON snapshot of committed file metadata, without reading code or fetching remote branches.</p>'+
         '<pre class="onboard-instructions">node scripts/git-change-source.mjs observe --repo /absolute/owned/repo --alias owned_project --base BASE_40_SHA --head HEAD_40_SHA --out /private/observation.json</pre>'+
@@ -138,7 +138,7 @@ export function createGitOnboardingController(client){
         '<section class="panel"><div class="panel-title"><h2>4 · Review, then use Launchwright</h2></div>'+
         '<div class="panel-body"><p>Applying creates or reconciles Product, draft Release, approved CLI Source, declared Target, imported Evidence and editable Markdown notes. A human must still review notes and obtain runtime verification before publication.</p>'+
         '<p class="small-note">Re-running the <strong>same</strong> exact plan after an interrupted reply is recoverable. Never generate a different plan to guess whether an unknown operation succeeded. There is no automatic resend.</p></div></section>'+
-        resultHtml;
+        resultHtml+'</div>';
     }
   };
 }

@@ -14,3 +14,11 @@
 .panel-body input[type=file]{width:100%;max-width:100%;padding:10px;cursor:pointer}
 .panel-body input[type=file]:disabled{cursor:not-allowed}
 @media(max-width:580px){.onboard-summary .fact-list{grid-template-columns:1fr}.onboard-instructions{font-size:.78rem;padding:12px}}
+
+/* Prevent pinned 40/64-character Git digests widening narrow tablet columns. */
+.git-onboarding{min-width:0;max-width:100%}
+.git-onboarding .panel,.git-onboarding .panel-body{min-width:0}
+.git-onboarding .fact-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+.git-onboarding .fact-list>div,.git-onboarding .fact-list dd{min-width:0;overflow-wrap:anywhere}
+.git-onboarding .fact-list code{overflow-wrap:anywhere;word-break:break-word}
+@media(max-width:1080px){.git-onboarding .fact-list{grid-template-columns:minmax(0,1fr)}}

@@ -117,8 +117,17 @@ try{
  await page.screenshot({path:out+'/git-onboarding-created.png',fullPage:true});
  for(const width of [320,390,768]){
    await page.setViewportSize({width,height:900});
-   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),
-     'R37 Git import view overflows viewport width '+width);
+   const overflow=await page.evaluate(()=>({
+     viewport:innerWidth,document:document.documentElement.scrollWidth,
+     offenders:[...document.querySelectorAll('#view-content *')].filter(el=>
+       el.getBoundingClientRect().right>innerWidth+1).slice(0,8).map(el=>({
+         tag:el.tagName,className:el.className?.baseVal??el.className,
+         right:Math.ceil(el.getBoundingClientRect().right),
+         text:(el.textContent??'').slice(0,50)
+       }))
+   }));
+   assert.ok(overflow.document<=width+1,
+     'R37 Git import view overflows viewport '+width+': '+JSON.stringify(overflow));
    await page.screenshot({path:out+'/git-onboarding-'+width+'.png',fullPage:true});
  }
  await page.setViewportSize({width:1440,height:1000});
