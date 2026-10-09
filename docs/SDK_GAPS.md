@@ -30,3 +30,11 @@ only 21/36 original E2E scenarios; no exact-source CI result for one
 owned fixture automatically satisfies all scenario variants or external
 account/customer acceptance. This is a whole-master BLOCKED gate, not a
 defect masked by another local dashboard percentage.
+
+## R40 source-local Git documentation staging
+
+The R40 operator workflow can create one exact local Git docs review branch
+from a human-approved frozen Markdown candidate using isolated Git plumbing.
+It does not push to GitHub, open a draft pull request, establish external
+review/merge authority or execute an arbitrary project. This narrows but does
+not close the original DOCS_GIT master profile.

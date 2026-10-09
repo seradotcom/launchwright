@@ -43,6 +43,15 @@ Client SDK and do not expose approvals or Publish actions. Follow
 [local MCP operator instructions](MCP_LOCAL.md). MCP interoperability in
 a local client is not host-side ChatGPT Plugin acceptance.
 
+## Local Git docs review branch from an approved candidate
+
+With the local Launchwright workspace, an approved editorial candidate
+and an owned Git repository, use the two-phase R40 operator CLI to prepare
+an exact private plan for one docs/*.md file and explicitly create a new
+Git branch. The current checkout/index/HEAD are not modified. There is no
+GitHub push/PR. See [Git docs review branch](GIT_DOCS_BRANCH.md).
+
+
 ## Optional R37 web onboarding for an existing project
 
 Start the local owner-authenticated UI, select Import Git project, and upload

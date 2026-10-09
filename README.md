@@ -134,6 +134,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [Git metadata to editorial release-note outlines](docs/GIT_RELEASE_OUTLINE.md)
 - [Onboard an existing Git project with a recoverable plan](docs/GIT_PROJECT_BOOTSTRAP.md)
 - [Onboard an existing Git project in the local web UI](docs/GIT_ONBOARDING_UI.md)
+- [R40: safely stage reviewed Markdown into an owned Git docs branch](docs/GIT_DOCS_BRANCH.md)
 - [MCP local Client SDK adapter and operator instructions](docs/MCP_LOCAL.md)
 - [Canonical Effects readback custody](docs/EFFECTS.md)
 - [DeltaDesk real-browser laboratory](docs/DELTADESK_LAB.md)

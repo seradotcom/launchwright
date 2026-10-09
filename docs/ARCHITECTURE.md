@@ -34,6 +34,21 @@ approved source/evidence revision binding. Human edits are not overwritten.
 No product-feature truth, runtime acceptance or Graph authority is inferred.
 See the Git release outline guide.
 
+## R40 Git docs branch writeback from an exact frozen candidate
+
+A distinct two-phase operator CLI takes a human-reviewed, exact frozen
+Markdown Launchwright candidate and prepares a plan against a pinned local
+Git base branch commit/tree. Applying an explicitly confirmed plan uses Git
+plumbing: hash-object --no-filters, a private temporary index, write-tree,
+commit-tree with the exact base parent, byte/path-only diff verification
+and a compare-and-swap update-ref into a NEW local docs branch. Neither
+the checked-out project tree nor its default index/HEAD is changed; Git
+network, repo hooks, GitHub PRs and external publication are not invoked.
+Preexisting local target edits, branch collisions and source/candidate drift
+fail closed. This is not yet real GitHub Docs PR integration or Platform
+authority. See [Git docs local staging](GIT_DOCS_BRANCH.md).
+
+
 ## R38 — Local MCP tool entry via the public client only
 
 R38 runs the official MCP TypeScript SDK in an owner-configured stdio process,
