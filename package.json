@@ -21,11 +21,20 @@
     "test:browser": "node tests/browser.mjs",
     "build:native-bundle": "node scripts/build-native-bundle.mjs",
     "verify": "node scripts/verify.mjs",
-    "mcp:local": "node scripts/mcp-local.mjs"
+    "mcp:local": "node scripts/mcp-local.mjs",
+    "deck:plan": "node scripts/deck-pdf.mjs plan",
+    "deck:export": "node scripts/deck-pdf.mjs export",
+    "test:deck": "node --test --test-concurrency=1 tests/deck-pdf.test.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",
     "@semwright/native-sdk": "file:vendor/semwright-native-sdk-1.0.0.tgz",
+    "jszip": "3.10.2",
+    "pdf-lib": "1.17.1",
+    "pptxgenjs": "4.0.0",
     "zod": "3.25.76"
+  },
+  "overrides": {
+    "image-size": "2.0.4"
   }
 }

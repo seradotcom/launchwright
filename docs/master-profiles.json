@@ -89,11 +89,11 @@
     {
       "profile": "DECK_PDF",
       "scope": "CORE",
-      "implementation": "MISSING",
-      "evidence": "NOT_TESTED",
+      "implementation": "PARTIAL",
+      "evidence": "LOCAL_APPLICATION_CI",
       "source_sha": null,
       "run_id": null,
-      "remaining": "Editable deck/source plus real PDF renderer, visual inspection and exact candidate binding"
+      "remaining": "R42 plain-text frozen Markdown -> native editable PPTX/real PDF requires supported Node24 and visual synthetic lane; rich media, accessible multilingual fonts, customer branding, independent editorial visual QA and real source/product acceptance remain."
     },
     {
       "profile": "INTERACTIVE_DEMO",

@@ -1,5 +1,19 @@
 # Operator runbook
 
+## R42 private deck/PDF source and recovery
+
+Use deck-pdf.mjs plan and export only on an exact human-reviewed frozen
+Markdown Candidate with a private 0700 output directory. Confirm the
+plan and candidate digests from the saved private JSON. The renderer
+creates an editable PPTX, a real PDF and an exact hashed receipt.
+On an interrupted local file write, replay the SAME immutable plan.
+An existing output differing by one byte, an exposed/public output
+directory, stale source or unsupported glyph is a stop condition; never
+overwrite the human-edited file or silently replace source content.
+Human graphic design/accessibility, licensing, technical feature truth,
+customer approval and any external publication remain distinct gates.
+
+
 ## R41 GitHub PR draft — no implicit remote retry
 
 R41 only creates a GitHub Pull Request in Draft state after the operator

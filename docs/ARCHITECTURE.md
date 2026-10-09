@@ -34,6 +34,21 @@ approved source/evidence revision binding. Human edits are not overwritten.
 No product-feature truth, runtime acceptance or Graph authority is inferred.
 See the Git release outline guide.
 
+## R42 immutable editorial candidate to two native document formats
+
+R42 reads one fresh human-reviewed Candidate and the exact frozen Markdown
+artifact bytes from the Native SDK-owned workspace. The source parser permits
+plain bounded sections and builds a measured common slide model, rejecting
+unsupported tables/code/glpyhs or layouts that cannot fit without clipping.
+The same layout is rendered to independently opening/editable OOXML PPTX
+and real PDF, each parsed back to verify slide/page count. Fixed metadata
+and ZIP timestamps make repeat exports binary-stable for recovery with the
+same private plan. Only operator-chosen 0700 paths are written; no fonts,
+external resource fetch, OS UI automation, GitHub PR or Platform job is used.
+The local visual synthetic acceptance is not a customer-quality approval.
+See [the deck/PDF export guide](DECK_PDF.md).
+
+
 ## R41 GitHub Draft PR transport after explicit manual branch push
 
 R41 operates on an R40 exact branch which the operator must have separately

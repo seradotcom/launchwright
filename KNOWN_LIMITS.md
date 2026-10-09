@@ -7,7 +7,7 @@ A green local browser/MCP test is not proof of real customer acceptance.
 ## Missing or incomplete CORE paths
 
 - DOCS_GIT: R40 has a real owned local Git Markdown branch with exact source locks. R41 adds a bounded GH Draft PR plan/send/recover adapter tested with injected GitHub API responses. A real operator account GitHub PR, human review/merge and live documentation deployment remain unaccepted. R32 Git metadata and R33 outlines are not remote PRs.
-- DECK_PDF: no delivered editable deck + real PDF export and visual QA for a complete owned release.
+- DECK_PDF: R42 adds a real editable PPTX plus independently generated PDF from bounded plain-text frozen editorial Markdown, with owned synthetic visual QA pending Node24 acceptance. Complex Markdown/media, multilingual fonts, customer-brand design quality, accessibility and real customer-review acceptance remain unavailable.
 - INTERACTIVE_DEMO: the Launchwright admin interface is real, but not a sanitized navigable *captured product* demo.
 - STORE_PACKAGE: generic channel ZIPs require store-specific sizes/assets/schema/policy and acceptance.
 - VIDEO: the owned R24 canonical MP4 fixture exists; two-format/captions/quality/user-content acceptance remains partial.

@@ -32,7 +32,7 @@
   ],
   "outstanding_core": [
     "DOCS_GIT local branch/draft-PR mock accepted only; live authorized GitHub PR, merge and docs deployment remain unaccepted",
-    "DECK_PDF editable deck plus PDF export",
+    "DECK_PDF text-only PPTX/PDF owned-synthetic render; rich media, accessibility, customer branding and editorial visual QA remain open",
     "INTERACTIVE_DEMO sanitized navigable product capture",
     "STORE_PACKAGE store-specific policy and asset sizes",
     "VIDEO second output/quality/accessibility acceptance",

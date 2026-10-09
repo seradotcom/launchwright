@@ -277,6 +277,23 @@ Platform Publish and customer execution are not established.
 Exact run, job and evidence limits are in
 `evidence/r41/ci-runs.json`.
 
+## R42 candidate — synthetic text-only editable PPTX and real PDF
+
+A fresh editorial-approved Candidate with a pinned Markdown artifact now
+supports a private two-phase deck export: a no-effects plan, explicit
+SHA/consent confirmation, native editable PPTX and independent PDF generated
+from the same measured source slide model. The parser rejects truncation,
+unsupported Markdown/glyphs, stale candidates and unapproved editorial state.
+Both outputs are validated by ZIP/XML and PDF structure, with stable
+metadata for exact-byte replay; altered local files and unsafe directories
+fail closed. Owned synthetic Node22 tests and independent Poppler/Impress
+visual samples exist, but supported Node24 Linux/Windows/macOS application
+checks and a fresh exact-SHA manual deck PDF visual lane are still required.
+This narrows original DECK_PDF from missing toward partial; it is not
+a customer-branded editable-presentation approval, general rich media
+support, accessibility certification, remote Platform task or publication.
+
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;

@@ -11,3 +11,13 @@ The MCP SDK source/license text is not copied or redistributed as handwritten
 Launchwright implementation; original packages retain their own license files.
 An npm audit check runs in supported-engine application CI. No hosted OAuth,
 remote MCP auth service or ChatGPT host acceptance is implied.
+
+R42 text-only document generation uses PptxGenJS 4.0.0 (MIT),
+pdf-lib 1.17.1 (MIT) and JSZip 3.10.2 (MIT OR GPL-3.0-or-later,
+used under its MIT option). Their original npm distributions retain
+their licenses and notices. The transitive image-size parser is pinned
+to patched 2.0.4 (MIT) through a package-lock override because compatible
+1.x versions had an infinite-loop security advisory; no image or external
+fonts are read by the R42 text-only pipeline. Future image support must
+reassess this dependency API and sandbox/source rights. Never redistribute
+installed fonts, customer content or the private original master specification.
