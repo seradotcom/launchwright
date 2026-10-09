@@ -33,7 +33,11 @@
     "test:store": "node --test --test-concurrency=1 tests/store-package.test.mjs",
     "docs:plan": "node scripts/static-docs.mjs plan",
     "docs:export": "node scripts/static-docs.mjs export",
-    "test:docs": "node --test --test-concurrency=1 tests/static-docs.test.mjs"
+    "test:docs": "node --test --test-concurrency=1 tests/static-docs.test.mjs",
+    "video:plan": "node scripts/video-variants.mjs plan",
+    "video:export": "node scripts/video-variants.mjs export",
+    "video:smoke": "node scripts/video-variants-owned-smoke.mjs",
+    "test:video": "node --test --test-concurrency=1 tests/video-variants.test.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",

@@ -1,5 +1,19 @@
 # Operator runbook
 
+## R46 video aspect derivation / operator incident checklist
+
+Do not derive a video from an unreviewed Native Media source or stale
+frozen WebVTT Candidate. The operator must confirm original MP4 and
+plan SHA, 30fps Media duration, local FFmpeg version, and explicit
+rights/UNKNOWN declarations. The export contains the original AAC and
+captions as a WebVTT sidecar; portrait footage is contained with
+letterboxing and is technically UNKNOWN, not a canonical Composition
+Pass. An interrupted export may be retried only with the SAME exact
+private plan; if the local ZIP/receipt differs or another operator
+owns the workspace lock, stop and manually reconcile. Never modify
+the original MP4 or grant automatic external publication.
+
+
 ## R45 documentation source, offline preview and recovery
 
 Only export R45 static documentation from a fresh editorial-approved

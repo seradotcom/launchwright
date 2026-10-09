@@ -1,0 +1,115 @@
+name: Owned two-format video and WebVTT acceptance
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: video-variants-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  video-variants:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm audit --omit=dev --audit-level=high
+      - name: Install verified Linux video tooling as needed
+        run: |
+          set -euo pipefail
+          if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null; then
+            sudo apt-get update -qq
+            sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ffmpeg
+          fi
+          ffmpeg -hide_banner -version | sed -n '1,3p'
+          ffprobe -hide_banner -version | sed -n '1,2p'
+      - name: Native/FFmpeg real two-variant and negative tests
+        run: |
+          set -euo pipefail
+          node scripts/verify.mjs
+          node --test --test-concurrency=1 tests/video-variants.test.mjs
+          node scripts/master-acceptance.mjs --check
+      - name: Generate owned synthetic H264/AAC and exact WebVTT package
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/video-variants
+          chmod 0700 evidence/video-variants
+          node scripts/video-variants-owned-smoke.mjs --out-dir "$GITHUB_WORKSPACE/evidence/video-variants" | tee evidence/video-variants/acceptance.json
+      - name: Independently decode output dimensions, frames, audio samples and captions
+        run: |
+          set -euo pipefail
+          root=evidence/video-variants
+          mkdir -p "$root/unpacked"
+          python3 - <<'PY'
+          import hashlib,json,pathlib,zipfile
+          root=pathlib.Path('evidence/video-variants')
+          r=json.loads((root/'acceptance.json').read_text())
+          m=r['receipt']
+          assert r['synthetic_fixture'] is True
+          assert r['customer_source_captured'] is False
+          assert r['public_release_created'] is False
+          assert r['platform_authority'] is False
+          assert m['local_technical_state']=='UNKNOWN'
+          assert m['captions_format']=='sidecar WebVTT, not burned in'
+          assert m['source_timeline_recomposed'] is False
+          assert m['alternate_voice_generated'] is False
+          archive=root/m['zip_filename']
+          assert hashlib.sha256(archive.read_bytes()).hexdigest()==m['zip_sha256']
+          with zipfile.ZipFile(archive) as z:
+            assert z.testzip() is None
+            assert set(z.namelist())=={'landscape-16x9.mp4','portrait-9x16.mp4',
+              'captions.vtt','manifest.json','README.txt'}
+            z.extractall(root/'unpacked')
+          v=root/'unpacked'
+          manifest=json.loads((v/'manifest.json').read_text())
+          assert manifest['plan_sha256']==m['plan_sha256']
+          assert manifest['cropping_performed'] is False
+          assert manifest['derived_technical_state']=='UNKNOWN'
+          for filename,info in manifest['outputs'].items():
+            b=(v/filename).read_bytes()
+            assert hashlib.sha256(b).hexdigest()==info['sha256']
+            assert len(b)==info['bytes']
+          assert 'WEBVTT' in (v/'captions.vtt').read_text()
+          assert 'Owned synthetic video state' in (v/'captions.vtt').read_text()
+          print('OWNED_VIDEO_PACKAGE_AND_CAPTIONS_PASS',m['zip_sha256'])
+          PY
+          for type in landscape-16x9 portrait-9x16; do
+            ffprobe -v error -show_entries format=duration:stream=codec_name,codec_type,width,height,avg_frame_rate,nb_frames,sample_rate -of json "$root/unpacked/$type.mp4" > "$root/$type.probe.json"
+            ffmpeg -nostdin -v error -i "$root/unpacked/$type.mp4" -ss 00:00:02 -frames:v 1 -y "$root/$type.png"
+            ffmpeg -nostdin -v error -i "$root/unpacked/$type.mp4" -map 0:a:0 -vn -f s16le -ac 2 -ar 48000 -y "$root/$type.pcm"
+          done
+          python3 - <<'PY'
+          import hashlib,json,pathlib
+          root=pathlib.Path('evidence/video-variants')
+          for name,width,height in [('landscape-16x9',1280,720),('portrait-9x16',720,1280)]:
+            probe=json.loads((root/(name+'.probe.json')).read_text())
+            v=[x for x in probe['streams'] if x['codec_type']=='video'][0]
+            a=[x for x in probe['streams'] if x['codec_type']=='audio'][0]
+            assert (v['width'],v['height'])==(width,height)
+            assert v['codec_name']=='h264' and v['avg_frame_rate']=='30/1'
+            assert int(v['nb_frames'])==120
+            assert a['codec_name']=='aac' and int(a['sample_rate'])==48000
+            assert abs(float(probe['format']['duration'])-4)<0.08
+            assert (root/(name+'.png')).stat().st_size>1000
+          audio=[
+            hashlib.sha256((root/(name+'.pcm')).read_bytes()).hexdigest()
+            for name in ('landscape-16x9','portrait-9x16')
+          ]
+          assert audio[0]==audio[1], 'Source AAC decodes differently after ratio derivation'
+          (root/'audio-identical.sha256').write_text(audio[0]+'  BOTH_ASPECT_VARIANTS\n')
+          print('OWNED_VIDEO_FFMPEG_DIMENSIONS_FRAMES_AAC_PARITY_PASS',audio[0])
+          PY
+          rm "$root"/*.pcm
+      - name: Preserve source SHA, owned sample video, caption and visual evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: launchwright-owned-video-variants-${{ github.sha }}
+          path: evidence/video-variants/
+          if-no-files-found: error
+          retention-days: 14

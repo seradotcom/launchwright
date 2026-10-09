@@ -356,6 +356,26 @@ customer documentation, source rights/privacy, all Markdown/media,
 sample execution, WCAG or public hosting. The whole master
 remains BLOCKED.
 
+## R46 candidate — aspect-only MP4 source and real Native WebVTT output
+
+R46 introduces a private format-only conversion of one already imported/
+reviewed Native Media 1280x720 30fps H264/AAC MP4 into a separately
+reviewable 720x1280 portrait MP4 containing the full source image with
+black padding and its original audio, together with exact frozen Native
+WebVTT sidecar captions. Plan and export are bound to exact
+Media/candidate source digests, operator rights/UNKNOWN acknowledgements,
+FFmpeg version, private path and output hashes. FFprobe checks codecs,
+frames, audio, duration and dimensions. A real owned synthetic fixture
+exercises video encoding, byte-stable ZIP, WAV/PCM audio-parity,
+partial safe recovery and independent imported/UNKNOWN Native output
+custody without inventing canonical Composition execution.
+Node24 Linux/Windows/macOS CI, selective owned Linux video encoding/
+audio parity and human inspection of actual screenshots are required
+before accepting this bounded technical subset. Voice alternatives,
+burn-in captions, real customer source, editorial film quality,
+license/privacy acceptance and upstream Platform Publish remain open.
+
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;

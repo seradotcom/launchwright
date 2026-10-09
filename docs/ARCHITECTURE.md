@@ -34,6 +34,22 @@ approved source/evidence revision binding. Human edits are not overwritten.
 No product-feature truth, runtime acceptance or Graph authority is inferred.
 See the Git release outline guide.
 
+## R46 bounded aspect-only video derivation from Semwright Media custody
+
+R46 reads an exact Native Media plan (two video variants at 1280x720 and
+720x1280, 30fps, fixed duration), an editorial-approved Media output,
+and a separately reviewed frozen Native WebVTT artifact. FFprobe validates
+the approved source MPEG-4 bytes and audio; a bounded FFmpeg process with
+no network inputs only makes a portrait H264 image-containment derivative
+with the original AAC packets. This does not reimplement the Semwright
+Composition temporal clock, effects or narration, and does not execute
+customer product scripts. ZIP/VTT/MP4 digests, a private 0700 output
+directory, a workspace lock and Native imported/UNKNOWN output receipt
+support exact replay and avoid clobbering human changes. No Platform,
+external publication, voice variants or customer acceptance is inferred.
+See VIDEO_VARIANTS.md.
+
+
 ## R45 — Static version-bound documentation compiler
 
 The owner-selected site plan pins one human-editorial-approved Candidate and
