@@ -38,3 +38,13 @@ from a human-approved frozen Markdown candidate using isolated Git plumbing.
 It does not push to GitHub, open a draft pull request, establish external
 review/merge authority or execute an arbitrary project. This narrows but does
 not close the original DOCS_GIT master profile.
+
+## R41 bounded GitHub documentation Draft PR handoff
+
+R41 prepares a version-bound DRAFT PR intent after the exact R40 Markdown
+branch is manually pushed to the intended GitHub repository. The remote
+adapter verifies SHA-bound head/base and DRAFT body/title/URL readback
+without remote branch mutation or approval, and has read-only recovery
+for lost API replies. These tests use a mocked GitHub transport; live
+owner GitHub PR creation, review, merge, Git-host deployment and actual
+customer ownership remain externally unaccepted. DOCS_GIT is PARTIAL.

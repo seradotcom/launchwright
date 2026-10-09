@@ -6,7 +6,7 @@ A green local browser/MCP test is not proof of real customer acceptance.
 
 ## Missing or incomplete CORE paths
 
-- DOCS_GIT: no independently accepted owner Git docs PR/writeback adapter yet; R32 Git read-only metadata and R33 editorial drafts are not PRs.
+- DOCS_GIT: R40 has a real owned local Git Markdown branch with exact source locks. R41 adds a bounded GH Draft PR plan/send/recover adapter tested with injected GitHub API responses. A real operator account GitHub PR, human review/merge and live documentation deployment remain unaccepted. R32 Git metadata and R33 outlines are not remote PRs.
 - DECK_PDF: no delivered editable deck + real PDF export and visual QA for a complete owned release.
 - INTERACTIVE_DEMO: the Launchwright admin interface is real, but not a sanitized navigable *captured product* demo.
 - STORE_PACKAGE: generic channel ZIPs require store-specific sizes/assets/schema/policy and acceptance.

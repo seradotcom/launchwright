@@ -16,7 +16,7 @@ not included or published. No profile is auto-promoted by a source file.
 | ANDROID_CAPTURE | EXTERNAL_ACCEPTANCE | MISSING | not tested | Bounded Android runner/adapter implementation and authorized emulator/device acceptance |
 | IOS_CAPTURE | EXTERNAL_ACCEPTANCE | MISSING | not tested | Bounded iOS runner/adapter implementation and authorized macOS/simulator acceptance |
 | DOCS_STATIC | CORE | PARTIAL | local application ci | Version-bound complete static site, links, code samples, accessibility and cross-release regression acceptance |
-| DOCS_GIT | CORE | MISSING | not tested | Safe Git docs PR adapter with real branch/diff/conflict/local hosted test; R32 observation is not a docs writeback |
+| DOCS_GIT | CORE | PARTIAL | Exact source b69d17aafbb4; CI run 37874876016 | Live operator GitHub DRAFT PR creation and readback, remote reviewers/merge, docs website deployment, customer ownership and exact published-version acceptance remain external; R41 tests use injected GitHub provider. |
 | VIDEO | CORE | PARTIAL | Exact source 635bf1c4d02b; CI run 37582490691 | Two output formats, independently inspected editorial quality, caption/voice variants and real customer/source acceptance |
 | DECK_PDF | CORE | MISSING | not tested | Editable deck/source plus real PDF renderer, visual inspection and exact candidate binding |
 | INTERACTIVE_DEMO | CORE | MISSING | not tested | Sanitized navigable product demo tied to real captured states, not merely Launchwright admin UI |
