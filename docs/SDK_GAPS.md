@@ -70,3 +70,16 @@ independently verified. The accepted subset requires Chromium E2E
 on owned synthetic fixture; full customer-product interactive behavior,
 multi-browser accessibility, source privacy admission, Platform Publish
 and real external customer acceptance remain open.
+
+## R44 technical Apple/Google Store listing packages
+
+R44 adds real owner-local store-specific screenshot/graphic/metadata
+ZIP packages for Apple iPhone Dynamic Island medium and Google Play
+phone portrait subsets, with exact PNG dimensions and alpha semantics,
+private CSP preview and fail-closed SHA recovery. Source evidence does
+not yet cryptographically bind pixels to independent device-origin
+captures. All other device families/locales, real content/privacy
+and licensing review, complete store policy, app binary and authenticated
+App Store Connect/Google Play API upload acceptance remain outside
+this technical package. STORE_PACKAGE stays PARTIAL, while separate
+APPLE_UPLOAD/PLAY_UPLOAD profiles remain MISSING.

@@ -1,0 +1,91 @@
+name: Owned store listing asset packages
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: store-assets-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  store-assets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Verify production dependency security
+        run: npm audit --omit=dev --audit-level=high
+      - name: Verify actual Native state and both store policy subsets
+        run: |
+          set -euo pipefail
+          node scripts/verify.mjs
+          node --test --test-concurrency=1 tests/store-package.test.mjs
+          node scripts/master-acceptance.mjs --check
+      - name: Generate actual owned synthetic Apple/Google store packages
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/store-assets
+          chmod 0700 evidence/store-assets
+          node scripts/store-owned-smoke.mjs --out-dir "$GITHUB_WORKSPACE/evidence/store-assets" | tee evidence/store-assets/acceptance.json
+      - name: Real offline Chromium previews at four viewport widths
+        run: |
+          set -euo pipefail
+          npm install --prefix .ci-tools --no-audit --no-fund --ignore-scripts playwright@1.58.2
+          .ci-tools/node_modules/.bin/playwright install --with-deps chromium
+          node tests/store-browser.mjs evidence/store-assets | tee evidence/store-assets/browser-acceptance.json
+      - name: Independently verify archive policy structure and source hashes
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'JS'
+          import {readFileSync} from 'node:fs';
+          import {join} from 'node:path';
+          import {createHash} from 'node:crypto';
+          import {PNG} from 'pngjs';
+          import JSZip from 'jszip';
+          const root='evidence/store-assets';
+          const data=JSON.parse(readFileSync(join(root,'owned-smoke.json')));
+          const browser=JSON.parse(readFileSync(join(root,'browser-result.json')));
+          if(!browser.real_chromium_test_passed || browser.network_requests.length ||
+            browser.page_errors.length || browser.store_api_upload_performed)
+            throw Error('Offline browser acceptance failed or contacted an external origin');
+          for(const p of data.results){
+            const filename='launchwright-store-'+p.plan_sha256.slice(0,12)+'.zip';
+            const bytes=readFileSync(join(root,p.output_folder,filename));
+            const hash=createHash('sha256').update(bytes).digest('hex');
+            if(hash!==p.zip_sha256)throw Error('Private output ZIP digest was altered');
+            const zip=await JSZip.loadAsync(bytes,{checkCRC32:true});
+            const manifest=JSON.parse(await zip.file('manifest.json').async('string'));
+            if(manifest.store_policy_complete || manifest.store_account_accepted ||
+              manifest.store_upload_performed || manifest.platform_authority)
+              throw Error('A local fixture claimed external store authority');
+            for(const s of manifest.screenshot_assets){
+              const png=await zip.file(s.path).async('nodebuffer');
+              if(png[25]!==2)throw Error('Screenshot is not a 24-bit no-alpha PNG');
+              const pixels=PNG.sync.read(png,{checkCRC:true});
+              if(pixels.width!==s.width || pixels.height!==s.height)
+                throw Error('Screenshot dimensions drifted after packaging');
+              if(createHash('sha256').update(png).digest('hex')!==s.normalized_png_sha256)
+                throw Error('Screenshot SHA-256 drifted');
+            }
+            if(p.platform==='google-play-phone-portrait'){
+              const icon=await zip.file('graphics/icon.png').async('nodebuffer');
+              const graphic=await zip.file('graphics/feature.png').async('nodebuffer');
+              if(icon[25]!==6 || graphic[25]!==2)throw Error('Google icon/feature PNG alpha semantics invalid');
+              if(icon.length>1024*1024)throw Error('Google Play app icon byte limit exceeded');
+            }
+          }
+          console.log('OWNED_STORE_LISTING_ASSET_ACCEPTANCE_PASS',data.results.map(x=>x.platform).join(','));
+          JS
+      - name: Retain private synthetic ZIPs, technical manifest and offline previews
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: launchwright-owned-store-assets-${{ github.sha }}
+          path: evidence/store-assets/
+          if-no-files-found: error
+          retention-days: 14

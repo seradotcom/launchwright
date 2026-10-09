@@ -30,3 +30,10 @@ MIT option to produce a deterministic offline HTML ZIP with no scripts
 or remote resource requests. The official npm distributions retain their
 own license and copyright notices; no fonts or customer screenshots are
 bundled in the repository.
+
+R44 store listing asset packaging reuses pngjs 7.0.0 (MIT) for
+strict PNG format checks and metadata-free pixel normalization and
+JSZip 3.10.2 (dual MIT/GPL-3.0-or-later; MIT option) for
+deterministic private ZIP exports. No downloaded fonts,
+customer screenshots, store badges, external store SDK or uploader
+are bundled. Existing npm production audit gates remain active.
