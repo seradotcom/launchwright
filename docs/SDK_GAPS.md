@@ -92,4 +92,4 @@ inert code examples, source/build identity, private export/recovery
 and two-release continuity. It does not certify execution of samples,
 support arbitrary rich Markdown/images, guarantee WCAG conformance,
 publish a production docs website or establish customer product/rights
-acceptance. DOCS_STATIC stays PARTIAL after the owned browser lane passes.
+acceptance. DOCS_STATIC is PARTIAL, with accepted owned Browser evidence on SHA 68c8baf1013c4a16346c17c15d47293713144b36.

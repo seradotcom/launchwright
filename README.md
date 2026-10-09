@@ -196,7 +196,7 @@ acceptance remain unestablished. See [store assets](docs/STORE_ASSETS.md).
 
 ## R45 — Offline version-bound documentation site
 
-R45 compiles two to twelve editorial-approved, exact frozen Markdown artifacts
+R45 (accepted exact source SHA `68c8baf1013c4a16346c17c15d47293713144b36`) compiles two to twelve editorial-approved, exact frozen Markdown artifacts
 from the same release and target into a **complete offline HTML documentation
 site**. Real internal links, code examples, accessible navigation and
 build/source version pins are validated; unsupported Markdown or external

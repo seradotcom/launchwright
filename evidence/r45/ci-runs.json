@@ -1,0 +1,145 @@
+{
+  "schema_version": "launchwright-r45-ci-evidence/1",
+  "source_sha": "68c8baf1013c4a16346c17c15d47293713144b36",
+  "merge_commit_sha": "fdd5462a14d9a143778c0bb524be1559d1c47e8f",
+  "canonical_semwright_sha": "d2da9a495a53fe279a1ca4de61f0e24646350f22",
+  "native_sdk_version": "1.0.0",
+  "supported_application_checks": {
+    "run_id": 38000276874,
+    "head_sha": "68c8baf1013c4a16346c17c15d47293713144b36",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/38000276874",
+    "jobs": {
+      "light (macos-latest)": {
+        "job_id": 114056400695,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38000276874/job/114056400695"
+      },
+      "light (ubuntu-latest)": {
+        "job_id": 114056400925,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38000276874/job/114056400925"
+      },
+      "light (windows-latest)": {
+        "job_id": 114056401009,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38000276874/job/114056401009"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Windows-55f304aa5f621381868981d62e7afe28dd4c0b0c": {
+        "id": 11648831944,
+        "bytes": 733,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-55f304aa5f621381868981d62e7afe28dd4c0b0c": {
+        "id": 11648791894,
+        "bytes": 698,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-55f304aa5f621381868981d62e7afe28dd4c0b0c": {
+        "id": 11648459871,
+        "bytes": 694,
+        "expired": false
+      }
+    }
+  },
+  "real_owned_chromium_lane": {
+    "run_id": 38000643500,
+    "head_sha": "fdd5462a14d9a143778c0bb524be1559d1c47e8f",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/38000643500",
+    "jobs": {
+      "static-docs": {
+        "job_id": 114057597315,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38000643500/job/114057597315"
+      }
+    },
+    "artifacts": {
+      "launchwright-owned-static-docs-fdd5462a14d9a143778c0bb524be1559d1c47e8f": {
+        "id": 11648921835,
+        "bytes": 501830,
+        "expired": false
+      }
+    }
+  },
+  "main_push_checks": {
+    "run_id": 38000643072,
+    "head_sha": "fdd5462a14d9a143778c0bb524be1559d1c47e8f",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/38000643072",
+    "jobs": {
+      "light (macos-latest)": {
+        "job_id": 114057592368,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38000643072/job/114057592368"
+      },
+      "light (ubuntu-latest)": {
+        "job_id": 114057592534,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38000643072/job/114057592534"
+      },
+      "light (windows-latest)": {
+        "job_id": 114057592578,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38000643072/job/114057592578"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Windows-fdd5462a14d9a143778c0bb524be1559d1c47e8f": {
+        "id": 11649236118,
+        "bytes": 733,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-fdd5462a14d9a143778c0bb524be1559d1c47e8f": {
+        "id": 11649115839,
+        "bytes": 694,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-fdd5462a14d9a143778c0bb524be1559d1c47e8f": {
+        "id": 11648757666,
+        "bytes": 697,
+        "expired": false
+      }
+    }
+  },
+  "superseded_pr_checks": [
+    {
+      "run_id": 38000028383,
+      "source_sha": "07fed5f740b9222cbc0c557120bee3f83c67732d",
+      "superseded_by": "A visible empty Native Markdown quote delimiter was removed before final source acceptance"
+    }
+  ],
+  "owned_synthetic_acceptance": {
+    "offline_page_count": 4,
+    "source_build": "build-A",
+    "private_archive_sha256": "f4baac0afdda0d4ac0799eb56a2e4e177d095d74434a704c198be31ce57b55bd",
+    "independent_browser_archive_sha256": "5c98b1ac53acec0f59f51696274374e8fe33bd328ecde99f1f9fb2dc8a149f1e",
+    "browser_viewports": [
+      320,
+      390,
+      768,
+      1440
+    ],
+    "navigation_keyboard_accepted": true,
+    "internal_link_graph_checked": true,
+    "inert_code_samples_checked": true,
+    "zero_external_browser_requests": true,
+    "zero_failed_requests": true,
+    "zero_browser_errors": true,
+    "two_release_historical_isolation_unit_tested": true,
+    "source_rights_operator_declared": true,
+    "source_rights_independently_verified": false
+  },
+  "authority": {
+    "owner_local_static_docs_accepted": true,
+    "live_customer_docs_review_accepted": false,
+    "sample_code_runtime_conformance_accepted": false,
+    "third_party_hosting_or_publishing_accepted": false,
+    "independent_wcag_conformance_accepted": false,
+    "semwright_platform_publish_accepted": false,
+    "real_customer_product_capture_accepted": false
+  },
+  "scope_note": "Owned synthetic, owner-local, script-free static documentation site accepted on Chromium and 3OS Node24. Browser and owned ZIP runs are independent disposable source fixtures, so their archive hashes intentionally differ. Whole original master remains BLOCKED."
+}
