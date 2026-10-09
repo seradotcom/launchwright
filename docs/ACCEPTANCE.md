@@ -331,22 +331,30 @@ review are not included. Node24 three-OS and owned real Chromium technical
 acceptance remain pending. STORE_PACKAGE is still PARTIAL.
 
 
-## R45 candidate — real static version-bound documentation site
+## R45 accepted — offline version-bound documentation site
 
-R45 adds a two-phase owner-only export of 2–12 frozen Markdown artifacts
-of one human-editorial-approved Candidate/Release/Target into a real
-HTML documentation site with a ZIP and SHA-256 receipt. Only declared
-internal links are allowed and validated; code examples are escaped inert
-text, while raw HTML, unsupported media, missing targets and remote links
-fail closed. Site pages include semantic headings, skip links, scoped nav,
-responsive CSS, strict offline CSP, and source/build identity. Exact
-candidate/source metadata is verified on replay, with private file/lock
-protection and no clobber. Real Native SDK/SQLite synthetic tests include
-a two-release continuity case; supported Node24 Linux/Windows/macOS
-checks and a genuine offline Chromium acceptance lane remain mandatory.
-No external hosting, customer authentication/privacy/rights or WCAG
-certification is claimed; DOCS_STATIC remains PARTIAL and whole master BLOCKED.
-
+R45 exact implementation SHA `68c8baf1013c4a16346c17c15d47293713144b36` passed
+Node24 Linux/Windows/macOS Application checks run `38000276874`.
+PR #69 merged as `fdd5462a14d9a143778c0bb524be1559d1c47e8f`, and main-push run
+`38000643072` passed all three OSes.
+Owned real Chromium workflow `38000643500` passed on the
+same merged source, retaining exact offline ZIP, manifest,
+source receipts and screenshots at 320, 390, 768 and 1440 px.
+The browser report verifies working internal navigation,
+keyboard focus, inert code examples, no cross-origin/network
+requests, zero failed requests and zero page errors. Native SDK
+owned synthetic tests also prove two-release historical site
+isolation, stale-source/Candidate/target rejection, declared
+source rights, no output clobber and byte-identical private
+recovery. An earlier accepted Node24 PR source at
+`07fed5f740b9222cbc0c557120bee3f83c67732d`
+was superseded by a presentation-only fix suppressing a
+trailing blank Native Markdown quote line. All exact CI job
+and artifact IDs are in `evidence/r45/ci-runs.json`.
+DOCS_STATIC remains PARTIAL: this does not certify production
+customer documentation, source rights/privacy, all Markdown/media,
+sample execution, WCAG or public hosting. The whole master
+remains BLOCKED.
 
 ## Explicitly not established
 

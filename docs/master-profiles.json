@@ -63,10 +63,10 @@
       "profile": "DOCS_STATIC",
       "scope": "CORE",
       "implementation": "PARTIAL",
-      "evidence": "LOCAL_APPLICATION_CI",
-      "source_sha": null,
-      "run_id": null,
-      "remaining": "R45 adds a real script-free version-bound multi-page HTML docs site with owned synthetic internal-link/code examples and two-release continuity; Node24/Chromium acceptance pending. Complex docs/media, WCAG audit, live customer/source approval and public hosting remain external."
+      "evidence": "OWNED_FIXTURE_OFFLINE_BROWSER",
+      "source_sha": "68c8baf1013c4a16346c17c15d47293713144b36",
+      "run_id": 38000643500,
+      "remaining": "R45 source-bound script-free multi-page site accepted on Node24 Linux/Windows/macOS and owned Chromium fixture. Complex images/docs/media, independent rights/PII/WCAG review, production sample execution, real customer version migrations and external hosting remain unaccepted."
     },
     {
       "profile": "DOCS_GIT",
