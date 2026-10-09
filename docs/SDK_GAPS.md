@@ -48,3 +48,13 @@ without remote branch mutation or approval, and has read-only recovery
 for lost API replies. These tests use a mocked GitHub transport; live
 owner GitHub PR creation, review, merge, Git-host deployment and actual
 customer ownership remain externally unaccepted. DOCS_GIT is PARTIAL.
+
+## R42 text-only editable deck/PDF export
+
+R42 now generates a real source-bound editable PPTX and PDF from an
+editorial-approved Markdown candidate, including a private deterministic
+source receipt, no layout truncation and fail-closed filesystem recovery.
+The accepted scope will be only bounded plain text + synthetic owned
+fixtures. Full rich-content decks, customer branding/asset usage,
+multilingual embedded font coverage, accessibility/visual editorial review,
+independent customer acceptance and Platform Publish remain open.

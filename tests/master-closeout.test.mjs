@@ -34,7 +34,7 @@ test('R39 no source-only profile or unverified private Publish can become accept
   const copy=structuredClone(manifest);
   const publish=copy.profiles.find(p=>p.profile==='PUBLISH_PRIVATE');
   assert.equal(publish.implementation,'BLOCKED_UPSTREAM');
-  assert.equal(copy.profiles.find(p=>p.profile==='DECK_PDF').implementation,'MISSING');
+  assert.equal(copy.profiles.find(p=>p.profile==='DECK_PDF').implementation,'PARTIAL');
   assert.equal(copy.profiles.find(p=>p.profile==='DOCS_GIT').implementation,'PARTIAL');
   publish.implementation='COMPLETE';
   assert.throws(()=>evaluateMaster(index,copy,lock),
@@ -73,7 +73,7 @@ test('R39 capability matrix is derived from the public profile evidence only, wi
   const md=renderCapabilityMatrix(manifest,evaluateMaster(index,manifest,lock));
   assert.match(md,/\*\*Whole-master gate: BLOCKED/u);
   assert.match(md,/\| PUBLISH_PRIVATE \| CORE \| BLOCKED_UPSTREAM \|/u);
-  assert.match(md,/\| DECK_PDF \| CORE \| MISSING \|/u);
+  assert.match(md,/\| DECK_PDF \| CORE \| PARTIAL \|/u);
   assert.match(md,/21 referenced/u);
   assert.ok(!md.includes('Semwright Release Studio v0.1.0/'));
   // Git checkout may materialize tracked Markdown using Windows CRLF. The

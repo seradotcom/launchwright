@@ -136,6 +136,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [Onboard an existing Git project in the local web UI](docs/GIT_ONBOARDING_UI.md)
 - [R40: safely stage reviewed Markdown into an owned Git docs branch](docs/GIT_DOCS_BRANCH.md)
 - [R41: operator-controlled GitHub DRAFT PR from exact approved Git docs branch](docs/GIT_DOCS_DRAFT_PR.md)
+- [R42: frozen Markdown to editable PPTX and matching PDF](docs/DECK_PDF.md)
 - R40 source `b69d17aafbb4badfd84d83205112244a994f02dc` and R41 source `b0016eaa23cc84cfdd9b290432ecee29cc9edae7` passed Node24 Linux/Windows/macOS; the latter tests GitHub DRAFT PR transport with a mocked remote only, not a live owner account.
 - [MCP local Client SDK adapter and operator instructions](docs/MCP_LOCAL.md)
 - [Canonical Effects readback custody](docs/EFFECTS.md)
@@ -147,6 +148,21 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [Operator runbook](docs/RUNBOOK.md)
 - [Requirements traceability](docs/REQUIREMENTS.md)
 - [Acceptance ledger](docs/ACCEPTANCE.md)
+
+## Editable deck + actual PDF (R42, preview scope)
+
+R42 projects a human-editorial-approved, exact frozen Markdown artifact into
+a private **editable PowerPoint (.pptx)** and an independently rendered
+matching **PDF**. It does not summarize, invent product claims, publish or
+promote UNKNOWN evidence. The real text-only output is deterministically
+reproducible; a bounded parser rejects layouts that would clip or omit copy.
+The operator can save a SHA-bound no-effects plan and explicitly export
+both formats to a private directory with fail-closed recovery. The owned
+synthetic E2E and visual-render acceptance are in the manual Deck/PDF
+GitHub Actions lane; external branding, accessibility and customer
+product quality review remain unestablished. See
+[DECK_PDF](docs/DECK_PDF.md).
+
 
 ## Original master scope and truthful transfer acceptance
 

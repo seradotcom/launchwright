@@ -43,6 +43,17 @@ Client SDK and do not expose approvals or Publish actions. Follow
 [local MCP operator instructions](MCP_LOCAL.md). MCP interoperability in
 a local client is not host-side ChatGPT Plugin acceptance.
 
+## R42 editable deck and real PDF
+
+From a human-approved, exact frozen Markdown Candidate, execute the
+two-phase plan/export commands in [DECK_PDF.md](DECK_PDF.md). The output
+directory must already exist with 0700 owner permissions on POSIX. It
+receives a real editable PPTX, a real PDF and a private source SHA receipt.
+The operation has no external side effects; imported/UNKNOWN technical
+evidence remains UNKNOWN. Unsupported font characters or rich Markdown
+fail closed rather than displaying replacement glyphs.
+
+
 ## Optional operator-reviewed GitHub DRAFT PR (R41)
 
 R40 creates a local branch. Independently verify and push that exact branch

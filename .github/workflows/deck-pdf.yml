@@ -1,0 +1,94 @@
+name: Owned editable deck and PDF acceptance
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: owned-deck-pdf-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  deck-pdf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: No vulnerable production dependencies
+        run: npm audit --omit=dev --audit-level=high
+      - name: Native source and deck tests
+        run: |
+          set -euo pipefail
+          node scripts/verify.mjs
+          node --test --test-concurrency=1 tests/deck-pdf.test.mjs
+          node scripts/master-acceptance.mjs --check
+      - name: Generate owned synthetic PPTX and PDF from approved candidate
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/owned-deck
+          chmod 0700 evidence/owned-deck
+          node scripts/deck-owned-smoke.mjs --out-dir "$GITHUB_WORKSPACE/evidence/owned-deck" | tee evidence/owned-deck/result.json
+      - name: Independently render and inspect both real document formats
+        run: |
+          set -euo pipefail
+          if ! command -v pdftoppm >/dev/null || ! command -v pdftotext >/dev/null || ! command -v libreoffice >/dev/null; then
+            sudo apt-get update -qq
+            sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libreoffice-impress poppler-utils
+          fi
+          dir=evidence/owned-deck
+          direct=$(find "$dir" -maxdepth 1 -type f -name '*.pdf' -print -quit)
+          pptx=$(find "$dir" -maxdepth 1 -type f -name '*.pptx' -print -quit)
+          test -n "$direct" && test -n "$pptx"
+          pdftotext "$direct" "$dir/pdf-text.txt"
+          pdftoppm -f 1 -l 4 -png -r 115 "$direct" "$dir/pdf-preview"
+          mkdir -p "$dir/from-pptx"
+          libreoffice -env:UserInstallation=file://"$GITHUB_WORKSPACE"/.r42-lo-home --headless --convert-to pdf --outdir "$dir/from-pptx" "$pptx"
+          converted="$dir/from-pptx/$(basename "$direct")"
+          test -s "$converted"
+          pdftotext "$converted" "$dir/pptx-text.txt"
+          pdftoppm -f 1 -l 4 -png -r 115 "$converted" "$dir/pptx-preview"
+          python3 - <<'PY'
+          import hashlib,json,pathlib,subprocess,zipfile
+          root=pathlib.Path('evidence/owned-deck')
+          report=json.loads((root/'result.json').read_text())
+          receipt=report['output']
+          assert report['synthetic_fixture'] is True
+          assert report['real_customer_acceptance'] is False
+          assert report['platform_authority'] is False
+          assert report['visual_human_review_pending'] is True
+          assert receipt['page_count']==4
+          assert receipt['technical_state']=='UNKNOWN'
+          assert receipt['published'] is False and receipt['editable_pptx'] is True
+          assert receipt['pdf_rendered'] is True
+          for name,info in receipt['files'].items():
+            data=(root/name).read_bytes()
+            assert hashlib.sha256(data).hexdigest()==info['sha256'],name
+            assert len(data)==info['bytes']
+          direct=[root/name for name in receipt['files'] if name.endswith('.pdf')][0]
+          pptx=[root/name for name in receipt['files'] if name.endswith('.pptx')][0]
+          with zipfile.ZipFile(pptx) as z:
+            assert z.testzip() is None
+            assert len([n for n in z.namelist() if n.startswith('ppt/slides/slide') and n.endswith('.xml')])==4
+          for pdf in (direct,root/'from-pptx'/direct.name):
+            info=subprocess.check_output(['pdfinfo',str(pdf)],text=True)
+            assert 'Pages:           4' in info
+          for label in ('pdf-text.txt','pptx-text.txt'):
+            extracted=(root/label).read_text()
+            for token in ('What is actually included','Scope and claims','Source and review','UNKNOWN'):
+              assert token in extracted,(label,token)
+          assert len(list(root.glob('pdf-preview-*.png')))==4
+          assert len(list(root.glob('pptx-preview-*.png')))==4
+          print('OWNED_DECK_PDF_PPTX_INDEPENDENT_RENDER_PASS',receipt['frozen_markdown_sha256'])
+          PY
+      - name: Retain exact owned synthetic editable/PDF, renders and receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: launchwright-owned-deck-pdf-${{ github.sha }}
+          path: evidence/owned-deck/
+          if-no-files-found: error
+          retention-days: 14
