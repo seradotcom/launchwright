@@ -53,7 +53,7 @@ node scripts/video-variants.mjs export \
   --acknowledge-private-export
 ```
 
-The ZIP contains exactly landscape-16x9.mp4, portrait-9x16.mp4, captions.vtt, manifest.json and README.txt. A hashed private receipt accompanies it. The source video file path is not serialized into the plan or ZIP; the original MP4 and caption bytes are preserved and separately hashed.
+The ZIP contains exactly landscape-16x9.mp4, portrait-9x16.mp4, captions.vtt, manifest.json and README.txt. A hashed private receipt accompanies it. The operator source video file path is not serialized as a manifest field, but the original MP4 bytes are preserved and may themselves contain embedded author, location, device or path metadata. **R46 does not independently scrub or audit original MP4 metadata.** Privately review source metadata and pixel/voice content before any distribution. Both the original MP4 and captions are separately hashed.
 
 ## Security, recovery and technical custody
 

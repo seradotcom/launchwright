@@ -61,6 +61,9 @@ real('R46 real MP4 variants keep full landscape pixels within 720x1280, source A
   assert.equal(m.captions_burned_in,false);
   assert.equal(m.alternate_voice_generated,false);
   assert.equal(m.public_release_performed,false);
+  assert.equal(m.operator_source_path_serialized,false);
+  assert.equal(m.original_mp4_metadata_preserved,true);
+  assert.equal(m.original_mp4_metadata_privacy_not_verified,true);
   assert.equal(m.semwright_platform_authority,false);
   const original=await zip.file('landscape-16x9.mp4').async('nodebuffer');
   assert.equal(hash(original),f.videoSha);

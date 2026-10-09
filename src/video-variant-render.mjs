@@ -100,7 +100,9 @@ export async function makeVideoVariantZip(source,plan,sourceFile,outDir){
       cropping_performed:false,alternate_voice_generated:false,
       captions_burned_in:false,external_network_access:false,
       derived_technical_state:'UNKNOWN',human_editorial_review_pending:true,
-      source_file_paths_disclosed:false,
+      operator_source_path_serialized:false,
+      original_mp4_metadata_preserved:true,
+      original_mp4_metadata_privacy_not_verified:true,
       customer_acceptance:false,semwright_platform_authority:false,
       public_release_performed:false
     };
