@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 // SPDX-License-Identifier: AGPL-3.0-only
 // R35 two-phase operator-owned existing-Git-project bootstrap.
-import { readFileSync, writeFileSync, lstatSync, openSync, closeSync, unlinkSync } from 'node:fs';
-import { resolve, join } from 'node:path';
+import { readFileSync, writeFileSync, lstatSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { LaunchwrightApplication } from '../src/application.mjs';
-import { planGitProjectBootstrap, applyGitProjectBootstrap } from '../src/git-project-bootstrap.mjs';
+import { planGitProjectBootstrap, applyGitProjectBootstrap, withGitBootstrapLock } from '../src/git-project-bootstrap.mjs';
 
 const [command='help',...args]=process.argv.slice(2);
 const options=new Set([
@@ -82,25 +82,17 @@ async function main(){
   if(!o.state)throw Error('--state EXISTING_WORKSPACE is required');
   const observation=privateJson(o.in),plan=privateJson(o['plan-file']);
   const app=new LaunchwrightApplication(resolve(o.state));
-  const lockfile=join(app.store.root,'.git-bootstrap-apply.lock');
-  let lockFd=null;
   try{
-    // Exclusivity only guards this operator CLI; the native database still
-    // provides per-operation transactions. A crashed lock fails closed until
-    // manually inspected/removed; it never forces an unsafe automatic retry.
-    lockFd=openSync(lockfile,'wx',0o600);
-    const result=await applyGitProjectBootstrap(app,plan,observation,{
-      confirm_plan_sha256:o['confirm-plan'],confirm_head_sha:o['confirm-head'],
-      acknowledge_source_approval:o['approve-source']===true,
-      acknowledge_rights:o['declare-rights']===true,
-      acknowledge_imported:o['acknowledge-imported']===true,
-      acknowledge_editorial_draft:o['acknowledge-editorial-draft']===true
-    });
+    const result=await withGitBootstrapLock(app.store.root,()=>
+      applyGitProjectBootstrap(app,plan,observation,{
+        confirm_plan_sha256:o['confirm-plan'],confirm_head_sha:o['confirm-head'],
+        acknowledge_source_approval:o['approve-source']===true,
+        acknowledge_rights:o['declare-rights']===true,
+        acknowledge_imported:o['acknowledge-imported']===true,
+        acknowledge_editorial_draft:o['acknowledge-editorial-draft']===true
+      }));
     print(result);
-  }finally{
-    if(lockFd!==null){closeSync(lockFd);unlinkSync(lockfile);}
-    app.close();
-  }
+  }finally{app.close();}
 }
 main().catch(error=>{
   print({error:{code:error.code??'InvalidArgument',message:error.message,

@@ -33,6 +33,17 @@ an editable Markdown deliverable. Preview makes no domain changes; creation
 requires a human-review-only acknowledgement.
 See the Git release outline guide.
 
+## Optional R37 web onboarding for an existing project
+
+Start the local owner-authenticated UI, select Import Git project, and upload
+a private R32 observation JSON using the browser picker. Plan without
+mutating, save or reselect a matching private plan, then explicitly type the
+plan SHA and head commit plus four operator acknowledgements. The server
+never accepts an arbitrary Git filesystem path or runs customer code;
+the existing Native SDK dispatcher creates scoped editorial resources only.
+See [local Git onboarding UI](GIT_ONBOARDING_UI.md).
+
+
 ## First-time bootstrap from a preexisting Git project
 
 The operator can create an exact, private two-phase onboarding plan from

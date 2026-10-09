@@ -8,6 +8,7 @@ import { NativeError, dispatchApplication, applicationContext, requireCondition 
 import { OPERATION_SCOPES, READ_OPERATIONS, makeRequest, str, idText } from './contracts.mjs';
 import { LaunchwrightApplication } from './application.mjs';
 import { buildPrivateChannelBundle } from './channel-bundle.mjs';
+import { planGitProjectBootstrap, applyGitProjectBootstrap, withGitBootstrapLock } from './git-project-bootstrap.mjs';
 const CODE=dirname(dirname(fileURLToPath(import.meta.url)));
 const statusFor={InvalidArgument:400,PermissionDenied:403,PolicyDenied:403,ConsentRequired:403,NotFound:404,StaleReference:409,Conflict:409,ResourceExhausted:413,Unavailable:503,Unsupported:501};
 const equal=(a,b)=>typeof a==='string'&&typeof b==='string'&&Buffer.byteLength(a)===Buffer.byteLength(b)&&timingSafeEqual(Buffer.from(a),Buffer.from(b));
@@ -43,7 +44,7 @@ export function createAppServer(app,{token=localToken(app.store.root),port=4317,
   ensure(new Set(actors.map(actor=>actor.token)).size===actors.length,'Duplicate bearer principal token','Conflict');
   ensure(new Set(actors.map(actor=>actor.principal)).size===actors.length,'Duplicate bearer principal identity','Conflict');
   const allowedHosts=new Set([`127.0.0.1:${port}`,`localhost:${port}`]);
-  const staticFiles=new Map([['/',['web/index.html','text/html; charset=utf-8']],['/app.mjs',['web/app.mjs','text/javascript; charset=utf-8']],['/style.css',['web/style.css','text/css; charset=utf-8']],['/client.mjs',['client/index.mjs','text/javascript; charset=utf-8']],['/LICENSE',['LICENSE','text/plain; charset=utf-8']]]);
+  const staticFiles=new Map([['/',['web/index.html','text/html; charset=utf-8']],['/app.mjs',['web/app.mjs','text/javascript; charset=utf-8']],['/git-onboarding.mjs',['web/git-onboarding.mjs','text/javascript; charset=utf-8']],['/style.css',['web/style.css','text/css; charset=utf-8']],['/client.mjs',['client/index.mjs','text/javascript; charset=utf-8']],['/LICENSE',['LICENSE','text/plain; charset=utf-8']]]);
   const resolveActor=bearer=>{
     if(equal(bearer,token))return null;
     return actors.find(actor=>equal(bearer,actor.token))??undefined;
@@ -80,6 +81,35 @@ export function createAppServer(app,{token=localToken(app.store.root),port=4317,
         res.writeHead(200,{'Content-Type':bundle.mime,'Content-Disposition':`attachment; filename="${bundle.filename}"`,'Content-Length':bundle.bytes.length,'Cache-Control':'no-store','ETag':`"${bundle.sha256}"`});res.end(bundle.bytes);return;
       }
       ensure(req.method==='POST','Route not found','NotFound');const data=await body(req);
+      if(path==='/api/v1/local-git-bootstrap/plan'){
+        // R37 deliberately accepts an already observed R32 JSON snapshot, not
+        // a server-side Git path, URL, repository command, or browser file handle.
+        ensure(ownerAuthenticated,
+          'Only the authenticated local workspace owner can plan project onboarding',
+          'PermissionDenied');
+        requestApp.allow('edit');
+        object(data,['observation','config'],['observation','config']);
+        const plan=planGitProjectBootstrap(data.observation,data.config);
+        json(res,200,{plan,workspace_mutated:false,external_send_performed:false,
+          observation_persisted:false,technical_state:'UNKNOWN'});
+        return;
+      }
+      if(path==='/api/v1/local-git-bootstrap/apply'){
+        ensure(ownerAuthenticated,
+          'Only the authenticated local workspace owner can apply project onboarding',
+          'PermissionDenied');
+        requestApp.allow('edit');
+        object(data,['observation','plan','confirmations'],
+          ['observation','plan','confirmations']);
+        object(data.confirmations,[
+          'confirm_plan_sha256','confirm_head_sha','acknowledge_source_approval',
+          'acknowledge_rights','acknowledge_imported','acknowledge_editorial_draft'
+        ]);
+        const applied=await withGitBootstrapLock(app.store.root,()=>
+          applyGitProjectBootstrap(app,data.plan,data.observation,data.confirmations));
+        json(res,200,applied);
+        return;
+      }
       if(path==='/api/v1/read'){object(data,['operation','input'],['operation','input']);ensure(READ_OPERATIONS.has(data.operation),'This route accepts only read operations');json(res,200,await call(data.operation,data.input));}
       else if(path==='/api/v1/observe')json(res,200,await dispatchApplication(requestApp,'observe',null,data,applicationContext(randomUUID())));
       else if(path==='/api/v1/recover')json(res,200,await dispatchApplication(requestApp,'lookup',null,data,applicationContext(randomUUID())));

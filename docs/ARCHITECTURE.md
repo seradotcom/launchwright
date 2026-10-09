@@ -34,6 +34,21 @@ approved source/evidence revision binding. Human edits are not overwritten.
 No product-feature truth, runtime acceptance or Graph authority is inferred.
 See the Git release outline guide.
 
+## R37 — Owner-scoped web onboarding of an existing project
+
+Launchwright's loopback-only web interface offers an opt-in Import Git project
+screen before any product is created. Browser file input accepts the exact
+private R32 JSON snapshot; changed filenames and private observations are not
+stored in browser localStorage. Read-only plan and owner-only apply HTTP routes
+enforce the same source validation, exact plan/head digests, independent
+rights/approval acknowledgements and fail-closed imported UNKNOWN authority
+already accepted in R35. Consumer bearers are denied and the HTTP/CLI routes
+share one filesystem-exclusive operator lock. The real Chromium acceptance
+checks that the whole flow creates a scoped editorial workspace and keeps
+customer/Platform/Graph authority false. See
+[local Git onboarding UI](GIT_ONBOARDING_UI.md).
+
+
 ## Existing-project Git bootstrap (R35)
 
 The R35 operator CLI binds an imported R32 Git snapshot to a private, digest-

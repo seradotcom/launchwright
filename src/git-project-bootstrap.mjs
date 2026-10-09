@@ -2,12 +2,32 @@
 // R35: Explicit operator-owned onboarding of an existing Git project.
 // This is a recoverable LOCAL workflow over the canonical Native SDK dispatcher,
 // NOT Semwright Platform project adoption, runtime capture or Project Graph admission.
-import { requireCondition as ensure, validateValue } from '@semwright/native-sdk';
+import { requireCondition as ensure, validateValue, NativeError } from '@semwright/native-sdk';
+import { openSync, closeSync, unlinkSync } from 'node:fs';
+import { join } from 'node:path';
 import { digest } from './base.mjs';
 import { validateEntity } from './contracts.mjs';
 import { verifyGitObservation, importGitObservation } from './git-change-source.mjs';
 import { createGitReleaseOutline, previewGitReleaseOutline } from './git-release-outline.mjs';
 import { execute } from './application.mjs';
+
+// Shared between the operator CLI and the owner-authenticated local web UI.
+// An unknown lock is NEVER auto-reaped; only the creator removes its own lock.
+export async function withGitBootstrapLock(workspaceRoot,callback){
+  ensure(typeof callback==='function','Bootstrap lock requires an explicit callback');
+  const file=join(workspaceRoot,'.git-bootstrap-apply.lock');
+  let fd;
+  try {fd=openSync(file,'wx',0o600);}
+  catch(err) {
+    if(err?.code==='EEXIST')throw new NativeError('Conflict',
+      'Another Git bootstrap is in progress, or an abandoned lock needs manual review');
+    throw new NativeError('Unavailable','Could not acquire private Git bootstrap lock');
+  }
+  try{return await callback();}
+  finally{
+    try{closeSync(fd);}finally{unlinkSync(file);}
+  }
+}
 
 export const GIT_BOOTSTRAP_SCHEMA='launchwright-git-project-bootstrap/1';
 const TYPE_KEYS=[
