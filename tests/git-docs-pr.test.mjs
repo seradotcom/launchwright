@@ -2,6 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync,spawnSync } from 'node:child_process';
+import {createHash} from 'node:crypto';
 import { mkdtempSync,mkdirSync,writeFileSync,readFileSync,existsSync,rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -76,6 +77,8 @@ test('R40 apply creates exactly one local docs branch with the exact candidate b
   const x=await fixture(t);
   const plan=prepareGitDocsBranch(x.app,x.planInput);
   const oldStatus=git(x.dir,'status','--porcelain');
+  const mainIndex=join(x.dir,'.git','index');
+  const originalIndex=createHash('sha256').update(readFileSync(mainIndex)).digest('hex');
   const result=applyGitDocsBranch(x.app,plan,x.dir,x.confirmations(plan));
   assert.equal(result.state,'LOCAL_BRANCH_READY');
   assert.equal(result.branch,plan.branch);
@@ -87,6 +90,8 @@ test('R40 apply creates exactly one local docs branch with the exact candidate b
   assert.equal(git(x.dir,'rev-parse','HEAD'),x.base);
   assert.equal(git(x.dir,'symbolic-ref','--short','HEAD'),'main');
   assert.equal(git(x.dir,'status','--porcelain'),oldStatus);
+  assert.equal(createHash('sha256').update(readFileSync(mainIndex)).digest('hex'),originalIndex,
+    'A separate GIT_INDEX_FILE must protect the operator current index');
   assert.equal(readFileSync(join(x.dir,'docs','CHANGELOG.md'),'utf8'),x.initial);
   assert.equal(git(x.dir,'rev-list','--parents','-n','1',result.commit_sha),
     result.commit_sha+' '+x.base);
@@ -215,4 +220,21 @@ test('R40 operator CLI writes one private plan and applies only with explicit ex
   assert.equal(repeated.status,0,repeated.stdout+repeated.stderr);
   assert.equal(JSON.parse(repeated.stdout).recovered,true);
   assert.equal(git(x.dir,'symbolic-ref','--short','HEAD'),'main');
+});
+
+
+test('R40 a new docs Markdown path stages exactly one new file, and does not execute Git hooks',async t=>{
+  const x=await fixture(t);
+  const hook=join(x.dir,'.git','hooks','pre-commit');
+  const marker=join(x.dir,'HOOK_WAS_RUN');
+  writeFileSync(hook,'#!/bin/sh\nprintf insecure > HOOK_WAS_RUN\n',{mode:0o755});
+  const input={...x.planInput,docs_path:'docs/new-release.md'};
+  const plan=prepareGitDocsBranch(x.app,input);
+  assert.equal(plan.previous_docs_sha256,null);
+  const applied=applyGitDocsBranch(x.app,plan,x.dir,x.confirmations(plan));
+  assert.equal(applied.local_git_write_performed,true);
+  assert.equal(git(x.dir,'diff-tree','--no-commit-id','--name-status','-r',x.base,applied.commit_sha),
+    'A\tdocs/new-release.md');
+  assert.equal(existsSync(marker),false,'Git hooks were never executed');
+  assert.equal(existsSync(join(x.dir,'docs','new-release.md')),false,'No checkout occurred');
 });

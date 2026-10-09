@@ -50,11 +50,13 @@ function repository(value){
 function git(root,args,{env={},input=null,allowMissing=false,limit=256*1024}={}){
   const result=spawnSync('git',[
     '-C',root,'-c',process.platform==='win32'?'core.hooksPath=NUL':'core.hooksPath=/dev/null',
-    '-c','core.fsmonitor=false','-c','commit.gpgsign=false',
+    '-c','core.fsmonitor=false','-c','core.splitIndex=false',
+    '-c','commit.gpgsign=false',
     '-c','diff.external=','-c','core.quotePath=false',...args
   ],{
     input,encoding:null,timeout:12000,maxBuffer:limit+65536,
-    env:{...process.env,GIT_TERMINAL_PROMPT:'0',GIT_CONFIG_NOSYSTEM:'1',
+    env:{...process.env,GIT_TERMINAL_PROMPT:'0',GIT_OPTIONAL_LOCKS:'0',
+      GIT_CONFIG_NOSYSTEM:'1',
       GIT_CONFIG_GLOBAL:process.platform==='win32'?'NUL':'/dev/null',
       GIT_EXTERNAL_DIFF:'',GIT_LFS_SKIP_SMUDGE:'1',...env}
   });
