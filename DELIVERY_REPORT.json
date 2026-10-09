@@ -32,8 +32,8 @@
   ],
   "outstanding_core": [
     "DOCS_GIT local branch/draft-PR mock accepted only; live authorized GitHub PR, merge and docs deployment remain unaccepted",
-    "DECK_PDF text-only PPTX/PDF owned-synthetic render; rich media, accessibility, customer branding and editorial visual QA remain open",
-    "INTERACTIVE_DEMO static synthetic offline Media screenshot tour; customer interactive actions, pixel privacy, accessibility and independent source admission remain unaccepted",
+    "DECK_PDF text-only PPTX/PDF owned-synthetic Node24 document rendering accepted; rich media, accessibility, customer branding and editorial visual QA remain open",
+    "INTERACTIVE_DEMO static synthetic offline Chromium navigation accepted; customer interactive actions, pixel privacy, accessibility and independent source admission remain unaccepted",
     "STORE_PACKAGE store-specific policy and asset sizes",
     "VIDEO second output/quality/accessibility acceptance",
     "WEB and CLI customer-source capture",
