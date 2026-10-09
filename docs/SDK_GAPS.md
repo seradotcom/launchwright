@@ -18,3 +18,15 @@ These are explicit integration gaps, not implied application successes.
 | Plugin/ChatGPT host | Native Application bridge is implemented. R38 adds a separate official MCP SDK local stdio adapter using only the public Launchwright Client SDK, with ten bounded tools including durable prepare/submit/recover and a separate real MCP client test. No remote OAuth/host registration is implemented. | Actual ChatGPT Plugin host installation and interaction receipt, cross-surface deep-link/tenant lifecycle and host-side product acceptance remain external. |
 
 No application-side schema should be promoted to an upstream Semwright API merely because it is useful locally.
+
+## Original master cross-profile closure
+
+The granular scope of all 18 original master profiles, including missing
+Git docs PR writeback, editable deck/PDF, captured-product interactive
+demo, per-store asset packages and the Platform Publish dependency, is
+retained in [CAPABILITY_MATRIX.md](../CAPABILITY_MATRIX.md) and
+[KNOWN_LIMITS.md](../KNOWN_LIMITS.md). The public 196-ID index references
+only 21/36 original E2E scenarios; no exact-source CI result for one
+owned fixture automatically satisfies all scenario variants or external
+account/customer acceptance. This is a whole-master BLOCKED gate, not a
+defect masked by another local dashboard percentage.
