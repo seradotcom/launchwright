@@ -331,6 +331,23 @@ review are not included. Node24 three-OS and owned real Chromium technical
 acceptance remain pending. STORE_PACKAGE is still PARTIAL.
 
 
+## R45 candidate — real static version-bound documentation site
+
+R45 adds a two-phase owner-only export of 2–12 frozen Markdown artifacts
+of one human-editorial-approved Candidate/Release/Target into a real
+HTML documentation site with a ZIP and SHA-256 receipt. Only declared
+internal links are allowed and validated; code examples are escaped inert
+text, while raw HTML, unsupported media, missing targets and remote links
+fail closed. Site pages include semantic headings, skip links, scoped nav,
+responsive CSS, strict offline CSP, and source/build identity. Exact
+candidate/source metadata is verified on replay, with private file/lock
+protection and no clobber. Real Native SDK/SQLite synthetic tests include
+a two-release continuity case; supported Node24 Linux/Windows/macOS
+checks and a genuine offline Chromium acceptance lane remain mandatory.
+No external hosting, customer authentication/privacy/rights or WCAG
+certification is claimed; DOCS_STATIC remains PARTIAL and whole master BLOCKED.
+
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;

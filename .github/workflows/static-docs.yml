@@ -1,0 +1,76 @@
+name: Owned version-bound static documentation
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: static-docs-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  static-docs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Audit dependencies and pinned Semwright source
+        run: |
+          npm audit --omit=dev --audit-level=high
+          node scripts/verify.mjs
+          node scripts/master-acceptance.mjs --check
+      - name: Owned source-linked docs and cross-release tests
+        run: node --test --test-concurrency=1 tests/static-docs.test.mjs
+      - name: Produce exact committed-fixture offline documentation bundle
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/static-docs/export
+          chmod 0700 evidence/static-docs/export
+          node scripts/static-docs-owned-smoke.mjs --out-dir "$GITHUB_WORKSPACE/evidence/static-docs/export" | tee evidence/static-docs/export/result.json
+          python3 - <<'PY'
+          import hashlib,json,pathlib,zipfile
+          base=pathlib.Path('evidence/static-docs/export')
+          report=json.loads((base/'result.json').read_text())
+          assert report['synthetic_fixture'] is True
+          assert report['real_customer_acceptance'] is False
+          assert report['platform_authority'] is False
+          assert report['source_release_build']=='build-A'
+          assert report['page_count']==4
+          receipt=report['receipt']
+          assert receipt['technical_state']=='UNKNOWN'
+          assert receipt['links_verified'] is True
+          assert receipt['published'] is False
+          archives=list(base.glob('launchwright-docs-*.zip'))
+          assert len(archives)==1
+          archive=archives[0]
+          assert hashlib.sha256(archive.read_bytes()).hexdigest()==receipt['archive_sha256']
+          with zipfile.ZipFile(archive) as z:
+            assert z.testzip() is None
+            assert sorted(z.namelist())==['api.html','index.html','manifest.json','review.html','start.html']
+            manifest=json.loads(z.read('manifest.json'))
+            assert manifest['candidate_sha256']==receipt['candidate_sha256']
+            assert manifest['links_verified'] is True
+            assert manifest['script_execution_allowed'] is False
+            assert manifest['internet_required'] is False
+            assert sum(p['code_samples'] for p in manifest['pages'])>=1
+            assert any(p['links'] for p in manifest['pages'])
+          print('R45_OWNED_STATIC_ZIP_EXACT_SHA_PASS',report['archive_sha256'])
+          PY
+      - name: Install Chromium for independent offline browser acceptance
+        run: |
+          npm install --prefix .ci-tools --no-audit --no-fund --ignore-scripts playwright@1.58.2
+          .ci-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Inspect real HTML navigation, code and accessible viewport layouts
+        run: node tests/static-docs-browser.mjs
+      - name: Retain actual ZIP, HTML navigation screenshots and non-authority receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: launchwright-owned-static-docs-${{ github.sha }}
+          path: evidence/static-docs/
+          if-no-files-found: error
+          retention-days: 14

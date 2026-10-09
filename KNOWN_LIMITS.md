@@ -12,7 +12,7 @@ A green local browser/MCP test is not proof of real customer acceptance.
 - STORE_PACKAGE: R44 creates bounded Apple iPhone Dynamic Island medium and Google Play phone-portrait technical PNG/metadata ZIPs with current policy snapshot, private preview and digest-bound candidate/evidence provenance. This is NOT independent device-origin pixel proof, content/rights/privacy approval, all device families/locales, actual store upload or an app binary. Full master profile remains PARTIAL.
 - VIDEO: the owned R24 canonical MP4 fixture exists; two-format/captions/quality/user-content acceptance remains partial.
 - PUBLISH_PRIVATE: canonical Semwright Platform Publish API, deployment, cross-tenant identity, job/metering/output ACLs are not in the reviewed SDK source. Local product-version rehearsal cannot substitute.
-- WEB/CLI/DOCS_STATIC: technical owned-fixture paths exist; customer capture, complete second-release selective/full rebuild, output integrity, rights and review gates remain incomplete.
+- WEB/CLI: source-specific owned-fixture paths exist but customer execution/capture, selective full cross-release rebuild, rights and independent review remain incomplete. DOCS_STATIC: R45 creates a real offline versioned Markdown HTML site with internal links, code examples and cross-release isolation in owned synthetic tests, but real customer content approvals, full media/multilingual styling, accessibility certification, code execution verification and external hosting remain open.
 
 ## External acceptance with implementation debt
 

@@ -1,5 +1,20 @@
 # Operator runbook
 
+## R45 documentation source, offline preview and recovery
+
+Only export R45 static documentation from a fresh editorial-approved
+Candidate containing a complete set of frozen Markdown pages of the same
+release and target. Prepare a private digest-bound source/slug plan and
+independently confirm its plan/candidate SHA before exporting into a
+0700 directory. Links and code examples are statically validated; the
+offline files are not published. If a write is interrupted, repeat the
+same plan; any modified ZIP/receipt or stale lock must be examined by
+the operator, not overwritten or cleared by guessing. A newer release
+gets a distinct private archive and cannot overwrite historical LTS
+documentation. Customer accessibility/rights checks and real hosting
+are separately required.
+
+
 ## R44 store asset package — private draft and integrity replay
 
 Choose a fresh editorial-approved Release Candidate, an exact store

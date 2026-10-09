@@ -83,3 +83,13 @@ and licensing review, complete store policy, app binary and authenticated
 App Store Connect/Google Play API upload acceptance remain outside
 this technical package. STORE_PACKAGE stays PARTIAL, while separate
 APPLE_UPLOAD/PLAY_UPLOAD profiles remain MISSING.
+
+## R45 version-bound static documentation (owned synthetic)
+
+R45 creates a genuine script-free offline site from exact frozen
+Markdown Candidate artifacts, including internal link validation,
+inert code examples, source/build identity, private export/recovery
+and two-release continuity. It does not certify execution of samples,
+support arbitrary rich Markdown/images, guarantee WCAG conformance,
+publish a production docs website or establish customer product/rights
+acceptance. DOCS_STATIC stays PARTIAL after the owned browser lane passes.

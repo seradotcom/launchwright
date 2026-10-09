@@ -34,6 +34,20 @@ approved source/evidence revision binding. Human edits are not overwritten.
 No product-feature truth, runtime acceptance or Graph authority is inferred.
 See the Git release outline guide.
 
+## R45 — Static version-bound documentation compiler
+
+The owner-selected site plan pins one human-editorial-approved Candidate and
+2–12 frozen Markdown artifacts of one release and editorial target. Its
+read-only planner parses bounded content, requires a valid internal link
+graph and an inert code example, and records all source/target/build and ZIP
+digests. The private exporter generates index.html, complete page HTML and
+manifest.json without fetching assets, JavaScript or Semwright Platform
+jobs. All links target declared local slug files, with a strict CSP and
+responsive accessible navigation. Exact-byte ZIP/receipt readback, private
+workspace lock and no-clobber recovery preserve historical releases.
+See [Static docs architecture/limitations](STATIC_DOCS.md).
+
+
 ## R44 — Store-specific listing PNG profile validation
 
 R44 consumes the exact Native SDK Release, Target, approved frozen

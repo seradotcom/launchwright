@@ -30,7 +30,10 @@
     "test:demo": "node --test --test-concurrency=1 tests/interactive-demo.test.mjs",
     "store:plan": "node scripts/store-package.mjs plan",
     "store:export": "node scripts/store-package.mjs export",
-    "test:store": "node --test --test-concurrency=1 tests/store-package.test.mjs"
+    "test:store": "node --test --test-concurrency=1 tests/store-package.test.mjs",
+    "docs:plan": "node scripts/static-docs.mjs plan",
+    "docs:export": "node scripts/static-docs.mjs export",
+    "test:docs": "node --test --test-concurrency=1 tests/static-docs.test.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",
