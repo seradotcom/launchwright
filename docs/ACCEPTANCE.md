@@ -224,6 +224,28 @@ acceptance. Host-side ChatGPT Plugin installation/interactivity,
 remote OAuth/tenant identity, Platform Publish and customer acceptance
 remain separate and unestablished.
 
+## R39 candidate — original-master gates and reproducible source transfer
+
+The master-specific acceptance work enumerates the *original* 196 public-safe
+requirement IDs in **22** modules, 36 mandatory E2E scenario slots and all
+18 product source/output profiles. Only 21 distinct scenarios currently
+appear in the public requirement index. The machine-readable
+\`ACCEPTANCE_REPORT.json\`, \`CAPABILITY_MATRIX.md\` and
+\`docs/master-profiles.json\` therefore retain **whole-master BLOCKED**;
+neither a green local suite nor a Core/App API export can relabel missing
+docs Git PR, editable Deck/PDF, interactive product demo, store packs,
+multi-format video/customer evidence or upstream Publish as accepted.
+
+The source-transfer workflow is reproducible from one exact committed SHA:
+tests + production audit + source-lock verification run on disposable Node24
+runners, the package contains the public committed tree and source-declared
+licenses, a matching SHA-256 is retained, and no external account or
+GitHub Release is created. The private master, local tokens, caches and
+untracked customer state are not copied from the operator's workstation.
+No general *content-level* secret scan is certified. Exact source ZIP and
+job/artifact IDs will be recorded only **after** successful CI; no PASS
+is assumed from the existence of the workflow definition.
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;

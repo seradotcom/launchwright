@@ -145,6 +145,44 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [Requirements traceability](docs/REQUIREMENTS.md)
 - [Acceptance ledger](docs/ACCEPTANCE.md)
 
+## Original master scope and truthful transfer acceptance
+
+The original private Semwright Release Studio / Launchwright master specifies
+**196 public-safe requirement IDs across 22 modules and 36 mandatory E2E
+scenarios**. Do not misread the application's historical wave percentages as
+this master's Definition of Done: the public requirements index currently
+references only 21 distinct E2E scenarios, not all 36. Several CORE product
+output profiles remain partial, missing or blocked by upstream Platform
+interfaces. **The whole-master gate is BLOCKED**, despite the accepted
+individual synthetic-fixture CI lanes. No real customer, ChatGPT Plugin-host,
+cross-tenant Semwright Platform Publish or app-store account acceptance has
+been claimed.
+
+Public-safe transfer and project audit artifacts:
+
+- [Master discovery and source locks](DISCOVERY_REPORT.md)
+- [Per-profile master capability matrix](CAPABILITY_MATRIX.md)
+- [Machine-readable aggregate acceptance report](ACCEPTANCE_REPORT.json)
+- [Delivery status — explicitly NOT complete](DELIVERY_REPORT.json)
+- [Contract ownership and responsibility](OWNERSHIP.md)
+- [Mapping from SRS intentions to actual Native SDK contracts](CONTRACT_MAPPING.md)
+- [Installation/operator entry](INSTALL.md)
+- [Reproducible verification](VERIFY.md) and [selected-suite launcher](scripts/acceptance-launcher.mjs)
+- [Migration and recovery](MIGRATION.md)
+- [Incident/operator runbooks](RUNBOOKS.md)
+- [Known limitations and blockers](KNOWN_LIMITS.md)
+- [Versioned public-safe master profile evidence](docs/master-profiles.json)
+
+To inspect the master gate without changing the application, run
+\`node scripts/master-acceptance.mjs --check\`. The strict
+\`--require-complete\` mode **fails** while the original obligations lack
+evidence; this is intentional, not a test failure to waive. The GitHub
+\`source-transfer.yml\` manual workflow uses Node24, runs real tests,
+validates the master gate, and produces a source ZIP, SHA-256 checksum and
+receipt from **one exact committed Git SHA**, excluding untracked state/
+private master ZIP, not a public GitHub Release. No credential content scan
+is certified by that workflow.
+
 ## License
 
 New Launchwright code is **AGPL-3.0-only**. Canonical Semwright SDK files retain **MIT OR Apache-2.0** and their original notices.
