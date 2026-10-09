@@ -58,3 +58,15 @@ The accepted scope will be only bounded plain text + synthetic owned
 fixtures. Full rich-content decks, customer branding/asset usage,
 multilingual embedded font coverage, accessibility/visual editorial review,
 independent customer acceptance and Platform Publish remain open.
+
+## R43 bounded static offline INTERACTIVE_DEMO
+
+R43 generates a genuine offline navigable HTML package from declared
+sanitized screenshot pixels referenced by existing Native Media
+Evidence. It never executes a live customer application or proves
+actual UI interactions. Native output is imported-declaration and
+technical UNKNOWN; pixel PII/rights are operator declared, not
+independently verified. The accepted subset requires Chromium E2E
+on owned synthetic fixture; full customer-product interactive behavior,
+multi-browser accessibility, source privacy admission, Platform Publish
+and real external customer acceptance remain open.

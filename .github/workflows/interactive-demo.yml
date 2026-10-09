@@ -1,0 +1,91 @@
+name: Owned offline interactive demo acceptance
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: offline-demo-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  interactive-demo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Reject vulnerable production dependencies
+        run: npm audit --omit=dev --audit-level=high
+      - name: Check immutable source and Native Media receipts
+        run: |
+          set -euo pipefail
+          node scripts/verify.mjs
+          node --test --test-concurrency=1 tests/interactive-demo.test.mjs
+          node scripts/master-acceptance.mjs --check
+      - name: Install disposable headless browser
+        run: |
+          set -euo pipefail
+          npm install --prefix .ci-tools --no-audit --no-fund --ignore-scripts playwright@1.58.2
+          .ci-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Produce source-pinned owned synthetic offline bundle
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/interactive-demo
+          chmod 0700 evidence/interactive-demo
+          node scripts/interactive-demo-owned-smoke.mjs --out-dir "$GITHUB_WORKSPACE/evidence/interactive-demo" | tee evidence/interactive-demo/result.json
+      - name: Exercise keyboard, CSP and responsive navigation in real Chromium
+        run: node tests/interactive-demo-browser.mjs
+      - name: Independently inspect ZIP manifest, image bytes and non-authority receipts
+        run: |
+          python3 - <<'PY'
+          import base64,hashlib,json,pathlib,re,struct,zipfile
+          root=pathlib.Path('evidence/interactive-demo')
+          r=json.loads((root/'result.json').read_text())
+          br=json.loads((root/'browser-report.json').read_text())
+          assert r['owner_synthetic_fixture'] is True
+          assert r['real_customer_acceptance'] is False if 'real_customer_acceptance' in r else r['canonical_customer_capture'] is False
+          assert r['technical_state']=='UNKNOWN'
+          assert r['platform_authority'] is False
+          assert r['external_publication'] is False
+          assert br['offline_chromium_navigation_passed'] is True
+          assert br['script_csp_enforced'] is True
+          assert br['keyboard_radio_navigation_passed'] is True
+          assert br['http_requests']==[] and br['failed_requests']==[] and br['page_errors']==[]
+          data=(root/r['bundle_filename']).read_bytes()
+          assert hashlib.sha256(data).hexdigest()==r['bundle_sha256']
+          with zipfile.ZipFile(root/r['bundle_filename']) as z:
+            assert z.testzip() is None
+            assert sorted(z.namelist())==['README.txt','index.html','manifest.json']
+            html=z.read('index.html')
+            manifest=json.loads(z.read('manifest.json'))
+            assert hashlib.sha256(html).hexdigest()==manifest['html_sha256']
+            assert manifest['pixel_privacy_independently_verified'] is False
+            assert manifest['script_execution_permitted'] is False
+            assert manifest['network_access_performed'] is False
+            assert manifest['technical_state']=='UNKNOWN'
+            assert len(manifest['screenshots'])==2
+            assert b'<script' not in html and b'<iframe' not in html
+            assert b'http://' not in html and b'https://' not in html
+            assert b'script-src &#39;none&#39;' in html
+            image_b64=re.findall(rb'src="data:image/png;base64,([^"]+)"',html)
+            assert len(image_b64)==2
+            for png,proof in zip(image_b64,manifest['screenshots']):
+              pixels=base64.b64decode(png,validate=True)
+              assert pixels[:8]==b'\x89PNG\r\n\x1a\n'
+              assert struct.unpack('>II',pixels[16:24])==(640,360)
+              assert hashlib.sha256(pixels).hexdigest()==proof['normalized_png_sha256']
+          assert len(list(root.glob('offline-*.png')))>=5
+          print('R43 EXACT MEDIA OFFLINE CHROMIUM ZIP PASS',r['bundle_sha256'])
+          PY
+      - name: Retain synthetic offline HTML, ZIP, mobile screenshots and receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: launchwright-owned-interactive-demo-${{ github.sha }}
+          path: evidence/interactive-demo/
+          if-no-files-found: error
+          retention-days: 14

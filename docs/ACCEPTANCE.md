@@ -294,6 +294,28 @@ a customer-branded editable-presentation approval, general rich media
 support, accessibility certification, remote Platform task or publication.
 
 
+## R43 candidate — static offline interactive Media walkthrough
+
+R43 implements a private, navigable HTML ZIP from exact per-shot
+SANITIZED_DERIVATIVE Media Evidence and operator-selected normalized PNG
+screens. The Native SDK records a separate imported-declaration
+Media output, always technical UNKNOWN. The source contract enforces
+exact release/target/scenario/shot binding, source and normalized PNG
+SHA-256, complete shot ordering, owner-declared rights, private 0600
+inputs and an exclusive 0700 output directory. A deterministic ZIP
+contains only CSP-restricted script-free HTML, a source manifest and
+a README; it cannot execute original source app scripts or contact
+remote resources. Tests deny malicious labels, stale Media pins, changed
+screenshot pixels, incomplete shots, conflicting output, dangerous
+output directories and source authorizations. Re-export verifies
+the original bytes and resumes interrupted private file writes.
+Real Chromium offline navigation, keyboard input and mobile layouts
+need exact-SHA manual CI before accepting this bounded subset.
+The original master INTERACTIVE_DEMO profile remains PARTIAL:
+interactive business logic, customer image rights/privacy, general
+accessibility and canonical Driver Host/Platform admission are missing.
+
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;

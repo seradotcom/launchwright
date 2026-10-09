@@ -21,3 +21,12 @@ to patched 2.0.4 (MIT) through a package-lock override because compatible
 fonts are read by the R42 text-only pipeline. Future image support must
 reassess this dependency API and sandbox/source rights. Never redistribute
 installed fonts, customer content or the private original master specification.
+
+The R43 offline interactive walkthrough uses pngjs 7.0.0 (MIT) for
+reading and re-encoding operator-declared sanitized PNG pixel data.
+This strips source file metadata but does NOT certify pixel privacy or
+application/host execution. The app uses existing JSZip 3.10.2 under its
+MIT option to produce a deterministic offline HTML ZIP with no scripts
+or remote resource requests. The official npm distributions retain their
+own license and copyright notices; no fonts or customer screenshots are
+bundled in the repository.
