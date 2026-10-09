@@ -16,6 +16,17 @@ export class LaunchwrightClient {
     finally{clearTimeout(timer);}
   }
   describe(){return this.request('/api/v1/describe',undefined,'GET');}
+  // Explicit local-owner Git onboarding. Unlike mutate(), partial progress is
+  // reconciled by resubmitting the SAME plan only after an operator decision.
+  // Never auto-retry an ambiguous network outcome; no browser file paths.
+  planLocalGitBootstrap(observation,config){
+    return this.request('/api/v1/local-git-bootstrap/plan',{observation,config});
+  }
+  applyLocalGitBootstrap(observation,plan,confirmations){
+    return this.request('/api/v1/local-git-bootstrap/apply',
+      {observation,plan,confirmations});
+  }
+
   get(id){return this.request('/api/v1/read',{operation:'resource.get',input:{id}});}
   read(operation,input={}){return this.request('/api/v1/read',{operation,input});}
   snapshotSummary(){return this.read('workspace.snapshot');}

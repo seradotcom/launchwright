@@ -181,6 +181,26 @@ deleting unrelated user files. Native Host/Platform/customer authority
 is unchanged. Exact CI job/artifact receipts are retained in
 `evidence/r36/ci-runs.json`.
 
+## R37 candidate — browser-based local Git project onboarding
+
+R37 exposes the bounded R32/R35 existing Git project bootstrap through a
+local owner-authenticated screen that accepts an explicit private observation
+JSON, never an arbitrary Git repository path. Two dedicated loopback HTTP
+routes validate the exact observation and operator plan, forbid consumer
+bearers, require independent full SHA confirmations and four explicit consent
+flags, and share one exclusive lock with the R35 CLI. The app creates six
+reconciled local Native SDK entities and keeps evidence technical UNKNOWN.
+The browser stores uploaded JSON and the private plan only in memory;
+filenames from Git metadata are not shown or persisted in localStorage.
+Tests cover authentication, Origin denial, input bounds, tampered files,
+partial Native transaction recovery, lock conflicts and saved-plan
+reconciliation. Actual Playwright Chromium acceptance in the manual
+Browser lane must establish the new owner UI workflow at an exact SHA;
+Linux/Windows/macOS Node24 checks and owner Browser lane are still pending.
+No Semwright Driver Host, Platform, GitHub, real customer or public
+publication acceptance is inferred.
+
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;

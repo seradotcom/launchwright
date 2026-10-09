@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 import { LaunchwrightClient } from '/client.mjs';
+import { createGitOnboardingController, MAX_GIT_OBSERVATION_UPLOAD_BYTES, MAX_GIT_PLAN_UPLOAD_BYTES } from '/git-onboarding.mjs';
 const $=s=>document.querySelector(s), root=$('#app');
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const stamp=(text,kind='neutral')=>`<span class="stamp ${kind}">${esc(text)}</span>`;
 const time=s=>new Intl.DateTimeFormat(undefined,{dateStyle:'medium',timeStyle:'short'}).format(new Date(s));
 let pendingStore={save:async p=>{localStorage.setItem('launchwright.pending.'+p.args.request.key,JSON.stringify(p));},clear:async key=>localStorage.removeItem('launchwright.pending.'+key)};
 const api=new LaunchwrightClient({baseUrl:location.origin,pendingStore});
+const gitOnboarding=createGitOnboardingController(api);
 let model={entities:[],version:null},description=null,productId=localStorage.getItem('launchwright.product'),releaseId=localStorage.getItem('launchwright.release'),view='overview',selected=null,renderEpoch=0;
-const tabs=[['overview','◫','Overview'],['targets','⊡','Targets & sources'],['scenarios','↳','Scenarios'],['claims','≡','Claims & evidence'],['locales','文','Localization'],['deliverables','▤','Deliverables'],['impact','⌁','Impact'],['work','▷','Work'],['review','◎','Review room'],['delivery','↗','Delivery'],['templates','◇','Templates'],['integrations','⌘','Integrations'],['history','◷','History']];
+const tabs=[['onboard','⌁','Import Git project'],['overview','◫','Overview'],['targets','⊡','Targets & sources'],['scenarios','↳','Scenarios'],['claims','≡','Claims & evidence'],['locales','文','Localization'],['deliverables','▤','Deliverables'],['impact','⌁','Impact'],['work','▷','Work'],['review','◎','Review room'],['delivery','↗','Delivery'],['templates','◇','Templates'],['integrations','⌘','Integrations'],['history','◷','History']];
 const kinds=k=>model.entities.filter(e=>e.kind===k);
 const get=id=>model.entities.find(e=>e.id===id);
 const inRelease=k=>kinds(k).filter(e=>e.data.release_id===releaseId);
@@ -32,7 +34,8 @@ function shell(){const p=get(productId),r=get(releaseId);return`<div class="shel
 async function render(){
   if(!description)return;const epoch=++renderEpoch;root.innerHTML=shell();let html;
   try{
-    if(!productId){html=heading('Release production','A launch starts with a source.','Build a traceable release package. Keep editorial decisions, evidence and delivery states distinct.')+panel('Create your first workspace',empty('Nothing invented. Nothing published.','Add a product and an explicit build, then define a target and the deliverables it needs.',button('Create product','new-product')))+`<div class="callout"><strong>What works here</strong>Structured release editing, versioned text exports, input change detection, editorial review and private draft delivery. Browser capture, media rendering and external delivery require their canonical runtime integration.</div>`;}
+    if(view==='onboard')html=heading('Project adoption','Import an existing Git project','Use an exact local Git metadata observation to create an editorial workspace without executing or publishing the project.')+gitOnboarding.render();
+    else if(!productId){html=heading('Release production','A launch starts with a source.','Build a traceable release package. Keep editorial decisions, evidence and delivery states distinct.')+panel('Create your first workspace',empty('Nothing invented. Nothing published.','Add a product and an explicit build, then define a target and the deliverables it needs.',button('Create product','new-product')+button('Import Git project','navigate-onboard','','secondary')))+`<div class="callout"><strong>What works here</strong>Structured release editing, versioned text exports, input change detection, editorial review and private draft delivery. Browser capture, media rendering and external delivery require their canonical runtime integration.</div>`;}
     else if(!hasRelease()&&view!=='templates'){html=heading('Product',get(productId).data.name,'Create a release with an explicit build identity.',button('Create release','new-release'))+panel('Release brief',empty('Name the release. Pin the build.','A commercial version is not a resource revision. Launchwright keeps both.',button('Create release','new-release')));}
     else{const fn={overview,targets,scenarios,claims,locales,deliverables,impact,work,review,delivery,templates,integrations,history}[view];html=await fn();}
     if(epoch===renderEpoch)$('#view-content').innerHTML=html;
@@ -147,10 +150,10 @@ const entityFields=(kind,data={})=>{
  template:[textField('name','Template name',data.name??''),selectField('format','Format',['markdown','html','json','email'],data.format??'markdown'),textField('content','Template text',data.content??'# {{title}}\n\n{{summary}}','textarea'),jsonField('parameters','Allowed parameter names',data.parameters??['title','summary'])]
  };return fields[kind];
 };
-function openForm(title,fields,onSubmit,submit='Save'){
+function openForm(title,fields,onSubmit,submit='Save',success='Saved to the application journal.'){
  const dialog=$('#editor');$('#editor-title').textContent=title;$('#save-editor').textContent=submit;$('#form-error').textContent='';
  $('#editor-fields').innerHTML=fields.map(f=>`<div class="field"><label for="f-${f.key}">${esc(f.label)}</label>${f.type==='select'?`<select id="f-${f.key}" name="${f.key}">${f.items.map(i=>`<option value="${esc(i.value)}"${String(f.value??'')===String(i.value)?' selected':''}>${esc(i.label)}</option>`).join('')}</select>`:f.type==='multiselect'?`<select id="f-${f.key}" name="${f.key}" multiple size="${Math.min(8,Math.max(3,f.items.length))}">${f.items.map(i=>`<option value="${esc(i.value)}"${(f.value??[]).includes(i.value)?' selected':''}>${esc(i.label)}</option>`).join('')}</select>`:f.type==='checkbox'?`<input id="f-${f.key}" name="${f.key}" type="checkbox"${f.value?' checked':''}>`:f.type==='textarea'||f.type==='json'?`<textarea id="f-${f.key}" name="${f.key}" rows="${f.type==='json'?5:8}">${esc(f.type==='json'?JSON.stringify(f.value,null,2):f.value)}</textarea>`:`<input id="f-${f.key}" name="${f.key}" type="${f.type==='password'?'password':'text'}" value="${esc(f.value)}" autocomplete="off">`}${f.help?`<small>${esc(f.help)}</small>`:''}</div>`).join('');
- $('#editor-form').onsubmit=async event=>{event.preventDefault();const save=$('#save-editor');save.disabled=true;$('#form-error').textContent='';try{const data={};for(const f of fields){const el=$(`#f-${f.key}`);data[f.key]=f.type==='json'?JSON.parse(el.value):f.type==='checkbox'?el.checked:f.type==='multiselect'?[...el.selectedOptions].map(option=>option.value):el.value;}await onSubmit(data);dialog.close();await render();notice('Saved to the application journal.');}catch(err){$('#form-error').textContent=err.message;}finally{save.disabled=false;}};
+ $('#editor-form').onsubmit=async event=>{event.preventDefault();const save=$('#save-editor');save.disabled=true;$('#form-error').textContent='';try{const data={};for(const f of fields){const el=$(`#f-${f.key}`);data[f.key]=f.type==='json'?JSON.parse(el.value):f.type==='checkbox'?el.checked:f.type==='multiselect'?[...el.selectedOptions].map(option=>option.value):el.value;}await onSubmit(data);dialog.close();await render();notice(success);}catch(err){$('#form-error').textContent=err.message;}finally{save.disabled=false;}};
  dialog.showModal();
 }
 $('#close-editor').onclick=$('#cancel-editor').onclick=()=>$('#editor').close();
@@ -166,11 +169,89 @@ function editEntity(kind,e){
    localStorage.setItem('launchwright.product',productId??'');localStorage.setItem('launchwright.release',releaseId??'');
  });
 }
-root.addEventListener('change',async event=>{try{if(event.target.id==='product-select'){productId=event.target.value;releaseId=null;await refresh();render();}if(event.target.id==='release-select'){releaseId=event.target.value;localStorage.setItem('launchwright.release',releaseId);selected=null;render();}}catch(err){notice(err.message);}});
+root.addEventListener('change',async event=>{try{
+ if(event.target.id==='git-observation-file'){
+  const file=event.target.files?.[0];
+  if(!file)return;
+  if(file.size>MAX_GIT_OBSERVATION_UPLOAD_BYTES)throw Error('R32 observation exceeds the 240 KiB UI limit');
+  gitOnboarding.uploadObservation(await file.text(),file.name);
+  await render();notice('Observation loaded into this browser session only. No server mutation occurred.');
+  return;
+ }
+ if(event.target.id==='git-plan-file'){
+  const file=event.target.files?.[0];
+  if(!file)return;
+  if(file.size>MAX_GIT_PLAN_UPLOAD_BYTES)throw Error('R35 saved plan exceeds 32 KiB');
+  await gitOnboarding.loadSavedPlan(await file.text());
+  await render();notice('Saved plan verified against this exact observation. No workspace mutation.');
+  return;
+ }
+if(event.target.id==='product-select'){productId=event.target.value;releaseId=null;await refresh();render();}if(event.target.id==='release-select'){releaseId=event.target.value;localStorage.setItem('launchwright.release',releaseId);selected=null;render();}}catch(err){
+ if(['git-observation-file','git-plan-file'].includes(event.target.id)){
+  gitOnboarding.clear();await render();
+ }
+ notice(err.message);
+}});
 root.addEventListener('click',async event=>{
  const el=event.target.closest('[data-action]');if(!el)return;const action=el.dataset.action,id=el.dataset.id;
  try{
   if(action.startsWith('navigate-')){location.hash=action.slice(9);return;}
+  if(action==='onboard-clear'){
+   gitOnboarding.clear();await render();
+   notice('Private onboarding inputs cleared from the current browser session.');
+   return;
+  }
+  if(action==='onboard-configure'){
+   if(!gitOnboarding.loaded())throw Error('Choose an R32 observation first');
+   const initial=gitOnboarding.defaults();
+   openForm('Plan an existing Git project',[
+    textField('product_name','Product name',initial.product_name),
+    textField('release_name','Release name',initial.release_name),
+    textField('source_name','Approved Git source label',initial.source_name),
+    textField('target_name','Editorial target name',initial.target_name),
+    textField('notes_title','Draft release notes title',initial.notes_title),
+    textField('source_purpose','Operator-approved Git metadata purpose',initial.source_purpose),
+    textField('locale','UI and editorial locale',initial.locale),
+    textField('role','Declared target role',initial.role),
+    textField('plan','Declared target plan',initial.plan),
+    textField('region','Declared region',initial.region),
+    selectField('rights','Operator-declared source rights',['','owned','licensed'],'')
+   ],async data=>gitOnboarding.prepare(data),'Prepare private plan',
+   'Private onboarding plan created. No application resources were changed.');
+   return;
+  }
+  if(action==='onboard-download-plan'){
+   const json=gitOnboarding.downloadPlan();
+   const blob=new Blob([json],{type:'application/json'});
+   const url=URL.createObjectURL(blob);
+   const link=document.createElement('a');link.href=url;
+   link.download='launchwright-private-git-bootstrap.json';
+   link.click();setTimeout(()=>URL.revokeObjectURL(url),0);
+   notice('Download the private plan and protect it like other source metadata.');
+   return;
+  }
+  if(action==='onboard-apply'){
+   if(!gitOnboarding.planned())throw Error('Prepare or load the exact plan first');
+   openForm('Confirm local Git onboarding',[
+    textField('confirm_plan_sha256','Re-enter the full 64-character plan SHA-256',''),
+    textField('confirm_head_sha','Re-enter the full 40-character Git head commit SHA',''),
+    {key:'acknowledge_source_approval',label:'I approve this local Git source and its stated purpose.',type:'checkbox',value:false},
+    {key:'acknowledge_rights',label:'I declare that I own or have licensed rights to this source.',type:'checkbox',value:false},
+    {key:'acknowledge_imported',label:'I understand the imported metadata remains technically UNKNOWN.',type:'checkbox',value:false},
+    {key:'acknowledge_editorial_draft',label:'I understand the generated notes require human review and are not feature claims.',type:'checkbox',value:false}
+   ],async data=>{
+     const result=await gitOnboarding.apply(data);
+     productId=result.product_id;releaseId=result.release_id;
+     localStorage.setItem('launchwright.product',productId);
+     localStorage.setItem('launchwright.release',releaseId);
+     await refresh();
+   },'Create or recover local workspace',
+   'Local workspace reconciled. Evidence remains UNKNOWN and notes require review.');
+   return;
+  }
+  if(action==='onboard-open-release'){
+   await refresh();location.hash='overview';return;
+  }
   if(action==='menu'){$('#sidebar').classList.toggle('mobile-open');return;}
   if(action==='theme'){setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');return;}
   if(action==='refresh'){await refresh();await render();return;}

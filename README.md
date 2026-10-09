@@ -37,6 +37,7 @@ Synthetic data is never described as a real product capture.
 - R33 (accepted exact SHA `c01be5d99f8edc907a4ebb96acc20c8db113773b`) Git observation to human-editable Markdown outline: deterministic counts, source/evidence SHA pinning, default filename redaction, explicit disclosure consent and idempotent Native SDK deliverable creation. The draft remains UNKNOWN and cannot stand in for behavior/feature verification;
 - (accepted exact source SHA `7c8862aeffeebeecef9e0a58313dc85961bbd16d`) R35 two-phase, operator-owned **existing Git project onboarding**: private SHA-bound plan followed by explicitly confirmed local Native SDK creation/reconciliation of Product, Release, Source, Target, imported UNKNOWN Evidence and editable Markdown; safe partial-failure retry, no network, no Project Graph/Platform authority;
 - (accepted exact source SHA `af133e77cf064c49618d141d572afc333878ef7d`) R36 adds read-only temporary/workspace filesystem capacity preflight to doctor, distinguishing zero-space and low-space failures from Node/SDK issues and never deleting any files.
+- R37 operator-owned Git onboarding **in the local web UI**: select an R32 observation JSON, prepare/reload a byte-pinned R35 plan, confirm source/rights/commit approvals and create the editorial workspace through the canonical Native SDK dispatcher. Never accepts arbitrary filesystem paths from the browser or promotes imported metadata to technical PASS.
 - claims, CopyBlocks, availability rules and ReleaseContract readiness denominators;
 - immutable Markdown, safe HTML, JSON, email-draft and VTT artifacts with SHA-256-addressed bytes;
 - explicit relation provenance plus an immutable, owner-admitted Semwright Project Graph projection with bounded visible-node impact, preserved UNKNOWN frontiers, exact-revision impact proposals/coalescing, conservative reuse assessment and rebuild/finalization receipts; local heuristics never promote themselves to Graph authority;
@@ -131,6 +132,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [Read-only Git change sources for existing projects](docs/GIT_CHANGE_SOURCE.md)
 - [Git metadata to editorial release-note outlines](docs/GIT_RELEASE_OUTLINE.md)
 - [Onboard an existing Git project with a recoverable plan](docs/GIT_PROJECT_BOOTSTRAP.md)
+- [Onboard an existing Git project in the local web UI](docs/GIT_ONBOARDING_UI.md)
 - [Canonical Effects readback custody](docs/EFFECTS.md)
 - [DeltaDesk real-browser laboratory](docs/DELTADESK_LAB.md)
 - [GitHub Release draft operator integration](docs/GITHUB_RELEASE_DRAFT.md)
