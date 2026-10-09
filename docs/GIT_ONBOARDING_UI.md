@@ -34,3 +34,5 @@ The Node tests cover owner-vs-consumer authentication, cross-Origin rejection, s
 The real Chromium Browser CI lane exercises the full operator workflow on a disposable owned Git fixture: login, select private R32 file, prepare digest-bound plan, type confirmations, reconcile six Native resources, verify imported UNKNOWN evidence and open the editorial release. Retained screenshots are test evidence for this owned local UI scenario only.
 
 This does not establish customer-project acceptance, Semwright Driver Host isolation, Platform execution, external publication or automatic proof of feature and rights claims. See [R35 local Git bootstrap](GIT_PROJECT_BOOTSTRAP.md).
+
+R37 application acceptance passed on exact SHA a4af17f3551dc1067001bf48ec86b88d7fd14e32 on Node24 Linux, Windows and macOS. The owned-fixture Chromium Browser lane passed on that SHA; screenshot/report artifact IDs are in evidence/r37/ci-runs.json. Live customer Git project acceptance and Platform/Host authority remain outside that result.

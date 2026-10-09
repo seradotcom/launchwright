@@ -181,25 +181,27 @@ deleting unrelated user files. Native Host/Platform/customer authority
 is unchanged. Exact CI job/artifact receipts are retained in
 `evidence/r36/ci-runs.json`.
 
-## R37 candidate — browser-based local Git project onboarding
+## R37 accepted — owner-authenticated browser onboarding of Git projects
 
-R37 exposes the bounded R32/R35 existing Git project bootstrap through a
-local owner-authenticated screen that accepts an explicit private observation
-JSON, never an arbitrary Git repository path. Two dedicated loopback HTTP
-routes validate the exact observation and operator plan, forbid consumer
-bearers, require independent full SHA confirmations and four explicit consent
-flags, and share one exclusive lock with the R35 CLI. The app creates six
-reconciled local Native SDK entities and keeps evidence technical UNKNOWN.
-The browser stores uploaded JSON and the private plan only in memory;
-filenames from Git metadata are not shown or persisted in localStorage.
-Tests cover authentication, Origin denial, input bounds, tampered files,
-partial Native transaction recovery, lock conflicts and saved-plan
-reconciliation. Actual Playwright Chromium acceptance in the manual
-Browser lane must establish the new owner UI workflow at an exact SHA;
-Linux/Windows/macOS Node24 checks and owner Browser lane are still pending.
-No Semwright Driver Host, Platform, GitHub, real customer or public
-publication acceptance is inferred.
-
+R37 passed at exact source SHA `a4af17f3551dc1067001bf48ec86b88d7fd14e32`. Node 24 Application checks
+run `37868576966` succeeded on Linux, Windows and macOS.
+The selective real Chromium Browser run `37868573105` passed
+an owner workflow from disposable real Git commits through an R32
+private JSON picker, digest-bound R35 plan, typed plan/head SHA
+confirmation and four operator approvals, into six Native SDK-backed
+local resources. The report records zero page errors and failed network
+requests, private Git filenames not rendered, and successful viewport
+overflow checks at 320, 390 and 768 px. Earlier Browser attempts
+`37868099888` and `37868437463` did fail on 768 px
+responsiveness; the latter revealed a long shared topbar breadcrumb
+overflow that was corrected before acceptance. PR #57 merged as
+`c61d0645dde4532807a0fa6c84b5ed991516c13f`, and the resulting main-push three-OS Application
+checks `37868842267` succeeded. The local HTTP API is restricted
+to an authenticated owner and shares the CLI lock; it does not grant
+customer/tenant, Semwright Driver Host, Graph, Platform or public
+publication authority. Imported evidence is technical UNKNOWN.
+Exact source, run, job, artifact IDs and scope boundaries are
+recorded in `evidence/r37/ci-runs.json`.
 
 ## Explicitly not established
 
