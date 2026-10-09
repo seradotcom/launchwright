@@ -1,0 +1,135 @@
+{
+  "schema_version": "launchwright-r43-ci-evidence/1",
+  "source_sha": "7c60976055849c70c0d6ac95960f8282f70bd6f5",
+  "merge_commit_sha": "8438ae2b8de8b3c8fdafb53e92111d6d9907c2b0",
+  "app_checks": {
+    "run_id": 37977920432,
+    "head_sha": "7c60976055849c70c0d6ac95960f8282f70bd6f5",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37977920432",
+    "jobs": {
+      "light (windows-latest)": {
+        "job_id": 113980769651,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37977920432/job/113980769651"
+      },
+      "light (macos-latest)": {
+        "job_id": 113980769919,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37977920432/job/113980769919"
+      },
+      "light (ubuntu-latest)": {
+        "job_id": 113980769924,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37977920432/job/113980769924"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Windows-3f183186f2822f010bfcd1615267bccc1af82028": {
+        "id": 11639194358,
+        "bytes": 731,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-3f183186f2822f010bfcd1615267bccc1af82028": {
+        "id": 11638939042,
+        "bytes": 694,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-3f183186f2822f010bfcd1615267bccc1af82028": {
+        "id": 11638489907,
+        "bytes": 696,
+        "expired": false
+      }
+    }
+  },
+  "main_push_checks": {
+    "run_id": 37978315864,
+    "head_sha": "8438ae2b8de8b3c8fdafb53e92111d6d9907c2b0",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37978315864",
+    "jobs": {
+      "light (ubuntu-latest)": {
+        "job_id": 113982123482,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37978315864/job/113982123482"
+      },
+      "light (macos-latest)": {
+        "job_id": 113982123886,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37978315864/job/113982123886"
+      },
+      "light (windows-latest)": {
+        "job_id": 113982124009,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37978315864/job/113982124009"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-macOS-8438ae2b8de8b3c8fdafb53e92111d6d9907c2b0": {
+        "id": 11640275113,
+        "bytes": 694,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-8438ae2b8de8b3c8fdafb53e92111d6d9907c2b0": {
+        "id": 11639905413,
+        "bytes": 694,
+        "expired": false
+      },
+      "launchwright-clean-room-Windows-8438ae2b8de8b3c8fdafb53e92111d6d9907c2b0": {
+        "id": 11639865832,
+        "bytes": 732,
+        "expired": false
+      }
+    }
+  },
+  "owned_chromium_offline_lane": {
+    "run_id": 37978319215,
+    "head_sha": "8438ae2b8de8b3c8fdafb53e92111d6d9907c2b0",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37978319215",
+    "jobs": {
+      "interactive-demo": {
+        "job_id": 113982141273,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37978319215/job/113982141273"
+      }
+    },
+    "artifacts": {
+      "launchwright-owned-interactive-demo-8438ae2b8de8b3c8fdafb53e92111d6d9907c2b0": {
+        "id": 11639548747,
+        "bytes": 515170,
+        "expired": false
+      }
+    }
+  },
+  "browser_assertions": {
+    "static_owner_synthetic_sanitized_derivative_package": true,
+    "script_free_csp_enforced": true,
+    "browser_csp_injected_script_denials": 1,
+    "no_http_requests": true,
+    "page_errors": 0,
+    "failed_requests": 0,
+    "keyboard_radio_navigation": true,
+    "fully_offline_navigation": true,
+    "viewport_widths": [
+      320,
+      390,
+      768,
+      1440
+    ],
+    "normalized_png_source_hashes_checked": true,
+    "owned_fixture_bundle_sha256": "3f7605aa17f90b475da17a62f43df3dab1e74580b24f07fd26cf19fb150e1964",
+    "pixel_privacy_independently_verified": false,
+    "live_customer_app_actions_executed": false,
+    "canonical_host_execution_admitted": false,
+    "platform_publish_authority": false
+  },
+  "authority": {
+    "master_profile": "INTERACTIVE_DEMO",
+    "implementation": "PARTIAL",
+    "browser_navigation_synthetic_pass": true,
+    "real_customer_capture": false,
+    "source_pixel_rights_independently_verified": false,
+    "external_publication": false
+  }
+}

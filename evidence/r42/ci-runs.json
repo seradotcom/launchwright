@@ -1,0 +1,127 @@
+{
+  "schema_version": "launchwright-r42-ci-evidence/1",
+  "source_sha": "9f9bdfbdd6bb219cef3c0e105b1960e476807c6a",
+  "merge_commit_sha": "57bcfc6f62b36a420fd223de689b0dddea82abbd",
+  "app_checks": {
+    "run_id": 37905414198,
+    "head_sha": "9f9bdfbdd6bb219cef3c0e105b1960e476807c6a",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37905414198",
+    "jobs": {
+      "light (windows-latest)": {
+        "job_id": 113737572684,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37905414198/job/113737572684"
+      },
+      "light (macos-latest)": {
+        "job_id": 113737573023,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37905414198/job/113737573023"
+      },
+      "light (ubuntu-latest)": {
+        "job_id": 113737573174,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37905414198/job/113737573174"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Windows-3af33a77de71caddd54df6ba88632b6d31f70802": {
+        "id": 11604751376,
+        "bytes": 733,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-3af33a77de71caddd54df6ba88632b6d31f70802": {
+        "id": 11604606185,
+        "bytes": 695,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-3af33a77de71caddd54df6ba88632b6d31f70802": {
+        "id": 11604471582,
+        "bytes": 694,
+        "expired": false
+      }
+    }
+  },
+  "main_push_checks": {
+    "run_id": 37906144764,
+    "head_sha": "57bcfc6f62b36a420fd223de689b0dddea82abbd",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37906144764",
+    "jobs": {
+      "light (windows-latest)": {
+        "job_id": 113739960415,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37906144764/job/113739960415"
+      },
+      "light (ubuntu-latest)": {
+        "job_id": 113739960953,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37906144764/job/113739960953"
+      },
+      "light (macos-latest)": {
+        "job_id": 113739961106,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37906144764/job/113739961106"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Windows-57bcfc6f62b36a420fd223de689b0dddea82abbd": {
+        "id": 11604856635,
+        "bytes": 731,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-57bcfc6f62b36a420fd223de689b0dddea82abbd": {
+        "id": 11604532673,
+        "bytes": 696,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-57bcfc6f62b36a420fd223de689b0dddea82abbd": {
+        "id": 11603584997,
+        "bytes": 693,
+        "expired": false
+      }
+    }
+  },
+  "owned_document_visual_lane": {
+    "run_id": 37906146250,
+    "head_sha": "57bcfc6f62b36a420fd223de689b0dddea82abbd",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37906146250",
+    "jobs": {
+      "deck-pdf": {
+        "job_id": 113739971154,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37906146250/job/113739971154"
+      }
+    },
+    "artifacts": {
+      "launchwright-owned-deck-pdf-57bcfc6f62b36a420fd223de689b0dddea82abbd": {
+        "id": 11604692067,
+        "bytes": 444614,
+        "expired": false
+      }
+    }
+  },
+  "document_assertions": {
+    "synthetic_owned_native_candidate_source": true,
+    "editable_pptx_generated": true,
+    "real_pdf_generated": true,
+    "pptx_independent_libreoffice_open_and_render": true,
+    "pdf_poppler_independent_render_and_text_check": true,
+    "page_count": 4,
+    "source_lines_editable": true,
+    "reproducible_binary_output_tested": true,
+    "source_markdown_sha256": "87c03fc8349d9f6602efd75f4edd23d432bad199b3064797d809e0c8a3c1fdbc",
+    "human_editorial_visual_quality_acceptance": false,
+    "customer_product_acceptance": false,
+    "platform_publish_authority": false,
+    "technical_truth_verified": false
+  },
+  "authority": {
+    "master_profile": "DECK_PDF",
+    "implementation": "PARTIAL",
+    "real_customer_brand_fonts_accessibility": false,
+    "rich_media_input_accepted": false,
+    "external_publication": false
+  }
+}

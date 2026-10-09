@@ -90,19 +90,19 @@
       "profile": "DECK_PDF",
       "scope": "CORE",
       "implementation": "PARTIAL",
-      "evidence": "LOCAL_APPLICATION_CI",
-      "source_sha": null,
-      "run_id": null,
-      "remaining": "R42 plain-text frozen Markdown -> native editable PPTX/real PDF requires supported Node24 and visual synthetic lane; rich media, accessible multilingual fonts, customer branding, independent editorial visual QA and real source/product acceptance remain."
+      "evidence": "OWNED_FIXTURE_DOCUMENT_RENDER",
+      "source_sha": "9f9bdfbdd6bb219cef3c0e105b1960e476807c6a",
+      "run_id": 37906146250,
+      "remaining": "R42 reviewed text-only PPTX and real PDF passed separate Poppler and LibreOffice owned synthetic runs. Rich media, multilingual embedded fonts, customer branding/permissions, accessibility and independent editorial design acceptance remain missing."
     },
     {
       "profile": "INTERACTIVE_DEMO",
       "scope": "CORE",
       "implementation": "PARTIAL",
-      "evidence": "LOCAL_APPLICATION_CI",
-      "source_sha": null,
-      "run_id": null,
-      "remaining": "R43 generated static script-free offline sanitized Media screenshot navigation pending exact Node24/Chromium acceptance; real customer interactive behavior, PII review, accessibility/multi-browser QA, source permissions and Platform Publish remain unaccepted."
+      "evidence": "OWNED_FIXTURE_OFFLINE_BROWSER",
+      "source_sha": "7c60976055849c70c0d6ac95960f8282f70bd6f5",
+      "run_id": 37978319215,
+      "remaining": "R43 real Chromium offline radio/keyboard/CSP/viewport navigation passed on owned synthetic PNGs only. Running customer-product interactions, independent pixel privacy/source rights verification, multi-browser accessibility and Platform/Host acceptance remain missing."
     },
     {
       "profile": "STORE_PACKAGE",

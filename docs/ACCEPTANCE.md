@@ -277,44 +277,44 @@ Platform Publish and customer execution are not established.
 Exact run, job and evidence limits are in
 `evidence/r41/ci-runs.json`.
 
-## R42 candidate — synthetic text-only editable PPTX and real PDF
+## R42 accepted — exact synthetic editable PPTX and independent PDF
 
-A fresh editorial-approved Candidate with a pinned Markdown artifact now
-supports a private two-phase deck export: a no-effects plan, explicit
-SHA/consent confirmation, native editable PPTX and independent PDF generated
-from the same measured source slide model. The parser rejects truncation,
-unsupported Markdown/glyphs, stale candidates and unapproved editorial state.
-Both outputs are validated by ZIP/XML and PDF structure, with stable
-metadata for exact-byte replay; altered local files and unsafe directories
-fail closed. Owned synthetic Node22 tests and independent Poppler/Impress
-visual samples exist, but supported Node24 Linux/Windows/macOS application
-checks and a fresh exact-SHA manual deck PDF visual lane are still required.
-This narrows original DECK_PDF from missing toward partial; it is not
-a customer-branded editable-presentation approval, general rich media
-support, accessibility certification, remote Platform task or publication.
+R42 source SHA `9f9bdfbdd6bb219cef3c0e105b1960e476807c6a` passed Node24 Linux/Windows/macOS
+application run `37905414198`. PR #64 merged as
+`57bcfc6f62b36a420fd223de689b0dddea82abbd`;
+main-push checks `37906144764` passed all three OSes.
+The exact-merge-sha manual owned document lane `37906146250`
+also passed: a Native SDK synthetic frozen Markdown Candidate with
+human editorial approval produced an editable native PPTX and real
+PDF, independently reopened/rendered with Poppler and LibreOffice.
+Source text, line content, page count, binary reproducibility,
+checksum, missing edits and private-output replay were verified.
+The retained artifact `11604692067` includes PPTX, both PDFs,
+renderings and receipts; SHA/run/job boundaries are in
+`evidence/r42/ci-runs.json`. Technical state remains UNKNOWN
+and no customer branding, rich-media, general accessibility or
+independent editorial design-quality acceptance was established.
+Original master DECK_PDF remains PARTIAL.
 
+## R43 accepted — offline HTML walkthrough from sanitized Media Evidence
 
-## R43 candidate — static offline interactive Media walkthrough
-
-R43 implements a private, navigable HTML ZIP from exact per-shot
-SANITIZED_DERIVATIVE Media Evidence and operator-selected normalized PNG
-screens. The Native SDK records a separate imported-declaration
-Media output, always technical UNKNOWN. The source contract enforces
-exact release/target/scenario/shot binding, source and normalized PNG
-SHA-256, complete shot ordering, owner-declared rights, private 0600
-inputs and an exclusive 0700 output directory. A deterministic ZIP
-contains only CSP-restricted script-free HTML, a source manifest and
-a README; it cannot execute original source app scripts or contact
-remote resources. Tests deny malicious labels, stale Media pins, changed
-screenshot pixels, incomplete shots, conflicting output, dangerous
-output directories and source authorizations. Re-export verifies
-the original bytes and resumes interrupted private file writes.
-Real Chromium offline navigation, keyboard input and mobile layouts
-need exact-SHA manual CI before accepting this bounded subset.
-The original master INTERACTIVE_DEMO profile remains PARTIAL:
-interactive business logic, customer image rights/privacy, general
-accessibility and canonical Driver Host/Platform admission are missing.
-
+R43 source SHA `7c60976055849c70c0d6ac95960f8282f70bd6f5` passed Node24 Linux/Windows/macOS
+application run `37977920432`. PR #65 merged as
+`8438ae2b8de8b3c8fdafb53e92111d6d9907c2b0`;
+main-push run `37978315864` also passed all three OSes.
+The exact-merge-sha real Playwright Chromium manual lane
+`37978319215` passed: the owned synthetic offline HTML
+navigated two Media-linked screenshots by mouse, keyboard and
+network-offline mode, blocked an injected script through CSP,
+used no HTTP requests, logged zero page errors and checked
+320/390/768/1440px viewports. The retained artifact
+`11639548747` includes ZIP/HTML/manifest, original source
+digests, CSS-only browser screenshots and the browser report.
+Exact run/job/bytes are in `evidence/r43/ci-runs.json`.
+This does not certify customer product actions, independent
+PII/rights review or canonical Driver Host/Platform execution.
+The Native Media output remains imported and technically UNKNOWN.
+Original master INTERACTIVE_DEMO remains PARTIAL.
 
 ## Explicitly not established
 

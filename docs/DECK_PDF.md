@@ -70,3 +70,5 @@ The visual inspection compares actual slides, not an assistant-drawn mockup. **A
 ## Supply-chain boundary
 
 R42 pins pptxgenjs 4.0.0, pdf-lib 1.17.1 and JSZip 3.10.2. The text-only PPTX renderer does not use image parsing; a forced override pins image-size to patched 2.0.4 because the compatible 1.x dependency carried a high-severity infinite-loop advisory. The override will require revalidation before adding source-image support. CI runs npm audit and never downloads private fonts or executes a customer project script.
+
+**Bounded CI acceptance:** Exact owned synthetic Node24/independent renderer or Chromium results and source SHAs are recorded in [evidence/r42/ci-runs.json](../evidence/r42/ci-runs.json). This is not customer, privacy, publisher-account or Platform authority.

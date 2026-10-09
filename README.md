@@ -138,6 +138,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [R41: operator-controlled GitHub DRAFT PR from exact approved Git docs branch](docs/GIT_DOCS_DRAFT_PR.md)
 - [R42: frozen Markdown to editable PPTX and matching PDF](docs/DECK_PDF.md)
 - [R43: source-pinned offline interactive demo from sanitized Media Evidence](docs/INTERACTIVE_DEMO.md)
+- R42/R43 owned synthetic Node24 Linux/Windows/macOS application CI and independent document/Chromium E2E accepted at exact source SHAs; see [R42 evidence](evidence/r42/ci-runs.json) and [R43 evidence](evidence/r43/ci-runs.json). Customer-side quality/privacy/product execution and Platform Publish remain unaccepted.
 - R40 source `b69d17aafbb4badfd84d83205112244a994f02dc` and R41 source `b0016eaa23cc84cfdd9b290432ecee29cc9edae7` passed Node24 Linux/Windows/macOS; the latter tests GitHub DRAFT PR transport with a mocked remote only, not a live owner account.
 - [MCP local Client SDK adapter and operator instructions](docs/MCP_LOCAL.md)
 - [Canonical Effects readback custody](docs/EFFECTS.md)

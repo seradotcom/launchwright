@@ -35,6 +35,10 @@ test('R39 no source-only profile or unverified private Publish can become accept
   const publish=copy.profiles.find(p=>p.profile==='PUBLISH_PRIVATE');
   assert.equal(publish.implementation,'BLOCKED_UPSTREAM');
   assert.equal(copy.profiles.find(p=>p.profile==='DECK_PDF').implementation,'PARTIAL');
+  assert.equal(copy.profiles.find(p=>p.profile==='DECK_PDF').source_sha,'9f9bdfbdd6bb219cef3c0e105b1960e476807c6a');
+  assert.equal(copy.profiles.find(p=>p.profile==='INTERACTIVE_DEMO').source_sha,'7c60976055849c70c0d6ac95960f8282f70bd6f5');
+  assert.equal(copy.profiles.find(p=>p.profile==='INTERACTIVE_DEMO').implementation,'PARTIAL');
+  assert.equal(copy.profiles.find(p=>p.profile==='INTERACTIVE_DEMO').evidence,'OWNED_FIXTURE_OFFLINE_BROWSER');
   assert.equal(copy.profiles.find(p=>p.profile==='DOCS_GIT').implementation,'PARTIAL');
   publish.implementation='COMPLETE';
   assert.throws(()=>evaluateMaster(index,copy,lock),
