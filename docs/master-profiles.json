@@ -98,11 +98,11 @@
     {
       "profile": "INTERACTIVE_DEMO",
       "scope": "CORE",
-      "implementation": "MISSING",
-      "evidence": "NOT_TESTED",
+      "implementation": "PARTIAL",
+      "evidence": "LOCAL_APPLICATION_CI",
       "source_sha": null,
       "run_id": null,
-      "remaining": "Sanitized navigable product demo tied to real captured states, not merely Launchwright admin UI"
+      "remaining": "R43 generated static script-free offline sanitized Media screenshot navigation pending exact Node24/Chromium acceptance; real customer interactive behavior, PII review, accessibility/multi-browser QA, source permissions and Platform Publish remain unaccepted."
     },
     {
       "profile": "STORE_PACKAGE",

@@ -1,5 +1,21 @@
 # Operator runbook
 
+## R43 offline demo screenshot/privacy recovery
+
+Offline demos are static HTML tours of exact Media-backed sanitized
+derivatives, not running customer apps. Start with current Media
+source versions and approved operator-owned PNGs, inspect every pixel
+for PII and rights (metadata stripping is insufficient) before
+signing the explicit source-selection JSON. Never publish an UNKNOWN
+demo as a real verified product. Re-run the identical private plan
+after an interrupted export; unchanged ZIP/manifest bytes and the
+original imported Native media receipt are reconciled. On stale
+dependency, lock contention, changed pixel hash, foreign evidence,
+public output directory or conflicting Media result stop and seek
+human reconciliation. No automatic deletion of unknown lock files
+or blind changes to the original project.
+
+
 ## R42 private deck/PDF source and recovery
 
 Use deck-pdf.mjs plan and export only on an exact human-reviewed frozen

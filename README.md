@@ -137,6 +137,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [R40: safely stage reviewed Markdown into an owned Git docs branch](docs/GIT_DOCS_BRANCH.md)
 - [R41: operator-controlled GitHub DRAFT PR from exact approved Git docs branch](docs/GIT_DOCS_DRAFT_PR.md)
 - [R42: frozen Markdown to editable PPTX and matching PDF](docs/DECK_PDF.md)
+- [R43: source-pinned offline interactive demo from sanitized Media Evidence](docs/INTERACTIVE_DEMO.md)
 - R40 source `b69d17aafbb4badfd84d83205112244a994f02dc` and R41 source `b0016eaa23cc84cfdd9b290432ecee29cc9edae7` passed Node24 Linux/Windows/macOS; the latter tests GitHub DRAFT PR transport with a mocked remote only, not a live owner account.
 - [MCP local Client SDK adapter and operator instructions](docs/MCP_LOCAL.md)
 - [Canonical Effects readback custody](docs/EFFECTS.md)
@@ -162,6 +163,20 @@ synthetic E2E and visual-render acceptance are in the manual Deck/PDF
 GitHub Actions lane; external branding, accessibility and customer
 product quality review remain unestablished. See
 [DECK_PDF](docs/DECK_PDF.md).
+
+
+## R43 — Offline interactive screen-state walkthroughs
+
+R43 can package 2–8 operator-selected **sanitized-derivative Media shots**
+into a private, self-contained HTML ZIP. The user selects exact Evidence
+IDs and approved PNG SHA-256 hashes; Launchwright generates a script-free,
+mouse/touch/keyboard-navigable screen-state tour with strict CSP, real
+pixel readback, source manifest and a Native imported/UNKNOWN media receipt.
+The original project's scripts and remote services never execute.
+This is a static offline screenshot journey **not** a customer product
+simulator or proof of independent pixel privacy. A synthetic Browser CI
+lane covers navigation and mobile layouts; see
+[the R43 operator guide](docs/INTERACTIVE_DEMO.md).
 
 
 ## Original master scope and truthful transfer acceptance

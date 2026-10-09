@@ -43,6 +43,18 @@ Client SDK and do not expose approvals or Publish actions. Follow
 [local MCP operator instructions](MCP_LOCAL.md). MCP interoperability in
 a local client is not host-side ChatGPT Plugin acceptance.
 
+## Optional R43 offline interactive demo from existing Media Evidence
+
+Use [the offline walkthrough instructions](INTERACTIVE_DEMO.md) with an
+existing, current Native Media plan and per-shot sanitized-derivative
+Evidence. The operator must already own/authorize private PNG files
+and verify screenshot pixel privacy. Two-phase plan/export produces
+a private 0700 ZIP/receipt without source app execution or network use.
+A GitHub Actions synthetic owned Browser lane verifies the user interface
+independently. This is not real customer capture or an externally
+hosted/deployed interactive application.
+
+
 ## R42 editable deck and real PDF
 
 From a human-approved, exact frozen Markdown Candidate, execute the

@@ -34,6 +34,23 @@ approved source/evidence revision binding. Human edits are not overwritten.
 No product-feature truth, runtime acceptance or Graph authority is inferred.
 See the Git release outline guide.
 
+## R43 — Script-free offline product screen tour from canonical Media records
+
+The bounded R43 operator CLI reads only a current Native Media plan with
+an interactive-demo variant and per-shot SANITIZED_DERIVATIVE Evidence
+linked to the original capture, exact release/target/scenario and rights.
+An operator separately supplies private PNG source paths, SHA-256,
+short labels/alt text and pixel privacy declarations. All PNG bytes are
+decoded/re-encoded to discard source metadata and pinned by normalized
+pixel hashes, but no pixel privacy claim is inferred.
+A two-phase SHA-bound plan/export creates one private script-free HTML ZIP
+using static data-image frames, native keyboard radio navigation, strict
+CSP, no external links and manifest/source digests. The original app is
+never executed; the Native SDK receives an imported-declaration Media
+output that remains technical UNKNOWN. CLI lock and exact-byte recovery
+avoid blind retries/overwrites. See [the offline demo guide](INTERACTIVE_DEMO.md).
+
+
 ## R42 immutable editorial candidate to two native document formats
 
 R42 reads one fresh human-reviewed Candidate and the exact frozen Markdown
