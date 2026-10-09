@@ -1,0 +1,95 @@
+{
+  "schema_version": "launchwright-r40-acceptance/1",
+  "source_sha": "b69d17aafbb4badfd84d83205112244a994f02dc",
+  "merge_commit_sha": "802e8826ff6aa32cc4bc6802a27acc704293427e",
+  "source_checks": {
+    "run_id": 37874876016,
+    "head_sha": "b69d17aafbb4badfd84d83205112244a994f02dc",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37874876016",
+    "jobs": {
+      "light (ubuntu-latest)": {
+        "job_id": 113641050859,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37874876016/job/113641050859"
+      },
+      "light (macos-latest)": {
+        "job_id": 113641051046,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37874876016/job/113641051046"
+      },
+      "light (windows-latest)": {
+        "job_id": 113641051094,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37874876016/job/113641051094"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Linux-ce24c5ac4d2b3a3ad7cf6a1c5e56b4a455d96e7d": {
+        "id": 11591863080,
+        "bytes": 693,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-ce24c5ac4d2b3a3ad7cf6a1c5e56b4a455d96e7d": {
+        "id": 11591657299,
+        "bytes": 697,
+        "expired": false
+      },
+      "launchwright-clean-room-Windows-ce24c5ac4d2b3a3ad7cf6a1c5e56b4a455d96e7d": {
+        "id": 11591544215,
+        "bytes": 732,
+        "expired": false
+      }
+    }
+  },
+  "main_push_checks": {
+    "run_id": 37875187063,
+    "head_sha": "802e8826ff6aa32cc4bc6802a27acc704293427e",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/37875187063",
+    "jobs": {
+      "light (ubuntu-latest)": {
+        "job_id": 113642038056,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37875187063/job/113642038056"
+      },
+      "light (windows-latest)": {
+        "job_id": 113642038218,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37875187063/job/113642038218"
+      },
+      "light (macos-latest)": {
+        "job_id": 113642038245,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/37875187063/job/113642038245"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Windows-802e8826ff6aa32cc4bc6802a27acc704293427e": {
+        "id": 11592445158,
+        "bytes": 732,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-802e8826ff6aa32cc4bc6802a27acc704293427e": {
+        "id": 11592425090,
+        "bytes": 694,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-802e8826ff6aa32cc4bc6802a27acc704293427e": {
+        "id": 11592083221,
+        "bytes": 695,
+        "expired": false
+      }
+    }
+  },
+  "authority": {
+    "local_git_exact_candidate_branch_tested": true,
+    "source_checkout_modified": false,
+    "hooks_executed": false,
+    "github_pull_request_created": false,
+    "remote_customer_git_accepted": false,
+    "platform_publish_accepted": false,
+    "technical_state_upgraded": false
+  },
+  "scope_note": "Real disposable Git SHA1 commit and Native SDK candidate->reviewed Markdown->one local docs branch using exact private index and CAS. No remote GitHub API interaction."
+}

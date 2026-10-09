@@ -38,7 +38,7 @@ Synthetic data is never described as a real product capture.
 - (accepted exact source SHA `7c8862aeffeebeecef9e0a58313dc85961bbd16d`) R35 two-phase, operator-owned **existing Git project onboarding**: private SHA-bound plan followed by explicitly confirmed local Native SDK creation/reconciliation of Product, Release, Source, Target, imported UNKNOWN Evidence and editable Markdown; safe partial-failure retry, no network, no Project Graph/Platform authority;
 - (accepted exact source SHA `af133e77cf064c49618d141d572afc333878ef7d`) R36 adds read-only temporary/workspace filesystem capacity preflight to doctor, distinguishing zero-space and low-space failures from Node/SDK issues and never deleting any files.
 - R37 (accepted exact SHA `a4af17f3551dc1067001bf48ec86b88d7fd14e32`) operator-owned Git onboarding **in the local web UI**: select an R32 observation JSON, prepare/reload a byte-pinned R35 plan, confirm source/rights/commit approvals and create the editorial workspace through the canonical Native SDK dispatcher. Never accepts arbitrary filesystem paths from the browser or promotes imported metadata to technical PASS.
-- R38 local MCP stdio tool adapter through the official MCP SDK and Launchwright **public** Client SDK: independently read and version-edit the same workspace, inspect impacts/candidates/events, prepare durable local intents, explicitly submit or read-only recover unknown outcomes without a second app/Platform backend. Host-side ChatGPT acceptance remains external;
+- R38 (accepted source `751f586d9c2ff4ae6facbc89d002804e9346e882`) local MCP stdio tool adapter through the official MCP SDK and Launchwright **public** Client SDK: independently read and version-edit the same workspace, inspect impacts/candidates/events, prepare durable local intents, explicitly submit or read-only recover unknown outcomes without a second app/Platform backend. Host-side ChatGPT acceptance remains external;
 - claims, CopyBlocks, availability rules and ReleaseContract readiness denominators;
 - immutable Markdown, safe HTML, JSON, email-draft and VTT artifacts with SHA-256-addressed bytes;
 - explicit relation provenance plus an immutable, owner-admitted Semwright Project Graph projection with bounded visible-node impact, preserved UNKNOWN frontiers, exact-revision impact proposals/coalescing, conservative reuse assessment and rebuild/finalization receipts; local heuristics never promote themselves to Graph authority;
@@ -136,6 +136,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [Onboard an existing Git project in the local web UI](docs/GIT_ONBOARDING_UI.md)
 - [R40: safely stage reviewed Markdown into an owned Git docs branch](docs/GIT_DOCS_BRANCH.md)
 - [R41: operator-controlled GitHub DRAFT PR from exact approved Git docs branch](docs/GIT_DOCS_DRAFT_PR.md)
+- R40 source `b69d17aafbb4badfd84d83205112244a994f02dc` and R41 source `b0016eaa23cc84cfdd9b290432ecee29cc9edae7` passed Node24 Linux/Windows/macOS; the latter tests GitHub DRAFT PR transport with a mocked remote only, not a live owner account.
 - [MCP local Client SDK adapter and operator instructions](docs/MCP_LOCAL.md)
 - [Canonical Effects readback custody](docs/EFFECTS.md)
 - [DeltaDesk real-browser laboratory](docs/DELTADESK_LAB.md)
