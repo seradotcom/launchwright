@@ -1,5 +1,24 @@
 # Operator runbook
 
+## R38 private local MCP operation and recovery
+
+Launchwright's optional stdio MCP adapter is a **separate local process**
+started by an authorized MCP client. Configure its explicit loopback --url,
+private --token-file (0600) and --pending-dir (0700), using Node24. The owner
+HTTP server must already be running. Never print or paste token contents,
+or put them in tool arguments.
+
+For changes: launchwright_prepare creates only a private intent; review the
+returned original request_sha256 and intent_key before launchwright_submit.
+A lost acknowledgement or uncertain result must be handled with
+launchwright_recover **using the same key**, never a substitute intent or
+blind retry. The private journal persists until receipt reconciliation;
+do not delete it as a shortcut. Publishing/approval tools are not exposed.
+If the client cannot authenticate, check the locally owned token file,
+loopback URL, and file modes. Never expose stdio transport as a public
+HTTP service or claim ChatGPT host acceptance from a local inspector.
+
+
 ## R36 filesystem capacity preflight
 
 Use node src/main.mjs doctor --state <DIR> before importing or rendering

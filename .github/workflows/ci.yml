@@ -25,6 +25,8 @@ jobs:
         with:
           node-version: '24.21.0'
       - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Check high-severity production dependency advisories
+        run: npm audit --omit=dev --audit-level=high
       - run: npm test
       - run: node scripts/verify.mjs
       - name: Smoke the clean CLI and portable recovery

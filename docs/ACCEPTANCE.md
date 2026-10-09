@@ -203,6 +203,27 @@ publication authority. Imported evidence is technical UNKNOWN.
 Exact source, run, job, artifact IDs and scope boundaries are
 recorded in `evidence/r37/ci-runs.json`.
 
+## R38 candidate — independent local MCP Client SDK consumer
+
+R38 implements a real official MCP stdio adapter whose runtime uses only
+the public Launchwright HTTP Client SDK, never the Native application or
+private database. The owner supplies an explicit loopback URL, private 0600
+token file and 0700 pending intent directory. Ten bounded tools list/read
+shared resources, events, candidate/impact/channel state, prepare selected
+local mutations, submit only after exact intent SHA/confirmation and recover
+a lost reply without resubmission. The separate official MCP SDK test client
+edits the same Release and Claim observed through the independent public
+HTTP Client SDK, and denies unsupported approvals/Publish, unsafe URLs,
+invalid token file permissions and unbounded pagination. The entire
+Node22 local suite passed 294/294 tests with 137 JS modules and 86 Native
+operations checked; this is supplemental only. npm audit initially rejected
+MCP SDK v1.29.0 (high-severity OAuth advisory); pinned 1.32.1 passed the
+production dependency audit with zero known vulnerabilities. Supported
+Node24 Linux/Windows/macOS tests and exact-SHA CI must pass before
+acceptance. Host-side ChatGPT Plugin installation/interactivity,
+remote OAuth/tenant identity, Platform Publish and customer acceptance
+remain separate and unestablished.
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;

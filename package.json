@@ -20,9 +20,12 @@
     "test:light": "node --test --test-concurrency=1 tests/*.test.mjs",
     "test:browser": "node tests/browser.mjs",
     "build:native-bundle": "node scripts/build-native-bundle.mjs",
-    "verify": "node scripts/verify.mjs"
+    "verify": "node scripts/verify.mjs",
+    "mcp:local": "node scripts/mcp-local.mjs"
   },
   "dependencies": {
-    "@semwright/native-sdk": "file:vendor/semwright-native-sdk-1.0.0.tgz"
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "@semwright/native-sdk": "file:vendor/semwright-native-sdk-1.0.0.tgz",
+    "zod": "3.25.76"
   }
 }
