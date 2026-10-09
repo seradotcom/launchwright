@@ -261,6 +261,22 @@ Node24 Linux, Windows and macOS before R40 is accepted. The original master
 DOCS_GIT profile remains **PARTIAL** after local acceptance because live
 GitHub PR creation/review/remote target ownership are not covered.
 
+## R41 candidate — GitHub DRAFT PR, remote consent and recover-first
+
+R41 adds an operator-owned GitHub Draft PR adapter after an exact, separately
+pushed and approved R40 local branch. Before any PR POST it verifies remote
+base and head SHAs against the local candidate/branch intent, searches all
+historical PRs and requires explicit source/repo/commit confirmation. It
+rejects altered PR title/body/draft status, head/base or owner, closed PRs,
+URL spoofing and stale Git/candidate source. If the remote create reply is
+lost, the code instructs read-only recover-only without blind resubmission;
+a verified DRAFT is never treated as publication. Tests use a real Git
+fixture/Native SDK workspace plus a bounded injected GitHub API. The real
+GitHub API/account and external reviewer/merge/deployment acceptance have
+NOT been performed in R41. Node24 Linux/Windows/macOS are still required
+before accepting the bounded implementation.
+
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;

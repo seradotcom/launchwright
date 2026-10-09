@@ -221,6 +221,14 @@ function branchReceipt(root,plan){
   if(ref===null)return null;
   return verifyDocsCommit(root,plan,ref);
 }
+// R41 read-only handoff: a remote draft PR may be considered only after the
+// exact local branch/commit has actually been created and revalidated.
+export function inspectGitDocsBranch(app,plan,repoRoot){
+  verifyGitDocsPlan(app,plan,repoRoot);
+  const existing=branchReceipt(rootCheck(repoRoot),plan);
+  ensure(!!existing,'Approved local docs branch does not exist; prepare/apply it first','NotFound');
+  return existing;
+}
 export function applyGitDocsBranch(app,plan,repoRoot,{
   confirm_plan_sha256,confirm_candidate_sha256,confirm_base_commit_sha,
   acknowledge_local_git_write

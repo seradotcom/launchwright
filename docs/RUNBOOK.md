@@ -1,5 +1,18 @@
 # Operator runbook
 
+## R41 GitHub PR draft — no implicit remote retry
+
+R41 only creates a GitHub Pull Request in Draft state after the operator
+separately pushes an exact R40 branch. Confirm that gh auth status points
+at the intended account, and verify the remote target repository, base,
+head, and exact commit SHAs before explicitly sending. A missing pushed
+branch or moved base blocks creation. After an ambiguous API response,
+use the SAME saved intent with recover-only, and never retry a fresh PR.
+A mismatched or closed prior PR requires manual source review; no existing
+remote PR content is overwritten. GitHub approval, merge, website
+publication, customer acceptance, and Platform Publish are separately gated.
+
+
 ## R40 owned Git docs branch incident and recovery
 
 R40 writes a NEW local Git branch, never a remote PR. On a lost CLI response,

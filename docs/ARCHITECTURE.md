@@ -34,6 +34,22 @@ approved source/evidence revision binding. Human edits are not overwritten.
 No product-feature truth, runtime acceptance or Graph authority is inferred.
 See the Git release outline guide.
 
+## R41 GitHub Draft PR transport after explicit manual branch push
+
+R41 operates on an R40 exact branch which the operator must have separately
+reviewed and manually pushed with their own authorization. The saved private
+GitHub DRAFT intent pins full base/head SHAs, PR title, complete body,
+candidate/artifact SHA-256 and a deterministic request digest. The bounded
+GH transport reads remote base/head and historical Pull Requests first; it
+creates a PR only with explicit operator confirmation, re-reads the exact
+draft/body/owner/refs/URL after creation, and never edits an existing remote
+PR. On lost remote send replies, read-only recover requires the original
+intent and never silently retries. No branch push, merge, external
+publication, Semwright Platform job or ChatGPT-host grant occurs here.
+Acceptance currently uses an injected remote provider, not real GitHub
+credentials or a live customer repository. See GIT_DOCS_DRAFT_PR.md.
+
+
 ## R40 Git docs branch writeback from an exact frozen candidate
 
 A distinct two-phase operator CLI takes a human-reviewed, exact frozen

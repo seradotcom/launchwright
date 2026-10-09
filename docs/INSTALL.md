@@ -43,6 +43,16 @@ Client SDK and do not expose approvals or Publish actions. Follow
 [local MCP operator instructions](MCP_LOCAL.md). MCP interoperability in
 a local client is not host-side ChatGPT Plugin acceptance.
 
+## Optional operator-reviewed GitHub DRAFT PR (R41)
+
+R40 creates a local branch. Independently verify and push that exact branch
+to an owned GitHub repository using the operator's existing Git tooling,
+then use the R41 two-phase intent in docs/GIT_DOCS_DRAFT_PR.md to request
+a GitHub Pull Request in DRAFT state. A lost response must use recover-only.
+This adapter never pushes source, merges, publishes or grants Platform rights.
+No live GitHub acceptance follows from the mocked tests.
+
+
 ## Local Git docs review branch from an approved candidate
 
 With the local Launchwright workspace, an approved editorial candidate

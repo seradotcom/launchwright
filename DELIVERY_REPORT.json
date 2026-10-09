@@ -31,7 +31,7 @@
     "R38 local stdio MCP independent client Node24 CI run 37870767220"
   ],
   "outstanding_core": [
-    "DOCS_GIT Git docs PR/writeback",
+    "DOCS_GIT local branch/draft-PR mock accepted only; live authorized GitHub PR, merge and docs deployment remain unaccepted",
     "DECK_PDF editable deck plus PDF export",
     "INTERACTIVE_DEMO sanitized navigable product capture",
     "STORE_PACKAGE store-specific policy and asset sizes",

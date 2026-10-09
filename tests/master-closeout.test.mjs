@@ -35,7 +35,7 @@ test('R39 no source-only profile or unverified private Publish can become accept
   const publish=copy.profiles.find(p=>p.profile==='PUBLISH_PRIVATE');
   assert.equal(publish.implementation,'BLOCKED_UPSTREAM');
   assert.equal(copy.profiles.find(p=>p.profile==='DECK_PDF').implementation,'MISSING');
-  assert.equal(copy.profiles.find(p=>p.profile==='DOCS_GIT').implementation,'MISSING');
+  assert.equal(copy.profiles.find(p=>p.profile==='DOCS_GIT').implementation,'PARTIAL');
   publish.implementation='COMPLETE';
   assert.throws(()=>evaluateMaster(index,copy,lock),
     /requires exact evidence/u);
