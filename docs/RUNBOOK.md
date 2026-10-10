@@ -90,6 +90,21 @@ scope. Its transformation marks changes-observed-state and preserves
 technical UNKNOWN, never observed-state eligibility.
 
 
+## R61 clickable screenshots: source and interruption recovery
+
+Retain the exact R59 private ZIP, JSON receipt and plan and the R55 source
+request/Native derivatives. R61 does not create a second canonical
+media_output. The operator must separately authorize private-only
+pixel-masked screen links, prepare the saved SHA-bound plan and confirm
+both that plan and the original R59 ZIP hash before export. Links are
+static local anchors; a clickable screenshot region is NOT proof that
+clicking a real product would produce another state. No zone can overlap
+a redacted R55 rectangle. If a response is lost, reuse the SAME private
+plan with exact source SHA, not a substitute; edited ZIP/receipt or a
+stale operator lock requires manual investigation, never auto deletion
+or overwrite. No live network, app scripts or public activation.
+
+
 ## R59 exact masked offline demo source and privacy incident
 
 A privacy claim about a Media screenshot is not made true by its label.

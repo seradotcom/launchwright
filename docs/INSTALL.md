@@ -75,6 +75,17 @@ remain private. No automatic screenshot resizing, Apple/Google network
 operation, actual mobile-device execution or Store approval is implied.
 
 
+## Optional R61 click-through offline walkthrough
+
+First generate a current R59 masked Native Media offline bundle with its
+private plan, request, source ZIP and receipt. Define 1–20 screen-to-screen
+click zones in an operator-private JSON file (source-pixel coordinates),
+then prepare/confirm/export the bounded R61 derivative via the
+[offline hotspots guide](OFFLINE_HOTSPOTS.md). It needs no browser plugin
+or network and changes no Native Media output. Pixels outside R55 operator
+rectangles remain unverified for privacy.
+
+
 ## Optional R59 masked offline walkthrough
 
 After completing the R55 pixel-masking and current R43 Media plan

@@ -585,6 +585,26 @@ PARTIAL; no customer product behavior, device-origin authority, global
 privacy or Platform acceptance is established.
 
 
+## R61 candidate — source-bound offline spatial navigation
+
+R61 adds private click-through navigation to the exact already accepted R59
+masked screenshots and imported UNKNOWN Native Media receipt. The strict
+two-phase plan binds R59/R55 original masked Native source, ZIP/manifest and
+HTML hashes, media resource revision, per-image pixel identity and
+operator-provided exact original-image rectangles and target Media shots.
+No hotspot can overlap any R55 mask, leave the screenshot, impersonate an
+unapproved shot or exceed bounded count/geometry. Export produces static
+scriptless, no-network HTML with CSS :target and hash-pinned CSP, exact
+ZIP/receipt checksums and no additional Native Media record. Bad files,
+stale/foreign sources, concurrent operations and missing consent fail
+closed. Ten owned synthetic local tests pass; supported Node24 Linux/Windows/
+macOS and a distinct Chromium suite exercising real click/Enter navigation,
+pixel alignment and responsive 320/390/768/1440 widths remain pending.
+Product action semantics, privacy outside masks, customer approval,
+canonical Driver Host acceptance and Platform Publish are NOT implied.
+INTERACTIVE_DEMO remains PARTIAL.
+
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;
