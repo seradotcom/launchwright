@@ -151,6 +151,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [R45: offline versioned documentation site from exact frozen Markdown sources](docs/STATIC_DOCS.md)
 - [R46: two exact private MP4 aspect formats plus frozen WebVTT captions](docs/VIDEO_VARIANTS.md)
 - [R62: burn exact reviewed Native WebVTT into real landscape and portrait H.264/AAC MP4s](docs/VIDEO_CAPTION_BURNIN.md)
+- [R63: source-approved es-MX/NFC Latin subtitle burn-in with pinned DejaVu glyph coverage](docs/VIDEO_CAPTION_LATIN.md)
 - [R47: operator-approved WordPress post DRAFT through exact REST readback](docs/WORDPRESS_DRAFT.md)
 - [R54: source-bound private dossier comparing two frozen releases](docs/RELEASE_CONTINUITY.md)
 - R42/R43 owned synthetic Node24 Linux/Windows/macOS application CI and independent document/Chromium E2E accepted at exact source SHAs; see [R42 evidence](evidence/r42/ci-runs.json) and [R43 evidence](evidence/r43/ci-runs.json). Customer-side quality/privacy/product execution and Platform Publish remain unaccepted.

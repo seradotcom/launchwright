@@ -5,10 +5,10 @@
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import {
-  existsSync, lstatSync, mkdtempSync, readFileSync, rmSync, writeFileSync,
+  existsSync, lstatSync, realpathSync, mkdtempSync, readFileSync, rmSync, writeFileSync,
   openSync, closeSync, unlinkSync
 } from 'node:fs';
-import { isAbsolute, join } from 'node:path';
+import { isAbsolute, join, basename } from 'node:path';
 import { tmpdir } from 'node:os';
 import JSZip from 'jszip';
 import { requireCondition as ensure, validateValue, NativeError } from '@semwright/native-sdk';
@@ -18,6 +18,58 @@ import {
 } from './video-variants.mjs';
 
 export const BURNIN_SCHEMA='launchwright-source-caption-burnin/1';
+export const BURNIN_LATIN_SCHEMA='launchwright-source-caption-burnin/2';
+const LATIN_POLICY='approved-nfc-latin/1';
+const LATIN_LOCALES=/^(?:en|es|fr|pt|de|it|nl|ca|gl)(?:-[A-Za-z0-9]{2,8})*$/u;
+// Explicit DejaVu-covered Latin-1 + common Latin Extended glyphs. Never
+// accept controls, bidi, emojis, ASS braces or arbitrary Unicode scripts.
+const LATIN_TEXT=/^[A-Za-z0-9 À-ÖØ-öø-ÿŒœŠšŸŽžĄąĆćĘęŁłŃńŚśŹźŻż.,;:!?"'¿¡()/%+‘’“”\-–—…]+$/u;
+function installedLatinFont(cues){
+  ensure(process.platform==='linux',
+    'R63 Latin caption profile currently requires a verified Linux fontconfig host',
+    'Unavailable');
+  const call=spawnSync('fc-match',['-f','%{family}\\n%{file}\\n','DejaVu Sans'],{
+    encoding:'utf8',timeout:5000,maxBuffer:4096,
+    env:{...process.env,LC_ALL:'C.UTF-8'}
+  });
+  ensure(!call.error&&call.status===0,'Unable to verify installed DejaVu font','Unavailable');
+  const [family,sourcePath]=call.stdout.trim().split(String.fromCharCode(10));
+  ensure(family?.split(',')[0]==='DejaVu Sans'&&
+    typeof sourcePath==='string'&&isAbsolute(sourcePath),
+    'The installed Latin caption font family or path does not match the approved DejaVu profile',
+    'Unavailable');
+  const path=realpathSync(sourcePath);
+  ensure(path.startsWith('/usr/share/fonts/')&&basename(path)==='DejaVuSans.ttf',
+    'R63 requires the system-shipped DejaVuSans.ttf, not an arbitrary operator font',
+    'PermissionDenied');
+  const stat=lstatSync(path);
+  ensure(stat.isFile()&&!stat.isSymbolicLink()&&stat.size>50000&&
+    stat.size<=10*1024*1024,
+    'The pinned system font is invalid or exceeds its byte budget','Unavailable');
+  const fontQuery=spawnSync('fc-query',['-f','%{charset}\\n',path],{
+    encoding:'utf8',timeout:5000,maxBuffer:16384,
+    env:{...process.env,LC_ALL:'C.UTF-8'}
+  });
+  ensure(!fontQuery.error&&fontQuery.status===0,
+    'Unable to verify actual glyph coverage in pinned host font','Unavailable');
+  const ranges=fontQuery.stdout.trim().split(/\s+/u).map(token=>{
+    const match=/^([0-9a-f]{1,6})(?:-([0-9a-f]{1,6}))?$/iu.exec(token);
+    ensure(match,'Fontconfig returned an invalid glyph coverage range','ProtocolMismatch');
+    return [parseInt(match[1],16),parseInt(match[2]??match[1],16)];
+  });
+  ensure(ranges.length>30,'Installed font returned an incomplete glyph coverage map','Unavailable');
+  for(const cue of cues){
+    for(const character of cue.text){
+      const code=character.codePointAt(0);
+      ensure(ranges.some(([first,last])=>first<=code&&code<=last),
+        'Pinned DejaVu Sans font cannot draw an approved Latin caption glyph; never display tofu/omissions',
+        'InvalidArgument');
+    }
+  }
+  return{font_family:'DejaVu Sans',font_file_sha256:sha(readFileSync(path)),
+    policy:LATIN_POLICY,glyph_coverage_checked:true};
+}
+
 const sha=value=>createHash('sha256').update(value).digest('hex');
 const hex=value=>typeof value==='string'&&/^[a-f0-9]{64}$/u.test(value);
 const FIXED_DATE=new Date('2000-01-01T00:00:00.000Z');
@@ -52,17 +104,22 @@ function run(bin,args,timeout=15000){
       'Exact owned FFmpeg caption conversion or probe failed; original source was not modified');
   return call.stdout;
 }
-export function strictBurninCues(vtt,durationMillis){
+export function strictBurninCues(vtt,durationMillis,policy='ascii'){
   const cues=validateNativeWebVtt(vtt,durationMillis);
   ensure(cues.length>=1&&cues.length<=20,
     'Caption overlay requires 1–20 source-approved cue windows','ResourceExhausted');
   for(const cue of cues){
-    // The local built-in font subset is deliberately ASCII only. Non-ASCII
-    // requires a separately licensed, tested font pipeline, never tofu glyphs.
-    ensure(typeof cue.text==='string'&&cue.text.length>=2&&cue.text.length<=85&&
-      /^[\x20-\x7e]+$/u.test(cue.text),
-      'Source WebVTT has an unsupported glyph or overly long overlay line',
-      'InvalidArgument');
+    ensure(typeof cue.text==='string'&&cue.text.length>=2&&cue.text.length<=85,
+      'A source caption must be 2–85 visible characters','InvalidArgument');
+    if(policy==='latin'){
+      ensure(cue.text.normalize('NFC')===cue.text&&LATIN_TEXT.test(cue.text),
+        'R63 Latin overlay requires NFC plain Latin text and approved readable punctuation; emojis, bidi, other scripts and markup fail closed',
+        'InvalidArgument');
+    }else{
+      ensure(policy==='ascii'&&/^[\x20-\x7e]+$/u.test(cue.text),
+        'Source WebVTT has an unsupported glyph or overly long overlay line',
+        'InvalidArgument');
+    }
     ensure(!cue.text.includes('\\')&&!/[{}]/u.test(cue.text),
       'Source caption contains potential ASS styling/control syntax',
       'InvalidArgument');
@@ -71,7 +128,7 @@ export function strictBurninCues(vtt,durationMillis){
   }
   return cues;
 }
-async function inspectR46(app,r46Plan,r46Input,dir){
+async function inspectR46(app,r46Plan,r46Input,dir,policy='ascii'){
   verifyVideoPlan(app,r46Plan,r46Input);
   const original=inspectVideoInput(app,r46Input);
   privateDirectory(dir);
@@ -118,21 +175,38 @@ async function inspectR46(app,r46Plan,r46Input,dir){
     original.candidate.data.candidate_sha256===r46Plan.captions_candidate_sha256,
     'R46 ZIP, approved Native WebVTT or original video source bytes differ',
     'Conflict');
-  const cues=strictBurninCues(vtt,Math.round(r46Plan.duration_seconds*1000));
+  const cues=strictBurninCues(vtt,Math.round(r46Plan.duration_seconds*1000),policy);
   return{original,receipt,landscape,portrait,vtt,cues,manifest,
     r46_zip_sha256:sha(zipped),r46_receipt_sha256:sha(receiptBytes)};
 }
-export async function planVideoCaptionBurnin(app,{
+async function planBurnin(app,{
   r46_plan,r46_input,r46_dir,
   acknowledge_caption_review=false,acknowledge_video_privacy_unknown=false,
-  acknowledge_private_only=false
-}={}){
+  acknowledge_private_only=false,acknowledge_latin_glyph_review=false
+}={},policy='ascii'){
   ensure(acknowledge_caption_review===true &&
     acknowledge_video_privacy_unknown===true &&
     acknowledge_private_only===true,
     'Independent operator approval of the exact captions, residual privacy and private-only output is required',
     'ConsentRequired');
-  const data=await inspectR46(app,r46_plan,r46_input,r46_dir);
+  ensure(policy==='ascii'||policy==='latin','Unrecognized subtitle character policy','InvalidArgument');
+  if(policy==='latin')ensure(acknowledge_latin_glyph_review===true,
+    'Operator must independently approve the Latin glyph/font/locale review boundary',
+    'ConsentRequired');
+  const data=await inspectR46(app,r46_plan,r46_input,r46_dir,policy);
+  let latin=null,locale=null;
+  if(policy==='latin'){
+    const media=data.original.plan;
+    const a=media.data.variants.find(v=>v.id===r46_input.landscape_variant_id);
+    const b=media.data.variants.find(v=>v.id===r46_input.vertical_variant_id);
+    const target=app.get(media.data.target_id,'target');
+    locale=a?.locale;
+    ensure(LATIN_LOCALES.test(locale??'')&&b?.locale===locale&&
+      target.data.editorial_locale===locale,
+      'R63 subtitle language must be a supported real matching Native Media/target editorial locale',
+      'Conflict');
+    latin=installedLatinFont(data.cues);
+  }
   const core={
     schema_version:BURNIN_SCHEMA,
     r46_plan_sha256:r46_plan.plan_sha256,
@@ -165,16 +239,30 @@ export async function planVideoCaptionBurnin(app,{
     platform_publish_authority:false,
     external_network_access:false
   };
-  return{...core,plan_sha256:digest('video-caption-burnin',core)};
+  if(policy==='latin'){
+    core.schema_version=BURNIN_LATIN_SCHEMA;
+    core.subtitle_style='fixed-readable-latin/1';
+    core.charset_policy=latin.policy;
+    core.caption_locale=locale;
+    core.system_font_sha256=latin.font_file_sha256;
+    core.all_caption_glyphs_present_in_font=latin.glyph_coverage_checked;
+    core.operator_latin_glyph_review_declared=true;
+  }
+  return{...core,plan_sha256:digest(policy==='latin'?'video-caption-burnin-latin':'video-caption-burnin',core)};
 }
+export const planVideoCaptionBurnin=(app,options)=>planBurnin(app,options,'ascii');
+export const planVideoCaptionBurninLatin=(app,options)=>planBurnin(app,options,'latin');
 export async function verifyVideoCaptionBurnin(app,plan,options){
   validateValue(plan);
   ensure(plan&&typeof plan==='object'&&!Array.isArray(plan),
     'Saved burn-in plan must be valid JSON','InvalidArgument');
   const {plan_sha256,...core}=plan;
-  ensure(hex(plan_sha256)&&digest('video-caption-burnin',core)===plan_sha256,
+  const isLatin=core.schema_version===BURNIN_LATIN_SCHEMA;
+  ensure([BURNIN_SCHEMA,BURNIN_LATIN_SCHEMA].includes(core.schema_version)&&
+    hex(plan_sha256)&&
+    digest(isLatin?'video-caption-burnin-latin':'video-caption-burnin',core)===plan_sha256,
     'Saved burn-in intent digest or metadata was changed','Conflict');
-  const exact=await planVideoCaptionBurnin(app,options);
+  const exact=await (isLatin?planVideoCaptionBurninLatin:planVideoCaptionBurnin)(app,options);
   ensure(JSON.stringify(exact)===JSON.stringify(plan),
     'Native source, R46 video package, toolchain or original captions drifted',
     'StaleReference');
@@ -252,7 +340,9 @@ async function createBundle(data,plan){
       {name:'captions.vtt',bytes:data.vtt}
     ];
     const manifest={
-      schema_version:'launchwright-video-caption-burnin-package/1',
+      schema_version:plan.schema_version===BURNIN_LATIN_SCHEMA?
+        'launchwright-video-caption-burnin-package/2':
+        'launchwright-video-caption-burnin-package/1',
       plan_sha256:plan.plan_sha256,
       source_r46_plan_sha256:plan.r46_plan_sha256,
       source_r46_zip_sha256:plan.r46_zip_sha256,
@@ -274,6 +364,10 @@ async function createBundle(data,plan){
       technical_state:'UNKNOWN',caption_visual_review_pending:true,
       portrait_captions_expected_in_lower_letterbox:true,
       caption_style_version:plan.subtitle_style,
+      ...(plan.schema_version===BURNIN_LATIN_SCHEMA?{
+        charset_policy:plan.charset_policy,caption_locale:plan.caption_locale,
+        system_font_sha256:plan.system_font_sha256,
+        all_caption_glyphs_present_in_font:plan.all_caption_glyphs_present_in_font}:{}),
       voice_changed:false,source_timeline_recomposed:false,
       original_source_modified:false,
       independent_privacy_review:false,customer_acceptance:false,
@@ -281,7 +375,9 @@ async function createBundle(data,plan){
     };
     entries.push({name:'manifest.json',bytes:Buffer.from(JSON.stringify(manifest,null,2)+'\n')});
     entries.push({name:'README.txt',bytes:Buffer.from(
-      'LAUNCHWRIGHT R62 PRIVATE VIDEO CAPTION BURN-IN\n'+
+      (plan.schema_version===BURNIN_LATIN_SCHEMA?
+        'LAUNCHWRIGHT R63 PRIVATE LATIN NFC CAPTION BURN-IN\n':
+        'LAUNCHWRIGHT R62 PRIVATE VIDEO CAPTION BURN-IN\n')+
       'Two FFmpeg-produced video derivatives with rendered WebVTT text and original AAC audio.\n'+
       'Human readable-caption, video privacy, rights and product-behavior review still required.\n'+
       'Imported UNKNOWN output. No Semwright Composition re-render, Platform job or publication.\n','utf8')});
@@ -322,14 +418,17 @@ export async function exportVideoCaptionBurnin(app,plan,options,outDir,{
   catch{throw new NativeError('Conflict',
     'Another caption burn-in is active or the stale lock requires manual review');}
   try{
-    const data=await inspectR46(app,options.r46_plan,options.r46_input,options.r46_dir);
+    const data=await inspectR46(app,options.r46_plan,options.r46_input,options.r46_dir,
+      plan.schema_version===BURNIN_LATIN_SCHEMA?'latin':'ascii');
     const output=await createBundle(data,plan);
     // Verify source *again* after time-consuming media conversion so
     // concurrent edits to Native source or media packages are not accepted.
     await verifyVideoCaptionBurnin(app,plan,options);
     const stem='launchwright-caption-burnin-'+plan.plan_sha256.slice(0,12);
     const receipt={
-      schema_version:'launchwright-video-caption-burnin-receipt/1',
+      schema_version:plan.schema_version===BURNIN_LATIN_SCHEMA?
+        'launchwright-video-caption-burnin-receipt/2':
+        'launchwright-video-caption-burnin-receipt/1',
       plan_sha256:plan.plan_sha256,
       source_r46_zip_sha256:plan.r46_zip_sha256,
       media_plan_digest:plan.media_plan_digest,
@@ -339,6 +438,10 @@ export async function exportVideoCaptionBurnin(app,plan,options,outDir,{
       bundle_bytes:output.bytes.length,
       output_files:output.manifest.outputs,
       source_audio_preserved:true,captions_burned_in:true,
+      ...(plan.schema_version===BURNIN_LATIN_SCHEMA?{
+        caption_locale:plan.caption_locale,charset_policy:plan.charset_policy,
+        system_font_sha256:plan.system_font_sha256,
+        all_caption_glyphs_present_in_font:plan.all_caption_glyphs_present_in_font}:{}),
       new_native_media_receipt_created:false,
       technical_state:'UNKNOWN',human_review_pending:true,
       source_app_scripts_executed:false,external_network_access:false,

@@ -52,6 +52,20 @@ real customer account or a Semwright Platform deployment.
 See WORDPRESS_DRAFT.md.
 
 
+## R63 — optional NFC Latin subtitle overlay with no new Media runtime
+
+R63 extends only the R62 formatting layer: a separate /2 SHA-bound plan
+permits approved NFC Latin text and finite punctuation, only when the two
+original Native Media video variants and their editorial target have the
+same supported locale. The actual installed system DejaVuSans.ttf bytes and
+fc-query character coverage are pinned before rendering and checked again
+on export, never downloaded or redistributed. Frozen Native WebVTT, R46
+source ZIP, timing and AAC/frames remain untouched. The legacy R62 ASCII
+v1 plan is a separately stable policy. Resulting video pixels remain
+imported UNKNOWN and human rights, accessibility and placement review
+remains outside this proof. See VIDEO_CAPTION_LATIN.md.
+
+
 ## R62 — approved subtitle burn-in as a source-linked video derivative
 
 R62 validates the exact R46 ZIP/receipt, approved frozen Native Media/WebVTT

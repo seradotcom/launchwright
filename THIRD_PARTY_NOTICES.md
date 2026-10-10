@@ -79,3 +79,9 @@ The offline output embeds only normalized R55 pixel-masked PNGs and its
 source hashes, never unmasked original screenshots or font assets.
 Original package licenses remain with their npm distributions.
 No third-party product code is executed during R59 bundling.
+
+R63 uses only the existing system-shipped DejaVuSans.ttf for bounded
+NFC Latin WebVTT burn-in through FFmpeg/libass. Its font file identity
+is SHA-256 pinned and glyph coverage is checked with fc-query, but the
+font file is NEVER copied into this repository, source ZIP or media ZIP.
+Operator-provided source audiovisual rights remain independently required.

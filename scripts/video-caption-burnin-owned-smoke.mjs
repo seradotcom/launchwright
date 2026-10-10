@@ -6,11 +6,12 @@ import { resolve, join } from 'node:path';
 import { lstatSync, readFileSync, writeFileSync } from 'node:fs';
 import { ownedVideoFixture } from '../tests/video-variants-fixture.mjs';
 import { planVideoVariants, exportVideoVariants } from '../src/video-variants.mjs';
-import { planVideoCaptionBurnin, exportVideoCaptionBurnin } from '../src/video-caption-burnin.mjs';
+import { planVideoCaptionBurnin, planVideoCaptionBurninLatin, exportVideoCaptionBurnin } from '../src/video-caption-burnin.mjs';
 
 const args=process.argv.slice(2);
-if(args.length!==2||args[0]!=='--out-dir'){
-  process.stderr.write('Usage: node scripts/video-caption-burnin-owned-smoke.mjs --out-dir PRIVATE_EXISTING_0700_DIR\n');
+const latin=args.length===3&&args[2]==='--latin-nfc';
+if((args.length!==2&&!latin)||args[0]!=='--out-dir'){
+  process.stderr.write('Usage: node scripts/video-caption-burnin-owned-smoke.mjs --out-dir PRIVATE_EXISTING_0700_DIR [--latin-nfc]\n');
   process.exit(2);
 }
 const dir=resolve(args[1]),stat=lstatSync(dir);
@@ -21,16 +22,21 @@ if(!stat.isDirectory()||stat.isSymbolicLink()||
 let fixture=null;const cleanups=[];
 const t={after(fn){cleanups.push(fn);}};
 try{
-  fixture=await ownedVideoFixture(t);
+  fixture=await ownedVideoFixture(t,latin?{
+    locale:'es-MX',
+    captionTexts:['¡Ya está disponible!','Revisión de edición: función útil.']
+  }:{});
   const r46Plan=planVideoVariants(fixture.app,fixture.input);
   const r46Receipt=await exportVideoVariants(
     fixture.app,r46Plan,fixture.input,fixture.outDir,fixture.approve(r46Plan));
   const selection={
     r46_plan:r46Plan,r46_input:fixture.input,r46_dir:fixture.outDir,
     acknowledge_caption_review:true,
-    acknowledge_video_privacy_unknown:true,acknowledge_private_only:true
+    acknowledge_video_privacy_unknown:true,acknowledge_private_only:true,
+    acknowledge_latin_glyph_review:latin
   };
-  const plan=await planVideoCaptionBurnin(fixture.app,selection);
+  const plan=await (latin?planVideoCaptionBurninLatin:
+    planVideoCaptionBurnin)(fixture.app,selection);
   const receipt=await exportVideoCaptionBurnin(fixture.app,plan,selection,dir,{
     confirm_plan_sha256:plan.plan_sha256,
     confirm_r46_zip_sha256:plan.r46_zip_sha256,
@@ -44,7 +50,8 @@ try{
     mode:0o600,flag:'wx'
   });
   const report={
-    schema_version:'launchwright-r62-owned-caption-burnin-smoke/1',
+    schema_version:latin?'launchwright-r63-owned-caption-latin-smoke/1':
+      'launchwright-r62-owned-caption-burnin-smoke/1',
     source_sha:process.env.GITHUB_SHA??null,
     synthetic_fixture:true,
     real_customer_source:false,
@@ -58,6 +65,10 @@ try{
     output_zip_filename:receipt.zip_filename,
     output_zip_sha256:receipt.bundle_sha256,
     exact_cue_count:plan.cue_count,
+    ...(latin?{charset_policy:plan.charset_policy,
+      caption_locale:plan.caption_locale,
+      system_font_sha256:plan.system_font_sha256,
+      all_caption_glyphs_present_in_font:plan.all_caption_glyphs_present_in_font}:{}),
     source_audio_unchanged:true,
     two_real_captioned_mp4s:true,
     technical_state:'UNKNOWN',caption_layout_human_review_pending:true,
