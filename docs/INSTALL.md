@@ -98,6 +98,16 @@ evidence remains UNKNOWN. Unsupported font characters or rich Markdown
 fail closed rather than displaying replacement glyphs.
 
 
+## R47 WordPress CMS DRAFT adapter
+
+Create a wordpress-post-draft Channel Profile for one approved HTTPS origin,
+pin it to the frozen Candidate, record editorial approval, and produce a
+Channel Package. The separate WordPress Application Password lives in
+a private owner-only JSON file. Use the R47 CLI to plan, explicitly send,
+or read-only recover exactly one remote WordPress DRAFT. This never
+publishes or grants upstream Platform authority; see WORDPRESS_DRAFT.md.
+
+
 ## Optional operator-reviewed GitHub DRAFT PR (R41)
 
 R40 creates a local branch. Independently verify and push that exact branch

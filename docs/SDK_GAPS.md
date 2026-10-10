@@ -93,3 +93,14 @@ and two-release continuity. It does not certify execution of samples,
 support arbitrary rich Markdown/images, guarantee WCAG conformance,
 publish a production docs website or establish customer product/rights
 acceptance. DOCS_STATIC is PARTIAL, with accepted owned Browser evidence on SHA 68c8baf1013c4a16346c17c15d47293713144b36.
+
+## R47 concrete WordPress DRAFT CMS adapter
+
+R47 implements WordPress post DRAFT preparation and authenticated REST
+readback using existing Native candidate/channel custody. Its synthetic
+HTTP tests and gated disposable WordPress/MySQL CI cover site-specific
+execution, exact content, recover-first behavior and credential isolation.
+No other CMS is implemented; independent live customer account
+authorization, external editorial approval/publication, webhooks,
+cross-tenant security and canonical Semwright Platform Publish remain
+unaccepted. CUSTOM_CMS stays PARTIAL.

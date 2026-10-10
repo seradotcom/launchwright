@@ -376,6 +376,24 @@ burn-in captions, real customer source, editorial film quality,
 license/privacy acceptance and upstream Platform Publish remain open.
 
 
+## R47 candidate — bounded WordPress Posts REST DRAFT adapter
+
+A version-pinned WordPress Channel Profile, approved frozen Candidate and
+unsent Channel Package can prepare a private SHA-bound DRAFT intent without
+network access. A separately confirmed send uses a private 0600 Application
+Password and bounded WordPress REST JSON requests. It creates only a post
+in status DRAFT, and verifies the full raw title/content, exact slug,
+post type, closed comments/pings and identity before a canonical Native
+channel.record_outcome DRAFT_CREATED. Unknown send acknowledgements
+require recover-only, which never creates posts or upgrades technical UNKNOWN.
+The actual HTTP test suite covers credentials, origin/redirect denial,
+source and profile drift, modified or published posts and idempotency.
+Supported Node24 Linux/Windows/macOS plus owned genuine disposable WordPress
+and MySQL integration CI are still required before R47 acceptance.
+No live customer CMS account, rights certification or Platform Publish
+acceptance follows from mocked or synthetic-runner tests.
+
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;

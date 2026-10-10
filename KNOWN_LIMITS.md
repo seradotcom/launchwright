@@ -18,8 +18,10 @@ A green local browser/MCP test is not proof of real customer acceptance.
 
 Real Android/iOS capture and App Store/Play upload adapters are not accepted.
 A local MCP client is not host acceptance in ChatGPT Plugin or equivalent
-remote accounts. Third-party CMS destination remains a bounded descriptor
-rather than a generally accepted runnable CMS integration.
+remote accounts. R47 implements a concrete WordPress Posts REST DRAFT adapter with
+synthetic HTTP integration and a separately gated genuine disposable
+WordPress test. Other CMS platforms, customer website authorization,
+public activation and Semwright Platform Publish remain unaccepted.
 
 ## Safety and business
 

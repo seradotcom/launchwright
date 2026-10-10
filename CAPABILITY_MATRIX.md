@@ -25,7 +25,7 @@ not included or published. No profile is auto-promoted by a source file.
 | PLAY_UPLOAD | EXTERNAL_ACCEPTANCE | MISSING | not tested | Bounded Google Play draft asset adapter; external account/permission acceptance separately required |
 | PLUGIN_HOST | EXTERNAL_ACCEPTANCE | PARTIAL | Exact source 751f586d9c2f; CI run 37870767220 | Installed and authorized ChatGPT Plugin host, same-job Studio deep link and actual host interaction acceptance |
 | PUBLISH_PRIVATE | CORE | BLOCKED_UPSTREAM | local consumer rehearsal | Canonical Semwright Platform Publish API, ProductVersion deployment, authenticated tenant isolation, metered job and output ACL; current pinned SDK lacks that API |
-| CUSTOM_CMS | PROFILE | PARTIAL | extension contract only | Versioned runnable CMS destination adapter against operator-owned test endpoint and readback |
+| CUSTOM_CMS | PROFILE | PARTIAL | local contract ci | R47 WordPress DRAFT REST adapter pending accepted Node24 genuine disposable WordPress CI; other CMS providers, real customer accounts/consent, external review/publication and Semwright Platform Publish remain unaccepted. |
 | PUBLIC_SOCIAL_POST | FUTURE_OPTION | OUT_OF_SCOPE | not required | Direct social auto-publication was explicitly not a core requirement |
 
 PARTIAL is not COMPLETE. An OWNED_FIXTURE CI acceptance is not a real

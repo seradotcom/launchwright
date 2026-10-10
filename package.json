@@ -37,7 +37,9 @@
     "video:plan": "node scripts/video-variants.mjs plan",
     "video:export": "node scripts/video-variants.mjs export",
     "video:smoke": "node scripts/video-variants-owned-smoke.mjs",
-    "test:video": "node --test --test-concurrency=1 tests/video-variants.test.mjs"
+    "test:video": "node --test --test-concurrency=1 tests/video-variants.test.mjs",
+    "cms:wordpress": "node scripts/wordpress-draft.mjs",
+    "test:wordpress": "node --test --test-concurrency=1 tests/wordpress-draft.test.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",
