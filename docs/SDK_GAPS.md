@@ -137,3 +137,13 @@ REST fixtures cannot prove real Google developer account permissions,
 storefront image order, productive app source, pixel privacy/rights,
 customer review or Semwright Platform Publish. PLAY_UPLOAD remains
 PARTIAL even after local Node24 CI.
+
+## R54 two-version continuity without missing-source promotion
+
+R54 builds a genuine local two-release Native candidate comparison and
+private offline review package. It shows exact versioned artifact and
+editorial-copy differences and preserves the historical candidate without
+claiming automatic reuse. It does not prove full customer source capture,
+browser/native behavior equivalence, a complete Project Graph denominator,
+cross-tenant ACLs, real external publication or the original master’s
+remaining E2E scenarios. Whole-master acceptance remains BLOCKED.

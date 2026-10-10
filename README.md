@@ -144,6 +144,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [R45: offline versioned documentation site from exact frozen Markdown sources](docs/STATIC_DOCS.md)
 - [R46: two exact private MP4 aspect formats plus frozen WebVTT captions](docs/VIDEO_VARIANTS.md)
 - [R47: operator-approved WordPress post DRAFT through exact REST readback](docs/WORDPRESS_DRAFT.md)
+- [R54: source-bound private dossier comparing two frozen releases](docs/RELEASE_CONTINUITY.md)
 - R42/R43 owned synthetic Node24 Linux/Windows/macOS application CI and independent document/Chromium E2E accepted at exact source SHAs; see [R42 evidence](evidence/r42/ci-runs.json) and [R43 evidence](evidence/r43/ci-runs.json). Customer-side quality/privacy/product execution and Platform Publish remain unaccepted.
 - R40 source `b69d17aafbb4badfd84d83205112244a994f02dc` and R41 source `b0016eaa23cc84cfdd9b290432ecee29cc9edae7` passed Node24 Linux/Windows/macOS; the latter tests GitHub DRAFT PR transport with a mocked remote only, not a live owner account.
 - [MCP local Client SDK adapter and operator instructions](docs/MCP_LOCAL.md)
@@ -262,6 +263,23 @@ remote SHA-256 readback, a local write lock and read-only recovery protect
 the upload. Google Play image ordering and source pixel privacy are not
 independently verified. No real Google Play account was tested.
 See docs/GOOGLE_PLAY_IMAGES.md.
+
+
+## Two-release historical continuity (R54)
+
+R54 adds an operator-private, version-bound comparison of two **distinct
+releases of one product**, both selected from their existing immutable Native
+SDK candidates. It compares every registered deliverable/target semantic slot,
+separates editorial copy SHA equality from release-bound rendered-byte changes,
+and identifies added, removed or changed candidate outputs without
+automatically reusing old assets. The result is a deterministic offline
+HTML+JSON ZIP and byte-verifiable private receipt, with human operator
+confirmations and safe interrupted-export recovery. Missing Project Graph,
+source execution and external Publish evidence remain UNKNOWN. The synthetic
+two-release acceptance uses real Native/SQLite state and a separate offline
+Chromium lane; user/customer production coverage and actual platform
+deployment remain independent. See
+[Release continuity review](docs/RELEASE_CONTINUITY.md).
 
 
 ## Original master scope and truthful transfer acceptance

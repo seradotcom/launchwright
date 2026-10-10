@@ -88,6 +88,21 @@ labels and APK binary hashes remain unverified operator declarations;
 never claim canonical Android Driver Host or Platform acceptance.
 
 
+## R54 lost two-release review export and historical drift
+
+Continuity compares two frozen release candidates, not arbitrary current
+file contents. Store the original private plan and both full candidate
+SHA-256 values securely; a partial ZIP/receipt output can only be
+recovered by rerunning that exact reviewed plan. Verify the release
+build identities, selected targets and unknown Project Graph frontier.
+If an old candidate’s input revisions changed, the comparison stops;
+restore an authorized prior snapshot rather than replacing historical
+copy with current source text. If output files have been edited, or a
+separate export lock remains, inspect manually and never delete
+another operator’s files. A continuity report is not a release
+publication or a customer behavior proof. See RELEASE_CONTINUITY.md.
+
+
 ## R52 Google Play Edit loss and expiration
 
 Keep the exact private R44 ZIP, R52 intent, approved source Candidate

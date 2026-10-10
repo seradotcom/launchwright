@@ -49,7 +49,10 @@
     "google-play:plan": "node scripts/google-play-staging.mjs plan",
     "google-play:send": "node scripts/google-play-staging.mjs send",
     "google-play:recover": "node scripts/google-play-staging.mjs recover",
-    "test:google-play": "node --test --test-concurrency=1 tests/google-play-staging.test.mjs"
+    "test:google-play": "node --test --test-concurrency=1 tests/google-play-staging.test.mjs",
+    "continuity:plan": "node scripts/release-continuity.mjs plan",
+    "continuity:export": "node scripts/release-continuity.mjs export",
+    "test:continuity": "node --test --test-concurrency=1 tests/release-continuity.test.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",
