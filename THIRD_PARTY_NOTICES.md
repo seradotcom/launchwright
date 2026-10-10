@@ -72,3 +72,10 @@ is supplied by the operator from a private file and is never included in
 source code, logged in test artifacts or sent to Apple blobstore signed
 upload URLs. Official API references are links, not vendored proprietary
 Apple SDK code. Screenshots/Pixel rights remain operator-controlled.
+
+R59 reuses pngjs 7.0.0 (MIT) and JSZip 3.10.2
+(MIT option of its MIT/GPL dual license) already pinned for R43/R55.
+The offline output embeds only normalized R55 pixel-masked PNGs and its
+source hashes, never unmasked original screenshots or font assets.
+Original package licenses remain with their npm distributions.
+No third-party product code is executed during R59 bundling.

@@ -75,6 +75,17 @@ remain private. No automatic screenshot resizing, Apple/Google network
 operation, actual mobile-device execution or Store approval is implied.
 
 
+## Optional R59 masked offline walkthrough
+
+After completing the R55 pixel-masking and current R43 Media plan
+with Native derivatives, use the operator-only private R59 plan/export
+workflow from [MASKED_INTERACTIVE_DEMO.md](MASKED_INTERACTIVE_DEMO.md).
+Each displayed screen must use the exact R55 derived pixels, not merely
+an arbitrary operator-sanitation label. Input JSON is private (0600),
+output preexisting folder is 0700; nothing is executed or published.
+Privacy outside masked regions still requires independent review.
+
+
 ## Optional R43 offline interactive demo from existing Media Evidence
 
 Use [the offline walkthrough instructions](INTERACTIVE_DEMO.md) with an

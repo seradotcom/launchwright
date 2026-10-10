@@ -88,9 +88,9 @@ test('R39 capability matrix is derived from the public profile evidence only, wi
 test('R39 launcher enumerates actual selective CI lanes without running any suite or live publish',()=>{
   const x=launcherCatalog();
   assert.equal(x.application_sdk,'Semwright Native SDK 1.0.0');
-  assert.equal(x.ci_runner_required.length,10);
+  assert.equal(x.ci_runner_required.length,11);
   for(const name of ['native','host','verifier','extension','effects','composition',
-    'deltadesk','godot','browser','stress'])assert.ok(x.ci_runner_required.includes(name));
+    'deltadesk','godot','browser','masked-demo','stress'])assert.ok(x.ci_runner_required.includes(name));
   assert.equal(x.no_automatic_install_or_publish,true);
   assert.equal(x.platform_publish_gate,'NOT_ESTABLISHED');
   const denied=spawnSync(process.execPath,['scripts/acceptance-launcher.mjs','dispatch','publish'],

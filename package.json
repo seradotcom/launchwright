@@ -64,7 +64,10 @@
     "apple-screenshots": "node scripts/apple-screenshot-upload.mjs",
     "test:apple": "node --test --test-concurrency=1 tests/apple-screenshot-upload.test.mjs",
     "masked-apple": "node scripts/masked-apple.mjs",
-    "test:masked-apple": "node --test --test-concurrency=1 tests/masked-apple-handoff.test.mjs"
+    "test:masked-apple": "node --test --test-concurrency=1 tests/masked-apple-handoff.test.mjs",
+    "test:masked-demo": "node --test --test-concurrency=1 tests/masked-interactive-demo.test.mjs",
+    "masked-demo:plan": "node scripts/masked-interactive-demo.mjs plan",
+    "masked-demo:export": "node scripts/masked-interactive-demo.mjs export"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",

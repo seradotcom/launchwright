@@ -566,6 +566,25 @@ developer-account processing, independent pixel privacy, Apple
 policy, customer/device and Platform Publish remain unaccepted.
 
 
+## R59 candidate — R55 opaque masking to real offline Native Media walkthrough
+
+R59 requires every R43 offline Media shot to bind one exact R55
+operator-defined opaque pixel mask, R55 source plan/receipt, unmodified
+original PNG digest and matching current Native SANITIZED_DERIVATIVE
+with semantic changes-observed-state. Each embedded display screenshot
+is decoded and compared to R55's masked pixel SHA-256. The derived
+Media plan remains technical UNKNOWN and no outside-mask privacy proof
+is invented. The R59 plan/executor uses the existing R43 lock, Native
+media.output_record transaction, private digest confirmations and
+no-clobber local output receipts. Tests run on genuine synthetic PNGs
+and Native fixtures; a dedicated selected heavy Browser lane must
+exercise actual HTML in offline Chromium with CSP and responsive checks.
+Node24 Linux/Windows/macOS acceptance and selective Browser evidence
+are pending on an exact R59 SHA. The original INTERACTIVE_DEMO remains
+PARTIAL; no customer product behavior, device-origin authority, global
+privacy or Platform acceptance is established.
+
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;

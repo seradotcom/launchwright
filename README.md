@@ -142,6 +142,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [R48: bounded real Android emulator screenshot and Native imported evidence](docs/ANDROID_EMULATOR_CAPTURE.md)
 - [R49: bounded Apple CoreSimulator iPhone screenshot with Native imported UNKNOWN receipt](docs/IOS_SIMULATOR_CAPTURE.md)
 - [R43: source-pinned offline interactive demo from sanitized Media Evidence](docs/INTERACTIVE_DEMO.md)
+- [R59: exact R55 masked Native pixels inside R43 script-free offline demo](docs/MASKED_INTERACTIVE_DEMO.md)
 - [R55: operator-defined exact PNG pixel masking and Native sanitized capture evidence](docs/PIXEL_REDACTION.md)
 - [R56: exact R55 masked Native screenshot evidence to R44 Google Play ZIP](docs/MASKED_STORE_HANDOFF.md)
 - [R57: exact masked Native capture pixels in editable PPTX and PDF](docs/MASKED_DECK.md)
@@ -176,6 +177,20 @@ synthetic E2E and visual-render acceptance are in the manual Deck/PDF
 GitHub Actions lane; external branding, accessibility and customer
 product quality review remain unestablished. See
 [DECK_PDF](docs/DECK_PDF.md).
+
+
+## R59 — Exact masked pixels in offline Media walkthroughs
+
+R59 strengthens R43 by requiring every navigable screenshot to be the
+exact current R55 operator-masked PNG and Native SANITIZED_DERIVATIVE,
+linked to the same Media shot, build, release, target and source rights.
+The private ZIP embeds only normalized masked screenshots plus a complete
+source SHA/Native/mask lineage manifest. It contains no scripts, URLs or
+productive authentication and never replays the original product. A real
+Chromium selective CI lane checks static keyboard navigation, CSP,
+pixel digests and offline viewports. R55 verifies only selected opaque
+rectangles: **privacy outside masks is still UNKNOWN**. No customer
+authorization, Host/Platform job or public release is implied.
 
 
 ## R43 — Offline interactive screen-state walkthroughs

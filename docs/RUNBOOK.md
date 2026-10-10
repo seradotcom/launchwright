@@ -90,6 +90,22 @@ scope. Its transformation marks changes-observed-state and preserves
 technical UNKNOWN, never observed-state eligibility.
 
 
+## R59 exact masked offline demo source and privacy incident
+
+A privacy claim about a Media screenshot is not made true by its label.
+R59 requires complete, distinct R55 Native pixel-mask derivatives for all
+shots; the Media plan itself must reference those exact Evidence IDs.
+Prepare a digest-bound private R59 plan, verify each original PNG, masked
+rectangle, derived Native revision, rights and Media digest, and re-enter
+the exact plan/Media SHA plus residual-privacy acknowledgement before
+export. Unknown result: replay the **same plan**, never a substituted
+screenshot or revised unsupervised mask. Conflict: inspect R55 receipts,
+Native versions, source changes, existing Media output and shared R43
+lock; do not clear a live lock or overwrite another operator's output.
+The ZIP remains static/offline and technical UNKNOWN; independent privacy
+review of all remaining pixels is mandatory before distribution.
+
+
 ## R43 offline demo screenshot/privacy recovery
 
 Offline demos are static HTML tours of exact Media-backed sanitized

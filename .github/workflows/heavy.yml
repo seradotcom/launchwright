@@ -5,7 +5,7 @@ on:
       lane:
         description: Select only the lane affected by the change
         type: choice
-        options: [all, native, host, verifier, extension, browser, deltadesk, composition, effects, godot, stress]
+        options: [all, native, host, verifier, extension, browser, masked-demo, deltadesk, composition, effects, godot, stress]
         default: all
         required: true
 permissions:
@@ -34,6 +34,72 @@ jobs:
         with:
           name: launchwright-browser-${{ github.sha }}
           path: evidence/browser/
+          if-no-files-found: error
+          retention-days: 14
+  masked-demo:
+    if: inputs.lane == 'all' || inputs.lane == 'masked-demo'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Audit production dependencies and Native SDK schemas
+        run: |
+          set -euo pipefail
+          npm audit --omit=dev --audit-level=high
+          node scripts/verify.mjs
+      - name: R43, R55 and R59 actual owned PNG/Native integrations
+        run: |
+          set -euo pipefail
+          node --test --test-concurrency=1 tests/masked-interactive-demo.test.mjs tests/interactive-demo.test.mjs tests/pixel-redaction.test.mjs
+      - name: Build Native R55 masked offline R59 bundle
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/masked-demo
+          chmod 0700 evidence/masked-demo
+          node scripts/masked-demo-owned-smoke.mjs --out-dir "$GITHUB_WORKSPACE/evidence/masked-demo" | tee evidence/masked-demo/result.json
+      - run: npm install --prefix .ci-tools --no-audit --no-fund --ignore-scripts playwright@1.58.2
+      - run: .ci-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Chromium offline navigation, CSP, masked pixels and four viewports
+        run: |
+          set -euo pipefail
+          node tests/masked-demo-browser.mjs
+          python3 - <<'PY'
+          import json,pathlib,hashlib,zipfile
+          root=pathlib.Path('evidence/masked-demo')
+          report=json.loads((root/'result.json').read_text())
+          assert report['technical_state']=='UNKNOWN'
+          assert report['platform_authority'] is False
+          assert report['independent_pixel_privacy_review'] is False
+          assert report['mask_proof_count']==2
+          browser=json.loads((root/'browser-report.json').read_text())
+          assert browser['offline_masked_navigation_passed'] is True
+          assert browser['image_pixels_match_r55'] is True
+          assert browser['script_csp_enforced'] is True
+          assert browser['http_requests']==[] and browser['failed_requests']==[]
+          assert browser['page_errors']==[]
+          data=root/report['bundle_filename']
+          assert hashlib.sha256(data.read_bytes()).hexdigest()==report['bundle_sha256']
+          with zipfile.ZipFile(data) as z:
+              assert z.testzip() is None
+              assert sorted(z.namelist())==['README.txt','index.html','manifest.json']
+              manifest=json.loads(z.read('manifest.json'))
+              assert len(manifest['r55_mask_chain'])==2
+              assert manifest['technical_state']=='UNKNOWN'
+              assert manifest['pixels_outside_masks_independently_private'] is False
+              assert hashlib.sha256(z.read('index.html')).hexdigest()==manifest['html_sha256']
+          print('R59_REAL_OFFLINE_MASKED_NATIVE_CSP_BUNDLE_PASS')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: launchwright-masked-offline-${{ github.sha }}
+          path: evidence/masked-demo/
           if-no-files-found: error
           retention-days: 14
   native:

@@ -137,6 +137,12 @@ function collect(app,raw){
   }
   return{plan,release,variant,frames,totalBytes};
 }
+// Shared R43 source reader for the stricter R59 owner-mask admission.
+ // Returns operator-selected private PNG buffers to in-process renderers only;
+ // never expose this object through the public HTTP/MCP surface.
+export function inspectInteractiveDemoSource(app,input){
+  return collect(app,input);
+}
 export function planInteractiveDemo(app,input){
   const data=collect(app,input);
   const core={

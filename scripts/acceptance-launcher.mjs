@@ -9,7 +9,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root=dirname(dirname(fileURLToPath(import.meta.url)));
 const heavy=[
-  'browser','native','host','verifier','extension','effects',
+  'browser','masked-demo','native','host','verifier','extension','effects',
   'composition','deltadesk','godot','stress'
 ];
 const local=['light','master','cleanroom','browser'];
