@@ -66,7 +66,7 @@ fi
 xcrun --sdk iphonesimulator clang \
   -arch "$arch" -isysroot "$sdk" \
   -mios-simulator-version-min=16.0 -fobjc-arc \
-  -framework UIKit -framework Foundation \
+  -framework UIKit -framework Foundation -framework CoreGraphics \
   -o "$app/OwnedIOSFixture" fixtures/ios-owned/OwnedAppDelegate.m
 codesign --force --sign - --timestamp=none "$app"
 xcrun simctl install "$UDID" "$app"
