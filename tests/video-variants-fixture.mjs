@@ -24,8 +24,16 @@ export const FFMPEG_AVAILABLE=(()=>{
     !f.error&&f.status===0&&!probe.error&&probe.status===0 &&
     (f.stdout??'').includes('libx264')&&(f.stdout??'').includes('aac');
 })();;
-export async function ownedVideoFixture(t,{duration=4,addReview=true}={}){
+export async function ownedVideoFixture(t,{
+  duration=4,addReview=true,locale='en-US',captionTexts=null
+}={}){
   const {app,root}=setup(t),b=await baseline(app);
+  if(locale!=='en-US'){
+    b.target=(await execute(app,'entity.update',{
+      id:b.target.id,expected:b.target.version,
+      data:{...b.target.data,ui_locale:locale,editorial_locale:locale}
+    })).entity;
+  }
   const source=(await execute(app,'entity.update',{
     id:b.source.id,expected:b.source.version,
     data:{...b.source.data,approval:'approved',
@@ -63,16 +71,16 @@ export async function ownedVideoFixture(t,{duration=4,addReview=true}={}){
     }],
     assets:[],tracks:[],
     variants:[
-      {id:'landscape',kind:'video',locale:'en-US',width:1280,height:720,
+      {id:'landscape',kind:'video',locale,width:1280,height:720,
         safe_area_milli:{top:40,right:40,bottom:40,left:40},
         shot_ids:['owned_state'],track_ids:[]},
-      {id:'portrait',kind:'video',locale:'en-US',width:720,height:1280,
+      {id:'portrait',kind:'video',locale,width:720,height:1280,
         safe_area_milli:{top:40,right:40,bottom:40,left:40},
         shot_ids:['owned_state'],track_ids:[]},
-      {id:'screens',kind:'screenshot-series',locale:'en-US',width:1280,height:720,
+      {id:'screens',kind:'screenshot-series',locale,width:1280,height:720,
         safe_area_milli:{top:40,right:40,bottom:40,left:40},
         shot_ids:['owned_state'],track_ids:[]},
-      {id:'demo',kind:'interactive-demo',locale:'en-US',width:1280,height:720,
+      {id:'demo',kind:'interactive-demo',locale,width:1280,height:720,
         safe_area_milli:{top:40,right:40,bottom:40,left:40},
         shot_ids:['owned_state'],track_ids:[]}
     ],
@@ -107,9 +115,14 @@ export async function ownedVideoFixture(t,{duration=4,addReview=true}={}){
     output_id:master.id,artifact_sha256:videoSha,
     decision:'approve-editorial',comment:'Owned synthetic audio/video fixtures only'
   });
+  const approvedText=captionTexts??[
+    'Owned synthetic video state','Format review is not publication'
+  ];
+  if(!Array.isArray(approvedText)||approvedText.length!==2)
+    throw Error('The owned fixture requires two explicit short caption cues');
   const cues=[
-    {start_ms:500,end_ms:1300,text:'Owned synthetic video state'},
-    {start_ms:1800,end_ms:Math.min(duration*1000-200,2900),text:'Format review is not publication'}
+    {start_ms:500,end_ms:1300,text:approvedText[0]},
+    {start_ms:1800,end_ms:Math.min(duration*1000-200,2900),text:approvedText[1]}
   ];
   const captionDeliverable=(await execute(app,'entity.update',{
     id:b.deliverable.id,expected:b.deliverable.version,

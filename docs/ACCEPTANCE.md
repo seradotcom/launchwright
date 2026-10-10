@@ -621,6 +621,22 @@ customer capture, independently verified source rights, alternate voice,
 general pixel privacy or Platform Publish authority is claimed.
 
 
+## R63 candidate — reviewed Latin WebVTT and real two-aspect MP4 overlays
+
+R63 keeps original R62 ASCII v1 source compatibility, adding a separately
+digested Latin /2 profile for precomposed accents and bounded punctuation.
+The operator must approve the exact Native Media/target locale (es-MX
+synthetic acceptance), frozen WebVTT, system DejaVuSans.ttf file SHA and
+fontconfig proof for every approved code point. Text outside the pinned
+profile, ASS directives, bidi controls, zero-width characters, CJK and
+emoji fail closed. No font is bundled. Owned local real FFmpeg tests have
+confirmed two H.264/AAC videos, frame/PCM source parity and visible Spanish
+cue pixels, with original technical UNKNOWN unchanged. Official Node24
+three-OS application checks and the exact-SHA Latin video CI lane still
+must pass before accepting R63. This does not establish human readability,
+general Latin typography, customer source/rights or Platform Publish.
+
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;

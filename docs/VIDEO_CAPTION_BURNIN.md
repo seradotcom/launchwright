@@ -68,3 +68,11 @@ The CI artifact retains both formats, an **owned synthetic** original R46 ZIP, d
 Portrait video still contains the entire landscape image inside a black letterbox. Captions may cover UI, so human safe-area and accessibility review remain mandatory. Source pixels/audio and privacy outside approved masks are not independently validated. Multilingual glyphs, voice alternatives, rich cinematography and externally published videos remain outside this fixed text-only subset.
 
 The original master **VIDEO profile remains PARTIAL** even after R62 acceptance.
+
+## Optional R63 reviewed Latin policy
+
+R62 ASCII v1 remains the default and does not auto-upgrade. See
+[VIDEO_CAPTION_LATIN.md](VIDEO_CAPTION_LATIN.md) for a separate
+Latin /2 plan, verified Linux system DejaVu font/UTF-8 glyphs and
+approved matching Native locale. This does not enable general Unicode,
+subtitling translation or externally accepted caption accessibility.

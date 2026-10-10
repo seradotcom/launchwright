@@ -43,6 +43,17 @@ Client SDK and do not expose approvals or Publish actions. Follow
 [local MCP operator instructions](MCP_LOCAL.md). MCP interoperability in
 a local client is not host-side ChatGPT Plugin acceptance.
 
+## R63 opt-in Spanish and NFC Latin video captions
+
+For source-approved Latin/Spanish caption text, the R62 CLI now supports
+an explicit --latin-nfc and --acknowledge-latin-glyph-review plan.
+The Linux host must provide exact system DejaVuSans.ttf, fontconfig
+(fc-match and fc-query), FFmpeg/libass and operator-approved matching
+Native Media/target locale. The plan binds the font hash, glyph coverage
+and source/locale SHA without embedding the font. Existing R62 ASCII
+plans/exports remain unchanged. See VIDEO_CAPTION_LATIN.md.
+
+
 ## R62 private burn-in for R46 frozen WebVTT and two MP4s
 
 With an R46 reviewed Native Media source and its private ZIP/JSON receipt,

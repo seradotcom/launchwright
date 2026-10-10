@@ -14,6 +14,19 @@ publishing, customer consent, color/branding review and Platform
 job authority require separate actions.
 
 
+## R63 Latin/NFC subtitle font, locale and source drift
+
+R63 is opt-in. Do not automatically convert an R62 ASCII plan into the
+new /2 policy. Reconfirm frozen Native WebVTT and exact R46 ZIP, matching
+source target/variant locale, operator caption/glyph/PII consents and the
+installed DejaVuSans.ttf SHA plus fc-query coverage. An absent or changed
+font, out-of-profile glyph, changed Native target or cue text blocks export.
+On an interrupted local export, reconcile only the SAME saved v2 plan;
+never replace a video or source to manufacture a successful receipt.
+Human caption placement/contrast/audio-language and customer publication
+are separate review gates.
+
+
 ## R62 WebVTT burn-in source/consent and unknown output
 
 Retain the exact original R46 plan, input, ZIP/receipt and frozen Native

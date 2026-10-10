@@ -236,3 +236,12 @@ fixed-style ASCII WebVTT cues are accepted. Human marketing quality,
 voice alternatives, multilingual caption fonts, independent pixel/rights
 review, customer filming, canonical Composition runtime and Platform
 Publish remain external and unaccepted. The VIDEO profile stays PARTIAL.
+
+## R63 source-bound Latin caption overlay
+
+An explicit R63 /2 opt-in profile supports source-approved Latin and
+Spanish VTT glyphs with exact Media/target locale and installed DejaVu
+Sans SHA/character coverage. It does not translate captions, certify
+language/sound synchronization or prove no UI occlusion; real customer
+rights/privacy/accessibility and Platform Publish remain open. R62 ASCII
+v1 continues as a separately supported immutable formatting policy.

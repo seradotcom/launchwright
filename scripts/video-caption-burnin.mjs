@@ -5,13 +5,14 @@
 import { lstatSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { LaunchwrightApplication } from '../src/application.mjs';
-import { planVideoCaptionBurnin, exportVideoCaptionBurnin } from '../src/video-caption-burnin.mjs';
+import { planVideoCaptionBurnin, planVideoCaptionBurninLatin, exportVideoCaptionBurnin } from '../src/video-caption-burnin.mjs';
 
 const [action='help',...argv]=process.argv.slice(2);
 const options=new Set(['state','r46-plan','r46-input','r46-dir','out',
   'burnin-plan','out-dir','confirm-plan','confirm-r46']);
 const switches=new Set(['acknowledge-caption-review','acknowledge-privacy-unknown',
-  'acknowledge-private-only','acknowledge-export']);
+  'acknowledge-private-only','acknowledge-export',
+  'latin-nfc','acknowledge-latin-glyph-review']);
 function parse(){
   const out={};
   for(let i=0;i<argv.length;i++){
@@ -46,6 +47,8 @@ async function main(){
       '        --r46-dir PRIVATE_R46_OUTPUT --burnin-plan PRIVATE_R62_PLAN \\\n'+
       '        --out-dir EXISTING_PRIVATE_0700_DIR --confirm-plan R62_SHA256 \\\n'+
       '        --confirm-r46 R46_ZIP_SHA256 --acknowledge-export\n'+
+      ' R63 optional: add --latin-nfc --acknowledge-latin-glyph-review to plan for approved Latin/Spanish text.\n'+
+      ' R63 export: add --acknowledge-latin-glyph-review when the saved plan is Latin.\n'+
       ' No customer-source execution, alternate voice, original timeline rewrite, Platform or publication.\n'
     );return;
   }
@@ -53,9 +56,10 @@ async function main(){
   const o=parse();
   const allowed=action==='plan'?
     ['state','r46-plan','r46-input','r46-dir','out',
-      'acknowledge-caption-review','acknowledge-privacy-unknown','acknowledge-private-only']:
+      'acknowledge-caption-review','acknowledge-privacy-unknown','acknowledge-private-only',
+      'latin-nfc','acknowledge-latin-glyph-review']:
     ['state','r46-plan','r46-input','r46-dir','burnin-plan','out-dir',
-      'confirm-plan','confirm-r46','acknowledge-export'];
+      'confirm-plan','confirm-r46','acknowledge-export','acknowledge-latin-glyph-review'];
   if(Object.keys(o).some(k=>!allowed.includes(k))||!o.state||!o['r46-dir'])
     throw Error('Caption command requires an explicit owner workspace and original R46 source');
   const app=new LaunchwrightApplication(resolve(o.state));
@@ -66,14 +70,18 @@ async function main(){
       r46_dir:resolve(o['r46-dir']),
       acknowledge_caption_review:true,
       acknowledge_video_privacy_unknown:true,
-      acknowledge_private_only:true
+      acknowledge_private_only:true,
+      acknowledge_latin_glyph_review:o['acknowledge-latin-glyph-review']===true
     };
     if(action==='plan'){
       if(!o.out)throw Error('A private --out plan path is required');
       selection.acknowledge_caption_review=o['acknowledge-caption-review']===true;
       selection.acknowledge_video_privacy_unknown=o['acknowledge-privacy-unknown']===true;
       selection.acknowledge_private_only=o['acknowledge-private-only']===true;
-      const plan=await planVideoCaptionBurnin(app,selection);
+      if(o['acknowledge-latin-glyph-review']&&!o['latin-nfc'])
+        throw Error('Latin glyph approval requires an explicit --latin-nfc plan');
+      const plan=await (o['latin-nfc']?planVideoCaptionBurninLatin:
+        planVideoCaptionBurnin)(app,selection);
       writeFileSync(resolve(o.out),JSON.stringify(plan,null,2)+'\n',{
         mode:0o600,flag:'wx'
       });
