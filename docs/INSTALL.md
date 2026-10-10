@@ -126,6 +126,49 @@ actual phone, supply a network ADB target or claim Semwright Android
 Driver Host/Platform authority. The synthetic Android CI lane is separate.
 
 
+## Optional R52 Google Play uncommitted Edit staging
+
+This adapter requires an existing operator-owned Google Play Edit,
+an approved R44 Google phone image ZIP, a private OAuth token file and
+explicit immutable SHA/package/edit confirmations. It cannot commit the
+Edit or publish an app and never blindly retries an ambiguous image POST.
+See GOOGLE_PLAY_IMAGES.md. Real Google account, image ordering and
+customer pixel/rights approval are external obligations.
+
+
+## R57 private Native-masked screenshot presentation
+
+After approving a frozen Markdown candidate and obtaining a set of exact
+R55 masked PNGs/Native SANITIZED_DERIVATIVE receipts, follow
+[MASKED_DECK.md](MASKED_DECK.md). The optional local CLI composes one
+screenshot per Markdown section into editable PPTX and real PDF with
+SHA lineage, using an owner-private output directory. Only operator-
+declared mask coverage is established; no independent pixel privacy
+certification or external publishing occurs.
+
+
+## R56 masked Google Play screenshot integrity handoff
+
+After R55 produces exact operator-owned masked PNGs, use the R56 private
+two-phase plan/export workflow in MASKED_STORE_HANDOFF.md to bind each
+R55 Native SANITIZED_DERIVATIVE receipt and output SHA to an R44 Google
+Play phone listing. The result is a private R44 ZIP + two receipts,
+never a Google Play Edit or published listing. Original source PNG
+paths remain private. Other store sizes and external account privacy/
+rights acceptance remain outside this restricted workflow.
+
+
+## R55 private pixel mask preflight for captured screenshots
+
+When downstream product demos require obscuring an owner-reviewed region,
+use the two-phase R55 operator CLI described in
+[PIXEL_REDACTION.md](PIXEL_REDACTION.md). This is an explicit opaque
+rectangle transform on an approved Native capture + exact PNG, not
+automatic PII detection and not a new source/Platform execution backend.
+It creates private RGB PNG/measurement output and a separately linked
+SANITIZED_DERIVATIVE receipt with technical UNKNOWN.
+
+
 ## R42 editable deck and real PDF
 
 From a human-approved, exact frozen Markdown Candidate, execute the
@@ -164,6 +207,18 @@ and an owned Git repository, use the two-phase R40 operator CLI to prepare
 an exact private plan for one docs/*.md file and explicitly create a new
 Git branch. The current checkout/index/HEAD are not modified. There is no
 GitHub push/PR. See [Git docs review branch](GIT_DOCS_BRANCH.md).
+
+
+## Review changes between two frozen releases (R54)
+
+Choose distinct historical/current release IDs and their frozen candidate
+IDs from the existing Launchwright workspace. Run the private two-phase
+continuity CLI (scripts/release-continuity.mjs) to prepare the exact
+read-only comparison and export a private HTML/JSON ZIP. A previously
+edited source, ambiguous target/doc slot, changed candidate digest or
+unreviewed coverage boundary fails closed. This process does not require
+GitHub, Semwright Platform or source-project execution and does not
+constitute a public release. See [continuity review](RELEASE_CONTINUITY.md).
 
 
 ## Optional R37 web onboarding for an existing project

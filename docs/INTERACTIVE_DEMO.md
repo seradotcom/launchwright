@@ -89,3 +89,14 @@ The manual R43 CI lane tests deterministic ZIP/PNG output, Native Media receipt 
 These are **synthetic owned sources only**. General customer screenshots, independent privacy inspection, multi-browser acceptance, arbitrary live interactive behavior, Semwright Driver Host/Platform execution and public deployment remain pending under the original master. See [the master capability matrix](../CAPABILITY_MATRIX.md).
 
 **Bounded CI acceptance:** Exact owned synthetic Node24/independent renderer or Chromium results and source SHAs are recorded in [evidence/r43/ci-runs.json](../evidence/r43/ci-runs.json). This is not customer, privacy, publisher-account or Platform authority.
+
+
+### R55 measured masks as optional input
+
+The R55 operator-owned PNG mask adapter now supplies explicitly
+source-bound SANITIZED_DERIVATIVE Evidence and normalized private PNG
+files for R43 Media plans to consume. It verifies the changed rectangular
+pixels and unchanged outside pixels, but **does not independently detect
+personal information in the remaining image**. The viewer's technical
+UNKNOWN, private distribution and independent human rights/PII review
+requirements are unchanged. See [R55 pixel redaction](PIXEL_REDACTION.md).

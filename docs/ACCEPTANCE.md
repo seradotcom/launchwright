@@ -447,6 +447,105 @@ origin, pixel/rights certification, submission or storefront activation
 has been observed. Node24 Linux/Windows/macOS CI remains a requirement
 before R51 can be accepted.
 
+## R52 candidate - Google Play existing Edit image upload only
+
+R52 binds one original R44 approved Google Play phone PNG asset ZIP,
+frozen Native SDK candidate, source evidence and exact Edit/package/locale
+to a private plan. With operator token and explicit SHA consent it GETs
+the existing Android Publisher Edit and three image lists, requiring
+empty slots, then POSTs only approved PNG bytes and reads SHA-256 image
+sets back. Read-only recovery handles lost acknowledgements; foreign
+images, expired Edits, tampered sources, duplicate IDs and missing
+consent fail closed. No image ordering claim, no Edits insert/commit,
+delete/deleteall, Play listing copy write or public app submission exists.
+Supported Node24 Linux/Windows/macOS and the selective owned Google
+REST HTTP lane are still required before R52 implementation acceptance.
+The test fixture is NOT a live developer account, customer app or
+semantically reviewed screenshot/rights/privacy certification.
+
+
+## R54 candidate — two real frozen releases, local continuity and offline review
+
+R54 adds an immutable two-release continuity dossier over real Native
+SDK/SQLite candidate state. It binds two release/candidate digests,
+checks every frozen artifact SHA and source revision, compares semantic
+target+editorial document slots, distinguishes changed release bytes from
+unchanged source copy and records registered-only claim/impact/channel
+coverage with explicit UNKNOWN frontier. It never copies/reuses assets,
+publishes anything or substitutes today’s edits into a historical
+candidate. A private operator-approved no-effects plan can export
+deterministic offline HTML/JSON ZIP plus SHA-256 and recover a partial
+write without clobber. Real disposable owned fixture tests include an
+older/younger release and strict failure controls. Supported Node24
+Linux/Windows/macOS CI and the separate synthetic Chromium browser lane
+at 1440/768/390/320px are required before accepting R54.
+The master’s 36 mandatory E2E scenarios still need independently
+audited completion; this local 2-release fixture does not claim
+customer/Platform/host/semantic coverage authority.
+
+
+## R55 candidate — exact rectangular pixel redaction and source-linked Native receipt
+
+R55 implements an owner-approved local two-phase PNG transform from an
+original Native CAPTURED_ACTUAL/CAPTURED_DEMO_DATA Evidence. Its plan binds
+exact original PNG SHA, decoded pixel SHA, Native source/release/scenario
+revision pins, 1–24 operator-selected non-overlapping masks, exact masked
+pixel count and derived output SHA. Applying an independently confirmed
+private plan replaces only those pixels with opaque fixed RGB, verifies
+EVERY unmasked pixel is unchanged, strips PNG metadata, and records a
+SANITIZED_DERIVATIVE through canonical capture.ingest with
+changes-observed-state and technical UNKNOWN. Native and private filesystem
+recovery require exact bytes; stale/colliding writes and invalid masks fail
+closed. The end-to-end tests integrate new derivative IDs into a revised
+R43 Media plan and real offline ZIP without granting observed-state
+eligibility or independent privacy certification.
+
+R55 acceptance is still pending supported Node24 Linux/Windows/macOS CI
+and the owned-fixture real Chromium/keyboard/privacy-negatives lane.
+No real customer PII review, visual source rights audit, universal pixel
+safety, application execution, Semwright Driver Host admission or external
+Platform/Store publication is implied by this capability.
+
+
+## R56 candidate — real masked screenshot to Google Play private ZIP
+
+R56 composes R55 exact rectangular PNG pixel redaction and imported
+Native SANITIZED_DERIVATIVE Evidence with R44 Google Play portrait store
+packages. A mandatory one-to-one source chain matches each R55 plan,
+applied receipt, exact 1080 x 1920 image SHA/pixels, Native evidence
+version/origin and R44 screenshot. The private R56 receipt binds the
+full source lineage to the final R44 ZIP digest. Actual owned synthetic
+tests independently compare every output PNG pixel to the original
+image plus the explicitly specified opaque rectangles. The ZIP is
+accepted by the real R52 prepare-only reader, without any Google Edit
+mutation. Stale Native revisions, source mismatches, altered files,
+consents and operator locks fail closed, and exact retries recover.
+Supported Node24 Linux/Windows/macOS CI and the dedicated owned-source
+workflow are required before accepting R56. Neither the original
+device-origin PNG, pixel privacy outside masked areas, icons/graphics,
+actual Play account, publication nor Semwright Platform execution are
+independently verified. STORE_PACKAGE remains PARTIAL and the original
+master remains BLOCKED.
+
+
+## R57 candidate — source-bound R55 masked images in PPTX and PDF
+
+R57 takes a frozen editorial-approved R42 Markdown candidate and exactly
+one R55 masked screenshot per content slide. Every input requires a
+specific R55 mask plan/input/apply receipt, exact PNG byte and decoded
+pixel SHA, Native SANITIZED_DERIVATIVE evidence ID/revision/origin and
+the same candidate release/target/build. Technical state remains UNKNOWN
+because masks cover operator-selected rectangles only; no independent
+PII clearance or source rights certification is asserted. Two-phase
+private plan/export embeds the images in replaceable PPTX media and PDF
+image XObjects, preserves the original source copy, checks deterministic
+binary outputs, and refuses human edits, stale source, swapped screenshots
+or concurrent writers. Real owned synthetic Node22 tests passed; Node24
+Linux/Windows/macOS and separate owned Poppler/LibreOffice visual
+acceptance on an exact SHA are required before R57 is accepted. Original
+DECK_PDF remains PARTIAL because rich multi-asset layout, customer visual
+quality/accessibility, licensed font coverage and customer/Platform
+acceptance are not established.
 
 ## Explicitly not established
 

@@ -1,0 +1,80 @@
+name: Owned masked screenshot to offline viewer
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/pixel-mask.yml'
+      - 'src/pixel-redaction.mjs'
+      - 'scripts/pixel-mask.mjs'
+      - 'tests/pixel-redaction.test.mjs'
+      - 'tests/pixel-mask-browser.mjs'
+      - 'docs/PIXEL_REDACTION.md'
+permissions:
+  contents: read
+concurrency:
+  group: owned-pixel-mask-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  owned-mask:
+    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'feat/pixel-redaction-r55')
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: No high-severity production dependency advisories
+        run: npm audit --omit=dev --audit-level=high
+      - name: Verify canonical Semwright Native SDK surface
+        run: node scripts/verify.mjs
+      - name: Exact PNG pixel, Native capture, CLI and offline-demo regression
+        run: node --test --test-concurrency=1 tests/pixel-redaction.test.mjs
+      - name: Install one disposable Chromium runner
+        run: |
+          set -euo pipefail
+          npm install --prefix .ci-tools --no-audit --no-fund --ignore-scripts playwright@1.58.2
+          .ci-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Real offline Chromium from explicitly masked owned screenshot evidence
+        run: |
+          set -euo pipefail
+          node tests/pixel-mask-browser.mjs
+          node --input-type=module <<'JS'
+          import {readFileSync,existsSync} from 'node:fs';
+          import {createHash} from 'node:crypto';
+          import {join} from 'node:path';
+          const dir='evidence/pixel-mask-browser';
+          const report=JSON.parse(readFileSync(join(dir,'result.json'),'utf8'));
+          if(report.passed!==true||report.native_sanitized_derivatives!==2||
+             report.source_pixel_mask_regions_verified!==4||
+             report.source_pixels_outside_masks_unchanged!==true||
+             report.original_source_pngs_retained_in_artifacts!==false||
+             report.media_technical_state!=='UNKNOWN'||
+             report.keyboard_navigation!==true||
+             report.independent_pii_review!==false||
+             report.human_privacy_review_pending!==true||
+             report.actual_customer_source_tested!==false||
+             report.platform_authority!==false||
+             report.publication_authority!==false||
+             JSON.stringify(report.browser_page_errors)!=='[]'||
+             JSON.stringify(report.network_requests)!=='[]')throw Error('R55 owned acceptance has an unsupported claim or failed check');
+          for(const width of [320,390,768,1280])
+             if(!existsSync(join(dir,'owned-masked-'+width+'.png')))
+               throw Error('Viewport screenshot is missing: '+width);
+          if(!existsSync(join(dir,'owned-masked-demo.zip')))throw Error('Real offline ZIP is missing');
+          const bytes=readFileSync(join(dir,'owned-masked-demo.zip'));
+          if(createHash('sha256').update(bytes).digest('hex')!==report.offline_package_sha256)
+             throw Error('Offline ZIP digest differs from exact Native record/receipt');
+          console.log('R55_OWNED_MASKED_OFFLINE_BROWSER_ACCEPTED',report.offline_package_sha256);
+          JS
+      - name: Retain synthetic redacted PNGs, offline ZIP and screenshots only
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: launchwright-owned-pixel-mask-${{ github.sha }}
+          path: evidence/pixel-mask-browser/
+          if-no-files-found: error
+          retention-days: 14

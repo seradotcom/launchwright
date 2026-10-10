@@ -96,6 +96,55 @@ store-account upload, device-origin attestation or Platform authority.
 See [STORE_ASSETS](STORE_ASSETS.md).
 
 
+## R57 — Exact masked Native evidence in editable deck/PDF
+
+R57 integrates R55 Native SANITIZED_DERIVATIVE pixel-redaction receipts
+with the existing R42 fresh, editorial-approved frozen Markdown candidate.
+One distinct R55 PNG/mask/evidence source per content slide is checked
+against the original source, rights, Native revision, build, target and
+masked-output pixels. The shared deck renderer uses the same measured
+text layout and projects each source image into replaceable PPTX media
+and a real PDF image XObject; the R42 text-only path remains unchanged.
+A private two-phase SHA-bound plan/export uses a dedicated exclusive
+local lock, prevents output clobber and can resume identical interrupted
+writes. It neither grants general pixel privacy, capture/Driver Host
+authority nor publishes to Platform. See MASKED_DECK.md.
+
+
+## R56 exact R55 Native masked pixels into R44 Google Play assets
+
+R56 adds a strict optional operator-owned handoff to R44: one R55
+SHA-bound mask input/plan/receipt plus an actual imported Native
+SANITIZED_DERIVATIVE Evidence for every Google Play portrait screenshot.
+It rejects generic unrelated sanitized evidence and matches exact
+Native origin/version and redacted PNG bytes; R44 re-normalizes the
+same pixels and packages the same original store ZIP. R56 appends a
+private mask-lineage receipt tied to R44 ZIP SHA-256. No new Native
+dispatcher, Google Play transport, source execution or publication API
+is implemented. R52 staging remains independently authorized; the
+pixel source is still an owner declaration, NOT canonical Device
+Host capture or general PII clearance. See MASKED_STORE_HANDOFF.md.
+
+
+## R55 exact operator-defined PNG pixel masks and Native derivative custody
+
+R55 narrows a source privacy problem shared by offline interactive demos and
+release packages. It requires an original, scoped CAPTURED_ACTUAL or
+CAPTURED_DEMO_DATA Native Evidence, a current approved Source and exact owned
+PNG digest. A private, no-mutation preparation validates 1–24 selected
+non-overlapping rectangles, proves a fixed opaque fill and verifies every
+unmasked pixel remains unchanged, removing ancillary PNG metadata by
+fresh RGB encoding. An explicit private apply rechecks source revisions,
+operator rights and plan SHA, writes PNG+receipt with byte-reconciled recovery,
+and records SANITIZED_DERIVATIVE provenance through canonical capture.ingest.
+The recorded REDACT semantic_effect is changes-observed-state and technical
+state remains UNKNOWN, even if the parent originally had successful capture
+admission. Pixels outside masks are NOT certified free of personal data; no
+general privacy, Host, customer, Platform or publication authority is granted.
+R43 Media variants can bind to the new exact Native evidence ID. See
+[PIXEL_REDACTION.md](PIXEL_REDACTION.md).
+
+
 ## R43 — Script-free offline product screen tour from canonical Media records
 
 The bounded R43 operator CLI reads only a current Native Media plan with
@@ -164,6 +213,36 @@ actual customer or real physical device authority. Recovery reuses the
 original saved bytes and reconciles exactly one Native Evidence record.
 The owned Android emulator CI app is separately installed/foregrounded
 by an intentionally isolated synthetic runner, never by the adapter.
+
+
+## R54 release-history comparison over frozen Native candidates
+
+The original master requires release progression without erasing previously
+approved materials. R54 produces an application-read-only two-release
+continuity projection over the canonical Native SDK candidate records and
+immutable artifact blobs. Every selected candidate must have fresh input
+pins; the report uses declared target/editorial document identities and
+compares both source-copy digests and exact rendered binary SHA-256 values.
+A second output copy is never promoted to technically unchanged behavior
+or automatic reuse. It includes the app's registered-only claim coverage,
+impact frontier and channel projections. No local second Graph/Platform
+engine exists. A private operator SHA-bound plan builds an offline
+HTML/JSON ZIP under a deterministic source digest and a lock; no Native
+or external mutation occurs. See
+[release continuity documentation](RELEASE_CONTINUITY.md).
+
+
+## R52 operator-owned Play Edit image staging
+
+The optional Android Publisher v3 adapter validates a frozen R44 Google
+Play Candidate, approved local source PNG ZIP, Edit ID, package identity,
+source SHA-256 and locale before contacting an operator-owned Play account.
+It GETs the existing Edit, GETs three image collections and POSTs only
+exact PNG bytes with uploadType=media. It cannot create/commit/delete edits,
+rewrite metadata, submit binaries, publish, or infer image ordering from
+unordered API results. Lost acknowledgements require read-only recovery
+with the original intent. Local write exclusivity does not substitute for
+Google Play Console user/tenant isolation. See GOOGLE_PLAY_IMAGES.md.
 
 
 ## R42 immutable editorial candidate to two native document formats

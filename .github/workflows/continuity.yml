@@ -1,0 +1,77 @@
+name: Owned two-release continuity acceptance
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: release-continuity-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  continuity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Production dependency and native source lock
+        run: |
+          npm audit --omit=dev --audit-level=high
+          node scripts/verify.mjs
+          node scripts/master-acceptance.mjs --check
+      - name: Two-release owned Native regression
+        run: node --test --test-concurrency=1 tests/release-continuity.test.mjs
+      - name: Generate exact private continuity dossier with owned Native fixture
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/continuity
+          chmod 0700 evidence/continuity
+          node scripts/continuity-owned-smoke.mjs --out-dir "$GITHUB_WORKSPACE/evidence/continuity" | tee evidence/continuity/result.json
+      - name: Validate genuine source ZIP and unreleased evidence
+        run: |
+          python3 - <<'PY'
+          import json,pathlib,hashlib,zipfile
+          root=pathlib.Path('evidence/continuity')
+          report=json.loads((root/'result.json').read_text())
+          result=report['private_report']
+          assert report['synthetic_data_only'] is True
+          assert report['external_publication'] is False
+          assert result['change_counts']==dict(added=1,removed=1,changed=1,unchanged=0)
+          assert result['technical_behavior_verified'] is False
+          assert result['platform_authority'] is False
+          archive=root/result['filename']
+          assert hashlib.sha256(archive.read_bytes()).hexdigest()==result['zip_sha256']
+          with zipfile.ZipFile(archive) as zipped:
+              assert zipped.testzip() is None
+              assert set(zipped.namelist())=={'index.html','report.json','README.txt'}
+              dossier=json.loads(zipped.read('report.json'))
+              assert dossier['before']['build']=='synthetic-build-A'
+              assert dossier['after']['build']=='synthetic-build-B'
+              assert dossier['registered_graph_scope_fully_observed'] is False
+              assert dossier['historical_release_preserved'] is True
+              assert dossier['after']['release_coverage']['registered_claims']==1
+              assert dossier['after']['release_coverage']['reported_unknown']==1
+              assert dossier['after']['release_coverage']['reported_pass']==0
+              assert len(dossier['changes'])==3
+              for row in dossier['changes']:
+                  assert row['reused_across_builds'] is False
+                  assert row['technical_truth']=='NOT_PROVED_BY_CROSS_RELEASE_HASHES'
+          print('R54_EXACT_NATIVE_TWO_RELEASE_DOSSIER_PASS',result['zip_sha256'])
+          PY
+      - name: Official Chromium for fully offline responsive review at four widths
+        run: |
+          npm install --prefix .ci-tools --no-audit --no-fund --ignore-scripts playwright@1.58.2
+          .ci-tools/node_modules/.bin/playwright install --with-deps chromium
+          node tests/continuity-browser.mjs
+      - name: Retain source ZIP, candidate SHA receipt and 4 actual browser screenshots
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: launchwright-owned-continuity-${{ github.sha }}
+          path: evidence/continuity/
+          if-no-files-found: error
+          retention-days: 14

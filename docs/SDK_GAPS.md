@@ -136,3 +136,62 @@ behavior. The synthetic tests use an injected Apple transport, not an
 actual Apple account. Screenshot asset processing is not App Review,
 storefront publication, customer privacy/rights certification or
 Semwright Platform Publish. The APPLE_UPLOAD profile remains PARTIAL.
+
+## R52 existing Google Play Edit staging
+
+R52 stages R44 exact approved Android phone screenshots, icon and feature
+graphic into an EXISTING, UNCOMMITTED Google Play Edit after explicit
+operator consent and a private OAuth token. It verifies remote image
+SHA sets and Edit TTL, rejects foreign or preexisting pixels, and
+never creates/commits/deletes edits or publishes. Accepted synthetic
+REST fixtures cannot prove real Google developer account permissions,
+storefront image order, productive app source, pixel privacy/rights,
+customer review or Semwright Platform Publish. PLAY_UPLOAD remains
+PARTIAL even after local Node24 CI.
+
+## R54 two-version continuity without missing-source promotion
+
+R54 builds a genuine local two-release Native candidate comparison and
+private offline review package. It shows exact versioned artifact and
+editorial-copy differences and preserves the historical candidate without
+claiming automatic reuse. It does not prove full customer source capture,
+browser/native behavior equivalence, a complete Project Graph denominator,
+cross-tenant ACLs, real external publication or the original master’s
+remaining E2E scenarios. Whole-master acceptance remains BLOCKED.
+
+
+## R55 exactly bounded pixel redaction versus general privacy
+
+R55 adds a source- and Native-revision-pinned manual rectangular mask
+adapter that proves byte-exact opaque replacement ONLY inside explicit
+rectangles and exact preservation of ALL unmasked pixels. It removes
+ancillary PNG metadata and creates an imported-authority
+SANITIZED_DERIVATIVE Evidence with REDACT as changes-observed-state.
+It cannot automatically detect all PII, facial/account/tenant data,
+sensitive copyrighted content or dangerous product information outside
+the masks; operator choice/rights are declarations. No general privacy
+verifier, observed product state, Driver Host approval, Platform execution,
+customer acceptance, store-upload clearance or publication follows.
+
+## R56 source-linked masked Google Play screenshots (narrow scope)
+
+R56 verifies that a Google Play 1080 x 1920 private R44 store ZIP
+uses the exact R55 masked screenshot bytes bound to each original
+Native SANITIZED_DERIVATIVE Evidence, with an additional SHA-bound
+source-chain receipt. This narrows the gap between generic operator-
+declared sanitized files and actual local mask operations. It does
+NOT independently bind original PNGs to canonical device capture,
+certify PII outside manually selected masks, certify the separate
+store icon/feature graphic, or prove external account authorization,
+Edit commit, customer acceptance or publication. The master stays
+BLOCKED; STORE_PACKAGE and PLAY_UPLOAD remain PARTIAL.
+
+## R57 exact masked screenshot presentation
+
+R57 composes R55 operator-owned exact PNG masks and Native derivative
+receipts with the R42 editable presentation renderer. Every inserted
+image is a replaceable real PPTX PNG and real PDF image with original
+source/version/pixel hashes in its private receipt, but only mask-area
+pixel changes are verified. Human pixel review outside masks, complete
+product-source rights, accessibility, fonts, customer/brand acceptance,
+additional rich media layouts and real Platform Publish remain open.

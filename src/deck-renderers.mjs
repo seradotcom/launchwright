@@ -32,31 +32,34 @@ function wrap(text,font,size,maxWidth,maxLines){
     'ResourceExhausted');
   return lines;
 }
-function presentationModel(source,sha,fonts){
+function presentationModel(source,sha,fonts,images=[]){
   const slides=[
     {kind:'cover',title:source.title,items:[
       {kind:'paragraph',text:'Editorial draft - human review required'},
       {kind:'paragraph',text:'Technical evidence is not upgraded by this export'}
     ]},
-    ...source.sections.map(section=>({kind:'content',
-      title:section.title,items:section.items})),
+    ...source.sections.map((section,i)=>({kind:'content',
+      title:section.title,items:section.items,
+      image:images.length?images[i]:null})),
     {kind:'source',title:'Source and review',items:[
       ...source.provenance.map(text=>({kind:'paragraph',text})),
       {kind:'paragraph',text:'Frozen Markdown SHA-256: '+sha}
     ]}
   ];
   return slides.map((s,index)=>{
-    const headingSize=s.kind==='cover'?37:29;
-    const bodySize=s.kind==='source'?13:s.kind==='cover'?18:20;
+    const hasMaskedImage=s.kind==='content'&&!!s.image;
+    const headingSize=s.kind==='cover'?37:hasMaskedImage?27:29;
+    const bodySize=s.kind==='source'?13:s.kind==='cover'?18:hasMaskedImage?15:20;
     // A uniform display grid is enforced with the PDF font metrics first.
     // PPTX receives these same explicit line breaks, not independent reflow.
     const headLines=wrap(s.title,fonts.bold,headingSize,820,2);
     const items=s.items.map(item=>({...item,
-      lines:wrap(item.text,fonts.normal,bodySize,790,s.kind==='source'?3:2)}));
+      lines:wrap(item.text,fonts.normal,bodySize,
+        hasMaskedImage?385:790,hasMaskedImage?3:s.kind==='source'?3:2)}));
     ensure(items.length<=7 && (s.kind==='source'||items.length<=5),
       'Source would exceed visible page limit','ResourceExhausted');
     const height=items.reduce((n,i)=>n+i.lines.length*(bodySize+10)+16,0);
-    ensure(height<=(s.kind==='source'?320:s.kind==='cover'?165:300),
+    ensure(height<=(s.kind==='source'?320:s.kind==='cover'?165:hasMaskedImage?277:300),
       'Source items exceed available readable slide height','ResourceExhausted');
     return{...s,index:index+1,headLines,headingSize,bodySize,items};
   });
@@ -96,6 +99,17 @@ async function pdfBytes(layout,sha){
         y-=s.bodySize+10;
       });
       y-=16;
+    }
+    if(s.image){
+      const image=await pdf.embedPng(s.image.png);
+      const box={x:515,y:145,w:390,h:259};
+      const fit=Math.min(box.w/image.width,box.h/image.height);
+      const w=image.width*fit,h=image.height*fit;
+      page.drawRectangle({x:box.x-7,y:box.y-7,width:box.w+14,height:box.h+14,
+        color:color('203B50')});
+      page.drawImage(image,{x:box.x+(box.w-w)/2,y:box.y+(box.h-h)/2,width:w,height:h});
+      page.drawText('OPERATOR-MASKED PIXELS / PRIVACY NOT VERIFIED',{
+        x:box.x,y:box.y-31,size:8,font:regular,color:color(COLORS.muted)});
     }
     const footer='DRAFT / NOT PUBLISHED  |  SOURCE '+sha.slice(0,12)+
       '  |  '+s.index+'/'+layout.length;
@@ -144,12 +158,25 @@ async function pptxBytes(layout,sha){
         (item.kind==='bullet'&&index===0?'\u2022  ':'')+line).join('\n');
       const height=item.lines.length*(s.bodySize*.76/72+.18)+.13;
       slide.addText(text,{
-        x:1.02,y,w:11.18,h:height,
+        x:1.02,y,w:s.image?5.25:11.18,h:height,
         fontSize:s.bodySize*.76,fontFace:'Arial',
         margin:0,color:COLORS.soft,valign:'mid',
         breakLine:false,fit:'shrink'
       });
       y+=height+.14;
+    }
+    if(s.image){
+      const bounds={x:7.13,y:1.99,w:5.40,h:3.60};
+      const fit=Math.min(bounds.w/s.image.width,bounds.h/s.image.height);
+      const w=s.image.width*fit,h=s.image.height*fit;
+      slide.addShape(pptx.ShapeType.rect,{x:bounds.x-.08,y:bounds.y-.08,
+        w:bounds.w+.16,h:bounds.h+.16,
+        line:{color:'406079',transparency:100},fill:{color:'203B50'}});
+      slide.addImage({data:'image/png;base64,'+s.image.png.toString('base64'),
+        x:bounds.x+(bounds.w-w)/2,y:bounds.y+(bounds.h-h)/2,w,h});
+      slide.addText('OPERATOR-MASKED PIXELS / PRIVACY NOT VERIFIED',{
+        x:bounds.x,y:bounds.y+bounds.h+.24,w:bounds.w,h:.20,
+        fontFace:'Arial',fontSize:8.2,margin:0,color:COLORS.muted});
     }
     slide.addText('DRAFT / NOT PUBLISHED  |  SOURCE '+sha.slice(0,12)+
       '  |  '+s.index+'/'+layout.length,{
@@ -198,13 +225,22 @@ async function verifyOutput(pptx,pdf,layout){
   ensure(parsed.getPageCount()===layout.length,
     'PDF page count differs from the editable PowerPoint','Conflict');
 }
-export async function renderDeckFormats(source,sha){
+export async function renderDeckFormats(source,sha,images=[]){
+  ensure(Array.isArray(images)&&
+    (images.length===0||images.length===source.sections.length),
+    'A masked screenshot must be supplied for every content slide, or none',
+    'InvalidArgument');
+  for(const img of images)ensure(img&&Buffer.isBuffer(img.png)&&
+    Number.isInteger(img.width)&&Number.isInteger(img.height)&&
+    img.width>=240&&img.height>=135&&
+    img.width<=3840&&img.height<=2160,
+    'Deck image must be a bounded real pixel screenshot','InvalidArgument');
   const measure=await PDFDocument.create();
   const fonts={
     normal:await measure.embedFont(StandardFonts.Helvetica),
     bold:await measure.embedFont(StandardFonts.HelveticaBold)
   };
-  const layout=presentationModel(source,sha,fonts);
+  const layout=presentationModel(source,sha,fonts,images);
   const pptx=await pptxBytes(layout,sha);
   const pdf=await pdfBytes(layout,sha);
   await verifyOutput(pptx,pdf,layout);

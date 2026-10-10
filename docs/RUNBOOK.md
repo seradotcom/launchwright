@@ -1,5 +1,19 @@
 # Operator runbook
 
+## R57 masked Native pixels to source-linked presentation
+
+Only use R57 with an exact fresh candidate plus operator-approved
+R55 masks and persisted Native SANITIZED_DERIVATIVE receipts. Keep the
+private input JSON and original PNGs outside public Git. Plan without
+workspace mutation, then re-enter exact candidate/plan SHA and use an
+owner-private 0700 output directory. The PPTX/PDF and receipt are
+private drafts with pixel privacy outside masks UNKNOWN. A failed write
+can be recovered only using the same plan; never overwrite modified
+outputs or silently substitute a different screenshot. External
+publishing, customer consent, color/branding review and Platform
+job authority require separate actions.
+
+
 ## R46 video aspect derivation / operator incident checklist
 
 Do not derive a video from an unreviewed Native Media source or stale
@@ -41,6 +55,40 @@ reply, replay the same intent after inspecting existing files. Reject
 edited ZIPs, stale source/channel revisions, unsafe output paths and
 wrong screenshot dimensions/alpha. Never automatically resize, publish
 or contact external store accounts.
+
+## R56 store mask lineage and no-silent-privacy-approval
+
+R56 refuses any Google Play screenshot without a matching R55 exact
+plan, receipt, Native derived Evidence and masked PNG bytes. Preserve
+the original private 0600 source JSON and exported SHA plan; if the
+store exporter fails, reconcile only the SAME plan and verify all
+existing ZIP/receipt bytes before resuming. A changed source, stale
+Candidate approval, substituted mask or modified user file is a hard
+stop. This only proves the selected masks and unchanged outside
+pixels; it does not certify PII outside masks or graphics, authorize
+device capture, or permit store staging without R52's own account
+authorization and existing uncommitted Edit.
+
+
+## R55 operator mask and pixel privacy incident checklist
+
+Choose an approved original Native capture evidence and a private 0600 PNG
+whose SHA matches the prepared intent. Manually inspect the complete image,
+identify all sensitive regions and provide bounded non-overlapping rectangles.
+Plan and verify the private hash before explicitly exporting to an existing
+0700 directory. The output has a fixed opaque RGB fill and exact same source
+pixels elsewhere; no person/name/address/PII detection is performed.
+The normalized PNG removes ancillary metadata, **not pixel-based PII outside
+the rectangles**. Do not publish it without independent privacy/rights review.
+
+On an interrupted write use the SAME saved mask plan, original source and
+exact SHA to reconcile PNG and Native SANITIZED_DERIVATIVE receipt. If a
+different PNG, Native revision, source purpose, human-edited output or
+abandoned .pixel-mask-apply.lock exists, STOP and investigate; never delete
+unknown files, skip operator confirmation or silently broaden the masking
+scope. Its transformation marks changes-observed-state and preserves
+technical UNKNOWN, never observed-state eligibility.
+
 
 ## R43 offline demo screenshot/privacy recovery
 
@@ -100,6 +148,35 @@ A conflicting original screenshot, missing receipt, unknown stale lock or
 changed Emulator/APK-installed identity requires manual review. Build
 labels and APK binary hashes remain unverified operator declarations;
 never claim canonical Android Driver Host or Platform acceptance.
+
+
+## R54 lost two-release review export and historical drift
+
+Continuity compares two frozen release candidates, not arbitrary current
+file contents. Store the original private plan and both full candidate
+SHA-256 values securely; a partial ZIP/receipt output can only be
+recovered by rerunning that exact reviewed plan. Verify the release
+build identities, selected targets and unknown Project Graph frontier.
+If an old candidate’s input revisions changed, the comparison stops;
+restore an authorized prior snapshot rather than replacing historical
+copy with current source text. If output files have been edited, or a
+separate export lock remains, inspect manually and never delete
+another operator’s files. A continuity report is not a release
+publication or a customer behavior proof. See RELEASE_CONTINUITY.md.
+
+
+## R52 Google Play Edit loss and expiration
+
+Keep the exact private R44 ZIP, R52 intent, approved source Candidate
+and package/edit identity. Use a 0600 OAuth token file belonging to the
+authorized Play operator. Do not create an Edit when another operator
+has one in progress. First send requires empty image slots, sufficient
+Edit TTL and separate SHA/package/edit approvals. A lost upload
+acknowledgement MUST use recover-only; never rerun send, delete remote
+images or commit the Edit to hide an inconclusive result. Recovery uses
+GET only and marks partial/expired cases for manual Play Console
+reconciliation. Local locks cannot prevent another Play user or machine
+from changing an Edit. External publication is not authorized here.
 
 
 ## R42 private deck/PDF source and recovery
