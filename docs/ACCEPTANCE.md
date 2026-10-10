@@ -490,6 +490,27 @@ safety, application execution, Semwright Driver Host admission or external
 Platform/Store publication is implied by this capability.
 
 
+## R56 candidate — real masked screenshot to Google Play private ZIP
+
+R56 composes R55 exact rectangular PNG pixel redaction and imported
+Native SANITIZED_DERIVATIVE Evidence with R44 Google Play portrait store
+packages. A mandatory one-to-one source chain matches each R55 plan,
+applied receipt, exact 1080 x 1920 image SHA/pixels, Native evidence
+version/origin and R44 screenshot. The private R56 receipt binds the
+full source lineage to the final R44 ZIP digest. Actual owned synthetic
+tests independently compare every output PNG pixel to the original
+image plus the explicitly specified opaque rectangles. The ZIP is
+accepted by the real R52 prepare-only reader, without any Google Edit
+mutation. Stale Native revisions, source mismatches, altered files,
+consents and operator locks fail closed, and exact retries recover.
+Supported Node24 Linux/Windows/macOS CI and the dedicated owned-source
+workflow are required before accepting R56. Neither the original
+device-origin PNG, pixel privacy outside masked areas, icons/graphics,
+actual Play account, publication nor Semwright Platform execution are
+independently verified. STORE_PACKAGE remains PARTIAL and the original
+master remains BLOCKED.
+
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;

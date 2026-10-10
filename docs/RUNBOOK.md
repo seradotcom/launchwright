@@ -42,6 +42,20 @@ edited ZIPs, stale source/channel revisions, unsafe output paths and
 wrong screenshot dimensions/alpha. Never automatically resize, publish
 or contact external store accounts.
 
+## R56 store mask lineage and no-silent-privacy-approval
+
+R56 refuses any Google Play screenshot without a matching R55 exact
+plan, receipt, Native derived Evidence and masked PNG bytes. Preserve
+the original private 0600 source JSON and exported SHA plan; if the
+store exporter fails, reconcile only the SAME plan and verify all
+existing ZIP/receipt bytes before resuming. A changed source, stale
+Candidate approval, substituted mask or modified user file is a hard
+stop. This only proves the selected masks and unchanged outside
+pixels; it does not certify PII outside masks or graphics, authorize
+device capture, or permit store staging without R52's own account
+authorization and existing uncommitted Edit.
+
+
 ## R55 operator mask and pixel privacy incident checklist
 
 Choose an approved original Native capture evidence and a private 0600 PNG

@@ -141,6 +141,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [R49: bounded Apple CoreSimulator iPhone screenshot with Native imported UNKNOWN receipt](docs/IOS_SIMULATOR_CAPTURE.md)
 - [R43: source-pinned offline interactive demo from sanitized Media Evidence](docs/INTERACTIVE_DEMO.md)
 - [R55: operator-defined exact PNG pixel masking and Native sanitized capture evidence](docs/PIXEL_REDACTION.md)
+- [R56: exact R55 masked Native screenshot evidence to R44 Google Play ZIP](docs/MASKED_STORE_HANDOFF.md)
 - [R44: Apple/Google store-specific private screenshot, graphic and listing packages](docs/STORE_ASSETS.md)
 - [R45: offline versioned documentation site from exact frozen Markdown sources](docs/STATIC_DOCS.md)
 - [R46: two exact private MP4 aspect formats plus frozen WebVTT captions](docs/VIDEO_VARIANTS.md)

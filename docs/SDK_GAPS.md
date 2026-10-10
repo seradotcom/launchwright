@@ -161,3 +161,16 @@ sensitive copyrighted content or dangerous product information outside
 the masks; operator choice/rights are declarations. No general privacy
 verifier, observed product state, Driver Host approval, Platform execution,
 customer acceptance, store-upload clearance or publication follows.
+
+## R56 source-linked masked Google Play screenshots (narrow scope)
+
+R56 verifies that a Google Play 1080 x 1920 private R44 store ZIP
+uses the exact R55 masked screenshot bytes bound to each original
+Native SANITIZED_DERIVATIVE Evidence, with an additional SHA-bound
+source-chain receipt. This narrows the gap between generic operator-
+declared sanitized files and actual local mask operations. It does
+NOT independently bind original PNGs to canonical device capture,
+certify PII outside manually selected masks, certify the separate
+store icon/feature graphic, or prove external account authorization,
+Edit commit, customer acceptance or publication. The master stays
+BLOCKED; STORE_PACKAGE and PLAY_UPLOAD remain PARTIAL.

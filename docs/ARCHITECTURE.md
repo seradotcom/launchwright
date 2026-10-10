@@ -96,6 +96,21 @@ store-account upload, device-origin attestation or Platform authority.
 See [STORE_ASSETS](STORE_ASSETS.md).
 
 
+## R56 exact R55 Native masked pixels into R44 Google Play assets
+
+R56 adds a strict optional operator-owned handoff to R44: one R55
+SHA-bound mask input/plan/receipt plus an actual imported Native
+SANITIZED_DERIVATIVE Evidence for every Google Play portrait screenshot.
+It rejects generic unrelated sanitized evidence and matches exact
+Native origin/version and redacted PNG bytes; R44 re-normalizes the
+same pixels and packages the same original store ZIP. R56 appends a
+private mask-lineage receipt tied to R44 ZIP SHA-256. No new Native
+dispatcher, Google Play transport, source execution or publication API
+is implemented. R52 staging remains independently authorized; the
+pixel source is still an owner declaration, NOT canonical Device
+Host capture or general PII clearance. See MASKED_STORE_HANDOFF.md.
+
+
 ## R55 exact operator-defined PNG pixel masks and Native derivative custody
 
 R55 narrows a source privacy problem shared by offline interactive demos and
