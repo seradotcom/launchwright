@@ -147,3 +147,17 @@ claiming automatic reuse. It does not prove full customer source capture,
 browser/native behavior equivalence, a complete Project Graph denominator,
 cross-tenant ACLs, real external publication or the original master’s
 remaining E2E scenarios. Whole-master acceptance remains BLOCKED.
+
+
+## R55 exactly bounded pixel redaction versus general privacy
+
+R55 adds a source- and Native-revision-pinned manual rectangular mask
+adapter that proves byte-exact opaque replacement ONLY inside explicit
+rectangles and exact preservation of ALL unmasked pixels. It removes
+ancillary PNG metadata and creates an imported-authority
+SANITIZED_DERIVATIVE Evidence with REDACT as changes-observed-state.
+It cannot automatically detect all PII, facial/account/tenant data,
+sensitive copyrighted content or dangerous product information outside
+the masks; operator choice/rights are declarations. No general privacy
+verifier, observed product state, Driver Host approval, Platform execution,
+customer acceptance, store-upload clearance or publication follows.

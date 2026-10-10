@@ -96,6 +96,25 @@ store-account upload, device-origin attestation or Platform authority.
 See [STORE_ASSETS](STORE_ASSETS.md).
 
 
+## R55 exact operator-defined PNG pixel masks and Native derivative custody
+
+R55 narrows a source privacy problem shared by offline interactive demos and
+release packages. It requires an original, scoped CAPTURED_ACTUAL or
+CAPTURED_DEMO_DATA Native Evidence, a current approved Source and exact owned
+PNG digest. A private, no-mutation preparation validates 1–24 selected
+non-overlapping rectangles, proves a fixed opaque fill and verifies every
+unmasked pixel remains unchanged, removing ancillary PNG metadata by
+fresh RGB encoding. An explicit private apply rechecks source revisions,
+operator rights and plan SHA, writes PNG+receipt with byte-reconciled recovery,
+and records SANITIZED_DERIVATIVE provenance through canonical capture.ingest.
+The recorded REDACT semantic_effect is changes-observed-state and technical
+state remains UNKNOWN, even if the parent originally had successful capture
+admission. Pixels outside masks are NOT certified free of personal data; no
+general privacy, Host, customer, Platform or publication authority is granted.
+R43 Media variants can bind to the new exact Native evidence ID. See
+[PIXEL_REDACTION.md](PIXEL_REDACTION.md).
+
+
 ## R43 — Script-free offline product screen tour from canonical Media records
 
 The bounded R43 operator CLI reads only a current Native Media plan with

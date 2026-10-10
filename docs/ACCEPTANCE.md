@@ -467,6 +467,29 @@ audited completion; this local 2-release fixture does not claim
 customer/Platform/host/semantic coverage authority.
 
 
+## R55 candidate — exact rectangular pixel redaction and source-linked Native receipt
+
+R55 implements an owner-approved local two-phase PNG transform from an
+original Native CAPTURED_ACTUAL/CAPTURED_DEMO_DATA Evidence. Its plan binds
+exact original PNG SHA, decoded pixel SHA, Native source/release/scenario
+revision pins, 1–24 operator-selected non-overlapping masks, exact masked
+pixel count and derived output SHA. Applying an independently confirmed
+private plan replaces only those pixels with opaque fixed RGB, verifies
+EVERY unmasked pixel is unchanged, strips PNG metadata, and records a
+SANITIZED_DERIVATIVE through canonical capture.ingest with
+changes-observed-state and technical UNKNOWN. Native and private filesystem
+recovery require exact bytes; stale/colliding writes and invalid masks fail
+closed. The end-to-end tests integrate new derivative IDs into a revised
+R43 Media plan and real offline ZIP without granting observed-state
+eligibility or independent privacy certification.
+
+R55 acceptance is still pending supported Node24 Linux/Windows/macOS CI
+and the owned-fixture real Chromium/keyboard/privacy-negatives lane.
+No real customer PII review, visual source rights audit, universal pixel
+safety, application execution, Semwright Driver Host admission or external
+Platform/Store publication is implied by this capability.
+
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;

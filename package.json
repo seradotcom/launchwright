@@ -52,7 +52,10 @@
     "test:google-play": "node --test --test-concurrency=1 tests/google-play-staging.test.mjs",
     "continuity:plan": "node scripts/release-continuity.mjs plan",
     "continuity:export": "node scripts/release-continuity.mjs export",
-    "test:continuity": "node --test --test-concurrency=1 tests/release-continuity.test.mjs"
+    "test:continuity": "node --test --test-concurrency=1 tests/release-continuity.test.mjs",
+    "mask:plan": "node scripts/pixel-mask.mjs plan",
+    "mask:apply": "node scripts/pixel-mask.mjs apply",
+    "test:mask": "node --test --test-concurrency=1 tests/pixel-redaction.test.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",
