@@ -58,7 +58,9 @@
     "test:mask": "node --test --test-concurrency=1 tests/pixel-redaction.test.mjs",
     "masked-store:plan": "node scripts/masked-store-handoff.mjs plan",
     "masked-store:export": "node scripts/masked-store-handoff.mjs export",
-    "test:masked-store": "node --test --test-concurrency=1 tests/masked-store-handoff.test.mjs"
+    "test:masked-store": "node --test --test-concurrency=1 tests/masked-store-handoff.test.mjs",
+    "test:masked-deck": "node --test --test-concurrency=1 tests/masked-deck.test.mjs",
+    "masked-deck": "node scripts/masked-deck.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",
