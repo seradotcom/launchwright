@@ -1,0 +1,75 @@
+name: Owned Google Play provisional images protocol
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: google-play-edit-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  google-play-edit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: No known high-severity production dependencies
+        run: npm audit --omit=dev --audit-level=high
+      - name: Canonical Native source pins and original master blocked gate
+        run: |
+          set -euo pipefail
+          node scripts/verify.mjs
+          node scripts/master-acceptance.mjs --check
+      - name: Real owned R44 PNGs and simulated Android Publisher HTTP
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/google-play-images
+          chmod 0700 evidence/google-play-images
+          node --test --test-concurrency=1 tests/google-play-staging.test.mjs | tee evidence/google-play-images/owned-protocol.tap
+      - name: Retain approved PNG ZIP, exact Edit intent and non-authority report
+        run: |
+          set -euo pipefail
+          node scripts/google-play-owned-smoke.mjs --out-dir "$GITHUB_WORKSPACE/evidence/google-play-images"
+          python3 - <<'PY'
+          import hashlib,json,pathlib,zipfile
+          root=pathlib.Path('evidence/google-play-images')
+          report=json.loads((root/'owned-acceptance.json').read_text())
+          intent=json.loads((root/'intent.json').read_text())
+          zip_path=root/report['bundle_filename']
+          assert report['schema_version']=='launchwright-google-play-owned-fixture/1'
+          assert hashlib.sha256(zip_path.read_bytes()).hexdigest()==report['source_sha256']
+          assert intent['source_zip_sha256']==report['source_sha256']
+          assert intent['intent_sha256']==report['intent_sha256']
+          assert intent['commits_edit'] is False
+          assert intent['creates_edit'] is False
+          assert intent['deletes_existing_images'] is False
+          assert intent['published'] is False and intent['platform_authority'] is False
+          assert intent['technical_state']=='UNKNOWN'
+          assert report['google_play_account_contacted'] is False
+          assert report['independent_device_capture_accepted'] is False
+          assert report['google_play_store_published'] is False
+          assert report['phone_screenshots']==2
+          with zipfile.ZipFile(zip_path) as z:
+              assert z.testzip() is None
+              names=z.namelist()
+              assert 'graphics/icon.png' in names and 'graphics/feature.png' in names
+              assert 'screenshots/01.png' in names and 'screenshots/02.png' in names
+              images=[item for item in intent['assets'] if item['type']=='phoneScreenshots']
+              assert all(hashlib.sha256(z.read(item['path'])).hexdigest()==item['sha256'] for item in images)
+              assert all(hashlib.sha256(z.read(item['path'])).hexdigest()==item['sha256']
+                for item in intent['assets'] if item['type']!='phoneScreenshots')
+          print('OWNED_GOOGLE_PLAY_UNCOMMITTED_EDIT_HTTP_PROTOCOL_PASS',intent['intent_sha256'])
+          PY
+      - name: Retain non-customer ZIP, hashes, exact test log and operator intent
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: launchwright-owned-google-play-${{ github.sha }}
+          path: evidence/google-play-images/
+          if-no-files-found: error
+          retention-days: 14

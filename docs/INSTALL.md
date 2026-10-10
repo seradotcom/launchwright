@@ -113,6 +113,16 @@ actual phone, supply a network ADB target or claim Semwright Android
 Driver Host/Platform authority. The synthetic Android CI lane is separate.
 
 
+## Optional R52 Google Play uncommitted Edit staging
+
+This adapter requires an existing operator-owned Google Play Edit,
+an approved R44 Google phone image ZIP, a private OAuth token file and
+explicit immutable SHA/package/edit confirmations. It cannot commit the
+Edit or publish an app and never blindly retries an ambiguous image POST.
+See GOOGLE_PLAY_IMAGES.md. Real Google account, image ordering and
+customer pixel/rights approval are external obligations.
+
+
 ## R42 editable deck and real PDF
 
 From a human-approved, exact frozen Markdown Candidate, execute the

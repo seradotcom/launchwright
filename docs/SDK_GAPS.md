@@ -125,3 +125,15 @@ gate, not a customer iOS app/physical device/Driver Host/Platform receipt.
 Even after passing that gate, executable build attestation, independently
 proved foreground, PII/pixel privacy, true customer app acceptance,
 Apple account/store upload and productive platform execution remain open.
+
+## R52 existing Google Play Edit staging
+
+R52 stages R44 exact approved Android phone screenshots, icon and feature
+graphic into an EXISTING, UNCOMMITTED Google Play Edit after explicit
+operator consent and a private OAuth token. It verifies remote image
+SHA sets and Edit TTL, rejects foreign or preexisting pixels, and
+never creates/commits/deletes edits or publishes. Accepted synthetic
+REST fixtures cannot prove real Google developer account permissions,
+storefront image order, productive app source, pixel privacy/rights,
+customer review or Semwright Platform Publish. PLAY_UPLOAD remains
+PARTIAL even after local Node24 CI.
