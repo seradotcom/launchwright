@@ -41,7 +41,7 @@ jobs:
             -e WORDPRESS_DB_USER=wordpress \
             -e WORDPRESS_DB_PASSWORD=owned-fixture-db-password \
             -e WORDPRESS_CONFIG_EXTRA="define('WP_ENVIRONMENT_TYPE', 'local');" \
-            wordpress:6.8.3-php8.3-apache
+            wordpress:7.1.2-php8.3-apache
           for count in $(seq 1 80); do
             if curl -fsS --max-time 2 http://127.0.0.1:8765/wp-admin/install.php -o /dev/null; then break; fi
             sleep 2
@@ -66,6 +66,7 @@ jobs:
             --admin_password=owned-fixture-operator-password \
             --admin_email=ownedoperator@example.invalid \
             --skip-email
+          wpcli eval 'if (wp_get_environment_type() !== "local") { exit(1); }'
           app_password="$(wpcli user application-password create ownedoperator "Launchwright R47 CI" --porcelain)"
           test -n "$app_password"
           export WP_CI_APP_PASSWORD="$app_password"
