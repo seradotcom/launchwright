@@ -45,10 +45,10 @@
       "profile": "ANDROID_CAPTURE",
       "scope": "EXTERNAL_ACCEPTANCE",
       "implementation": "PARTIAL",
-      "evidence": "LOCAL_CONTRACT_CI",
-      "source_sha": null,
-      "run_id": null,
-      "remaining": "R48 bounded Android emulator screenshot + exact Native imported UNKNOWN receipt; Node24 3OS fake ADB and owned real Android34 emulator CI pending. Customer APK provenance, physical device, independent pixel rights/PII, Native Driver Host and Platform admission remain absent."
+      "evidence": "OWNED_ANDROID_EMULATOR_CI",
+      "source_sha": "26d7eb1b383af944cfcd5a9dc06d57332efe8256",
+      "run_id": 38009606890,
+      "remaining": "R48 passed Node24 Linux/Windows/macOS plus real Android34 emulator running an owned synthetic APK and Native imported UNKNOWN screenshot. Missing customer APK binary attestation, physical device, independent privacy/rights, Android Driver Host and canonical Semwright Platform Publish."
     },
     {
       "profile": "IOS_CAPTURE",
