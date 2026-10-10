@@ -45,7 +45,9 @@
     "test:android": "node --test --test-concurrency=1 tests/android-emulator-capture.test.mjs",
     "ios:plan": "node scripts/ios-simulator-capture.mjs plan",
     "ios:capture": "node scripts/ios-simulator-capture.mjs capture",
-    "test:ios": "node --test --test-concurrency=1 tests/ios-simulator-capture.test.mjs"
+    "test:ios": "node --test --test-concurrency=1 tests/ios-simulator-capture.test.mjs",
+    "apple-screenshots": "node scripts/apple-screenshot-upload.mjs",
+    "test:apple": "node --test --test-concurrency=1 tests/apple-screenshot-upload.test.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",

@@ -42,7 +42,7 @@
   ],
   "outstanding_external": [
     "Android emulator-only imported screenshot scope (R48 pending real Android34 CI); physical customer Android/iOS devices remain unaccepted",
-    "Store account upload",
+    "R51 Apple screenshot-only upload protocol uses injected transport; real operator Apple App Store Connect account, screenshot processing, App Review, and independently approved customer pixels remain unaccepted",
     "ChatGPT Plugin host acceptance",
     "Human source/editorial approval and live customer pilot"
   ],

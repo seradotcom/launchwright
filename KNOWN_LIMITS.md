@@ -19,7 +19,9 @@ A green local browser/MCP test is not proof of real customer acceptance.
 Android/iOS customer capture and App Store/Play uploads are not accepted.
 R48 provides an emulator-only source reader and owned synthetic Android
 acceptance lane, but no physical phone, certified APK build proof or canonical
-Android Driver Host/Platform job. R49 adds a bounded CoreSimulator
+Android Driver Host/Platform job. R51 adds an injected-transport Apple screenshot-only reservation/upload/
+readback path, not a real App Store Connect account or app submission.
+R49 adds a bounded CoreSimulator
 iPhone screenshot adapter and an owned synthetic Xcode/macOS runner pending
 exact-SHA acceptance, but no real customer iOS execution, installed app
 binary proof, independent pixel privacy or Driver Host/Platform authority.

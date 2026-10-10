@@ -113,6 +113,27 @@ output that remains technical UNKNOWN. CLI lock and exact-byte recovery
 avoid blind retries/overwrites. See [the offline demo guide](INTERACTIVE_DEMO.md).
 
 
+## R51 bounded App Store Connect screenshot asset reservations
+
+R51 accepts an exact R44 Apple iPhone PNG store ZIP plus an approved Native
+Candidate, pre-existing screenshot set and version-localization IDs. Planning
+validates the candidate/source and pixels without contacting Apple. The
+operator-scoped Apple API JWT transport reads the exact locale/display/asset
+set; then with separate SHA/first-send confirmation it reserves missing
+screenshots, PUTs only its bounded uploadOperations chunks to Apple HTTPS
+blobstore without bearer headers, PATCHes uploaded:true with exact MD5,
+and re-reads processing state. Signed URLs are never persisted or logged.
+No new screenshot sets, version updates, app review submission, storefront
+activation or Platform/tenant authority can be created.
+
+A lost POST reservation, signed-part PUT or PATCH response requires the
+same original intent with recover-only GET, never blind duplication.
+Existing unrelated screenshots, failed/unknown asset states, checksum
+drift, unsupported links and wrong localization block further writes.
+No live Apple account was used for R51 mock transport acceptance.
+See [APPLE_SCREENSHOT_UPLOAD.md](APPLE_SCREENSHOT_UPLOAD.md).
+
+
 ## R49 — bounded CoreSimulator screenshot observation and custody
 
 A new operator-only fixed xcrun simctl adapter reads Apple CoreSimulator's

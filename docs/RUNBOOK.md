@@ -58,6 +58,20 @@ human reconciliation. No automatic deletion of unknown lock files
 or blind changes to the original project.
 
 
+## R51 Apple screenshot asset lost-ACK and processing recovery
+
+Use existing owner Apple screenshot-set and localization IDs and a
+short-lived 0600 private JWT. Plan from an exact R44 ZIP, then
+independently confirm the full intent/candidate/set SHA identity.
+Reservation POST, signed upload PUT and commit PATCH can have unknown
+outcomes; recover with the SAME saved intent using GET-only mode.
+If the server shows AWAITING_UPLOAD, stop and reconcile the original
+reservation manually; never create a replacement behind the operator.
+UPLOAD_COMPLETE still requires asynchronous Apple processing before
+COMPLETE. Completed screenshots are not a submitted app, and neither
+review approval nor storefront activation is performed by this adapter.
+
+
 ## R49 owner iPhone Simulator capture and incident recovery
 
 The operator, not Launchwright, boots and foregrounds the selected app on
