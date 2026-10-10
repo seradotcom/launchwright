@@ -96,6 +96,21 @@ store-account upload, device-origin attestation or Platform authority.
 See [STORE_ASSETS](STORE_ASSETS.md).
 
 
+## R57 — Exact masked Native evidence in editable deck/PDF
+
+R57 integrates R55 Native SANITIZED_DERIVATIVE pixel-redaction receipts
+with the existing R42 fresh, editorial-approved frozen Markdown candidate.
+One distinct R55 PNG/mask/evidence source per content slide is checked
+against the original source, rights, Native revision, build, target and
+masked-output pixels. The shared deck renderer uses the same measured
+text layout and projects each source image into replaceable PPTX media
+and a real PDF image XObject; the R42 text-only path remains unchanged.
+A private two-phase SHA-bound plan/export uses a dedicated exclusive
+local lock, prevents output clobber and can resume identical interrupted
+writes. It neither grants general pixel privacy, capture/Driver Host
+authority nor publishes to Platform. See MASKED_DECK.md.
+
+
 ## R56 exact R55 Native masked pixels into R44 Google Play assets
 
 R56 adds a strict optional operator-owned handoff to R44: one R55

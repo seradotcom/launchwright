@@ -1,0 +1,93 @@
+name: Owned masked screenshot to editable deck
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: masked-deck-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  owned-masked-deck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Check production dependencies and exact Native profiles
+        run: |
+          set -euo pipefail
+          npm audit --omit=dev --audit-level=high
+          node scripts/verify.mjs
+      - name: Real R55-to-R57 Native/pixel and editable document tests
+        run: node --test --test-concurrency=1 tests/masked-deck.test.mjs tests/deck-pdf.test.mjs tests/pixel-redaction.test.mjs
+      - name: Produce 2 redacted Native screenshot slides as owned synthetic PPTX and PDF
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/owned-masked-deck
+          chmod 0700 evidence/owned-masked-deck
+          node scripts/masked-deck-owned-smoke.mjs --out-dir "$GITHUB_WORKSPACE/evidence/owned-masked-deck" | tee evidence/owned-masked-deck/acceptance.json
+      - name: Independently open PPTX with LibreOffice and compare PDF structure and text
+        run: |
+          set -euo pipefail
+          if ! command -v libreoffice >/dev/null || ! command -v pdfinfo >/dev/null || ! command -v pdftoppm >/dev/null; then
+            sudo apt-get update -qq
+            sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libreoffice-impress poppler-utils
+          fi
+          dir=evidence/owned-masked-deck
+          pptx=$(find "$dir" -maxdepth 1 -type f -name '*.pptx' -print -quit)
+          direct=$(find "$dir" -maxdepth 1 -type f -name '*.pdf' -print -quit)
+          test -s "$pptx"
+          test -s "$direct"
+          mkdir -p "$dir/from-pptx"
+          libreoffice -env:UserInstallation=file://"$GITHUB_WORKSPACE"/.r57-lo-home --headless --convert-to pdf --outdir "$dir/from-pptx" "$pptx"
+          converted="$dir/from-pptx/$(basename "$direct")"
+          test -s "$converted"
+          pdftotext "$direct" "$dir/pdf-text.txt"
+          pdftotext "$converted" "$dir/pptx-text.txt"
+          pdftoppm -f 2 -l 3 -png -r 115 "$direct" "$dir/direct-slide"
+          pdftoppm -f 2 -l 3 -png -r 115 "$converted" "$dir/editable-slide"
+          python3 - <<'PY'
+          import json,subprocess,pathlib,hashlib,zipfile
+          base=pathlib.Path('evidence/owned-masked-deck')
+          report=json.loads((base/'acceptance.json').read_text())
+          assert report['schema_version']=='launchwright-owned-masked-deck-acceptance/1'
+          assert report['synthetic_fixture'] is True
+          assert report['pixel_privacy_certified'] is False
+          assert report['platform_authority'] is False
+          assert report['customer_acceptance'] is False
+          assert report['screenshots']==2 and report['pages']==4
+          docs=report['documents']
+          for name,info in docs.items():
+            raw=(base/name).read_bytes()
+            assert len(raw)==info['bytes'] and hashlib.sha256(raw).hexdigest()==info['sha256']
+          pdf=[base/name for name in docs if name.endswith('.pdf')][0]
+          pptx=[base/name for name in docs if name.endswith('.pptx')][0]
+          with zipfile.ZipFile(pptx) as archive:
+            assert archive.testzip() is None
+            images=[name for name in archive.namelist() if name.startswith('ppt/media/') and name.endswith('.png')]
+            assert len(images)==2,images
+            assert len([name for name in archive.namelist() if name.startswith('ppt/slides/slide') and name.endswith('.xml')])==4
+          for file in (pdf,base/'from-pptx'/pdf.name):
+            info=subprocess.check_output(['pdfinfo',str(file)],text=True)
+            assert 'Pages:           4' in info
+          for txt in ('pdf-text.txt','pptx-text.txt'):
+            text=(base/txt).read_text()
+            for marker in ('Product screen one','Product screen two','OPERATOR-MASKED PIXELS','NOT PUBLISHED'):
+              assert marker in text,(txt,marker)
+          assert len(list(base.glob('direct-slide-*.png')))==2
+          assert len(list(base.glob('editable-slide-*.png')))==2
+          print('R57_OWNED_R55_TO_PPTX_PDF_SOURCE_BOUND_PASS',report['masked_deck_plan_sha256'])
+          PY
+      - name: Upload synthetic exact-source docs and visual receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: launchwright-masked-deck-${{ github.sha }}
+          path: evidence/owned-masked-deck/
+          if-no-files-found: error
+          retention-days: 14

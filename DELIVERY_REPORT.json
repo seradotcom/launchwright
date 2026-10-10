@@ -32,7 +32,7 @@
   ],
   "outstanding_core": [
     "DOCS_GIT local branch/draft-PR mock accepted only; live authorized GitHub PR, merge and docs deployment remain unaccepted",
-    "DECK_PDF text-only PPTX/PDF owned-synthetic Node24 document rendering accepted; rich media, accessibility, customer branding and editorial visual QA remain open",
+    "DECK_PDF R57 exact R55-masked Native screenshots in PPTX/PDF pending Node24 owned visual acceptance; accessibility, customer branding, rich layouts, independent pixel privacy and rights review remain open",
     "INTERACTIVE_DEMO static synthetic offline Chromium navigation accepted; customer interactive actions, pixel privacy, accessibility and independent source admission remain unaccepted",
     "STORE_PACKAGE R56 exact local R55 pixel mask -> Native derivative -> R44 Google Play ZIP subset pending independent Node24 acceptance; original device capture, privacy outside masks, graphics rights, other store profiles and real external account acceptance unestablished",
     "VIDEO R46 two aspect MP4 plus frozen WebVTT owned technical subset (source Media reviewed, vertical derivative UNKNOWN); alternate voice, burn-in captions, independent editorial/customer rights and acceptance remain open",

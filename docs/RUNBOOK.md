@@ -1,5 +1,19 @@
 # Operator runbook
 
+## R57 masked Native pixels to source-linked presentation
+
+Only use R57 with an exact fresh candidate plus operator-approved
+R55 masks and persisted Native SANITIZED_DERIVATIVE receipts. Keep the
+private input JSON and original PNGs outside public Git. Plan without
+workspace mutation, then re-enter exact candidate/plan SHA and use an
+owner-private 0700 output directory. The PPTX/PDF and receipt are
+private drafts with pixel privacy outside masks UNKNOWN. A failed write
+can be recovered only using the same plan; never overwrite modified
+outputs or silently substitute a different screenshot. External
+publishing, customer consent, color/branding review and Platform
+job authority require separate actions.
+
+
 ## R46 video aspect derivation / operator incident checklist
 
 Do not derive a video from an unreviewed Native Media source or stale

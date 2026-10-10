@@ -93,7 +93,7 @@
       "evidence": "OWNED_FIXTURE_DOCUMENT_RENDER",
       "source_sha": "9f9bdfbdd6bb219cef3c0e105b1960e476807c6a",
       "run_id": 37906146250,
-      "remaining": "R42 reviewed text-only PPTX and real PDF passed separate Poppler and LibreOffice owned synthetic runs. Rich media, multilingual embedded fonts, customer branding/permissions, accessibility and independent editorial design acceptance remain missing."
+      "remaining": "R42 text-only PPTX/PDF accepted; R57 adds exact R55 pixel-masked Native screenshot image lineage to PPTX/PDF (Node24/visual acceptance pending). Customer branding/visual QA, accessibility, multilingual fonts, richer layouts, independent pixel privacy/rights and Platform remain unaccepted."
     },
     {
       "profile": "INTERACTIVE_DEMO",

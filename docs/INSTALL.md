@@ -123,6 +123,17 @@ See GOOGLE_PLAY_IMAGES.md. Real Google account, image ordering and
 customer pixel/rights approval are external obligations.
 
 
+## R57 private Native-masked screenshot presentation
+
+After approving a frozen Markdown candidate and obtaining a set of exact
+R55 masked PNGs/Native SANITIZED_DERIVATIVE receipts, follow
+[MASKED_DECK.md](MASKED_DECK.md). The optional local CLI composes one
+screenshot per Markdown section into editable PPTX and real PDF with
+SHA lineage, using an owner-private output directory. Only operator-
+declared mask coverage is established; no independent pixel privacy
+certification or external publishing occurs.
+
+
 ## R56 masked Google Play screenshot integrity handoff
 
 After R55 produces exact operator-owned masked PNGs, use the R56 private

@@ -174,3 +174,13 @@ certify PII outside manually selected masks, certify the separate
 store icon/feature graphic, or prove external account authorization,
 Edit commit, customer acceptance or publication. The master stays
 BLOCKED; STORE_PACKAGE and PLAY_UPLOAD remain PARTIAL.
+
+## R57 exact masked screenshot presentation
+
+R57 composes R55 operator-owned exact PNG masks and Native derivative
+receipts with the R42 editable presentation renderer. Every inserted
+image is a replaceable real PPTX PNG and real PDF image with original
+source/version/pixel hashes in its private receipt, but only mask-area
+pixel changes are verified. Human pixel review outside masks, complete
+product-source rights, accessibility, fonts, customer/brand acceptance,
+additional rich media layouts and real Platform Publish remain open.

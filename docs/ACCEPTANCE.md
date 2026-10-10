@@ -511,6 +511,26 @@ independently verified. STORE_PACKAGE remains PARTIAL and the original
 master remains BLOCKED.
 
 
+## R57 candidate — source-bound R55 masked images in PPTX and PDF
+
+R57 takes a frozen editorial-approved R42 Markdown candidate and exactly
+one R55 masked screenshot per content slide. Every input requires a
+specific R55 mask plan/input/apply receipt, exact PNG byte and decoded
+pixel SHA, Native SANITIZED_DERIVATIVE evidence ID/revision/origin and
+the same candidate release/target/build. Technical state remains UNKNOWN
+because masks cover operator-selected rectangles only; no independent
+PII clearance or source rights certification is asserted. Two-phase
+private plan/export embeds the images in replaceable PPTX media and PDF
+image XObjects, preserves the original source copy, checks deterministic
+binary outputs, and refuses human edits, stale source, swapped screenshots
+or concurrent writers. Real owned synthetic Node22 tests passed; Node24
+Linux/Windows/macOS and separate owned Poppler/LibreOffice visual
+acceptance on an exact SHA are required before R57 is accepted. Original
+DECK_PDF remains PARTIAL because rich multi-asset layout, customer visual
+quality/accessibility, licensed font coverage and customer/Platform
+acceptance are not established.
+
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;
