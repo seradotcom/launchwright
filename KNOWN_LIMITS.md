@@ -16,7 +16,10 @@ A green local browser/MCP test is not proof of real customer acceptance.
 
 ## External acceptance with implementation debt
 
-Real Android/iOS capture and App Store/Play upload adapters are not accepted.
+Android/iOS customer capture and App Store/Play uploads are not accepted.
+R48 provides an emulator-only source reader and owned synthetic Android
+acceptance lane, but no physical phone, certified APK build proof or canonical
+Android Driver Host/Platform job; iOS capture is still missing.
 A local MCP client is not host acceptance in ChatGPT Plugin or equivalent
 remote accounts. R47 implements a concrete WordPress Posts REST DRAFT adapter with
 synthetic HTTP integration and a separately gated genuine disposable

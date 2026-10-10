@@ -39,7 +39,10 @@
     "video:smoke": "node scripts/video-variants-owned-smoke.mjs",
     "test:video": "node --test --test-concurrency=1 tests/video-variants.test.mjs",
     "cms:wordpress": "node scripts/wordpress-draft.mjs",
-    "test:wordpress": "node --test --test-concurrency=1 tests/wordpress-draft.test.mjs"
+    "test:wordpress": "node --test --test-concurrency=1 tests/wordpress-draft.test.mjs",
+    "android:plan": "node scripts/android-emulator-capture.mjs plan",
+    "android:capture": "node scripts/android-emulator-capture.mjs capture",
+    "test:android": "node --test --test-concurrency=1 tests/android-emulator-capture.test.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",

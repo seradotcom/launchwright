@@ -58,6 +58,22 @@ human reconciliation. No automatic deletion of unknown lock files
 or blind changes to the original project.
 
 
+## R48 Android emulator evidence and incident recovery
+
+Only explicitly selected emulator-PORT devices with ro.kernel.qemu=1 are
+eligible. Start/foreground the approved app *outside* the R48 adapter, never
+attach a physical phone or use ADB over TCP. Plan the source build/target
+and check the full digest before taking the current foreground screenshot.
+Output PNG and receipt must remain in a private 0700 directory; the operator
+must perform independent pixel PII/rights review before sharing.
+A lost Native Evidence acknowledgement can be reconciled by re-running
+the same plan using the saved PNG/receipt, without another screencap.
+A conflicting original screenshot, missing receipt, unknown stale lock or
+changed Emulator/APK-installed identity requires manual review. Build
+labels and APK binary hashes remain unverified operator declarations;
+never claim canonical Android Driver Host or Platform acceptance.
+
+
 ## R42 private deck/PDF source and recovery
 
 Use deck-pdf.mjs plan and export only on an exact human-reviewed frozen

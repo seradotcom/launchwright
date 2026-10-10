@@ -1,0 +1,87 @@
+name: Owned Android emulator capture acceptance
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: owned-android-emulator-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  android-owned:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+      - name: Verify Native SDK and bounded ADB negative tests
+        run: |
+          set -euo pipefail
+          node scripts/verify.mjs
+          node --test --test-concurrency=1 tests/android-emulator-capture.test.mjs
+          node scripts/master-acceptance.mjs --check
+      - name: Enable hardware acceleration on disposable Linux runner
+        run: |
+          sudo chmod 0666 /dev/kvm
+      - name: Boot actual Android emulator and capture owned synthetic APK
+        uses: ReactiveCircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          cores: 2
+          ram-size: 2048M
+          disable-animations: true
+          emulator-boot-timeout: 600
+          script: |
+            set -euo pipefail
+            chmod +x scripts/android-owned-apk-build.sh
+            bash scripts/android-owned-apk-build.sh
+            mkdir -p evidence/android-owned
+            chmod 0700 evidence/android-owned
+            node scripts/android-owned-smoke.mjs --out-dir "$GITHUB_WORKSPACE/evidence/android-owned" | tee evidence/android-owned/result.json
+            node --input-type=module <<'NODE'
+            import { readFileSync } from 'node:fs';
+            import { join } from 'node:path';
+            import { createHash } from 'node:crypto';
+            import { PNG } from 'pngjs';
+            const dir='evidence/android-owned';
+            const report=JSON.parse(readFileSync(join(dir,'result.json'),'utf8'));
+            if(report.schema_version!=='launchwright-r48-owned-emulator-e2e/1'||
+              !report.owned_synthetic_android_apk||
+              !report.recovery_did_not_recapture||
+              report.original_native_evidence_state!=='UNKNOWN'||
+              report.real_customer_acceptance!==false||
+              report.real_mobile_hardware_acceptance!==false||
+              report.platform_publish_authority!==false||
+              report.driver_host_admission!==false||
+              report.pixel_privacy_independently_verified!==false)
+              throw Error('Android live emulator receipt violates accepted technical boundaries');
+            const bytes=readFileSync(join(dir,report.screenshot_filename));
+            const hash=createHash('sha256').update(bytes).digest('hex');
+            if(hash!==report.screenshot_png_sha256)throw Error('Android captured pixels differ from receipt SHA-256');
+            const pixels=PNG.sync.read(bytes,{checkCRC:true});
+            if(pixels.width!==report.device_dimensions[0]||
+              pixels.height!==report.device_dimensions[1])
+              throw Error('Android PNG pixels differ from device-reported dimensions');
+            const alpha=pixels.data.reduce((n,v,i)=>n+(i%4===3&&v!==0?1:0),0);
+            if(alpha<=pixels.width*pixels.height*0.95)
+              throw Error('Android owned fixture screenshot is unexpectedly transparent');
+            console.log('ANDROID_OWNED_EMULATOR_REAL_PIXELS_ACCEPTED',
+              report.screenshot_png_sha256,pixels.width,pixels.height);
+            NODE
+      - name: Preserve owned synthetic screenshot, strict Native receipt and plan
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: launchwright-android-owned-${{ github.sha }}
+          path: evidence/android-owned/
+          if-no-files-found: warn
+          retention-days: 14
