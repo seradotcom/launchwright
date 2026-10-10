@@ -430,6 +430,23 @@ device/app, true binary/foreground isolation, pixel PII screening,
 Driver Host/Platform and public App Store upload remain unverified.
 
 
+## R52 candidate - Google Play existing Edit image upload only
+
+R52 binds one original R44 approved Google Play phone PNG asset ZIP,
+frozen Native SDK candidate, source evidence and exact Edit/package/locale
+to a private plan. With operator token and explicit SHA consent it GETs
+the existing Android Publisher Edit and three image lists, requiring
+empty slots, then POSTs only approved PNG bytes and reads SHA-256 image
+sets back. Read-only recovery handles lost acknowledgements; foreign
+images, expired Edits, tampered sources, duplicate IDs and missing
+consent fail closed. No image ordering claim, no Edits insert/commit,
+delete/deleteall, Play listing copy write or public app submission exists.
+Supported Node24 Linux/Windows/macOS and the selective owned Google
+REST HTTP lane are still required before R52 implementation acceptance.
+The test fixture is NOT a live developer account, customer app or
+semantically reviewed screenshot/rights/privacy certification.
+
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;

@@ -145,6 +145,19 @@ The owned Android emulator CI app is separately installed/foregrounded
 by an intentionally isolated synthetic runner, never by the adapter.
 
 
+## R52 operator-owned Play Edit image staging
+
+The optional Android Publisher v3 adapter validates a frozen R44 Google
+Play Candidate, approved local source PNG ZIP, Edit ID, package identity,
+source SHA-256 and locale before contacting an operator-owned Play account.
+It GETs the existing Edit, GETs three image collections and POSTs only
+exact PNG bytes with uploadType=media. It cannot create/commit/delete edits,
+rewrite metadata, submit binaries, publish, or infer image ordering from
+unordered API results. Lost acknowledgements require read-only recovery
+with the original intent. Local write exclusivity does not substitute for
+Google Play Console user/tenant isolation. See GOOGLE_PLAY_IMAGES.md.
+
+
 ## R42 immutable editorial candidate to two native document formats
 
 R42 reads one fresh human-reviewed Candidate and the exact frozen Markdown

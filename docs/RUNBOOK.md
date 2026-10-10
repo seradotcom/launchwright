@@ -88,6 +88,20 @@ labels and APK binary hashes remain unverified operator declarations;
 never claim canonical Android Driver Host or Platform acceptance.
 
 
+## R52 Google Play Edit loss and expiration
+
+Keep the exact private R44 ZIP, R52 intent, approved source Candidate
+and package/edit identity. Use a 0600 OAuth token file belonging to the
+authorized Play operator. Do not create an Edit when another operator
+has one in progress. First send requires empty image slots, sufficient
+Edit TTL and separate SHA/package/edit approvals. A lost upload
+acknowledgement MUST use recover-only; never rerun send, delete remote
+images or commit the Edit to hide an inconclusive result. Recovery uses
+GET only and marks partial/expired cases for manual Play Console
+reconciliation. Local locks cannot prevent another Play user or machine
+from changing an Edit. External publication is not authorized here.
+
+
 ## R42 private deck/PDF source and recovery
 
 Use deck-pdf.mjs plan and export only on an exact human-reviewed frozen

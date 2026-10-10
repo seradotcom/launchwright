@@ -42,7 +42,7 @@
   ],
   "outstanding_external": [
     "Android emulator-only imported screenshot scope (R48 pending real Android34 CI); physical customer Android/iOS devices remain unaccepted",
-    "Store account upload",
+    "Google Play R52 image staging uses owned synthetic HTTP protocol only; real store account permissions, image order, existing-image replacements, Edit review/commit and public publication remain external",
     "ChatGPT Plugin host acceptance",
     "Human source/editorial approval and live customer pilot"
   ],

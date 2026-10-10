@@ -252,6 +252,18 @@ A selective CI Android34 owned synthetic APK/emulator runner is required
 before R48 source acceptance. [Android emulator guide](docs/ANDROID_EMULATOR_CAPTURE.md).
 
 
+## R52 provisional Google Play Edit images
+
+R52 connects an operator-approved R44 PNG package to an EXISTING Google
+Play Edit. It never creates or commits an Edit, deletes images, changes a
+listing or publishes. Only empty image slots are supported. An exact
+SHA-bound plan, private OAuth bearer file, explicit first-send consent,
+remote SHA-256 readback, a local write lock and read-only recovery protect
+the upload. Google Play image ordering and source pixel privacy are not
+independently verified. No real Google Play account was tested.
+See docs/GOOGLE_PLAY_IMAGES.md.
+
+
 ## Original master scope and truthful transfer acceptance
 
 The original private Semwright Release Studio / Launchwright master specifies
