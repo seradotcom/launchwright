@@ -120,7 +120,7 @@
       "evidence": "LOCAL_CONTRACT_CI",
       "source_sha": null,
       "run_id": null,
-      "remaining": "R51 screenshot-only Apple reservation/signed-part upload and MD5/processing readback are tested via injected Apple transport. Actual App Store Connect account, screenshot asynchronous processing, verified display mapping, privacy/rights, App Review submission and storefront activation remain unaccepted."
+      "remaining": "R51 bounded App Store staging uses an injected Apple transport. R58 links exact R55 masked Native screenshots to R44 Apple ZIP and R51 intent (Node24 and owned CI pending). Real Apple account, device provenance, remaining PII/rights review, async policy processing, App Review and publication remain unaccepted."
     },
     {
       "profile": "PLAY_UPLOAD",

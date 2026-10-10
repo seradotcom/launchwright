@@ -1,0 +1,78 @@
+name: Owned masked Apple screenshot chain
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: masked-apple-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  masked-apple:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Audit pinned production dependencies
+        run: npm audit --omit=dev --audit-level=high
+      - name: Check Native SDK source pins and master
+        run: |
+          set -euo pipefail
+          node scripts/verify.mjs
+          node scripts/master-acceptance.mjs --check
+      - name: Test full exact R55 Native pixel mask to Apple screenshot chain
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/masked-apple
+          chmod 0700 evidence/masked-apple
+          node --test --test-concurrency=1 tests/masked-apple-handoff.test.mjs | tee evidence/masked-apple/owned-protocol.tap
+      - name: Preserve only owned synthetic masked Apple PNG and exact intent
+        run: |
+          set -euo pipefail
+          node scripts/masked-apple-owned-smoke.mjs --out-dir "$GITHUB_WORKSPACE/evidence/masked-apple"
+          python3 - <<'PY'
+          import pathlib,json,hashlib,zipfile
+          root=pathlib.Path('evidence/masked-apple')
+          report=json.loads((root/'masked-apple-acceptance.json').read_text())
+          intent=json.loads((root/'masked-apple-upload-intent.json').read_text())
+          assert report['schema_version']=='launchwright-r58-owned-masked-apple/1'
+          assert report['synthetic_fixture'] is True
+          assert report['actual_apple_account_contacted'] is False
+          assert report['original_source_png_in_artifact'] is False
+          assert report['R51_upload_performed'] is False
+          assert report['store_publication_performed'] is False
+          assert report['pii_outside_masks_verified'] is False
+          assert report['source_device_attested'] is False
+          assert report['platform_authority'] is False
+          assert report['technical_state']=='UNKNOWN'
+          assert report['screenshot_count']==1 and report['screenshot_pixels']==[1179,2556]
+          assert len(report['exported_files'])==3
+          for file in report['exported_files']:
+            data=(root/file['name']).read_bytes()
+            assert len(data)==file['bytes']
+            assert hashlib.sha256(data).hexdigest()==file['sha256']
+          zipname=next(x['name'] for x in report['exported_files'] if x['name'].endswith('.zip'))
+          with zipfile.ZipFile(root/zipname) as z:
+            assert z.testzip() is None
+            png=z.read('screenshots/01.png')
+            assert hashlib.sha256(png).hexdigest()==report['R51_apple_image_sha256']
+          assert intent['apple_intent']['intent_sha256']==report['R51_apple_intent_sha256']
+          assert intent['apple_intent']['images'][0]['sha256']==report['R51_apple_image_sha256']
+          assert intent['apple_intent']['images'][0]['source_evidence_id']==report['derived_native_evidence_id']
+          assert intent['residual_pii_unknown'] is True
+          assert intent['remote_actions_performed'] is False
+          print('OWNED_MASKED_APPLE_NATIVE_PIXEL_AND_R51_PLAN_PASS',report['R44_store_zip_sha256'])
+          PY
+      - name: Retain masked pixels, R44 ZIP and R51 plan without originals/credentials
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: launchwright-owned-masked-apple-${{ github.sha }}
+          path: evidence/masked-apple/
+          if-no-files-found: error
+          retention-days: 14

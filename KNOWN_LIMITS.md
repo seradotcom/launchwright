@@ -17,7 +17,7 @@ A green local browser/MCP test is not proof of real customer acceptance.
 
 ## External acceptance with implementation debt
 
-Android/iOS customer capture and App Store/Play uploads are not accepted.
+Android/iOS customer capture and App Store/Play account acceptance remain external. R51 has a bounded App Store screenshot-only transport; R58 requires R55 masked Native screenshot proof before Apple R44/R51 staging but cannot verify all remaining PII, device ownership, actual developer account or App Review.
 R48 provides an emulator-only source reader and owned synthetic Android
 acceptance lane, but no physical phone, certified APK build proof or canonical
 Android Driver Host/Platform job. R51 adds an injected-transport Apple screenshot-only reservation/upload/

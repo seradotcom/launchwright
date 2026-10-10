@@ -10,7 +10,10 @@ import { digest } from './base.mjs';
 import { execute } from './application.mjs';
 
 export const MASK_SCHEMA='launchwright-owned-pixel-mask-plan/1';
-const MAX_PNG=12*1024*1024,MAX_WIDTH=3840,MAX_HEIGHT=2160;
+// Also admit reviewed iPhone 1179x2556/1206x2622 screenshots without
+// increasing the existing MAX_PIXELS memory/decode budget.
+const MAX_PNG=12*1024*1024,MAX_WIDTH=3840,MAX_HEIGHT=2700,
+  MAX_PIXELS=3840*2160;
 const FILL=Object.freeze([8,22,33,255]);
 const sha=v=>createHash('sha256').update(v).digest('hex');
 const isSha=x=>typeof x==='string'&&/^[0-9a-f]{64}$/u.test(x);
@@ -76,7 +79,7 @@ function loadSource(path,pinned){
     'Source is not a real PNG with IHDR','InvalidArgument');
   const width=raw.readUInt32BE(16),height=raw.readUInt32BE(20);
   ensure(width>0&&height>0&&width<=MAX_WIDTH&&height<=MAX_HEIGHT&&
-    width*height<=MAX_WIDTH*MAX_HEIGHT,
+    width*height<=MAX_PIXELS,
     'Uncompressed source dimensions exceed the declared pixel budget',
     'ResourceExhausted');
   let png;

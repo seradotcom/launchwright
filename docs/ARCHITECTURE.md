@@ -162,6 +162,20 @@ output that remains technical UNKNOWN. CLI lock and exact-byte recovery
 avoid blind retries/overwrites. See [the offline demo guide](INTERACTIVE_DEMO.md).
 
 
+## R58 exact masked Apple screenshot provenance
+
+R58 verifies a complete R55 opaque rectangular pixel mask for every
+supported R44 Apple iPhone screenshot and its imported Native
+SANITIZED_DERIVATIVE receipt, then byte-/pixel-readbacks the Apple ZIP.
+R51 remains the ONLY HTTPS Apple screenshot upload state machine:
+R58 adds an exact proof-bound wrapper around R51's immutable plan,
+send and recover-only operations, without duplicating its Apple client.
+R55 now admits 1179x2556 and 1206x2622 with the former absolute
+8.29-million-pixel memory ceiling intact. There is no general pixel
+PII clearance, device attestation, real App Store account or App
+Review acceptance. See [R58 masked Apple handoff](MASKED_APPLE.md).
+
+
 ## R51 bounded App Store Connect screenshot asset reservations
 
 R51 accepts an exact R44 Apple iPhone PNG store ZIP plus an approved Native

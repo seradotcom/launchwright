@@ -136,6 +136,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [Onboard an existing Git project in the local web UI](docs/GIT_ONBOARDING_UI.md)
 - [R40: safely stage reviewed Markdown into an owned Git docs branch](docs/GIT_DOCS_BRANCH.md)
 - [R41: operator-controlled GitHub DRAFT PR from exact approved Git docs branch](docs/GIT_DOCS_DRAFT_PR.md)
+- [R58: bind R55 masked Native pixels into Apple R44 screenshots and R51 staging](docs/MASKED_APPLE.md)
 - [R42: frozen Markdown to editable PPTX and matching PDF](docs/DECK_PDF.md)
 - [R51: owned Apple App Store Connect screenshot reservation/upload and read-only recovery](docs/APPLE_SCREENSHOT_UPLOAD.md)
 - [R48: bounded real Android emulator screenshot and Native imported evidence](docs/ANDROID_EMULATOR_CAPTURE.md)

@@ -547,6 +547,25 @@ DECK_PDF remains PARTIAL because rich multi-asset layout, customer visual
 quality/accessibility, licensed font coverage and customer/Platform
 acceptance are not established.
 
+## R58 candidate — exact masked Apple pixels to private R51 intent
+
+R58 binds each R55 manual opaque mask and imported Native
+SANITIZED_DERIVATIVE to R44 Apple iPhone ZIP screens and R51
+screenshot asset intent. Synthetic real 1179x2556 PNGs and R44
+normalized ZIP pixels are compared byte for byte, preserving
+every unmasked pixel while fixing explicit mask rectangles.
+R51's existing mocked Apple REST state machine remains the only
+remote implementation. The operator's R58 no-effects plan/export/
+apple-plan/send/recover commands require exact consent and source
+digests, with recover-only unknown-ACK rules and no automatic
+duplicate reservations. R55 admits taller Apple images without
+raising its decoded-pixel memory budget. Residual PII remains
+UNKNOWN. Node24 Linux/Windows/macOS and selective R58 owned CI
+are required before accepting this bounded implementation. Actual
+developer-account processing, independent pixel privacy, Apple
+policy, customer/device and Platform Publish remain unaccepted.
+
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;
