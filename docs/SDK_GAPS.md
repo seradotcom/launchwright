@@ -195,3 +195,12 @@ source/version/pixel hashes in its private receipt, but only mask-area
 pixel changes are verified. Human pixel review outside masks, complete
 product-source rights, accessibility, fonts, customer/brand acceptance,
 additional rich media layouts and real Platform Publish remain open.
+## R58 masked screenshot identity for Apple iPhone (candidate)
+
+R58 links exact R55 opaque pixel-mask plans/receipts and imported Native
+SANITIZED_DERIVATIVE evidence into every R44 Apple screenshot before
+R51 upload. R55 now admits taller iPhone portraits without increasing
+its previous total-pixel memory limit. Synthetic tests prove exact
+mask/source identity only. General PII, rights, real Apple account
+processing, device provenance, App Review and Platform Publish remain
+externally unaccepted. APPLE_UPLOAD stays PARTIAL.

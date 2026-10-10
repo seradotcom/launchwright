@@ -87,6 +87,17 @@ independently. This is not real customer capture or an externally
 hosted/deployed interactive application.
 
 
+## R58 mask-linked Apple asset staging
+
+For private App Store screenshots, use explicit R55 pixel masks and
+Native derivative receipts, then R58 plan/export/apple-plan to bind
+exact masked source pixels to the R44 ZIP and R51 screenshot intent.
+Only an operator with an existing App Store Connect account,
+screenshot set and private JWT may send. R58 does not submit apps
+for review or certify that all PII was removed. See
+[masked Apple instructions](MASKED_APPLE.md).
+
+
 ## R51 Apple screenshot asset preparation
 
 Start with the private R44 Apple iPhone screenshot ZIP and exact approved

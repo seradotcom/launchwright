@@ -62,7 +62,9 @@
     "test:masked-deck": "node --test --test-concurrency=1 tests/masked-deck.test.mjs",
     "masked-deck": "node scripts/masked-deck.mjs",
     "apple-screenshots": "node scripts/apple-screenshot-upload.mjs",
-    "test:apple": "node --test --test-concurrency=1 tests/apple-screenshot-upload.test.mjs"
+    "test:apple": "node --test --test-concurrency=1 tests/apple-screenshot-upload.test.mjs",
+    "masked-apple": "node scripts/masked-apple.mjs",
+    "test:masked-apple": "node --test --test-concurrency=1 tests/masked-apple-handoff.test.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",

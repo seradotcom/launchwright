@@ -47,7 +47,8 @@
     "Google Play R52 image staging uses owned synthetic HTTP protocol only; real store account permissions, image order, existing-image replacements, Edit review/commit and public publication remain external",
     "ChatGPT Plugin host acceptance",
     "Human source/editorial approval and live customer pilot",
-    "R51 Apple screenshot-only upload protocol uses injected transport; real operator Apple App Store Connect account, screenshot processing, App Review, and independently approved customer pixels remain unaccepted"
+    "R51 Apple screenshot-only upload protocol uses injected transport; real operator Apple App Store Connect account, screenshot processing, App Review, and independently approved customer pixels remain unaccepted",
+    "R58 source-linked operator pixel masking is required for the stricter Apple path. Remaining PII/pixel rights, device capture and real App Store account processing have no independent acceptance."
   ],
   "statement": "Local owned-fixture tests and source ZIP are evidence of scoped implementation only. Do not claim whole master completion until each required CORE and external profile has exact independent accepted evidence."
 }

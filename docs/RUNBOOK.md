@@ -106,6 +106,20 @@ human reconciliation. No automatic deletion of unknown lock files
 or blind changes to the original project.
 
 
+## R58 mask lineage before Apple screenshot assets
+
+For each approved screenshot, retain the exact R55 plan and Native
+derived receipt with explicit rectangles and source digests. R58
+revalidates these before writing the private R44 Apple ZIP or
+preparing the R51 intent. Drift in any screenshot, mask, evidence
+revision or candidate blocks the handoff. A lost R51 remote send
+must use recover-only with the original intent, never a duplicate
+reservation. Unmasked areas may still carry PII; pixel rights,
+device-origin, real account and App Review remain separate approvals.
+Only masked PNGs, not original screenshots or JWTs, belong in
+reproducible CI test artifacts.
+
+
 ## R51 Apple screenshot asset lost-ACK and processing recovery
 
 Use existing owner Apple screenshot-set and localization IDs and a
