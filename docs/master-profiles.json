@@ -44,11 +44,11 @@
     {
       "profile": "ANDROID_CAPTURE",
       "scope": "EXTERNAL_ACCEPTANCE",
-      "implementation": "MISSING",
-      "evidence": "NOT_TESTED",
+      "implementation": "PARTIAL",
+      "evidence": "LOCAL_CONTRACT_CI",
       "source_sha": null,
       "run_id": null,
-      "remaining": "Bounded Android runner/adapter implementation and authorized emulator/device acceptance"
+      "remaining": "R48 bounded Android emulator screenshot + exact Native imported UNKNOWN receipt; Node24 3OS fake ADB and owned real Android34 emulator CI pending. Customer APK provenance, physical device, independent pixel rights/PII, Native Driver Host and Platform admission remain absent."
     },
     {
       "profile": "IOS_CAPTURE",

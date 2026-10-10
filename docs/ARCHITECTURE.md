@@ -113,6 +113,22 @@ output that remains technical UNKNOWN. CLI lock and exact-byte recovery
 avoid blind retries/overwrites. See [the offline demo guide](INTERACTIVE_DEMO.md).
 
 
+## R48 scoped Android emulator screenshot adapter
+
+The fixed read-only ADB adapter checks local emulator serial and ro.kernel.qemu,
+an installed package and foreground state, and an operator-authorized Native
+Source/Release/Target bound to a declared build. A two-phase digest-bound
+plan ensures the same identity and dimensions before screenshot. The
+read-only ADB screencap PNG is CRC-validated and re-encoded without PNG
+metadata, saved to private 0700 output with receipt, and imported using
+the existing Native SDK evidence.import operation. The screenshot remains
+technical UNKNOWN with no canonical Android Driver Host, Platform job,
+actual customer or real physical device authority. Recovery reuses the
+original saved bytes and reconciles exactly one Native Evidence record.
+The owned Android emulator CI app is separately installed/foregrounded
+by an intentionally isolated synthetic runner, never by the adapter.
+
+
 ## R42 immutable editorial candidate to two native document formats
 
 R42 reads one fresh human-reviewed Candidate and the exact frozen Markdown

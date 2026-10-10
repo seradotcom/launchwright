@@ -137,6 +137,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [R40: safely stage reviewed Markdown into an owned Git docs branch](docs/GIT_DOCS_BRANCH.md)
 - [R41: operator-controlled GitHub DRAFT PR from exact approved Git docs branch](docs/GIT_DOCS_DRAFT_PR.md)
 - [R42: frozen Markdown to editable PPTX and matching PDF](docs/DECK_PDF.md)
+- [R48: bounded real Android emulator screenshot and Native imported evidence](docs/ANDROID_EMULATOR_CAPTURE.md)
 - [R43: source-pinned offline interactive demo from sanitized Media Evidence](docs/INTERACTIVE_DEMO.md)
 - [R44: Apple/Google store-specific private screenshot, graphic and listing packages](docs/STORE_ASSETS.md)
 - [R45: offline versioned documentation site from exact frozen Markdown sources](docs/STATIC_DOCS.md)
@@ -221,6 +222,18 @@ as imported/UNKNOWN, not canonical Composition PASS. The owned technical
 FFmpeg CI validates actual MP4 frames, audio parity and screenshots. This
 does NOT generate alternate voice, burn captions, publish, or accept a
 customer marketing-video quality claim. See [R46 video variants](docs/VIDEO_VARIANTS.md).
+
+
+## R48 Android emulator screenshot acceptance (synthetic scope)
+
+R48 adds a **bounded ADB screenshot reader for locally approved Android
+emulators**, with no arbitrary shell/app launch, no physical device, and
+no new Native SDK backend. A private no-effects identity plan and separately
+approved foreground capture produce a real metadata-stripped PNG, SHA receipt
+and one existing Native SDK imported Evidence row. Technical state stays
+UNKNOWN and customer/platform/Android Driver Host rights remain unestablished.
+A selective CI Android34 owned synthetic APK/emulator runner is required
+before R48 source acceptance. [Android emulator guide](docs/ANDROID_EMULATOR_CAPTURE.md).
 
 
 ## Original master scope and truthful transfer acceptance

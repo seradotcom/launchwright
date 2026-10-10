@@ -55,3 +55,12 @@ from a private local file. A selective CI job uses disposable WordPress,
 WP-CLI and MySQL container images owned by their respective projects.
 Their binaries, credentials and database are not shipped with Launchwright.
 WordPress API names identify public REST protocol only, not live customer access.
+
+R48 Android emulator PNG reading uses pngjs 7.0.0 (MIT) for
+CRC-checked pixel decode and metadata-free re-encoding. The GitHub Actions
+Android Emulator Runner used ONLY by the disposable owned synthetic emulator
+lane is pinned to source commit a421e43855164a8197daf9d8d40fe71c6996bb0d
+(Apache-2.0). The fixture Android Activity Java source is owned/AGPL
+Launchwright test code. Android system image and build-tool licenses remain
+with their original upstream providers and are not bundled in the product.
+No APK signing keys or actual Android customer screenshots are committed.

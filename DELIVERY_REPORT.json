@@ -41,7 +41,7 @@
     "DOCS_STATIC R45 accepted owned offline versioned site; rich docs, WCAG, user/source acceptance, production hosting and cross-release customer deployments remain open"
   ],
   "outstanding_external": [
-    "Authorized Android/iOS devices",
+    "Android emulator-only imported screenshot scope (R48 pending real Android34 CI); physical customer Android/iOS devices remain unaccepted",
     "Store account upload",
     "ChatGPT Plugin host acceptance",
     "Human source/editorial approval and live customer pilot"

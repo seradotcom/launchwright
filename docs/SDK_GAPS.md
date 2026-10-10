@@ -104,3 +104,13 @@ No other CMS is implemented; independent live customer account
 authorization, external editorial approval/publication, webhooks,
 cross-tenant security and canonical Semwright Platform Publish remain
 unaccepted. CUSTOM_CMS stays PARTIAL.
+
+## R48 real emulator-only Android screenshot (candidate)
+
+R48 adds a bounded read-only local ADB path with a disposable Android
+synthetic APK/AVD CI test. The original Android mobile source still has
+no canonical Semwright Driver Host provider or source build attestation.
+Images enter Launchwright only through imported-declaration evidence,
+technical UNKNOWN. Independent physical phone/customer APK, Device Host
+authorization, rights/PII accessibility and Platform approval remain
+unaccepted. IOS_CAPTURE remains entirely outside R48.

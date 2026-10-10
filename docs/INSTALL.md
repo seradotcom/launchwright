@@ -87,6 +87,19 @@ independently. This is not real customer capture or an externally
 hosted/deployed interactive application.
 
 
+## Optional Android emulator screenshot (R48)
+
+With the Android SDK Platform Tools installed, independently start a
+local emulator and foreground a deliberately approved package. Create an
+approved Launchwright mobile-import Source linked to the same Release
+build and a Target matching the emulator display. Use the exact two-phase
+Android plan/capture command in
+[ANDROID_EMULATOR_CAPTURE.md](ANDROID_EMULATOR_CAPTURE.md). It only reads
+an emulator screenshot and imports UNKNOWN evidence; never attach an
+actual phone, supply a network ADB target or claim Semwright Android
+Driver Host/Platform authority. The synthetic Android CI lane is separate.
+
+
 ## R42 editable deck and real PDF
 
 From a human-approved, exact frozen Markdown Candidate, execute the

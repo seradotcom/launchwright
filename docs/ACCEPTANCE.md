@@ -393,6 +393,23 @@ and MySQL integration CI are still required before R47 acceptance.
 No live customer CMS account, rights certification or Platform Publish
 acceptance follows from mocked or synthetic-runner tests.
 
+## R48 candidate — bounded local Android emulator screenshot
+
+R48 adds a fixed ADB emulator-only read path, with physical/wireless device
+denial, installed package and foreground checks, QEMU identity and exact
+Native Source/Release/Target bindings. Its private SHA-bound plan performs
+no capture. Explicitly approved capture validates the PNG pixels and
+dimensions and commits only an imported technical UNKNOWN evidence receipt,
+with exact screenshot/recovery custody, no replay after a lost Native ACK.
+Normal Node24 Linux/macOS/Windows CI must pass the injected ADB fault corpus
+and Native SQLite evidence tests; the selective Android34 emulator lane
+must independently build/launch a no-network owned synthetic APK, take actual
+on-emulator PNG pixels, and verify the same code/recovery with exact CI SHA.
+No live customer app, physical Android hardware, independent PII/rights
+screening, Driver Host, Platform or public publication acceptance is implied.
+This narrows ANDROID_CAPTURE from missing implementation to partial after
+successful emulator technical acceptance.
+
 
 ## Explicitly not established
 
