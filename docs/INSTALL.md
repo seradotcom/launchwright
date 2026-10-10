@@ -163,6 +163,18 @@ Git branch. The current checkout/index/HEAD are not modified. There is no
 GitHub push/PR. See [Git docs review branch](GIT_DOCS_BRANCH.md).
 
 
+## Review changes between two frozen releases (R54)
+
+Choose distinct historical/current release IDs and their frozen candidate
+IDs from the existing Launchwright workspace. Run the private two-phase
+continuity CLI (scripts/release-continuity.mjs) to prepare the exact
+read-only comparison and export a private HTML/JSON ZIP. A previously
+edited source, ambiguous target/doc slot, changed candidate digest or
+unreviewed coverage boundary fails closed. This process does not require
+GitHub, Semwright Platform or source-project execution and does not
+constitute a public release. See [continuity review](RELEASE_CONTINUITY.md).
+
+
 ## Optional R37 web onboarding for an existing project
 
 Start the local owner-authenticated UI, select Import Git project, and upload

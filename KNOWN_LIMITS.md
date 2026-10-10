@@ -30,6 +30,18 @@ synthetic HTTP integration and a separately gated genuine disposable
 WordPress test. Other CMS platforms, customer website authorization,
 public activation and Semwright Platform Publish remain unaccepted.
 
+## Historical release-diff limitations (R54)
+
+The new two-release HTML/JSON comparison can only enumerate artifacts
+registered in the selected frozen local Native candidates. It identifies
+byte-level artifact changes, editorial source copy equivalence, and the
+registered-only claim/impact/channel frontier. It never automatically
+reuses outputs across builds or validates whether product behavior,
+screenshots, rights, semantics, accessibility or customer publish state
+actually changed. Historical revision drift stops review rather than
+reconstructing a fabricated prior state. The 21/36 public master
+E2E references and Platform Publish missing authority remain unchanged.
+
 ## Safety and business
 
 No general privacy/PII, rights, semantic truth, broad accessibility

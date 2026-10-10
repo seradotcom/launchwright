@@ -145,6 +145,23 @@ The owned Android emulator CI app is separately installed/foregrounded
 by an intentionally isolated synthetic runner, never by the adapter.
 
 
+## R54 release-history comparison over frozen Native candidates
+
+The original master requires release progression without erasing previously
+approved materials. R54 produces an application-read-only two-release
+continuity projection over the canonical Native SDK candidate records and
+immutable artifact blobs. Every selected candidate must have fresh input
+pins; the report uses declared target/editorial document identities and
+compares both source-copy digests and exact rendered binary SHA-256 values.
+A second output copy is never promoted to technically unchanged behavior
+or automatic reuse. It includes the app's registered-only claim coverage,
+impact frontier and channel projections. No local second Graph/Platform
+engine exists. A private operator SHA-bound plan builds an offline
+HTML/JSON ZIP under a deterministic source digest and a lock; no Native
+or external mutation occurs. See
+[release continuity documentation](RELEASE_CONTINUITY.md).
+
+
 ## R52 operator-owned Play Edit image staging
 
 The optional Android Publisher v3 adapter validates a frozen R44 Google

@@ -447,6 +447,26 @@ The test fixture is NOT a live developer account, customer app or
 semantically reviewed screenshot/rights/privacy certification.
 
 
+## R54 candidate — two real frozen releases, local continuity and offline review
+
+R54 adds an immutable two-release continuity dossier over real Native
+SDK/SQLite candidate state. It binds two release/candidate digests,
+checks every frozen artifact SHA and source revision, compares semantic
+target+editorial document slots, distinguishes changed release bytes from
+unchanged source copy and records registered-only claim/impact/channel
+coverage with explicit UNKNOWN frontier. It never copies/reuses assets,
+publishes anything or substitutes today’s edits into a historical
+candidate. A private operator-approved no-effects plan can export
+deterministic offline HTML/JSON ZIP plus SHA-256 and recover a partial
+write without clobber. Real disposable owned fixture tests include an
+older/younger release and strict failure controls. Supported Node24
+Linux/Windows/macOS CI and the separate synthetic Chromium browser lane
+at 1440/768/390/320px are required before accepting R54.
+The master’s 36 mandatory E2E scenarios still need independently
+audited completion; this local 2-release fixture does not claim
+customer/Platform/host/semantic coverage authority.
+
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;
