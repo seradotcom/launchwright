@@ -52,6 +52,20 @@ real customer account or a Semwright Platform deployment.
 See WORDPRESS_DRAFT.md.
 
 
+## R62 — approved subtitle burn-in as a source-linked video derivative
+
+R62 validates the exact R46 ZIP/receipt, approved frozen Native Media/WebVTT
+Candidate and source MP4 pins, then prepares a digest-bound private export
+plan. On an explicitly confirmed Linux FFmpeg/libass host it stream-copies
+the approved AAC and reencodes only the two video streams with bounded,
+bottom-anchored frozen WebVTT captions. Same frame count, dimensions,
+duration and protected source metadata are independently probed; output
+ZIP/manifest and repeat receipt are byte-hashed and recoverable.
+No canonical Composition re-render, new technical PASS, arbitrary filter
+code, alternate narrator, OS project actions, customer rights verification,
+Platform job or public publication is claimed. See VIDEO_CAPTION_BURNIN.md.
+
+
 ## R46 bounded aspect-only video derivation from Semwright Media custody
 
 R46 reads an exact Native Media plan (two video variants at 1280x720 and

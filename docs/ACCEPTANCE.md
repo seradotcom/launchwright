@@ -585,24 +585,40 @@ PARTIAL; no customer product behavior, device-origin authority, global
 privacy or Platform acceptance is established.
 
 
-## R61 candidate — source-bound offline spatial navigation
+## R61 accepted — offline masked click-through navigation on owned fixtures
 
-R61 adds private click-through navigation to the exact already accepted R59
-masked screenshots and imported UNKNOWN Native Media receipt. The strict
-two-phase plan binds R59/R55 original masked Native source, ZIP/manifest and
-HTML hashes, media resource revision, per-image pixel identity and
-operator-provided exact original-image rectangles and target Media shots.
-No hotspot can overlap any R55 mask, leave the screenshot, impersonate an
-unapproved shot or exceed bounded count/geometry. Export produces static
-scriptless, no-network HTML with CSS :target and hash-pinned CSP, exact
-ZIP/receipt checksums and no additional Native Media record. Bad files,
-stale/foreign sources, concurrent operations and missing consent fail
-closed. Ten owned synthetic local tests pass; supported Node24 Linux/Windows/
-macOS and a distinct Chromium suite exercising real click/Enter navigation,
-pixel alignment and responsive 320/390/768/1440 widths remain pending.
-Product action semantics, privacy outside masks, customer approval,
-canonical Driver Host acceptance and Platform Publish are NOT implied.
-INTERACTIVE_DEMO remains PARTIAL.
+Exact source SHA `c1ac530938d98f8a23ee0abc8b4e8f7d5c29def6` passed Node24 Linux/Windows/macOS
+Application checks run `38090333493`. PR #86 merged as
+`1336193f4fa1a20704b287c27e3c0753e76fadc6`, whose main-push run `38093155631`
+also passed on all three OSes. The selective real Chromium
+masked-hotspot workflow `38093156141` accepted the full
+R55 Native mask → R59 sanitized offline Media → R61 CSS-only
+link chain with exact original screenshot digests, DRAFT/UNKNOWN
+authority, no network or page errors, valid script-blocking CSP,
+mouse/keyboard and responsive 320/390/768/1440 px navigation.
+The captured ZIP/artifact SHA, jobs and retained screenshot
+identities are in `evidence/r61/ci-runs.json`. Source
+pixels outside masks are not independently PII cleared; clicking a
+capture-to-capture link is not real product behavior. No customer,
+Driver Host, Plugin host or Platform Publish authority is implied.
+The original INTERACTIVE_DEMO master profile stays PARTIAL.
+
+## R62 candidate — actual dual-aspect WebVTT burn-in from frozen Native Media
+
+R62 adds source-pinned caption burn-in for original R46 landscape/portrait
+H.264/AAC plus approved frozen WebVTT, requiring an exact R46 ZIP,
+private receipt, Native Media/Candidate versions, FFmpeg version and
+operator source/caption/privacy consent. Its two-phase local CLI renders
+real subtitled MP4s in both original dimensions, preserves source AAC,
+validates frame counts/duration and records a hash-linked private ZIP.
+It refuses unsafe source VTT/control codes or unsupported glyphs,
+source/candidate/receipt drift and changed prior output files.
+Local Linux owned synthetic FFmpeg tests confirmed exact decoded PCM
+and visible burned-caption pixels compared against an uncaptioned frame.
+Node24 3-OS CI and a separate exact-SHA owned FFmpeg/libass run are
+still required before acceptance. No full human video marketing quality,
+customer capture, independently verified source rights, alternate voice,
+general pixel privacy or Platform Publish authority is claimed.
 
 
 ## Explicitly not established

@@ -150,6 +150,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [R44: Apple/Google store-specific private screenshot, graphic and listing packages](docs/STORE_ASSETS.md)
 - [R45: offline versioned documentation site from exact frozen Markdown sources](docs/STATIC_DOCS.md)
 - [R46: two exact private MP4 aspect formats plus frozen WebVTT captions](docs/VIDEO_VARIANTS.md)
+- [R62: burn exact reviewed Native WebVTT into real landscape and portrait H.264/AAC MP4s](docs/VIDEO_CAPTION_BURNIN.md)
 - [R47: operator-approved WordPress post DRAFT through exact REST readback](docs/WORDPRESS_DRAFT.md)
 - [R54: source-bound private dossier comparing two frozen releases](docs/RELEASE_CONTINUITY.md)
 - R42/R43 owned synthetic Node24 Linux/Windows/macOS application CI and independent document/Chromium E2E accepted at exact source SHAs; see [R42 evidence](evidence/r42/ci-runs.json) and [R43 evidence](evidence/r43/ci-runs.json). Customer-side quality/privacy/product execution and Platform Publish remain unaccepted.
@@ -245,6 +246,21 @@ require explicit review/consent before local output. A disposable Chromium
 E2E validates keyboard navigation and responsive layouts. This is **not**
 customer documentation acceptance, public deployment or technical PASS.
 See [the R45 docs guide](docs/STATIC_DOCS.md).
+
+
+## R62 exact frozen captions rendered into both H.264 videos
+
+R62 adds a private, no-publication fixed-style caption burn-in derivative
+from the exact R46 video ZIP/receipt and the original approved Native
+Media/WebVTT source. The same cue timing is rendered into 16:9 and fully
+contained 9:16 videos, preserving original AAC sample bytes, frame count,
+duration and frozen source identity. R62 adds no new Native PASS receipt or
+remote Platform/Composer runtime. Invalid fonts/glyphs, source drift, extra
+controls and changed local output files fail closed. Two-phase private
+plan and explicit export require exact plan/R46 SHA and separate residual
+privacy/readability acknowledgements. Synthetic Linux FFmpeg/libass acceptance
+and Node24 cross-platform contract validation are required.
+See [the caption burn-in guide](docs/VIDEO_CAPTION_BURNIN.md).
 
 
 ## R46 video aspect variants (source-linked, no alternate timeline)

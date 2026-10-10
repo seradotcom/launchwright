@@ -43,6 +43,17 @@ Client SDK and do not expose approvals or Publish actions. Follow
 [local MCP operator instructions](MCP_LOCAL.md). MCP interoperability in
 a local client is not host-side ChatGPT Plugin acceptance.
 
+## R62 private burn-in for R46 frozen WebVTT and two MP4s
+
+With an R46 reviewed Native Media source and its private ZIP/JSON receipt,
+use video-caption-burnin.mjs plan and export to create captioned variants.
+Burn-in execution is Linux-only and requires FFmpeg with libass plus an
+installed DejaVu Sans font. A known-good Node24 Linux CI lane is separate
+from the portable three-OS contract checks. The original AAC and source
+source files remain unchanged; any derived technical state remains UNKNOWN.
+See VIDEO_CAPTION_BURNIN.md for exact operator consent/digest steps.
+
+
 ## R46 two-format video and Native WebVTT review
 
 Install and authorize local FFmpeg/ffprobe (or use the selective owned
