@@ -42,7 +42,10 @@
     "test:wordpress": "node --test --test-concurrency=1 tests/wordpress-draft.test.mjs",
     "android:plan": "node scripts/android-emulator-capture.mjs plan",
     "android:capture": "node scripts/android-emulator-capture.mjs capture",
-    "test:android": "node --test --test-concurrency=1 tests/android-emulator-capture.test.mjs"
+    "test:android": "node --test --test-concurrency=1 tests/android-emulator-capture.test.mjs",
+    "ios:plan": "node scripts/ios-simulator-capture.mjs plan",
+    "ios:capture": "node scripts/ios-simulator-capture.mjs capture",
+    "test:ios": "node --test --test-concurrency=1 tests/ios-simulator-capture.test.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",

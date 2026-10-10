@@ -138,6 +138,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [R41: operator-controlled GitHub DRAFT PR from exact approved Git docs branch](docs/GIT_DOCS_DRAFT_PR.md)
 - [R42: frozen Markdown to editable PPTX and matching PDF](docs/DECK_PDF.md)
 - [R48: bounded real Android emulator screenshot and Native imported evidence](docs/ANDROID_EMULATOR_CAPTURE.md)
+- [R49: bounded Apple CoreSimulator iPhone screenshot with Native imported UNKNOWN receipt](docs/IOS_SIMULATOR_CAPTURE.md)
 - [R43: source-pinned offline interactive demo from sanitized Media Evidence](docs/INTERACTIVE_DEMO.md)
 - [R44: Apple/Google store-specific private screenshot, graphic and listing packages](docs/STORE_ASSETS.md)
 - [R45: offline versioned documentation site from exact frozen Markdown sources](docs/STATIC_DOCS.md)
@@ -222,6 +223,21 @@ as imported/UNKNOWN, not canonical Composition PASS. The owned technical
 FFmpeg CI validates actual MP4 frames, audio parity and screenshots. This
 does NOT generate alternate voice, burn captions, publish, or accept a
 customer marketing-video quality claim. See [R46 video variants](docs/VIDEO_VARIANTS.md).
+
+
+## R49 local iPhone Simulator screenshot (owned fixture only)
+
+R49 observes an **already booted, locally owned iPhone Simulator** and an
+already installed, operator-approved app through narrowly scoped Apple
+CoreSimulator commands. It records a real screenshot with CRC/dimension
+checks, SHA-bound private output/receipt recovery and canonical Semwright
+Native SDK imported evidence, technical **UNKNOWN**. The adapter never
+boots/installs/launches apps or accesses physical phones. A selective macOS
+GitHub Actions lane compiles an owned UIKit fixture and independently boots/
+launches it before the adapter observes genuine pixels. The fixture runner
+cannot certify any customer app, installed binary hash, foreground
+isolation, pixel privacy, Driver Host or Platform authority. See
+[IOS_SIMULATOR_CAPTURE](docs/IOS_SIMULATOR_CAPTURE.md).
 
 
 ## R48 Android emulator screenshot acceptance (synthetic scope)

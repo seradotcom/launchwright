@@ -114,3 +114,14 @@ Images enter Launchwright only through imported-declaration evidence,
 technical UNKNOWN. Independent physical phone/customer APK, Device Host
 authorization, rights/PII accessibility and Platform approval remain
 unaccepted. IOS_CAPTURE remains entirely outside R48.
+
+## R49 local CoreSimulator iPhone screenshot adapter (candidate)
+
+R49 introduces an Apple CoreSimulator-only read adapter for a manually
+booted simulator/installed app. Operator-approved source/build/target and
+private PNG/receipt are byte-bound to Native imported-declaration Evidence.
+The real Xcode/macOS synthetic UIKit CI is a distinct bounded acceptance
+gate, not a customer iOS app/physical device/Driver Host/Platform receipt.
+Even after passing that gate, executable build attestation, independently
+proved foreground, PII/pixel privacy, true customer app acceptance,
+Apple account/store upload and productive platform execution remain open.
