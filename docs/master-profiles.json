@@ -84,7 +84,7 @@
       "evidence": "OWNED_FIXTURE_HOST",
       "source_sha": "635bf1c4d02b44bd2da5ab357f408f78aa85388d",
       "run_id": 37582490691,
-      "remaining": "R46 source-bound landscape/portrait H264/AAC and frozen Native WebVTT, pending exact Node24/FFmpeg acceptance; alternate voice, burn-in captions, independent editorial video quality, customer footage/rights and Platform Publish remain unaccepted."
+      "remaining": "R46 landscape/portrait Native-linked MP4s + approved VTT; R62 bounded ASCII caption burn-in added with real local synthetic tests, pending exact Node24 FFmpeg acceptance. Alternate voice, rich multilingual captions, independent editorial/marketing video quality, customer source/rights and Platform Publish remain unaccepted."
     },
     {
       "profile": "DECK_PDF",

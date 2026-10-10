@@ -1,0 +1,131 @@
+name: Owned exact WebVTT burn-in media acceptance
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: owned-caption-burnin-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  video-caption-burnin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Reject high-severity runtime dependency advisories
+        run: npm audit --omit=dev --audit-level=high
+      - name: Verify real FFmpeg/libass and licensed host font availability
+        run: |
+          set -euo pipefail
+          if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null || ! command -v fc-match >/dev/null; then
+            sudo apt-get update -qq
+            sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ffmpeg fontconfig fonts-dejavu-core
+          fi
+          ffmpeg -hide_banner -filters | grep -Eq ' \.\.\. subtitles +V->V '
+          test -n "$(fc-match 'DejaVu Sans' -f '%{family}')"
+          ffmpeg -hide_banner -version | sed -n '1,2p'
+      - name: Real Native Media, frozen WebVTT and captioned MP4 negative/positive tests
+        env:
+          LAUNCHWRIGHT_VIDEO_BURNIN_REAL_TESTS: '1'
+        run: |
+          set -euo pipefail
+          node scripts/verify.mjs
+          node --test --test-concurrency=1 tests/video-caption-burnin.test.mjs
+          node scripts/master-acceptance.mjs --check
+      - name: Create synthetic source and both exact-caption real MP4s
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/video-caption-burnin
+          chmod 0700 evidence/video-caption-burnin
+          node scripts/video-caption-burnin-owned-smoke.mjs \
+            --out-dir "$GITHUB_WORKSPACE/evidence/video-caption-burnin" |
+            tee evidence/video-caption-burnin/acceptance.stdout.json
+      - name: Independent ZIP/FFprobe/PCM/pixel verification and screenshot receipts
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,hashlib,pathlib,zipfile,subprocess
+          root=pathlib.Path('evidence/video-caption-burnin')
+          report=json.loads((root/'acceptance.json').read_text())
+          receipt=report['receipt']
+          assert report['synthetic_fixture'] is True
+          assert report['real_customer_source'] is False
+          assert report['source_scripts_executed'] is False
+          assert report['technical_state']=='UNKNOWN'
+          assert receipt['captions_burned_in'] is True
+          assert receipt['new_native_media_receipt_created'] is False
+          assert receipt['published'] is False and receipt['platform_authority'] is False
+          assert receipt['bundle_sha256']==report['output_zip_sha256']
+          parent=root/report['original_r46_zip_filename']
+          assert hashlib.sha256(parent.read_bytes()).hexdigest()==report['original_r46_zip_sha256']
+          bundle=root/receipt['zip_filename']
+          assert hashlib.sha256(bundle.read_bytes()).hexdigest()==receipt['bundle_sha256']
+          old=root/'unpacked-original';new=root/'unpacked-captioned'
+          old.mkdir();new.mkdir()
+          with zipfile.ZipFile(parent) as z:
+            assert z.testzip() is None
+            assert sorted(z.namelist())==['README.txt','captions.vtt','landscape-16x9.mp4','manifest.json','portrait-9x16.mp4']
+            z.extractall(old)
+          with zipfile.ZipFile(bundle) as z:
+            assert z.testzip() is None
+            assert sorted(z.namelist())==['README.txt','captions.vtt','landscape-captioned.mp4','manifest.json','portrait-captioned.mp4']
+            z.extractall(new)
+          manifest=json.loads((new/'manifest.json').read_text())
+          assert manifest['source_r46_zip_sha256']==report['original_r46_zip_sha256']
+          assert manifest['technical_state']=='UNKNOWN' and manifest['caption_visual_review_pending'] is True
+          assert (old/'captions.vtt').read_bytes()==(new/'captions.vtt').read_bytes()
+          checks={}
+          for variant,source,derived,width,height in [
+            ('landscape','landscape-16x9.mp4','landscape-captioned.mp4',1280,720),
+            ('portrait','portrait-9x16.mp4','portrait-captioned.mp4',720,1280)]:
+            a=old/source;b=new/derived
+            assert hashlib.sha256(b.read_bytes()).hexdigest()==manifest['outputs'][derived]['sha256']
+            ffprobe=subprocess.check_output([
+              'ffprobe','-v','error','-show_entries',
+              'format=duration:stream=codec_name,codec_type,width,height,avg_frame_rate,nb_frames,sample_rate',
+              '-of','json',str(b)],text=True)
+            probe=json.loads(ffprobe)
+            v=next(s for s in probe['streams'] if s['codec_type']=='video')
+            audio=next(s for s in probe['streams'] if s['codec_type']=='audio')
+            assert (v['width'],v['height'])==(width,height)
+            assert v['codec_name']=='h264' and v['avg_frame_rate']=='30/1'
+            assert int(v['nb_frames'])==120
+            assert audio['codec_name']=='aac' and int(audio['sample_rate'])==48000
+            def pcm(path):
+              return subprocess.check_output([
+                'ffmpeg','-nostdin','-v','error','-i',str(path),
+                '-map','0:a:0','-ac','2','-ar','48000','-f','s16le','pipe:1'])
+            assert hashlib.sha256(pcm(a)).digest()==hashlib.sha256(pcm(b)).digest()
+            for label,path in [('original',a),('captioned',b)]:
+              image=root/(variant+'-'+label+'-cue.png')
+              subprocess.run(['ffmpeg','-nostdin','-v','error',
+                '-i',str(path),'-ss','0.8','-frames:v','1','-y',str(image)],
+                check=True)
+              assert image.stat().st_size>5000
+            checks[variant]={'original_sha256':hashlib.sha256(a.read_bytes()).hexdigest(),
+              'captioned_sha256':hashlib.sha256(b.read_bytes()).hexdigest(),
+              'pcm_audio_identical':True,
+              'captioned_frame_preview':variant+'-captioned-cue.png'}
+          (root/'independent-verification.json').write_text(json.dumps({
+            'schema_version':'launchwright-r62-independent-media-check/1',
+            'source_sha':report['source_sha'],'variants':checks,
+            'caption_pixels_verified_by_node_test':True,
+            'customer_source_captured':False,'technical_state':'UNKNOWN',
+            'platform_publish_authority':False
+          },indent=2)+'\n')
+          print('R62_NATIVE_CAPTIONED_MP4_AAC_PIXEL_CI_PASS',receipt['bundle_sha256'])
+          PY
+      - name: Retain exact owned media, burned caption previews, original source and receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: launchwright-owned-video-caption-burnin-${{ github.sha }}
+          path: evidence/video-caption-burnin/
+          if-no-files-found: error
+          retention-days: 14

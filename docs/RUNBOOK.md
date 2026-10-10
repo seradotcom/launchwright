@@ -14,6 +14,19 @@ publishing, customer consent, color/branding review and Platform
 job authority require separate actions.
 
 
+## R62 WebVTT burn-in source/consent and unknown output
+
+Retain the exact original R46 plan, input, ZIP/receipt and frozen Native
+Media/WebVTT candidate. Explicitly approve the caption text, private
+export and residual pixel/audio privacy; re-enter the exact R62 plan
+and R46 ZIP SHA before rendering. A lost local file-write response is
+recovered by re-exporting only the SAME plan after checking the private
+output directory and lock. Any stale Native version, changed R46 bytes,
+font/toolchain drift, unsupported glyphs or modified output blocks the
+operation. The result is two imported UNKNOWN MP4 derivatives, not
+canonically admitted Composition, production accessibility or publication.
+
+
 ## R46 video aspect derivation / operator incident checklist
 
 Do not derive a video from an unreviewed Native Media source or stale

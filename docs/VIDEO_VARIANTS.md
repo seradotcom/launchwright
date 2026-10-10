@@ -70,3 +70,13 @@ Tests use an owned disposable synthetic H.264 test pattern with a 440Hz synthesi
 Node 24 Linux/Windows/macOS application checks cover the portable JS/Native code. Expensive FFmpeg-dependent tests are **explicitly opt-in** on Linux through LAUNCHWRIGHT_VIDEO_REAL_TESTS=1 and are skipped by default app checks; the selective Linux workflow video-variants.yml sets that flag and **must run real encoding acceptance**. Individual supported-engine green checks without this selective video run do not establish real audiovisual acceptance. It retains actual video, captions, FFprobe diagnostics, PNG screenshots and exact source-SHA receipts.
 
 These synthetic technical acceptance results do not prove customer video, a compelling marketing film, voice alternatives, burned-in captions, full locale/accessibility, general rights/PII, streaming/HLS, or Semwright Platform Publish. The original master VIDEO profile remains **PARTIAL**.
+
+## Optional exact caption burn-in extension (R62)
+
+R46 keeps captions as an immutable, approved sidecar and does not burn them
+into either image track. R62 introduces a **separate explicitly approved**
+private formatting derivative for both H.264/AAC aspect variants. It
+requires the original frozen Native Media/WebVTT receipt and exact R46
+ZIP/plan; no original clip, audio or Native Media authority is overwritten.
+See [R62 real caption burn-in](VIDEO_CAPTION_BURNIN.md). The original VIDEO
+master profile remains PARTIAL even if the Linux synthetic render passes.

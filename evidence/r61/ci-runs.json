@@ -1,0 +1,127 @@
+{
+  "schema_version": "launchwright-r61-acceptance/1",
+  "source_sha": "c1ac530938d98f8a23ee0abc8b4e8f7d5c29def6",
+  "merge_commit_sha": "1336193f4fa1a20704b287c27e3c0753e76fadc6",
+  "semwright_native_sdk": "1.0.0",
+  "application_checks": {
+    "run_id": 38090333493,
+    "head_sha": "c1ac530938d98f8a23ee0abc8b4e8f7d5c29def6",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/38090333493",
+    "jobs": {
+      "light (ubuntu-latest)": {
+        "id": 114325285897,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38090333493/job/114325285897"
+      },
+      "light (windows-latest)": {
+        "id": 114325286096,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38090333493/job/114325286096"
+      },
+      "light (macos-latest)": {
+        "id": 114325286197,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38090333493/job/114325286197"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Windows-6878da48bd5054c082471cae391a03f5d4d1b02d": {
+        "id": 11684465346,
+        "bytes": 732,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-6878da48bd5054c082471cae391a03f5d4d1b02d": {
+        "id": 11684137271,
+        "bytes": 694,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-6878da48bd5054c082471cae391a03f5d4d1b02d": {
+        "id": 11683924964,
+        "bytes": 695,
+        "expired": false
+      }
+    }
+  },
+  "main_push_checks": {
+    "run_id": 38093155631,
+    "head_sha": "1336193f4fa1a20704b287c27e3c0753e76fadc6",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/38093155631",
+    "jobs": {
+      "light (ubuntu-latest)": {
+        "id": 114333545305,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38093155631/job/114333545305"
+      },
+      "light (macos-latest)": {
+        "id": 114333545415,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38093155631/job/114333545415"
+      },
+      "light (windows-latest)": {
+        "id": 114333545450,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38093155631/job/114333545450"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Linux-1336193f4fa1a20704b287c27e3c0753e76fadc6": {
+        "id": 11685216225,
+        "bytes": 694,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-1336193f4fa1a20704b287c27e3c0753e76fadc6": {
+        "id": 11685021638,
+        "bytes": 695,
+        "expired": false
+      },
+      "launchwright-clean-room-Windows-1336193f4fa1a20704b287c27e3c0753e76fadc6": {
+        "id": 11684574977,
+        "bytes": 733,
+        "expired": false
+      }
+    }
+  },
+  "offline_browser_lane": {
+    "run_id": 38093156141,
+    "head_sha": "1336193f4fa1a20704b287c27e3c0753e76fadc6",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/38093156141",
+    "jobs": {
+      "offline-hotspots": {
+        "id": 114333548420,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38093156141/job/114333548420"
+      }
+    },
+    "artifacts": {
+      "launchwright-owned-offline-hotspots-1336193f4fa1a20704b287c27e3c0753e76fadc6": {
+        "id": 11684906494,
+        "bytes": 534241,
+        "expired": false
+      }
+    }
+  },
+  "owned_browser_assertions": {
+    "real_chromium_accepted": true,
+    "r55_source_mask_pixels_verified": true,
+    "r59_native_media_sha_link_verified": true,
+    "browser_viewports": [
+      320,
+      390,
+      768,
+      1440
+    ],
+    "csp_blocks_scripts": true,
+    "remote_http_request_count": 0,
+    "page_errors": 0,
+    "bundle_sha256": "e30910f0a10ac972a4e4919d80f0c1162e83c618c28ef8e449c8cf9db162cad6",
+    "artifact_id": 11684906494,
+    "canonical_driver_host_acceptance": false,
+    "customer_source_acceptance": false,
+    "outside_mask_pixel_privacy_certified": false,
+    "semwright_platform_publish_authority": false
+  },
+  "scope_note": "Owned masked synthetic Native Media snapshots linked by CSS-only hotspots, not behavioral execution or customer source proof. The two source/caption states and their coordinates remain imported/UNKNOWN."
+}

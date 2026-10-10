@@ -226,3 +226,13 @@ another static captured state. Pixels outside the R55 operator masks may
 still contain sensitive data. No new canonical Host execution, customer
 app acceptance, accessibility certification or Platform Publish follows.
 The INTERACTIVE_DEMO original master profile remains PARTIAL.
+
+## R62 source-pinned video subtitle burn-in
+
+A bounded Linux FFmpeg/libass adapter now accepts the R46 exact
+Native Media/WebVTT candidate and separately emits two real H.264/AAC
+captioned MP4s, retaining original audio and source digests. Only
+fixed-style ASCII WebVTT cues are accepted. Human marketing quality,
+voice alternatives, multilingual caption fonts, independent pixel/rights
+review, customer filming, canonical Composition runtime and Platform
+Publish remain external and unaccepted. The VIDEO profile stays PARTIAL.
