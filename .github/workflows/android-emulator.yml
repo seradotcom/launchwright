@@ -1,6 +1,15 @@
 name: Owned Android emulator capture acceptance
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/android-emulator.yml'
+      - 'src/android-emulator-capture.mjs'
+      - 'scripts/android-emulator-capture.mjs'
+      - 'scripts/android-owned-apk-build.sh'
+      - 'scripts/android-owned-smoke.mjs'
+      - 'fixtures/android-owned/**'
+      - 'tests/android-emulator-capture.test.mjs'
 permissions:
   contents: read
 concurrency:
