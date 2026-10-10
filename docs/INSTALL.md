@@ -123,6 +123,17 @@ See GOOGLE_PLAY_IMAGES.md. Real Google account, image ordering and
 customer pixel/rights approval are external obligations.
 
 
+## R56 masked Google Play screenshot integrity handoff
+
+After R55 produces exact operator-owned masked PNGs, use the R56 private
+two-phase plan/export workflow in MASKED_STORE_HANDOFF.md to bind each
+R55 Native SANITIZED_DERIVATIVE receipt and output SHA to an R44 Google
+Play phone listing. The result is a private R44 ZIP + two receipts,
+never a Google Play Edit or published listing. Original source PNG
+paths remain private. Other store sizes and external account privacy/
+rights acceptance remain outside this restricted workflow.
+
+
 ## R55 private pixel mask preflight for captured screenshots
 
 When downstream product demos require obscuring an owner-reviewed region,

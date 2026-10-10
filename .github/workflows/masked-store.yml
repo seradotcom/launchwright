@@ -1,0 +1,117 @@
+name: Exact R55 masked Google store handoff
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/masked-store.yml'
+      - 'src/masked-store-handoff.mjs'
+      - 'scripts/masked-store-handoff.mjs'
+      - 'scripts/masked-store-owned-smoke.mjs'
+      - 'tests/masked-store-handoff.test.mjs'
+      - 'tests/masked-store-fixture.mjs'
+      - 'docs/MASKED_STORE_HANDOFF.md'
+permissions:
+  contents: read
+concurrency:
+  group: owned-masked-store-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  masked-store:
+    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'feat/masked-store-r56')
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Check for high-severity production dependency advisories
+        run: npm audit --omit=dev --audit-level=high
+      - name: Exact Native source pin and no-platform-authority verification
+        run: |
+          set -euo pipefail
+          node scripts/verify.mjs
+          node scripts/master-acceptance.mjs --check
+      - name: Owned full pixel source and Google package tests
+        run: node --test --test-concurrency=1 tests/masked-store-handoff.test.mjs
+      - name: Create actual R55-native-masked Google Play phone package (synthetic only)
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/masked-store
+          chmod 0700 evidence/masked-store
+          node scripts/masked-store-owned-smoke.mjs --out-dir "$GITHUB_WORKSPACE/evidence/masked-store" | tee evidence/masked-store/result.json
+      - name: Independent R44 ZIP and R56 Native mask source lineage readback
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,pathlib,zipfile,struct
+          root=pathlib.Path('evidence/masked-store')
+          report=json.loads((root/'result.json').read_text())
+          assert report['schema_version']=='launchwright-r56-owned-masked-store/1'
+          assert report['source']=='OWNED_SYNTHETIC_ONLY'
+          assert report['screenshot_dimensions']==[1080,1920]
+          assert report['screenshot_count']==2
+          assert report['unmasked_pixels_proven_unchanged'] is True
+          assert report['google_staging_prepare_only'] is True
+          assert report['google_staging_asset_count']==4
+          for key in ('pii_outside_masks_accepted','canonical_device_capture_accepted',
+                      'independent_marketing_graphic_privacy','real_customer_source_tested',
+                      'google_play_account_connected','remote_play_upload_performed',
+                      'play_edit_committed','published','platform_authority',
+                      'originals_retained_in_artifact'):
+              assert report[key] is False,key
+          assert report['technical_state']=='UNKNOWN'
+          files=report['exported_files']
+          assert len(files)==5
+          assert len({f['filename'] for f in files})==5
+          for item in files:
+              name=item['filename']
+              assert '/' not in name and '\\' not in name and '..' not in name
+              data=(root/name).read_bytes()
+              assert len(data)==item['bytes']
+              assert hashlib.sha256(data).hexdigest()==item['sha256']
+          zipfile_path=next(root/f['filename'] for f in files if f['filename'].endswith('.zip'))
+          assert hashlib.sha256(zipfile_path.read_bytes()).hexdigest()==report['store_zip_sha256']
+          chain=next(json.loads((root/f['filename']).read_text())
+            for f in files if f['filename'].startswith('launchwright-masked-store-') and f['filename'].endswith('.json'))
+          assert chain['schema_version']=='launchwright-masked-store-receipt/1'
+          assert chain['store_zip_sha256']==report['store_zip_sha256']
+          assert chain['store_plan_sha256']==report['store_plan_sha256']
+          assert chain['screenshot_count']==2
+          assert chain['privacy_outside_masks_verified'] is False
+          assert chain['graphics_independent_privacy_review'] is False
+          assert chain['store_api_upload_performed'] is False
+          assert chain['platform_authority'] is False
+          with zipfile.ZipFile(zipfile_path) as z:
+              assert z.testzip() is None
+              names=set(z.namelist())
+              assert names=={'README.txt','listing.json','manifest.json','preview.html',
+                'screenshots/01.png','screenshots/02.png',
+                'graphics/icon.png','graphics/feature.png'}
+              manifest=json.loads(z.read('manifest.json'))
+              assert manifest['store_platform']=='google-play-phone-portrait'
+              assert manifest['store_upload_performed'] is False
+              assert manifest['source_pixel_authenticity']=='operator-declaration-only'
+              assert manifest['independent_privacy_rights_content_review'] is False
+              for i,step in enumerate(chain['masked_sources'],1):
+                  embedded=z.read('screenshots/'+str(i).zfill(2)+'.png')
+                  png=(root/('owned-masked-screen-'+str(i)+'.png')).read_bytes()
+                  assert png[:8]==embedded[:8]==b'\x89PNG\r\n\x1a\n'
+                  assert struct.unpack('>II',png[16:24])==(1080,1920)
+                  assert hashlib.sha256(png).hexdigest()==step['redacted_png_sha256']
+                  assert embedded[25]==2
+                  assert manifest['screenshot_assets'][i-1]['evidence_id']==step['derived_evidence_id']
+                  assert manifest['screenshot_assets'][i-1]['source_png_sha256']==step['redacted_png_sha256']
+          print('R56_OWNED_NATIVE_MASKED_STORE_SOURCE_CHAIN_ACCEPTED',report['store_zip_sha256'])
+          PY
+      - name: Retain only synthetic masked screenshots, store ZIP, proof and receipt
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: launchwright-owned-masked-store-${{ github.sha }}
+          path: evidence/masked-store/
+          if-no-files-found: error
+          retention-days: 14

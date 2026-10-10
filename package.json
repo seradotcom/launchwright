@@ -55,7 +55,10 @@
     "test:continuity": "node --test --test-concurrency=1 tests/release-continuity.test.mjs",
     "mask:plan": "node scripts/pixel-mask.mjs plan",
     "mask:apply": "node scripts/pixel-mask.mjs apply",
-    "test:mask": "node --test --test-concurrency=1 tests/pixel-redaction.test.mjs"
+    "test:mask": "node --test --test-concurrency=1 tests/pixel-redaction.test.mjs",
+    "masked-store:plan": "node scripts/masked-store-handoff.mjs plan",
+    "masked-store:export": "node scripts/masked-store-handoff.mjs export",
+    "test:masked-store": "node --test --test-concurrency=1 tests/masked-store-handoff.test.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",

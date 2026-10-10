@@ -111,7 +111,7 @@
       "evidence": "LOCAL_APPLICATION_CI",
       "source_sha": null,
       "run_id": null,
-      "remaining": "R44 adds a candidate local Apple iPhone Dynamic Island medium and Google Play phone pixel/metadata listing ZIP, pending exact Node24 and Chromium CI. Independent device pixel source, rights/privacy/content, other device/locale policies, app binary and live store account uploads remain unaccepted."
+      "remaining": "R56 requires each Google Play phone screenshot to match exact R55 PNG mask/Native derivative and R44 ZIP, with owned local acceptance pending. Original device capture identity, privacy outside manual masks, graphics rights, Apple and additional store profiles, live account/policy/locale review remain unaccepted."
     },
     {
       "profile": "APPLE_UPLOAD",
