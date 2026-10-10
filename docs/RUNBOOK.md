@@ -72,6 +72,20 @@ Human graphic design/accessibility, licensing, technical feature truth,
 customer approval and any external publication remain distinct gates.
 
 
+## R47 WordPress DRAFT recovery
+
+Only send after exact Channel Profile, frozen Candidate, editorial approval,
+and original channel package are independently reviewed. Keep the WordPress
+Application Password in an owner-only 0600 file; never put it in tool arguments.
+Confirm origin, Candidate SHA, original intent digest and --acknowledge-send.
+The adapter creates no public posts and refuses remote changes to the
+readback raw Markdown projection, title, slug or DRAFT status.
+If POST status becomes unknown, use the SAME intent in recover-only mode,
+which reads an existing post and never creates another. A stale local
+exclusive send lock requires human reconciliation, not automatic deletion.
+Public activation, production account permission and Semwright Platform
+delivery remain separately authorized.
+
 ## R41 GitHub PR draft — no implicit remote retry
 
 R41 only creates a GitHub Pull Request in Draft state after the operator

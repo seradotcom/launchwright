@@ -1,0 +1,160 @@
+name: Owned WordPress DRAFT REST acceptance
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/wordpress-draft.yml'
+      - 'src/wordpress-draft.mjs'
+      - 'scripts/wordpress-draft.mjs'
+      - 'scripts/wordpress-owned-smoke.mjs'
+      - 'tests/wordpress-draft.test.mjs'
+      - 'docs/WORDPRESS_DRAFT.md'
+permissions:
+  contents: read
+concurrency:
+  group: owned-wordpress-draft-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  wordpress-draft:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm audit --omit=dev --audit-level=high
+      - name: Validate canonical Native SDK and WordPress negative tests
+        run: |
+          set -euo pipefail
+          node scripts/verify.mjs
+          node --test --test-concurrency=1 tests/wordpress-draft.test.mjs
+          node scripts/master-acceptance.mjs --check
+      - name: Start disposable owned MySQL and genuine WordPress REST containers
+        run: |
+          set -euo pipefail
+          docker network create launchwright-r47
+          docker run -d --name lw-r47-mysql --network launchwright-r47 \
+            -e MYSQL_ROOT_PASSWORD=owned-fixture-db-root \
+            -e MYSQL_DATABASE=wordpress -e MYSQL_USER=wordpress \
+            -e MYSQL_PASSWORD=owned-fixture-db-password \
+            mysql:8.4
+          docker run -d --name lw-r47-wordpress --network launchwright-r47 \
+            -p 127.0.0.1:8765:80 \
+            -e WORDPRESS_DB_HOST=lw-r47-mysql:3306 \
+            -e WORDPRESS_DB_NAME=wordpress \
+            -e WORDPRESS_DB_USER=wordpress \
+            -e WORDPRESS_DB_PASSWORD=owned-fixture-db-password \
+            -e WORDPRESS_CONFIG_EXTRA="define('WP_ENVIRONMENT_TYPE', 'local');" \
+            wordpress:7.1.2-php8.3-apache
+          for count in $(seq 1 80); do
+            if curl -fsS --max-time 2 http://127.0.0.1:8765/wp-admin/install.php -o /dev/null; then break; fi
+            sleep 2
+          done
+          curl -fsS --max-time 5 http://127.0.0.1:8765/wp-admin/install.php -o /dev/null
+      - name: Create disposable WordPress site and app password
+        run: |
+          set -euo pipefail
+          wpcli() {
+            docker run --rm --network launchwright-r47 \
+              --volumes-from lw-r47-wordpress --user 33:33 \
+              -e WORDPRESS_DB_HOST=lw-r47-mysql:3306 \
+              -e WORDPRESS_DB_NAME=wordpress \
+              -e WORDPRESS_DB_USER=wordpress \
+              -e WORDPRESS_DB_PASSWORD=owned-fixture-db-password \
+              -e WORDPRESS_CONFIG_EXTRA="define('WP_ENVIRONMENT_TYPE', 'local');" \
+              wordpress:cli-php8.3 wp "$@"
+          }
+          wpcli core install --url=http://127.0.0.1:8765 \
+            --title="Launchwright Owned Disposable WordPress" \
+            --admin_user=ownedoperator \
+            --admin_password=owned-fixture-operator-password \
+            --admin_email=ownedoperator@example.invalid \
+            --skip-email
+          # WordPress defaults to plain permalinks after fresh installation.
+          # /wp-json/wp/v2/... needs actual Apache rewrite rules; otherwise a
+          # probe can receive a 200 non-JSON page and falsely look authenticated.
+          wpcli rewrite structure '/%postname%/' --hard
+          wpcli rewrite flush --hard
+          wpcli eval 'if (wp_get_environment_type() !== "local") { exit(1); }'
+          python3 - <<'PY'
+          import json,urllib.request
+          request=urllib.request.Request('http://127.0.0.1:8765/wp-json/wp/v2')
+          with urllib.request.urlopen(request,timeout=8) as response:
+            content_type=response.headers.get('Content-Type','').lower()
+            body=response.read(8192)
+            status=response.status
+          print('OWNED_WORDPRESS_REST_DISCOVERY',status,content_type,len(body))
+          assert 'application/json' in content_type and body.startswith(b'{'), 'REST rewrite not installed or returned unexpected data'
+          PY
+          app_password="$(wpcli user application-password create ownedoperator "Launchwright R47 CI" --porcelain)"
+          test -n "$app_password"
+          export WP_CI_APP_PASSWORD="$app_password"
+          python3 - <<'PY'
+          import json,os,pathlib
+          p=pathlib.Path(os.environ['RUNNER_TEMP'])/'launchwright-r47-private.json'
+          p.write_text(json.dumps({
+            'username':'ownedoperator',
+            'application_password':os.environ['WP_CI_APP_PASSWORD']
+          }))
+          p.chmod(0o600)
+          print('PRIVATE_WORDPRESS_CREDENTIAL_FILE_READY',p.stat().st_mode & 0o777)
+          PY
+          test -s "$RUNNER_TEMP/launchwright-r47-private.json"
+          # Application passwords must work in the owned local environment.
+          python3 - <<'PY'
+          import base64,json,os,urllib.request
+          c=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'launchwright-r47-private.json')))
+          basic=base64.b64encode((c['username']+':'+c['application_password']).encode()).decode()
+          r=urllib.request.Request('http://127.0.0.1:8765/wp-json/wp/v2/users/me?context=edit',
+                                   headers={'Authorization':'Basic '+basic})
+          with urllib.request.urlopen(r,timeout=8) as response:
+            response_type=response.headers.get('Content-Type','').lower()
+            response_bytes=response.read(65537)
+            response_status=response.status
+          print('OWNED_WORDPRESS_AUTH_REST_METADATA',response_status,response_type,len(response_bytes))
+          assert 'application/json' in response_type and 0<len(response_bytes)<=65536, 'Authenticated endpoint did not return bounded JSON'
+          data=json.loads(response_bytes)
+          assert data['slug']=='ownedoperator'
+          print('OWNED_WORDPRESS_APPLICATION_PASSWORD_AUTH_PASS')
+          PY
+      - name: Real WordPress REST DRAFT, exact readback, idempotent recover
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/wordpress-draft
+          node scripts/wordpress-owned-smoke.mjs \
+            http://127.0.0.1:8765 \
+            "$RUNNER_TEMP/launchwright-r47-private.json" \
+            | tee evidence/wordpress-draft/owned-real-wordpress.json
+          python3 - <<'PY'
+          import json,pathlib,subprocess
+          d=json.loads(pathlib.Path('evidence/wordpress-draft/owned-real-wordpress.json').read_text())
+          assert d['authenticated_wordpress_http_roundtrip_passed'] is True
+          assert d['real_wordpress_post_draft_created'] is True
+          assert d['read_only_recovery_verified'] is True
+          assert d['posts_created']==1
+          assert d['post_published'] is False
+          assert d['real_customer_website'] is False
+          assert d['platform_authority'] is False
+          assert d['independent_customer_acceptance'] is False
+          print('OWNED_GENUINE_WORDPRESS_DRAFT_PASS',d['exact_intent_sha256'])
+          PY
+      - name: Archive bounded non-authority receipts (no secrets or DB)
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: launchwright-wordpress-owned-${{ github.sha }}
+          path: evidence/wordpress-draft/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Destroy ephemeral WordPress/MySQL and credentials
+        if: always()
+        run: |
+          rm -f "$RUNNER_TEMP/launchwright-r47-private.json"
+          docker rm -f lw-r47-wordpress lw-r47-mysql >/dev/null 2>&1 || true
+          docker network rm launchwright-r47 >/dev/null 2>&1 || true

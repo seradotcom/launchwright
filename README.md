@@ -141,6 +141,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [R44: Apple/Google store-specific private screenshot, graphic and listing packages](docs/STORE_ASSETS.md)
 - [R45: offline versioned documentation site from exact frozen Markdown sources](docs/STATIC_DOCS.md)
 - [R46: two exact private MP4 aspect formats plus frozen WebVTT captions](docs/VIDEO_VARIANTS.md)
+- [R47: operator-approved WordPress post DRAFT through exact REST readback](docs/WORDPRESS_DRAFT.md)
 - R42/R43 owned synthetic Node24 Linux/Windows/macOS application CI and independent document/Chromium E2E accepted at exact source SHAs; see [R42 evidence](evidence/r42/ci-runs.json) and [R43 evidence](evidence/r43/ci-runs.json). Customer-side quality/privacy/product execution and Platform Publish remain unaccepted.
 - R40 source `b69d17aafbb4badfd84d83205112244a994f02dc` and R41 source `b0016eaa23cc84cfdd9b290432ecee29cc9edae7` passed Node24 Linux/Windows/macOS; the latter tests GitHub DRAFT PR transport with a mocked remote only, not a live owner account.
 - [MCP local Client SDK adapter and operator instructions](docs/MCP_LOCAL.md)

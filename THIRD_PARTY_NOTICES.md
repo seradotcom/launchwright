@@ -48,3 +48,10 @@ No paid fonts, customer videos, synthetic voice likenesses, FFmpeg
 binaries or third-party assets are distributed by the Launchwright
 source repository. Real owned technical acceptance uses FFmpeg provided
 on disposable Linux GitHub runners and marks all outputs as drafts.
+
+R47 WordPress Posts REST integration adds no npm runtime dependency. It
+uses Node 24 built-in fetch with Application Password Basic authentication
+from a private local file. A selective CI job uses disposable WordPress,
+WP-CLI and MySQL container images owned by their respective projects.
+Their binaries, credentials and database are not shipped with Launchwright.
+WordPress API names identify public REST protocol only, not live customer access.

@@ -34,6 +34,24 @@ approved source/evidence revision binding. Human edits are not overwritten.
 No product-feature truth, runtime acceptance or Graph authority is inferred.
 See the Git release outline guide.
 
+## R47 WordPress post DRAFT via the Native SDK channel journal
+
+The adapter consumes a real frozen, editorial-approved Candidate and its
+version-pinned WordPress Channel Profile plus PACKAGE_READY channel delivery.
+An offline immutable intent fixes destination HTTPS origin, exact source
+Markdown, candidate, title and deterministic WordPress slug. The external
+transport sends only POST /wp-json/wp/v2/posts status=draft, with closed
+comments and escaped frozen Markdown. Independent GETs compare raw title,
+body, slug, type, status and post ID. Only then is a DRAFT_CREATED outcome
+recorded via the existing Native SDK dispatcher, not another backend.
+Read-only recovery uses the same deterministic slug; no automatic retries,
+publishing, updating an existing post or remote account mutation.
+The operator stores the WordPress Application Password separately in an
+0600 file. The selective CI lane uses disposable WordPress+MySQL, not a
+real customer account or a Semwright Platform deployment.
+See WORDPRESS_DRAFT.md.
+
+
 ## R46 bounded aspect-only video derivation from Semwright Media custody
 
 R46 reads an exact Native Media plan (two video variants at 1280x720 and
