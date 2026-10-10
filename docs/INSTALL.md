@@ -87,6 +87,19 @@ independently. This is not real customer capture or an externally
 hosted/deployed interactive application.
 
 
+## Optional iPhone CoreSimulator screenshot (R49)
+
+On an operator-authorized macOS machine with Xcode/CoreSimulator, manually
+boot a local iPhone Simulator and install/foreground your authorized app.
+Create an approved mobile-import source with ios-simulator:BUNDLE_ID locator,
+matching Release build and target viewport. Use the two-phase CLI in
+[IOS_SIMULATOR_CAPTURE.md](IOS_SIMULATOR_CAPTURE.md) to plan and explicitly
+capture one screenshot in an existing private output folder. Technical,
+foreground/installed-build, privacy and rights truth are not upgraded by
+this process. No real device, remote Apple account, GitHub/Platform or
+external publication is used.
+
+
 ## Optional Android emulator screenshot (R48)
 
 With the Android SDK Platform Tools installed, independently start a

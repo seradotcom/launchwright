@@ -113,6 +113,22 @@ output that remains technical UNKNOWN. CLI lock and exact-byte recovery
 avoid blind retries/overwrites. See [the offline demo guide](INTERACTIVE_DEMO.md).
 
 
+## R49 — bounded CoreSimulator screenshot observation and custody
+
+A new operator-only fixed xcrun simctl adapter reads Apple CoreSimulator's
+booted iPhone devices, verifies a selected bundle's installed app container,
+and only after separate operator consent reads one screenshot. The screenshot
+is validated as a real PNG, normalized without PNG metadata and saved with a
+SHA-bound immutable source/release/target/runtime receipt in a private
+directory. The existing Native SDK owns any imported Evidence creation;
+its technical state stays UNKNOWN and Host acceptance NOT_ESTABLISHED.
+The screenshot receipt is reconciled after a lost Native ACK without taking
+another screenshot. This does not execute customer application source or
+touch a physical iOS device. The disposable Xcode CI fixture separately
+installs/launches a tiny owned synthetic UIKit app to prove real simulator
+pixels, without altering adapter authority. See IOS_SIMULATOR_CAPTURE.md.
+
+
 ## R48 scoped Android emulator screenshot adapter
 
 The fixed read-only ADB adapter checks local emulator serial and ro.kernel.qemu,

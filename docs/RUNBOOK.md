@@ -58,6 +58,20 @@ human reconciliation. No automatic deletion of unknown lock files
 or blind changes to the original project.
 
 
+## R49 owner iPhone Simulator capture and incident recovery
+
+The operator, not Launchwright, boots and foregrounds the selected app on
+a local Apple CoreSimulator iPhone. Save the exact private plan and retype
+its SHA-256, bundle and release build before capturing. The output is
+one private PNG/receipt and imported-UNKNOWN Native Evidence. On a lost
+Native response use the SAME original plan; verify screenshot and receipt
+before reusing the exact bytes, never launch or recapture blindly.
+A locked workspace, moved simulator/app container, source revision drift,
+modified screenshot or unsafe output directory requires operator review.
+The adapter provides no physical iPhone, source app binary hash, actual
+foreground proof, privacy certification or Platform Publish authority.
+
+
 ## R48 Android emulator evidence and incident recovery
 
 Only explicitly selected emulator-PORT devices with ro.kernel.qemu=1 are

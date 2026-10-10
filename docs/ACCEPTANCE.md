@@ -411,6 +411,25 @@ This narrows ANDROID_CAPTURE from missing implementation to partial after
 successful emulator technical acceptance.
 
 
+## R49 candidate — local iPhone Simulator PNG and Native imported UNKNOWN receipt
+
+R49 adds a bounded Apple CoreSimulator-only adapter that independently
+checks a unique booted available iPhone Simulator identity and installed
+bundle container, selected approved Native mobile-import Source/Release/
+Target pins, exact private plan digest and owner screenshot authorization.
+The adapter invokes only fixed simctl list/get_app_container/io screenshot
+commands and never boots, installs or launches customer apps or contacts
+physical devices. A screenshot is checked with real PNG decoding/CRC and
+dimensions, saved privately with a SHA-bound receipt and imported into
+the existing Native SDK Evidence state as technical UNKNOWN. A lost Native
+ACK recovers from the exact receipt without recapture. Cross-OS Node24
+fault tests and a real owned synthetic UIKit/Xcode disposable simulator
+lane are REQUIRED for acceptance, not assumed from code existence.
+The original master IOS_CAPTURE remains PARTIAL on acceptance; customer
+device/app, true binary/foreground isolation, pixel PII screening,
+Driver Host/Platform and public App Store upload remain unverified.
+
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;
