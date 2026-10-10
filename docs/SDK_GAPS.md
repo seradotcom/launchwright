@@ -215,3 +215,14 @@ customer app or external script. R55 does not prove privacy outside the
 operator-selected rectangles, customer capture authenticity, UI action
 semantics, general accessibility, rights or Semwright Platform Publish.
 INTERACTIVE_DEMO remains PARTIAL under the original 36-scenario master.
+
+## R61 offline spatial click-through on R55/R59 captured states
+
+R61 narrows the original interactive-demo usability gap by linking exact
+R55 masked, Native Media-bound offline screenshots using CSS-only local
+hotspots, operator-authored geometry and SHA-bound plan/manifest.
+It cannot prove causal behavior in the original product; the target is
+another static captured state. Pixels outside the R55 operator masks may
+still contain sensitive data. No new canonical Host execution, customer
+app acceptance, accessibility certification or Platform Publish follows.
+The INTERACTIVE_DEMO original master profile remains PARTIAL.

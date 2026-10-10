@@ -100,3 +100,5 @@ pixels and unchanged outside pixels, but **does not independently detect
 personal information in the remaining image**. The viewer's technical
 UNKNOWN, private distribution and independent human rights/PII review
 requirements are unchanged. See [R55 pixel redaction](PIXEL_REDACTION.md).
+
+R61 can add operator-authored click-through zones to the exact masked R59 bundle; see [OFFLINE_HOTSPOTS.md](OFFLINE_HOTSPOTS.md). Clicks navigate between static captured states and do not establish live product action semantics or privacy beyond operator-selected masks.

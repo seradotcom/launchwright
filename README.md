@@ -143,6 +143,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [R49: bounded Apple CoreSimulator iPhone screenshot with Native imported UNKNOWN receipt](docs/IOS_SIMULATOR_CAPTURE.md)
 - [R43: source-pinned offline interactive demo from sanitized Media Evidence](docs/INTERACTIVE_DEMO.md)
 - [R59: exact R55 masked Native pixels inside R43 script-free offline demo](docs/MASKED_INTERACTIVE_DEMO.md)
+- [R61: source-pinned spatial click-through on R59 masked screenshots](docs/OFFLINE_HOTSPOTS.md)
 - [R55: operator-defined exact PNG pixel masking and Native sanitized capture evidence](docs/PIXEL_REDACTION.md)
 - [R56: exact R55 masked Native screenshot evidence to R44 Google Play ZIP](docs/MASKED_STORE_HANDOFF.md)
 - [R57: exact masked Native capture pixels in editable PPTX and PDF](docs/MASKED_DECK.md)
@@ -177,6 +178,19 @@ synthetic E2E and visual-render acceptance are in the manual Deck/PDF
 GitHub Actions lane; external branding, accessibility and customer
 product quality review remain unestablished. See
 [DECK_PDF](docs/DECK_PDF.md).
+
+
+## R61 — Click-through hotspots on source-masked screenshots
+
+An optional offline HTML viewer now adds operator-defined clickable areas to
+an already exported and Native-linked R59/R55 masked Media walkthrough.
+Every zone is bound to an exact source shot, image pixels and mask plan, and
+may only navigate to another authorized screenshot. An independently frozen
+R61 plan, private SHA-bound ZIP and receipt allow repeatable export without
+new Media output or customer-app execution. No scripts, network requests,
+live app action simulation or Platform Publish. This is still not proof that
+the original software responds to those clicks, or that PII outside the
+selected R55 masks has been removed. See [operator guide](docs/OFFLINE_HOTSPOTS.md).
 
 
 ## R59 — Exact masked pixels in offline Media walkthroughs

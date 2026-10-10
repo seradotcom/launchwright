@@ -145,6 +145,20 @@ R43 Media variants can bind to the new exact Native evidence ID. See
 [PIXEL_REDACTION.md](PIXEL_REDACTION.md).
 
 
+## R61 — Offline clickable state navigation over R59 masked evidence
+
+R61 is an offline static HTML derivative of an existing R59 Native-backed,
+UNKNOWN technical Media output. It requires the exact private R59 ZIP/
+receipt, current R55 mask plans and Native derivative IDs, decoded PNG pixel
+hashes and a source-bound plan. Operator zones are defined in original
+screenshot pixels; the renderer enforces minimum size/bounds, reachability
+and no overlap with any R55 masked rectangle. The browser uses same-document
+hash anchors and CSS :target only, with SHA-bound CSP, without JavaScript,
+source app code, network or external publication. R61 never creates another
+Native Media receipt or promotes privacy outside masks. See
+[OFFLINE_HOTSPOTS](OFFLINE_HOTSPOTS.md).
+
+
 ## R59 — R55 mask and Native derivative enforced in R43 static walkthrough
 
 An R43 bounded Media plan must name the current exact R55-derived Native

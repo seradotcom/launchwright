@@ -102,7 +102,7 @@
       "evidence": "OWNED_FIXTURE_OFFLINE_BROWSER",
       "source_sha": "7c60976055849c70c0d6ac95960f8282f70bd6f5",
       "run_id": 37978319215,
-      "remaining": "R43 real Chromium offline radio/keyboard/CSP/viewport navigation passed on owned synthetic PNGs only. Running customer-product interactions, independent pixel privacy/source rights verification, multi-browser accessibility and Platform/Host acceptance remain missing."
+      "remaining": "R59 exact Native/R55 masked pixels and R61 CSS-only operator-authored click-through state transitions (Node24/browser acceptance pending). Clicks cannot prove original app behavior. Real customer capture, general privacy outside masks, assistive technology QA, semantics, licensing and Platform Publish remain external."
     },
     {
       "profile": "STORE_PACKAGE",

@@ -67,7 +67,10 @@
     "test:masked-apple": "node --test --test-concurrency=1 tests/masked-apple-handoff.test.mjs",
     "test:masked-demo": "node --test --test-concurrency=1 tests/masked-interactive-demo.test.mjs",
     "masked-demo:plan": "node scripts/masked-interactive-demo.mjs plan",
-    "masked-demo:export": "node scripts/masked-interactive-demo.mjs export"
+    "masked-demo:export": "node scripts/masked-interactive-demo.mjs export",
+    "hotspots:plan": "node scripts/offline-hotspots.mjs plan",
+    "hotspots:export": "node scripts/offline-hotspots.mjs export",
+    "test:hotspots": "node --test --test-concurrency=1 tests/offline-hotspots.test.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",

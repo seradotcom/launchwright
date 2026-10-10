@@ -1,0 +1,96 @@
+name: Source-masked offline hotspot navigation
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hotspot-offline-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  offline-hotspots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Reject high-severity production dependency advisories
+        run: npm audit --omit=dev --audit-level=high
+      - name: Test canonical Native R55 and R59 source, immutable R61 offline navigation and master gate
+        run: |
+          set -euo pipefail
+          node scripts/verify.mjs
+          node --test --test-concurrency=1 tests/pixel-redaction.test.mjs tests/masked-interactive-demo.test.mjs tests/offline-hotspots.test.mjs
+          node scripts/master-acceptance.mjs --check
+      - name: Install disposable Chromium in runner
+        run: |
+          set -euo pipefail
+          npm install --prefix .ci-tools --no-audit --no-fund --ignore-scripts playwright@1.58.2
+          .ci-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Generate actual owned R55/R59 Native-masked click-through artifact
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/offline-hotspots
+          chmod 0700 evidence/offline-hotspots
+          node scripts/offline-hotspots-owned-smoke.mjs \
+            --out-dir "$GITHUB_WORKSPACE/evidence/offline-hotspots" \
+            | tee evidence/offline-hotspots/result.json
+      - name: Exercise CSS-only hotspot clicking, keyboard, CSP and responsive geometry in Chromium
+        run: node tests/offline-hotspots-browser.mjs
+      - name: Independently check exact parent masks and derived ZIP non-authority
+        run: |
+          python3 - <<'PY'
+          import json,hashlib,pathlib,re,zipfile
+          root=pathlib.Path('evidence/offline-hotspots')
+          report=json.loads((root/'result.json').read_text())
+          browser=json.loads((root/'browser-report.json').read_text())
+          assert report['real_owned_synthetic_fixture'] is True
+          assert report['canonical_driver_host_accepted'] is False
+          assert report['customer_source_captured'] is False
+          assert report['technical_state']=='UNKNOWN'
+          assert report['app_actions_executed'] is False
+          assert report['native_media_output_count']==1
+          assert browser['accepted_real_chromium'] is True
+          assert browser['hotspot_click_navigation'] is True
+          assert browser['hotspot_keyboard_enter_navigation'] is True
+          assert browser['script_csp_enforced'] is True
+          assert browser['exact_source_pixel_geometry'] is True
+          assert browser['remote_http_requests']==[]
+          assert browser['failed_requests']==[]
+          assert browser['page_errors']==[]
+          data=(root/report['hotspot_bundle_filename']).read_bytes()
+          assert hashlib.sha256(data).hexdigest()==report['hotspot_bundle_sha256']
+          with zipfile.ZipFile(root/report['hotspot_bundle_filename']) as zip:
+            assert zip.testzip() is None
+            assert sorted(zip.namelist())==['README.txt','index.html','manifest.json']
+            html=zip.read('index.html')
+            manifest=json.loads(zip.read('manifest.json'))
+            assert hashlib.sha256(html).hexdigest()==manifest['html_sha256']
+            assert manifest['r59_bundle_sha256']==report['original_r59_bundle_sha256']
+            assert manifest['r59_media_output_id']==report['original_r59_media_output_id']
+            assert manifest['technical_state']=='UNKNOWN'
+            assert manifest['network_access'] is False
+            assert manifest['script_execution'] is False
+            assert manifest['pixel_privacy_outside_masks_verified'] is False
+            assert manifest['navigation_mode']=='css-target-links'
+            assert len(manifest['links'])==report['hotspot_count']==2
+            assert len(manifest['masked_source_chain'])==2
+            assert b'<script' not in html and b'<iframe' not in html
+            assert b'http://' not in html and b'https://' not in html
+            assert b'script-src &#39;none&#39;' in html
+            assert len(re.findall(rb'class="hotspot"',html))==2
+          assert len(list(root.glob('hotspots-*.png')))>=5
+          print('R61_MASKED_PIXEL_NAVIGATION_CSP_CI_PASS',report['hotspot_bundle_sha256'])
+          PY
+      - name: Retain owned synthetic ZIP, manifest, 4 responsive screenshots and negative-authority report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: launchwright-owned-offline-hotspots-${{ github.sha }}
+          path: evidence/offline-hotspots/
+          if-no-files-found: error
+          retention-days: 14

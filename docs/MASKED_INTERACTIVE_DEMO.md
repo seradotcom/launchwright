@@ -91,3 +91,5 @@ R59's selective `masked-demo` heavy CI lane produces two real R55 masked PNGs fr
 That proves **selected rectangular masking and Native source linkage**, not generalized privacy, semantic fidelity, accessibility certification, a customer session, real device origin, real product interactions or Semwright Platform Publish. A static walkthrough does not prove that controls in the actual product operate correctly.
 
 The master `INTERACTIVE_DEMO` profile remains **PARTIAL** and the whole-master gate remains **BLOCKED**.
+
+R61 can add operator-authored click-through zones to the exact masked R59 bundle; see [OFFLINE_HOTSPOTS.md](OFFLINE_HOTSPOTS.md). Clicks navigate between static captured states and do not establish live product action semantics or privacy beyond operator-selected masks.
