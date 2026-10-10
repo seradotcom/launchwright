@@ -123,6 +123,17 @@ See GOOGLE_PLAY_IMAGES.md. Real Google account, image ordering and
 customer pixel/rights approval are external obligations.
 
 
+## R55 private pixel mask preflight for captured screenshots
+
+When downstream product demos require obscuring an owner-reviewed region,
+use the two-phase R55 operator CLI described in
+[PIXEL_REDACTION.md](PIXEL_REDACTION.md). This is an explicit opaque
+rectangle transform on an approved Native capture + exact PNG, not
+automatic PII detection and not a new source/Platform execution backend.
+It creates private RGB PNG/measurement output and a separately linked
+SANITIZED_DERIVATIVE receipt with technical UNKNOWN.
+
+
 ## R42 editable deck and real PDF
 
 From a human-approved, exact frozen Markdown Candidate, execute the

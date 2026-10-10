@@ -42,6 +42,26 @@ edited ZIPs, stale source/channel revisions, unsafe output paths and
 wrong screenshot dimensions/alpha. Never automatically resize, publish
 or contact external store accounts.
 
+## R55 operator mask and pixel privacy incident checklist
+
+Choose an approved original Native capture evidence and a private 0600 PNG
+whose SHA matches the prepared intent. Manually inspect the complete image,
+identify all sensitive regions and provide bounded non-overlapping rectangles.
+Plan and verify the private hash before explicitly exporting to an existing
+0700 directory. The output has a fixed opaque RGB fill and exact same source
+pixels elsewhere; no person/name/address/PII detection is performed.
+The normalized PNG removes ancillary metadata, **not pixel-based PII outside
+the rectangles**. Do not publish it without independent privacy/rights review.
+
+On an interrupted write use the SAME saved mask plan, original source and
+exact SHA to reconcile PNG and Native SANITIZED_DERIVATIVE receipt. If a
+different PNG, Native revision, source purpose, human-edited output or
+abandoned .pixel-mask-apply.lock exists, STOP and investigate; never delete
+unknown files, skip operator confirmation or silently broaden the masking
+scope. Its transformation marks changes-observed-state and preserves
+technical UNKNOWN, never observed-state eligibility.
+
+
 ## R43 offline demo screenshot/privacy recovery
 
 Offline demos are static HTML tours of exact Media-backed sanitized
