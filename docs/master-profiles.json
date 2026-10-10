@@ -93,7 +93,7 @@
       "evidence": "OWNED_FIXTURE_DOCUMENT_RENDER",
       "source_sha": "9f9bdfbdd6bb219cef3c0e105b1960e476807c6a",
       "run_id": 37906146250,
-      "remaining": "R42 text-only PPTX/PDF accepted; R57 adds exact R55 pixel-masked Native screenshot image lineage to PPTX/PDF (Node24/visual acceptance pending). Customer branding/visual QA, accessibility, multilingual fonts, richer layouts, independent pixel privacy/rights and Platform remain unaccepted."
+      "remaining": "R42 source-bound text PPTX/PDF and R57 exact R55 Native masked screenshot insertion into real editable PPTX/real PDF accepted on owned Node24 3-OS + Poppler/LibreOffice runs. Rich layout, broader fonts, accessibility, human visual/brand approval, privacy outside masks, real customer and Platform remain unaccepted."
     },
     {
       "profile": "INTERACTIVE_DEMO",

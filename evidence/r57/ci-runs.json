@@ -1,0 +1,139 @@
+{
+  "schema_version": "launchwright-r57-ci-evidence/1",
+  "source_sha": "bd5eb6a925965b276a87c3bef762407d5d685320",
+  "merge_commit_sha": "ab1942b07d3a62892081dbc9a3f8e88302d0fa86",
+  "semwright_native_sdk_version": "1.0.0",
+  "reviewed_semwright_sha": "d2da9a495a53fe279a1ca4de61f0e24646350f22",
+  "application_source_checks": {
+    "run_id": 38077927524,
+    "head_sha": "bd5eb6a925965b276a87c3bef762407d5d685320",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/38077927524",
+    "jobs": {
+      "light (macos-latest)": {
+        "job_id": 114288707429,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38077927524/job/114288707429"
+      },
+      "light (windows-latest)": {
+        "job_id": 114288707640,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38077927524/job/114288707640"
+      },
+      "light (ubuntu-latest)": {
+        "job_id": 114288707666,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38077927524/job/114288707666"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Linux-3cd4cf6ed20753349d4d7b8e54a1d3abbc7baa8d": {
+        "id": 11679608375,
+        "bytes": 695,
+        "expired": false
+      },
+      "launchwright-clean-room-Windows-3cd4cf6ed20753349d4d7b8e54a1d3abbc7baa8d": {
+        "id": 11679117535,
+        "bytes": 732,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-3cd4cf6ed20753349d4d7b8e54a1d3abbc7baa8d": {
+        "id": 11678478641,
+        "bytes": 695,
+        "expired": false
+      }
+    }
+  },
+  "owned_masked_deck_visual": {
+    "run_id": 38078291248,
+    "head_sha": "ab1942b07d3a62892081dbc9a3f8e88302d0fa86",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/38078291248",
+    "jobs": {
+      "owned-masked-deck": {
+        "job_id": 114289766397,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38078291248/job/114289766397"
+      }
+    },
+    "artifacts": {
+      "launchwright-masked-deck-ab1942b07d3a62892081dbc9a3f8e88302d0fa86": {
+        "id": 11679513761,
+        "bytes": 251064,
+        "expired": false
+      }
+    }
+  },
+  "main_push_checks": {
+    "run_id": 38078289484,
+    "head_sha": "ab1942b07d3a62892081dbc9a3f8e88302d0fa86",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/38078289484",
+    "jobs": {
+      "light (ubuntu-latest)": {
+        "job_id": 114289758698,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38078289484/job/114289758698"
+      },
+      "light (macos-latest)": {
+        "job_id": 114289758906,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38078289484/job/114289758906"
+      },
+      "light (windows-latest)": {
+        "job_id": 114289758909,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38078289484/job/114289758909"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-macOS-ab1942b07d3a62892081dbc9a3f8e88302d0fa86": {
+        "id": 11679549137,
+        "bytes": 698,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-ab1942b07d3a62892081dbc9a3f8e88302d0fa86": {
+        "id": 11679524026,
+        "bytes": 695,
+        "expired": false
+      },
+      "launchwright-clean-room-Windows-ab1942b07d3a62892081dbc9a3f8e88302d0fa86": {
+        "id": 11678668530,
+        "bytes": 731,
+        "expired": false
+      }
+    }
+  },
+  "owned_fixture": {
+    "r55_native_derivative_count": 2,
+    "editable_pptx_with_masked_png": true,
+    "independent_real_pdf_with_png_xobjects": true,
+    "page_count": 4,
+    "libreoffice_independent_pptx_conversion": true,
+    "pdf_poppler_page_renders": 2,
+    "pptx_poppler_page_renders": 2,
+    "source_pixel_sha256_checked_in_pptx": true,
+    "source_candidate_markdown_exact": true,
+    "local_node22_passed": 452,
+    "local_node22_skipped": 14,
+    "local_node22_failed": 0,
+    "local_js_modules_checked": 215,
+    "local_native_driver_operations_checked": 86
+  },
+  "authority": {
+    "masked_pixel_area_exact": true,
+    "pixels_outside_masks_verified_unchanged": true,
+    "native_sanitized_derivative_only": true,
+    "technical_state": "UNKNOWN",
+    "independent_pixel_privacy_verified": false,
+    "image_rights_independently_certified": false,
+    "real_customer_source_accepted": false,
+    "canonical_semwright_driver_host_new_acceptance": false,
+    "platform_publish_authority": false,
+    "public_publication_performed": false
+  },
+  "scope_note": "R55-owned synthetic exact mask to Native evidence and R42 editable PPTX/real PDF. No live customer pixels or independent privacy/accessibility/brand acceptance."
+}
