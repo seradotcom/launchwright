@@ -71,3 +71,12 @@ This only establishes owned-fixture output conformance, not
 independent general privacy, accessibility, visual design-quality,
 customer source rights, external publication or canonical Platform
 execution. DECK_PDF remains PARTIAL.
+
+R57 implementation SHA `bd5eb6a925965b276a87c3bef762407d5d685320`
+passed Node24 Linux/Windows/macOS, merged as
+`ab1942b07d3a62892081dbc9a3f8e88302d0fa86`.
+The independent owned-fixture PPTX/LibreOffice/PDF/Poppler receipt is
+GitHub Actions run `38078291248`; artifact ID
+`11679513761`. Details and scope limits are in
+`evidence/r57/ci-runs.json`. This does not establish real
+customer pixel/privacy or accessibility acceptance.

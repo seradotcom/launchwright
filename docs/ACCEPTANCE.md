@@ -467,27 +467,29 @@ audited completion; this local 2-release fixture does not claim
 customer/Platform/host/semantic coverage authority.
 
 
-## R55 candidate — exact rectangular pixel redaction and source-linked Native receipt
+## R55 accepted — exact operator PNG masks and Native provenance
 
-R55 implements an owner-approved local two-phase PNG transform from an
-original Native CAPTURED_ACTUAL/CAPTURED_DEMO_DATA Evidence. Its plan binds
-exact original PNG SHA, decoded pixel SHA, Native source/release/scenario
-revision pins, 1–24 operator-selected non-overlapping masks, exact masked
-pixel count and derived output SHA. Applying an independently confirmed
-private plan replaces only those pixels with opaque fixed RGB, verifies
-EVERY unmasked pixel is unchanged, strips PNG metadata, and records a
-SANITIZED_DERIVATIVE through canonical capture.ingest with
-changes-observed-state and technical UNKNOWN. Native and private filesystem
-recovery require exact bytes; stale/colliding writes and invalid masks fail
-closed. The end-to-end tests integrate new derivative IDs into a revised
-R43 Media plan and real offline ZIP without granting observed-state
-eligibility or independent privacy certification.
+R55 source SHA `946b2874fdb04931e7210348abd50416af8c0da3` passed supported Node24 Linux,
+Windows and macOS in Application checks run `38036570795`.
+The separate real Chromium owned-pixel-mask run `38036570825`
+passed with two Native SANITIZED_DERIVATIVE evidence resources and
+four masked regions, a rebuilt R43 Media offline viewer, keyboard
+navigation and 320/390/768/1280 viewport screenshots. The fixture
+recorded zero script errors, zero external network requests, no
+unmasked source PNG artifacts and explicit technical UNKNOWN.
+PR #79 merged as `a540bcb8a7dfa375289c137662b5557e526535c3`; main-push Application checks
+`38036931008` passed on all three supported systems.
 
-R55 acceptance is still pending supported Node24 Linux/Windows/macOS CI
-and the owned-fixture real Chromium/keyboard/privacy-negatives lane.
-No real customer PII review, visual source rights audit, universal pixel
-safety, application execution, Semwright Driver Host admission or external
-Platform/Store publication is implied by this capability.
+The byte-sensitive pixel oracle proves only that operator-selected
+rectangles are replaced by a fixed opaque RGB, source metadata is
+stripped and all pixels outside those rectangles are byte-exact.
+The output retains Native imported-only receipt provenance and sets
+changes-observed-state / observed_state_eligible=false; it NEVER
+upgrades a capture to a canonical product PASS, automatically
+detects personal information outside masks, independently certifies
+privacy/rights or performs customer/Platform/Host acceptance.
+Exact CI job and artifact IDs plus the offline ZIP SHA-256 are
+retained in `evidence/r55/ci-runs.json`.
 
 
 ## R56 candidate — real masked screenshot to Google Play private ZIP
@@ -511,25 +513,34 @@ independently verified. STORE_PACKAGE remains PARTIAL and the original
 master remains BLOCKED.
 
 
-## R57 candidate — source-bound R55 masked images in PPTX and PDF
+## R57 accepted — exact R55 Native pixel mask to editable PPTX/PDF
 
-R57 takes a frozen editorial-approved R42 Markdown candidate and exactly
-one R55 masked screenshot per content slide. Every input requires a
-specific R55 mask plan/input/apply receipt, exact PNG byte and decoded
-pixel SHA, Native SANITIZED_DERIVATIVE evidence ID/revision/origin and
-the same candidate release/target/build. Technical state remains UNKNOWN
-because masks cover operator-selected rectangles only; no independent
-PII clearance or source rights certification is asserted. Two-phase
-private plan/export embeds the images in replaceable PPTX media and PDF
-image XObjects, preserves the original source copy, checks deterministic
-binary outputs, and refuses human edits, stale source, swapped screenshots
-or concurrent writers. Real owned synthetic Node22 tests passed; Node24
-Linux/Windows/macOS and separate owned Poppler/LibreOffice visual
-acceptance on an exact SHA are required before R57 is accepted. Original
-DECK_PDF remains PARTIAL because rich multi-asset layout, customer visual
-quality/accessibility, licensed font coverage and customer/Platform
-acceptance are not established.
+R57 source SHA `bd5eb6a925965b276a87c3bef762407d5d685320`
+passed supported Node24 Linux/Windows/macOS Application checks run
+`38077927524`. PR #82 merged as
+`ab1942b07d3a62892081dbc9a3f8e88302d0fa86`;
+main-push checks `38078289484` passed on all three OSes.
+The separate owned-synthetic real document run `38078291248`
+passed on the exact merge SHA. Its retained artifact
+`11679513761` contains real editable PPTX, direct PDF, LibreOffice-
+reconstructed PDF, Poppler page previews and source-bound receipts.
+PPTX XML and media contain every reviewed text line and the two exact
+R55 masked PNG pixel digests; both PDF and PPTX have four readable
+slides. No changes to the original R42 text-only PPTX/PDF bytes were
+introduced. The local supplemental Node22 run reported 452 passes,
+14 skipped, 0 failures, 215 JavaScript modules verified and 86 Native
+Driver operations checked.
 
+This is source-bound **mask-scope** and format conformance, NOT a
+whole-pixel privacy certification. R55 masks replace operator-
+selected rectangles; all other pixels can still contain sensitive
+data. The derivative remains imported technical UNKNOWN,
+observed-state ineligible and Host NOT_ESTABLISHED. There is no
+customer source/right/accessibility/design approval, generic
+Semwright Platform Publish or external/public deployment authority.
+DECK_PDF and the original whole-master gate remain PARTIAL/BLOCKED.
+Exact source, job, artifact and authority details:
+`evidence/r57/ci-runs.json`.
 
 ## Explicitly not established
 
