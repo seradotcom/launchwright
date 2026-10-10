@@ -204,3 +204,14 @@ its previous total-pixel memory limit. Synthetic tests prove exact
 mask/source identity only. General PII, rights, real Apple account
 processing, device provenance, App Review and Platform Publish remain
 externally unaccepted. APPLE_UPLOAD stays PARTIAL.
+
+## R59 R55 masked screenshots inside R43 offline walkthroughs
+
+R59 narrows the R43 operator-sanitized screenshot path: every offline step
+must be an exact R55 masked PNG with current Native derivative Evidence,
+opaque selected rectangles and SHA-bound original/derived pixel proofs.
+Its manifest preserves mask/Media source lineage without executing any
+customer app or external script. R55 does not prove privacy outside the
+operator-selected rectangles, customer capture authenticity, UI action
+semantics, general accessibility, rights or Semwright Platform Publish.
+INTERACTIVE_DEMO remains PARTIAL under the original 36-scenario master.

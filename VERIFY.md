@@ -28,7 +28,7 @@ acceptance.
 
 ## Heavy authorized runners
 
-Manual .github/workflows/heavy.yml supports browser, native, host, verifier,
+Manual .github/workflows/heavy.yml supports browser, masked-demo, native, host, verifier,
 extension, effects, composition, deltadesk, godot and stress. Dispatch **only
 affected** lanes at the exact reviewed Git ref; record the run/job/artifact IDs
 and source SHA before assigning any supported-engine or Host acceptance.

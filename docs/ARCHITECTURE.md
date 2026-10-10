@@ -145,6 +145,21 @@ R43 Media variants can bind to the new exact Native evidence ID. See
 [PIXEL_REDACTION.md](PIXEL_REDACTION.md).
 
 
+## R59 — R55 mask and Native derivative enforced in R43 static walkthrough
+
+An R43 bounded Media plan must name the current exact R55-derived Native
+SANITIZED_DERIVATIVE for every ordered interactive shot. The additional
+R59 admission checks original/derived Native source/build/version, operator
+rights, opaque pixel rectangles, decoded masked PNG pixel hashes and
+same-variant Media digest. A no-effects plan binds all R55 receipts and
+private PNG path hashes. Export shares the R43 exclusive writer lock,
+embeds the source lineage in the same static HTML/JSON/README ZIP, and
+records the result through the existing Native media.output_record
+operation as imported UNKNOWN. No new Core, Composition renderer,
+backend store or user source code execution path exists. Read the
+[masked walkthrough specification](MASKED_INTERACTIVE_DEMO.md).
+
+
 ## R43 — Script-free offline product screen tour from canonical Media records
 
 The bounded R43 operator CLI reads only a current Native Media plan with
