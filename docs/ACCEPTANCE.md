@@ -467,28 +467,29 @@ audited completion; this local 2-release fixture does not claim
 customer/Platform/host/semantic coverage authority.
 
 
-## R55 candidate — exact rectangular pixel redaction and source-linked Native receipt
+## R55 accepted — exact operator PNG masks and Native provenance
 
-R55 implements an owner-approved local two-phase PNG transform from an
-original Native CAPTURED_ACTUAL/CAPTURED_DEMO_DATA Evidence. Its plan binds
-exact original PNG SHA, decoded pixel SHA, Native source/release/scenario
-revision pins, 1–24 operator-selected non-overlapping masks, exact masked
-pixel count and derived output SHA. Applying an independently confirmed
-private plan replaces only those pixels with opaque fixed RGB, verifies
-EVERY unmasked pixel is unchanged, strips PNG metadata, and records a
-SANITIZED_DERIVATIVE through canonical capture.ingest with
-changes-observed-state and technical UNKNOWN. Native and private filesystem
-recovery require exact bytes; stale/colliding writes and invalid masks fail
-closed. The end-to-end tests integrate new derivative IDs into a revised
-R43 Media plan and real offline ZIP without granting observed-state
-eligibility or independent privacy certification.
+R55 source SHA `946b2874fdb04931e7210348abd50416af8c0da3` passed supported Node24 Linux,
+Windows and macOS in Application checks run `38036570795`.
+The separate real Chromium owned-pixel-mask run `38036570825`
+passed with two Native SANITIZED_DERIVATIVE evidence resources and
+four masked regions, a rebuilt R43 Media offline viewer, keyboard
+navigation and 320/390/768/1280 viewport screenshots. The fixture
+recorded zero script errors, zero external network requests, no
+unmasked source PNG artifacts and explicit technical UNKNOWN.
+PR #79 merged as `a540bcb8a7dfa375289c137662b5557e526535c3`; main-push Application checks
+`38036931008` passed on all three supported systems.
 
-R55 acceptance is still pending supported Node24 Linux/Windows/macOS CI
-and the owned-fixture real Chromium/keyboard/privacy-negatives lane.
-No real customer PII review, visual source rights audit, universal pixel
-safety, application execution, Semwright Driver Host admission or external
-Platform/Store publication is implied by this capability.
-
+The byte-sensitive pixel oracle proves only that operator-selected
+rectangles are replaced by a fixed opaque RGB, source metadata is
+stripped and all pixels outside those rectangles are byte-exact.
+The output retains Native imported-only receipt provenance and sets
+changes-observed-state / observed_state_eligible=false; it NEVER
+upgrades a capture to a canonical product PASS, automatically
+detects personal information outside masks, independently certifies
+privacy/rights or performs customer/Platform/Host acceptance.
+Exact CI job and artifact IDs plus the offline ZIP SHA-256 are
+retained in `evidence/r55/ci-runs.json`.
 
 ## Explicitly not established
 

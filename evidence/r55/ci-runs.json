@@ -1,0 +1,145 @@
+{
+  "schema_version": "launchwright-r55-ci-evidence/1",
+  "source_sha": "946b2874fdb04931e7210348abd50416af8c0da3",
+  "merge_commit_sha": "a540bcb8a7dfa375289c137662b5557e526535c3",
+  "canonical_semwright_native_sdk": "1.0.0",
+  "semwright_reviewed_sha": "d2da9a495a53fe279a1ca4de61f0e24646350f22",
+  "application_source_checks": {
+    "run_id": 38036570795,
+    "head_sha": "946b2874fdb04931e7210348abd50416af8c0da3",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/38036570795",
+    "jobs": {
+      "light (macos-latest)": {
+        "job_id": 114168117464,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38036570795/job/114168117464"
+      },
+      "light (windows-latest)": {
+        "job_id": 114168117532,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38036570795/job/114168117532"
+      },
+      "light (ubuntu-latest)": {
+        "job_id": 114168117590,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38036570795/job/114168117590"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Linux-89acfc698a23cba7cc273ad718624f76061ac308": {
+        "id": 11664048162,
+        "bytes": 695,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-89acfc698a23cba7cc273ad718624f76061ac308": {
+        "id": 11663977149,
+        "bytes": 696,
+        "expired": false
+      },
+      "launchwright-clean-room-Windows-89acfc698a23cba7cc273ad718624f76061ac308": {
+        "id": 11663558870,
+        "bytes": 734,
+        "expired": false
+      }
+    }
+  },
+  "owned_chromium_e2e": {
+    "run_id": 38036570825,
+    "head_sha": "946b2874fdb04931e7210348abd50416af8c0da3",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/38036570825",
+    "jobs": {
+      "owned-mask": {
+        "job_id": 114168117537,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38036570825/job/114168117537"
+      }
+    },
+    "artifacts": {
+      "launchwright-owned-pixel-mask-89acfc698a23cba7cc273ad718624f76061ac308": {
+        "id": 11663682159,
+        "bytes": 360074,
+        "expired": false
+      }
+    }
+  },
+  "main_push_checks": {
+    "run_id": 38036931008,
+    "head_sha": "a540bcb8a7dfa375289c137662b5557e526535c3",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/38036931008",
+    "jobs": {
+      "light (windows-latest)": {
+        "job_id": 114169197958,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38036931008/job/114169197958"
+      },
+      "light (ubuntu-latest)": {
+        "job_id": 114169198099,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38036931008/job/114169198099"
+      },
+      "light (macos-latest)": {
+        "job_id": 114169198134,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38036931008/job/114169198134"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Windows-a540bcb8a7dfa375289c137662b5557e526535c3": {
+        "id": 11663619433,
+        "bytes": 731,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-a540bcb8a7dfa375289c137662b5557e526535c3": {
+        "id": 11663614015,
+        "bytes": 693,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-a540bcb8a7dfa375289c137662b5557e526535c3": {
+        "id": 11663424482,
+        "bytes": 696,
+        "expired": false
+      }
+    }
+  },
+  "source_and_pixel_assertions": {
+    "real_png_crc_and_metadata_stripping": true,
+    "all_unmasked_pixel_channels_unchanged": true,
+    "operator_declared_opaque_rectangles_tested": true,
+    "source_path_not_in_plan": true,
+    "native_derivative_linked_to_original_capture": true,
+    "native_observed_state_eligible": false,
+    "native_technical_state": "UNKNOWN",
+    "original_source_pngs_retained_in_browser_artifact": false,
+    "source_png_sha256_pinned": true,
+    "idempotent_private_files_and_native_receipts": true,
+    "human_privacy_review_performed": false,
+    "pii_outside_masks_verified": false,
+    "all_personal_information_removed": false
+  },
+  "chromium_assertions": {
+    "real_chromium_offline_owned_fixture": true,
+    "native_sanitized_derivatives": 2,
+    "mask_rectangles_in_source": 4,
+    "viewer_keyboard_navigation": true,
+    "viewport_widths": [
+      320,
+      390,
+      768,
+      1280
+    ],
+    "zero_script_errors": true,
+    "zero_external_network_requests": true,
+    "offline_demo_zip_sha256": "eddf3194b84b658431008a6065760067895be957cecec98e603700c32df49321",
+    "customer_capture_admitted": false,
+    "canonical_driver_host_accepted": false,
+    "semwright_platform_publish_authority": false,
+    "external_publication": false
+  },
+  "scope_note": "R55 verifies exact operator-chosen masks only. Original customer PNG pixels, personal information outside rectangles, source legal rights, product semantics and independent privacy review remain unaccepted. Fixture is owned synthetic and exported images are masked only."
+}
