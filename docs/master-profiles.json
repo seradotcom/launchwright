@@ -116,11 +116,11 @@
     {
       "profile": "APPLE_UPLOAD",
       "scope": "EXTERNAL_ACCEPTANCE",
-      "implementation": "MISSING",
-      "evidence": "NOT_TESTED",
+      "implementation": "PARTIAL",
+      "evidence": "LOCAL_CONTRACT_CI",
       "source_sha": null,
       "run_id": null,
-      "remaining": "Bounded App Store Connect draft upload adapter; external account/permission acceptance separately required"
+      "remaining": "R51 screenshot-only Apple reservation/signed-part upload and MD5/processing readback are tested via injected Apple transport. Actual App Store Connect account, screenshot asynchronous processing, verified display mapping, privacy/rights, App Review submission and storefront activation remain unaccepted."
     },
     {
       "profile": "PLAY_UPLOAD",

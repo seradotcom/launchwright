@@ -87,6 +87,19 @@ independently. This is not real customer capture or an externally
 hosted/deployed interactive application.
 
 
+## R51 Apple screenshot asset preparation
+
+Start with the private R44 Apple iPhone screenshot ZIP and exact approved
+Candidate. R51 optionally reserves and uploads those screenshots into an
+existing operator-created App Store Connect screenshot set, using a
+short-lived JWT token file. Prepare a private SHA-bound intent first,
+then type all confirmations before any remote asset request. On lost
+responses use GET-only recovery; an AWAITING_UPLOAD asset requires
+manual operator reconciliation, not retry. The adapter never submits an
+app to review, activates a storefront or invokes Platform Publish.
+See [APPLE_SCREENSHOT_UPLOAD.md](APPLE_SCREENSHOT_UPLOAD.md).
+
+
 ## Optional iPhone CoreSimulator screenshot (R49)
 
 On an operator-authorized macOS machine with Xcode/CoreSimulator, manually

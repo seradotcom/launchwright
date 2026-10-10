@@ -1,0 +1,68 @@
+name: Owned Apple screenshot asset protocol
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: apple-screenshot-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  apple-screenshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: No known high-severity production dependency advisories
+        run: npm audit --omit=dev --audit-level=high
+      - name: Check exact Native SDK pins and truthful master gate
+        run: |
+          set -euo pipefail
+          node scripts/verify.mjs
+          node scripts/master-acceptance.mjs --check
+      - name: Execute real R44 Native PNGs and simulated Apple REST/blobstore protocol
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/apple-screenshots
+          chmod 0700 evidence/apple-screenshots
+          node --test --test-concurrency=1 tests/apple-screenshot-upload.test.mjs | tee evidence/apple-screenshots/owned-protocol.tap
+      - name: Preserve the exact approved owned screenshot and asset plan
+        run: |
+          set -euo pipefail
+          node scripts/apple-owned-smoke.mjs --out-dir "$GITHUB_WORKSPACE/evidence/apple-screenshots"
+          python3 - <<'PY'
+          import hashlib,json,pathlib,zipfile
+          root=pathlib.Path('evidence/apple-screenshots')
+          report=json.loads((root/'owned-acceptance.json').read_text())
+          intent=json.loads((root/'intent.json').read_text())
+          archive=root/report['store_zip_filename']
+          assert report['schema_version']=='launchwright-apple-r51-owned-fixture/1'
+          assert hashlib.sha256(archive.read_bytes()).hexdigest()==report['source_zip_sha256']
+          assert intent['source_zip_sha256']==report['source_zip_sha256']
+          assert intent['intent_sha256']==report['intent_sha256']
+          assert intent['technical_state']=='UNKNOWN'
+          assert report['screenshot_count']==1
+          assert report['actual_apple_account_contacted'] is False
+          assert report['app_review_submitted'] is False
+          assert report['app_published'] is False
+          assert report['platform_authority'] is False
+          with zipfile.ZipFile(archive) as z:
+            assert z.testzip() is None
+            images=[n for n in z.namelist() if n.startswith('screenshots/') and n.endswith('.png')]
+            assert len(images)==1
+            assert hashlib.sha256(z.read(images[0])).hexdigest()==report['source_pixel_sha256']
+          print('OWNED_APPLE_SCREENSHOT_SOURCE_AND_MOCK_PROTOCOL_PASS',intent['intent_sha256'])
+          PY
+      - name: Retain synthetic ZIP, screenshots, intent and exact test transcript
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: launchwright-owned-apple-screenshots-${{ github.sha }}
+          path: evidence/apple-screenshots/
+          if-no-files-found: error
+          retention-days: 14

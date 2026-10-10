@@ -38,13 +38,16 @@
     "VIDEO R46 two aspect MP4 plus frozen WebVTT owned technical subset (source Media reviewed, vertical derivative UNKNOWN); alternate voice, burn-in captions, independent editorial/customer rights and acceptance remain open",
     "WEB and CLI customer-source capture",
     "PUBLISH_PRIVATE canonical Platform Publish/tenants/jobs/ACL",
-    "DOCS_STATIC R45 accepted owned offline versioned site; rich docs, WCAG, user/source acceptance, production hosting and cross-release customer deployments remain open"
+    "DOCS_STATIC R45 accepted owned offline versioned site; rich docs, WCAG, user/source acceptance, production hosting and cross-release customer deployments remain open",
+    "DECK_PDF text-only PPTX/PDF owned-synthetic Node24 document rendering accepted; rich media, accessibility, customer branding and editorial visual QA remain open",
+    "STORE_PACKAGE R44 local Apple/Google technical listing subset; other devices/locales, live privacy/rights/content review and real store account uploads unaccepted"
   ],
   "outstanding_external": [
     "Android emulator-only imported screenshot scope (R48 pending real Android34 CI); physical customer Android/iOS devices remain unaccepted",
     "Google Play R52 image staging uses owned synthetic HTTP protocol only; real store account permissions, image order, existing-image replacements, Edit review/commit and public publication remain external",
     "ChatGPT Plugin host acceptance",
-    "Human source/editorial approval and live customer pilot"
+    "Human source/editorial approval and live customer pilot",
+    "R51 Apple screenshot-only upload protocol uses injected transport; real operator Apple App Store Connect account, screenshot processing, App Review, and independently approved customer pixels remain unaccepted"
   ],
   "statement": "Local owned-fixture tests and source ZIP are evidence of scoped implementation only. Do not claim whole master completion until each required CORE and external profile has exact independent accepted evidence."
 }

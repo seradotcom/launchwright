@@ -430,6 +430,23 @@ device/app, true binary/foreground isolation, pixel PII screening,
 Driver Host/Platform and public App Store upload remain unverified.
 
 
+## R51 candidate — bounded screenshot upload, no App Review submission
+
+R51 adds owner-confirmed App Store Connect screenshot reservation,
+signed-URL multi-part upload, MD5 PATCH upload completion and
+asynchronous processing GETs from exact R44 Native Candidate PNG ZIPs.
+Operator-selected existing screenshot set/localization IDs and a
+private JWT token file are mandatory. The asset transport restricts
+signed PUTs to HTTPS Apple blobstore (no bearer JWT), validates all
+offset/length ranges, and refuses foreign screenshot bytes/set IDs.
+Lost reservation/PUT/PATCH acknowledgements require recover-only.
+Eleven owned synthetic tests cover exact source, consent, spoofed URLs,
+malformed JWT, wrong locale/set, duplicate reservations and processing
+state. No live Apple API/account/screenshot processing, customer device
+origin, pixel/rights certification, submission or storefront activation
+has been observed. Node24 Linux/Windows/macOS CI remains a requirement
+before R51 can be accepted.
+
 ## R52 candidate - Google Play existing Edit image upload only
 
 R52 binds one original R44 approved Google Play phone PNG asset ZIP,
@@ -529,7 +546,6 @@ acceptance on an exact SHA are required before R57 is accepted. Original
 DECK_PDF remains PARTIAL because rich multi-asset layout, customer visual
 quality/accessibility, licensed font coverage and customer/Platform
 acceptance are not established.
-
 
 ## Explicitly not established
 

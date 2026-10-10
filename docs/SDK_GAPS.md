@@ -126,6 +126,17 @@ Even after passing that gate, executable build attestation, independently
 proved foreground, PII/pixel privacy, true customer app acceptance,
 Apple account/store upload and productive platform execution remain open.
 
+## R51 bounded App Store Connect screenshots (candidate)
+
+R51 adds an owner-controlled screenshot-only Apple reservation/multi-part
+upload protocol from an exact R44 Candidate/PNG ZIP to an existing selected
+screenshot set. It checks source SHA/MD5, signed blobstore destination,
+remote locale and asset processing with recover-only unknown-ACK
+behavior. The synthetic tests use an injected Apple transport, not an
+actual Apple account. Screenshot asset processing is not App Review,
+storefront publication, customer privacy/rights certification or
+Semwright Platform Publish. The APPLE_UPLOAD profile remains PARTIAL.
+
 ## R52 existing Google Play Edit staging
 
 R52 stages R44 exact approved Android phone screenshots, icon and feature

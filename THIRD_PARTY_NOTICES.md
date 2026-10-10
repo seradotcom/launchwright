@@ -64,3 +64,11 @@ lane is pinned to source commit a421e43855164a8197daf9d8d40fe71c6996bb0d
 Launchwright test code. Android system image and build-tool licenses remain
 with their original upstream providers and are not bundled in the product.
 No APK signing keys or actual Android customer screenshots are committed.
+
+R51's operator-owned App Store Connect screenshot adapter introduces no
+new production npm dependencies. It reuses existing Node HTTPS fetch,
+JSZip and the R44 Native SDK source package. The Apple API bearer token
+is supplied by the operator from a private file and is never included in
+source code, logged in test artifacts or sent to Apple blobstore signed
+upload URLs. Official API references are links, not vendored proprietary
+Apple SDK code. Screenshots/Pixel rights remain operator-controlled.
