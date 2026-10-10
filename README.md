@@ -141,6 +141,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [R49: bounded Apple CoreSimulator iPhone screenshot with Native imported UNKNOWN receipt](docs/IOS_SIMULATOR_CAPTURE.md)
 - [R43: source-pinned offline interactive demo from sanitized Media Evidence](docs/INTERACTIVE_DEMO.md)
 - [R55: operator-defined exact PNG pixel masking and Native sanitized capture evidence](docs/PIXEL_REDACTION.md)
+- R55 accepted at exact source SHA `946b2874fdb04931e7210348abd50416af8c0da3`: supported Node24 3-OS and owned Chromium synthetic mask/Native offline demo CI pass; no independent PII/privacy certification, real customer capture or Platform Publish authority.
 - [R44: Apple/Google store-specific private screenshot, graphic and listing packages](docs/STORE_ASSETS.md)
 - [R45: offline versioned documentation site from exact frozen Markdown sources](docs/STATIC_DOCS.md)
 - [R46: two exact private MP4 aspect formats plus frozen WebVTT captions](docs/VIDEO_VARIANTS.md)
