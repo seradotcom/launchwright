@@ -393,23 +393,26 @@ and MySQL integration CI are still required before R47 acceptance.
 No live customer CMS account, rights certification or Platform Publish
 acceptance follows from mocked or synthetic-runner tests.
 
-## R48 candidate — bounded local Android emulator screenshot
+## R48 accepted — real owned Android emulator and imported Native evidence
 
-R48 adds a fixed ADB emulator-only read path, with physical/wireless device
-denial, installed package and foreground checks, QEMU identity and exact
-Native Source/Release/Target bindings. Its private SHA-bound plan performs
-no capture. Explicitly approved capture validates the PNG pixels and
-dimensions and commits only an imported technical UNKNOWN evidence receipt,
-with exact screenshot/recovery custody, no replay after a lost Native ACK.
-Normal Node24 Linux/macOS/Windows CI must pass the injected ADB fault corpus
-and Native SQLite evidence tests; the selective Android34 emulator lane
-must independently build/launch a no-network owned synthetic APK, take actual
-on-emulator PNG pixels, and verify the same code/recovery with exact CI SHA.
-No live customer app, physical Android hardware, independent PII/rights
-screening, Driver Host, Platform or public publication acceptance is implied.
-This narrows ANDROID_CAPTURE from missing implementation to partial after
-successful emulator technical acceptance.
-
+R48 exact source SHA `26d7eb1b383af944cfcd5a9dc06d57332efe8256` passed supported
+Node24 Linux/macOS/Windows run `38009606884`
+and a real Android34 Google APIs emulator with a no-permission
+owned synthetic APK in run `38009606890`.
+PR #73 merged as `5f4e716bc4fcf4a47838a27ddec11dd2821e67d0`.
+After merging, run `38009924019` independently
+produced a real 1080x2400 PNG, SHA-256
+`ca5f71829733fa3392ee68b123d3fa4def402c5e9d6302c67dcdb9fdbe5c16d4`,
+with one Native imported UNKNOWN evidence and safe receipt recovery
+without another screenshot. Main-push supported-engine checks are
+run `38009922383`.
+The prior failed run `38009403420` (Bash versus /bin/sh)
+is retained as superseded negative CI evidence.
+This acceptance does NOT establish customer APK binary/build
+attestation, independent pixel PII/rights review, real hardware,
+canonical Semwright Android Driver Host or Platform Publish.
+ANDROID_CAPTURE remains PARTIAL, not COMPLETE.
+Exact jobs and artifacts: `evidence/r48/ci-runs.json`.
 
 ## Explicitly not established
 

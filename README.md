@@ -232,8 +232,7 @@ no new Native SDK backend. A private no-effects identity plan and separately
 approved foreground capture produce a real metadata-stripped PNG, SHA receipt
 and one existing Native SDK imported Evidence row. Technical state stays
 UNKNOWN and customer/platform/Android Driver Host rights remain unestablished.
-A selective CI Android34 owned synthetic APK/emulator runner is required
-before R48 source acceptance. [Android emulator guide](docs/ANDROID_EMULATOR_CAPTURE.md).
+Real Android34 owned synthetic APK and Node24 3OS accepted source SHA `26d7eb1b383af944cfcd5a9dc06d57332efe8256`; see [R48 evidence](evidence/r48/ci-runs.json). No customer, physical Android or Driver Host acceptance. [Android emulator guide](docs/ANDROID_EMULATOR_CAPTURE.md).
 
 
 ## Original master scope and truthful transfer acceptance

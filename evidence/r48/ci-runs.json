@@ -1,0 +1,161 @@
+{
+  "schema_version": "launchwright-r48-ci-evidence/1",
+  "source_sha": "26d7eb1b383af944cfcd5a9dc06d57332efe8256",
+  "merge_commit_sha": "5f4e716bc4fcf4a47838a27ddec11dd2821e67d0",
+  "semwright_sha": "d2da9a495a53fe279a1ca4de61f0e24646350f22",
+  "native_sdk": "1.0.0",
+  "application_checks": {
+    "run_id": 38009606884,
+    "head_sha": "26d7eb1b383af944cfcd5a9dc06d57332efe8256",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/38009606884",
+    "jobs": {
+      "light (windows-latest)": {
+        "job_id": 114086321193,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38009606884/job/114086321193"
+      },
+      "light (ubuntu-latest)": {
+        "job_id": 114086321273,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38009606884/job/114086321273"
+      },
+      "light (macos-latest)": {
+        "job_id": 114086321437,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38009606884/job/114086321437"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Linux-870446e5ca47717c3e10a3ad5e043adb244a09f8": {
+        "id": 11652817471,
+        "bytes": 694,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-870446e5ca47717c3e10a3ad5e043adb244a09f8": {
+        "id": 11652269507,
+        "bytes": 693,
+        "expired": false
+      },
+      "launchwright-clean-room-Windows-870446e5ca47717c3e10a3ad5e043adb244a09f8": {
+        "id": 11652083138,
+        "bytes": 733,
+        "expired": false
+      }
+    }
+  },
+  "owned_emulator_source": {
+    "run_id": 38009606890,
+    "head_sha": "26d7eb1b383af944cfcd5a9dc06d57332efe8256",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/38009606890",
+    "jobs": {
+      "android-owned": {
+        "job_id": 114086301609,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38009606890/job/114086301609"
+      }
+    },
+    "artifacts": {
+      "launchwright-android-owned-870446e5ca47717c3e10a3ad5e043adb244a09f8": {
+        "id": 11652723155,
+        "bytes": 131514,
+        "expired": false
+      }
+    }
+  },
+  "main_push_checks": {
+    "run_id": 38009922383,
+    "head_sha": "5f4e716bc4fcf4a47838a27ddec11dd2821e67d0",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/38009922383",
+    "jobs": {
+      "light (ubuntu-latest)": {
+        "job_id": 114087306672,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38009922383/job/114087306672"
+      },
+      "light (windows-latest)": {
+        "job_id": 114087306699,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38009922383/job/114087306699"
+      },
+      "light (macos-latest)": {
+        "job_id": 114087306983,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38009922383/job/114087306983"
+      }
+    },
+    "artifacts": {
+      "launchwright-clean-room-Windows-5f4e716bc4fcf4a47838a27ddec11dd2821e67d0": {
+        "id": 11653285120,
+        "bytes": 732,
+        "expired": false
+      },
+      "launchwright-clean-room-Linux-5f4e716bc4fcf4a47838a27ddec11dd2821e67d0": {
+        "id": 11652447987,
+        "bytes": 695,
+        "expired": false
+      },
+      "launchwright-clean-room-macOS-5f4e716bc4fcf4a47838a27ddec11dd2821e67d0": {
+        "id": 11652274953,
+        "bytes": 696,
+        "expired": false
+      }
+    }
+  },
+  "owned_emulator_main": {
+    "run_id": 38009924019,
+    "head_sha": "5f4e716bc4fcf4a47838a27ddec11dd2821e67d0",
+    "conclusion": "success",
+    "url": "https://github.com/seradotcom/launchwright/actions/runs/38009924019",
+    "jobs": {
+      "android-owned": {
+        "job_id": 114087313875,
+        "conclusion": "success",
+        "url": "https://github.com/seradotcom/launchwright/actions/runs/38009924019/job/114087313875"
+      }
+    },
+    "artifacts": {
+      "launchwright-android-owned-5f4e716bc4fcf4a47838a27ddec11dd2821e67d0": {
+        "id": 11652414888,
+        "bytes": 130168,
+        "expired": false
+      }
+    }
+  },
+  "exact_postmerge_png": {
+    "name": "launchwright-android-86ece5d846b7.png",
+    "sha256": "ca5f71829733fa3392ee68b123d3fa4def402c5e9d6302c67dcdb9fdbe5c16d4",
+    "bytes": 153251,
+    "dimensions": [
+      1080,
+      2400
+    ],
+    "api_level": 34,
+    "native_evidence_id": "evidence_3cd4f8bd-ed98-40bc-9905-602c900f55d3",
+    "technical": "UNKNOWN",
+    "admission": "imported-declaration"
+  },
+  "prior_negative_run": {
+    "id": 38009403420,
+    "head_sha": "858ffc873c0f44a551f5841c0761b96245a202cb",
+    "conclusion": "failure",
+    "cause": "Pinned emulator action executed a Bash pipefail command under /bin/sh",
+    "corrected_in_source_sha": "26d7eb1b383af944cfcd5a9dc06d57332efe8256"
+  },
+  "authority": {
+    "owned_synthetic_real_emulator_capture": true,
+    "native_sdk_imported_unknown": true,
+    "receipt_recovery_without_recapture": true,
+    "operator_declared_source_build": true,
+    "apk_content_hash_verified": false,
+    "independent_pixel_privacy_or_rights_accepted": false,
+    "physical_android_device_accepted": false,
+    "real_customer_android_project_accepted": false,
+    "semwright_android_driver_host_admitted": false,
+    "semwright_platform_publish_accepted": false,
+    "external_publication": false
+  },
+  "scope_note": "Real Android34 emulated test app is owned synthetic. Screenshot is actual device pixels and copied into private imported Native evidence; no customer APK binary or Platform/Driver Host proof."
+}

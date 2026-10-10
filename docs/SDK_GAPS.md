@@ -107,8 +107,7 @@ unaccepted. CUSTOM_CMS stays PARTIAL.
 
 ## R48 real emulator-only Android screenshot (candidate)
 
-R48 adds a bounded read-only local ADB path with a disposable Android
-synthetic APK/AVD CI test. The original Android mobile source still has
+R48 accepted a real Android34 emulator with owned synthetic APK, exact Native imported UNKNOWN evidence and supported Node24 3OS tests (source SHA `26d7eb1b383af944cfcd5a9dc06d57332efe8256`, merge SHA `5f4e716bc4fcf4a47838a27ddec11dd2821e67d0`). The original Android mobile source still has
 no canonical Semwright Driver Host provider or source build attestation.
 Images enter Launchwright only through imported-declaration evidence,
 technical UNKNOWN. Independent physical phone/customer APK, Device Host
