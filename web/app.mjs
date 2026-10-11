@@ -2,6 +2,7 @@
 import { LaunchwrightClient } from '/client.mjs';
 import { createContinuityController } from '/continuity-ui.mjs';
 import { createGitDocsController } from '/git-docs-ui.mjs';
+import { createGitDocsDraftController } from '/git-docs-draft-ui.mjs';
 import { createGitOnboardingController, MAX_GIT_OBSERVATION_UPLOAD_BYTES, MAX_GIT_PLAN_UPLOAD_BYTES } from '/git-onboarding.mjs';
 const $=s=>document.querySelector(s), root=$('#app');
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -12,6 +13,7 @@ const api=new LaunchwrightClient({baseUrl:location.origin,pendingStore});
 const gitOnboarding=createGitOnboardingController(api);
 const continuityUI=createContinuityController(api);
 const gitDocsUI=createGitDocsController(api);
+const gitDocsDraftUI=createGitDocsDraftController(api);
 let model={entities:[],version:null},description=null,productId=localStorage.getItem('launchwright.product'),releaseId=localStorage.getItem('launchwright.release'),view='overview',selected=null,renderEpoch=0;
 const tabs=[['onboard','⌁','Import Git project'],['overview','◫','Overview'],['targets','⊡','Targets & sources'],['scenarios','↳','Scenarios'],['claims','≡','Claims & evidence'],['locales','文','Localization'],['deliverables','▤','Deliverables'],['impact','⌁','Impact'],['work','▷','Work'],['review','◎','Review room'],['continuity','⇄','Release continuity'],['docs-git','↗','Docs to Git'],['delivery','↗','Delivery'],['templates','◇','Templates'],['integrations','⌘','Integrations'],['history','◷','History']];
 const kinds=k=>model.entities.filter(e=>e.kind===k);
@@ -100,8 +102,9 @@ async function continuity(){
 async function docsGit(){
  const candidates=inRelease('candidate');
  return heading('Editorial Git delivery','Docs to Git',
-  'An editorially approved frozen Markdown candidate can become one safe local Git review branch. No push, GitHub PR or publication runs here.')+
-  gitDocsUI.render(candidates,inRelease('artifact'));
+  'An editorially approved Markdown candidate can create a local Git review branch, then request a separately authorized GitHub Draft PR. No push, merge or publication is performed.')+
+  gitDocsUI.render(candidates,inRelease('artifact'))+
+  gitDocsDraftUI.render(gitDocsUI.plan,gitDocsUI.status);
 }
 async function delivery(){const ds=inRelease('delivery'),profiles=inProduct('channel_profile'),channels=inRelease('channel_delivery'),cs=inRelease('candidate');const status=await api.channelStatus(releaseId);return heading('Distribution','Delivery board','Package generation, external receipts and activation are separate states. Launchwright never treats PACKAGE_READY as published.',button('Add channel profile','new-channel_profile','','secondary')+button('Build channel package','package-channel'))+
   panel('Private delivery receipts',ds.length?table(['Destination','Candidate','Local state','External state'],ds.map(d=>`<tr><td>${named(d)}<div class="sub">Alias revision ${esc(d.data.alias_version.revision)}</div></td><td><code>${esc(d.data.candidate_sha256.slice(0,22))}…</code></td><td>${stamp('Private draft','warn')}<div class="sub">${time(d.created)}</div></td><td>${stamp('NOT SENT')}<div class="sub">Technical ${esc(d.data.technical_state)}</div></td></tr>`)):empty('Nothing has been delivered.','A reviewed candidate can create an immutable private-draft receipt. Publication to an external channel requires a separate authorized integration.',button('Open review room','navigate-review','','secondary')))+
@@ -247,6 +250,65 @@ root.addEventListener('click',async event=>{
     ],async data=>{await continuityUI.recover(data.plan_sha256);},'Check existing export',
     'Existing private export inspected without repeating the send.');return;
   }
+  if(action==='docs-pr-plan'){
+    const p=gitDocsUI.plan,rootPath=gitDocsUI.repoRoot;
+    if(!p||gitDocsUI.status?.state!=='LOCAL_BRANCH_READY')
+      throw Error('Create or recover the exact R40 local branch first');
+    openForm('Prepare GitHub Draft PR (read-only planning)',[
+      textField('title','Draft PR title','Release documentation for review'),
+      textField('editorial_note','Human reviewer context','','textarea'),
+      {key:'acknowledge_draft_only',
+        label:'I acknowledge this only prepares a Draft PR, not publication.',
+        type:'checkbox',value:false}
+    ],async data=>{await gitDocsDraftUI.prepare(p,rootPath,data);},
+    'Prepare source-bound Draft','No GitHub request was sent. Save the exact private intent.');
+    return;
+  }
+  if(action==='docs-pr-load'){
+    const p=gitDocsUI.plan;
+    if(!p)throw Error('Restore the R40 branch plan before the R41 Draft intent');
+    openForm('Restore exact saved GitHub Draft intent',[
+      jsonField('intent','Paste complete private R41 Draft intent JSON',{},
+        'Recomputes exact source-bound intent; does not contact GitHub.')
+    ],async data=>{await gitDocsDraftUI.restore(data.intent,p,gitDocsUI.repoRoot);},
+    'Verify original intent','Saved Draft PR identity verified. No remote operation.');
+    return;
+  }
+  if(action==='docs-pr-send'){
+    const intent=gitDocsDraftUI.plan;
+    if(!intent)throw Error('Prepare or restore the immutable GitHub Draft intent');
+    openForm('Authorize the first GitHub Draft PR request',[
+      textField('confirm_repository','Retype exact GitHub OWNER/REPO'),
+      textField('confirm_branch_plan_sha256','Retype full R40 plan SHA-256'),
+      textField('confirm_local_commit_sha','Retype exact local Git commit SHA'),
+      {key:'acknowledge_remote_branch_pushed',
+        label:'I have separately reviewed and pushed the exact R40 branch.',
+        type:'checkbox',value:false},
+      {key:'acknowledge_first_send',
+        label:'I authorize creating one GitHub DRAFT PR; this is not publishing or merging.',
+        type:'checkbox',value:false}
+    ],async data=>{await gitDocsDraftUI.send(data);},
+    'Send first Draft PR request',
+    'Exact remote Draft PR verified. Nothing was merged or published.');
+    return;
+  }
+  if(action==='docs-pr-recover'){
+    await gitDocsDraftUI.recover();await render();
+    notice('Exact GitHub Draft PR read back; no create, push or retry.');return;
+  }
+  if(action==='docs-pr-clear'){
+    gitDocsDraftUI.clear();await render();
+    notice('Private Draft intent cleared from browser memory.');return;
+  }
+  if(action==='docs-pr-save'){
+    const blob=new Blob([gitDocsDraftUI.downloadIntent()],{type:'application/json'});
+    const url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download='launchwright-private-r41-github-draft-intent.json';
+    document.body.append(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+    notice('Private Draft intent saved. Keep the file secure for recover-only use.');
+    return;
+  }
   if(action==='docs-git-plan'){
     const cs=inRelease('candidate');
     const pinned=new Set(cs.flatMap(c=>c.data.manifest?.artifact_ids??[]));
@@ -281,7 +343,7 @@ root.addEventListener('click',async event=>{
     return;
   }
   if(action==='docs-git-clear'){
-    gitDocsUI.clear();await render();
+    gitDocsUI.clear();gitDocsDraftUI.clear();await render();
     notice('Git repository path and plan cleared from browser memory.');return;
   }
   if(action==='docs-git-inspect'){
