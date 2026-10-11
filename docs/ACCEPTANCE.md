@@ -2,6 +2,18 @@
 
 This ledger separates implemented behavior from execution evidence. A PASS belongs to an exact SHA, environment and lane; it is never inherited from another commit.
 
+## R69 — GitHub Draft PR first-send and recover-only from the UI (pending CI)
+
+- Reuses R41 exact GitHub Draft PR transport and Native-linked R40
+  branch plan; no second backend or remote code execution.
+- Owner-only HTTP planning and explicit source/repo/commit confirmation
+  before an external DRAFT PR request. Lost response requires read-only
+  recovery of the original intent; no retry, push, merge or publish.
+- Local Node 22 tests and synthetic GitHub provider are supplemental.
+  Node24 Linux/Windows/macOS and real Chromium owned-fixture CI required.
+- R66's prior real owned GitHub Draft acceptance is transport evidence,
+  **not** real customer review, hosted deployment or account publish approval.
+
 ## R68 — Git docs local branch through the UI (pending exact-SHA CI)
 
 - Implemented against the existing R40 Git plumbing; no arbitrary Git

@@ -7,8 +7,8 @@ export class LaunchwrightClient {
   constructor({baseUrl='http://127.0.0.1:4317',token=null,fetchImpl=globalThis.fetch,timeoutMs=15000,pendingStore=null}={}){
     this.baseUrl=baseUrl.replace(/\/$/,'');this.token=token;this.fetch=fetchImpl===globalThis.fetch?globalThis.fetch.bind(globalThis):fetchImpl;this.timeoutMs=timeoutMs;this.pendingStore=pendingStore;
   }
-  async request(path,body,method='POST'){
-    const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),this.timeoutMs);
+  async request(path,body,method='POST',requestTimeoutMs=this.timeoutMs){
+    const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),requestTimeoutMs);
     try {
       const res=await this.fetch(this.baseUrl+path,{method,credentials:'same-origin',redirect:'error',headers:{...(body===undefined?{}:{'Content-Type':'application/json'}),...(this.token?{'Authorization':`Bearer ${this.token}`}:{})},...(body===undefined?{}:{body:JSON.stringify(body)}),signal:controller.signal});
       const data=await res.json();if(!res.ok)throw new LaunchwrightError(data.error??{code:'ProtocolMismatch',message:'Unexpected application reply',outcome_known:method==='GET'},res.status);return data;
@@ -21,6 +21,17 @@ export class LaunchwrightClient {
   // Never auto-retry an ambiguous network outcome; no browser file paths.
   // R68: exact owner-only reviewed Markdown -> local Git branch. No push,
   // remote PR, arbitrary repository execution, or automatic send/retry.
+  // R69: GitHub DRAFT PR first-send is a separate explicit, owner-only
+  // external authorization. Recover is read-only and NEVER resends.
+  planLocalGitDocsDraft(input){
+    return this.request('/api/v1/local-git-docs-draft/plan',input);
+  }
+  sendLocalGitDocsDraft(input){
+    return this.request('/api/v1/local-git-docs-draft/send',input,'POST',90000);
+  }
+  recoverLocalGitDocsDraft(input){
+    return this.request('/api/v1/local-git-docs-draft/recover',input,'POST',90000);
+  }
   planLocalGitDocs(input){return this.request('/api/v1/local-git-docs/plan',input);}
   inspectLocalGitDocs(repository_root,plan){
     return this.request('/api/v1/local-git-docs/inspect',{repository_root,plan});
