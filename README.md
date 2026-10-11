@@ -139,6 +139,7 @@ Run expensive dependencies on GitHub Actions rather than the development worksta
 - [R68: Native-reviewed Markdown to a local Git review branch from the web workspace](docs/GIT_DOCS_WEB.md)
 - [R69: separately authorized GitHub Draft PR and read-only recovery from the web workspace](docs/GITHUB_DOCS_BROWSER.md)
 - [R70: human-confirmed historical Markdown to a fresh build draft, without inherited claims or approval](docs/CARRY_FORWARD.md)
+- [R71: select 2–8 historically reviewed Markdown files for independent NEW draft review with partial-recovery receipts](docs/CARRY_FORWARD_BATCH.md)
 - [R66: real GitHub Draft PR accepted and safely closed](docs/GITHUB_DOCS_LIVE_ACCEPTANCE.md)
 - [R58: bind R55 masked Native pixels into Apple R44 screenshots and R51 staging](docs/MASKED_APPLE.md)
 - [R42: frozen Markdown to editable PPTX and matching PDF](docs/DECK_PDF.md)

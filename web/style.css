@@ -50,3 +50,14 @@
 .carry-forward-facts{grid-template-columns:repeat(2,minmax(0,1fr))}
 .carry-forward-hash{word-break:break-all;overflow-wrap:anywhere}
 @media(max-width:860px){.carry-forward-facts{grid-template-columns:minmax(0,1fr)}}
+
+/* R71 bounded multi-document editorial workspace */
+.carry-batch-rows{margin:16px 0}
+.carry-batch-row{padding:16px 0;border-bottom:1px solid var(--line);min-width:0}
+.carry-batch-row:last-child{border-bottom:0}
+.carry-batch-row .carry-batch-source{display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap}
+.carry-batch-row input[type=checkbox]{min-width:0;width:auto}
+.carry-batch-plan{margin:20px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 0}
+.carry-batch-plan p{overflow-wrap:anywhere}
+.carry-batch-hash{overflow-wrap:anywhere;word-break:break-all}
+@media(max-width:520px){.carry-batch-row .carry-forward-fields{display:block}}

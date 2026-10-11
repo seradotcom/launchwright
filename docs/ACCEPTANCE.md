@@ -2,7 +2,31 @@
 
 This ledger separates implemented behavior from execution evidence. A PASS belongs to an exact SHA, environment and lane; it is never inherited from another commit.
 
-## R70 — Explicit human-reviewed carry-forward between Release builds (pending CI)
+## R71 — Bounded exact-Native carry-forward batch (pending CI)
+
+- Reuses R70's per-source immutable Candidate/Artifact/review and Target
+  validation, with a single shared owner writer lock around up to eight
+  independent Native document/provenance transactions. The plan is one
+  order-independent SHA-256 identity, no full text disclosed.
+- Operator explicitly selects every document, acknowledges historical rights
+  and new editorial review, and re-enters the full batch/Candidate/build
+  identity. Original reviewed files, claims, artifacts, evidence, verifiers
+  and approvals remain unchanged.
+- R71 is *recoverable but not database-atomic across the whole batch*;
+  `NOT_APPLIED`, `PARTIAL_NEEDS_RECONCILIATION` and `BATCH_READY`
+  derive from current persisted Native records. Preflight fails closed
+  before any write when an existing item was modified.
+- Node 22 workstation unit/regression results are supplemental.
+  Node 24 three-OS application CI and owned 1440/768/390/320 Chromium
+  acceptance are required for exact-source R71 admission.
+- R70 independently passed Node24 three-OS PR CI
+  [run 38111961426](https://github.com/seradotcom/launchwright/actions/runs/38111961426)
+  and owned Chromium
+  [run 38111961438](https://github.com/seradotcom/launchwright/actions/runs/38111961438).
+  These do not prove customer source permissions or Semwright Platform Publish.
+- The whole-master 196-ID/36-E2E gate remains BLOCKED.
+
+## R70 — Explicit human-reviewed carry-forward between Release builds (owned CI accepted)
 
 - Adds source-Candidate/artifact/approval SHA-bound plans and manually approved
   NEW Markdown Draft creation through the existing Native SDK dispatcher.
