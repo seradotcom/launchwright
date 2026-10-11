@@ -213,6 +213,15 @@ It creates private RGB PNG/measurement output and a separately linked
 SANITIZED_DERIVATIVE receipt with technical UNKNOWN.
 
 
+## R64 private cross-output release review
+
+Export R45 documentation and R42 editable PPTX/PDF for the same
+editorial-approved frozen Candidate. Optionally export the associated
+R61 masked offline demo for the same release. Follow the two-phase
+private source selection/plan/export instructions in
+[RELEASE_REVIEW_KIT.md](RELEASE_REVIEW_KIT.md) to create a navigable
+offline ZIP and hashed manifest. No remote publication is performed.
+
 ## R42 editable deck and real PDF
 
 From a human-approved, exact frozen Markdown Candidate, execute the

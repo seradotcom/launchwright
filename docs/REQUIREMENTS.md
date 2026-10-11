@@ -58,3 +58,9 @@ The private specification text is intentionally not redistributed in this AGPL r
 Canonical real-product capture across customer targets and Platform admission (the owned DeltaDesk Broker path remains imported-unverified); real customer/project Graph discovery and provider-specific dependency extraction beyond the owned R21 fixture, plus non-fixture scope/tenant acceptance; canonical execution-effect/noninterference and scenario-effect admission beyond immutable-artifact Effects custody; real Platform recipe/job execution; broader semantic, editorial, privacy, rights and accessibility verifier authorities beyond R26 format and the narrower R30 credential-pattern control; remote teams; real cross-account Platform Publish execution/output ACLs/external activation; mobile/Godot target acceptance; ChatGPT Plugin host acceptance; production deployment. R24 removes the owned-fixture Composition recipe gap, R26 accepts the fixed format verifier, R28 accepts only two owned extension commands, and R29 accepts immutable-artifact Effects evaluation through Host. The R30 credential-pattern scan remains a narrow separate capability and no prior receipt transfers external customer, Platform, publication or broad security/privacy authority.
 
 Requirement completion is therefore not represented as a single vanity percentage. Evidence is tracked by exact behavior, SHA and acceptance lane in `ACCEPTANCE.md`.
+
+- R64 cross-output source consistency: exact R45 documentation + R42 editable
+  deck/PDF from one same frozen approved Candidate/release, optional
+  R61 Native-masked demo, canonical SHA-byte reconstruction, no script
+  execution, private deterministic ZIP with local offline navigation,
+  no rights/customer/Platform authority promotion.

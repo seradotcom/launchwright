@@ -236,3 +236,15 @@ fixed-style ASCII WebVTT cues are accepted. Human marketing quality,
 voice alternatives, multilingual caption fonts, independent pixel/rights
 review, customer filming, canonical Composition runtime and Platform
 Publish remain external and unaccepted. The VIDEO profile stays PARTIAL.
+
+## R64 cross-output exact private review
+
+A bounded private assembly now joins R45 script-free documentation and
+R42 editable PPTX/PDF for the SAME frozen editorial Candidate and release.
+The optional R61 masked demo requires the exact imported Native Media
+revision. The bundle re-renders deck bytes, preserves SHA-256 manifests
+and allows offline reviewer navigation. Cross-output source integrity
+does not prove real product behavior, general privacy outside manual
+masks, customer approval, accessibility, licensed assets or canonical
+Semwright Platform Publish. All original CORE profiles remain PARTIAL or
+blocked by upstream as separately recorded.

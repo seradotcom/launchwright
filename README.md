@@ -332,6 +332,18 @@ deployment remain independent. See
 [Release continuity review](docs/RELEASE_CONTINUITY.md).
 
 
+## Cross-output release review kit (R64)
+
+R64 composes **one release, one exact frozen editorial Candidate** into a
+private offline review package with real R45 documentation HTML,
+R42 editable PPTX and PDF, plus an optional R61 R55-masked click-through
+demo. Source plans, actual Native revisions and byte-level receipts must
+match. R42 PPTX/PDF are independently re-rendered to prevent altered OOXML
+masquerading as the approved candidate. The index is script-free; a full
+SHA-256 manifest and explicit UNKNOWN/privacy/publish limitations are
+included. It does **not** confer customer, channel, Platform or overall
+master acceptance. See [R64 operator guide](docs/RELEASE_REVIEW_KIT.md).
+
 ## Original master scope and truthful transfer acceptance
 
 The original private Semwright Release Studio / Launchwright master specifies
@@ -369,6 +381,8 @@ validates the master gate, and produces a source ZIP, SHA-256 checksum and
 receipt from **one exact committed Git SHA**, excluding untracked state/
 private master ZIP, not a public GitHub Release. No credential content scan
 is certified by that workflow.
+
+- [R64 cross-output private release review kit](docs/RELEASE_REVIEW_KIT.md)
 
 ## License
 

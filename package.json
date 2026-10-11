@@ -73,7 +73,10 @@
     "test:hotspots": "node --test --test-concurrency=1 tests/offline-hotspots.test.mjs",
     "video:captions:plan": "node scripts/video-caption-burnin.mjs plan",
     "video:captions:export": "node scripts/video-caption-burnin.mjs export",
-    "test:video:captions": "node --test --test-concurrency=1 tests/video-caption-burnin.test.mjs"
+    "test:video:captions": "node --test --test-concurrency=1 tests/video-caption-burnin.test.mjs",
+    "kit:plan": "node scripts/release-review-kit.mjs plan",
+    "kit:export": "node scripts/release-review-kit.mjs export",
+    "test:kit": "node --test --test-concurrency=1 tests/release-review-kit.test.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",

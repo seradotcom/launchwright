@@ -621,6 +621,23 @@ customer capture, independently verified source rights, alternate voice,
 general pixel privacy or Platform Publish authority is claimed.
 
 
+## R64 candidate — genuine cross-output private release kit
+
+R64 adds a local, operator-confirmed, release-scoped composition of
+already rendered R45 HTML docs, R42 editable PPTX/real PDF, and an
+optional R61 manually masked offline demo. It requires one frozen
+approved Candidate, current Native revision/source identities,
+exact R45/R42 plan and receipts and byte-verified files. Critically,
+it recreates PPTX/PDF from frozen Native Markdown before packaging,
+so forged receipts cannot introduce edited PowerPoint content.
+The deterministic ZIP has an offline index, file-level hash manifest,
+a private recovery lock and no source scripts or external network.
+Tests reject foreign Candidates, wrong SHA, mutated Native sources,
+edited file contents, directory links and missing operator consent.
+Supported Node24 3-OS CI and owned-fixture offline Chromium
+acceptance are pending. No customer product behavior, independent
+privacy/rights/WCAG or Platform Publish is established.
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;
