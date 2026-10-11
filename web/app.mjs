@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 import { LaunchwrightClient } from '/client.mjs';
+import { createContinuityController } from '/continuity-ui.mjs';
 import { createGitOnboardingController, MAX_GIT_OBSERVATION_UPLOAD_BYTES, MAX_GIT_PLAN_UPLOAD_BYTES } from '/git-onboarding.mjs';
 const $=s=>document.querySelector(s), root=$('#app');
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -8,8 +9,9 @@ const time=s=>new Intl.DateTimeFormat(undefined,{dateStyle:'medium',timeStyle:'s
 let pendingStore={save:async p=>{localStorage.setItem('launchwright.pending.'+p.args.request.key,JSON.stringify(p));},clear:async key=>localStorage.removeItem('launchwright.pending.'+key)};
 const api=new LaunchwrightClient({baseUrl:location.origin,pendingStore});
 const gitOnboarding=createGitOnboardingController(api);
+const continuityUI=createContinuityController(api);
 let model={entities:[],version:null},description=null,productId=localStorage.getItem('launchwright.product'),releaseId=localStorage.getItem('launchwright.release'),view='overview',selected=null,renderEpoch=0;
-const tabs=[['onboard','⌁','Import Git project'],['overview','◫','Overview'],['targets','⊡','Targets & sources'],['scenarios','↳','Scenarios'],['claims','≡','Claims & evidence'],['locales','文','Localization'],['deliverables','▤','Deliverables'],['impact','⌁','Impact'],['work','▷','Work'],['review','◎','Review room'],['delivery','↗','Delivery'],['templates','◇','Templates'],['integrations','⌘','Integrations'],['history','◷','History']];
+const tabs=[['onboard','⌁','Import Git project'],['overview','◫','Overview'],['targets','⊡','Targets & sources'],['scenarios','↳','Scenarios'],['claims','≡','Claims & evidence'],['locales','文','Localization'],['deliverables','▤','Deliverables'],['impact','⌁','Impact'],['work','▷','Work'],['review','◎','Review room'],['continuity','⇄','Release continuity'],['delivery','↗','Delivery'],['templates','◇','Templates'],['integrations','⌘','Integrations'],['history','◷','History']];
 const kinds=k=>model.entities.filter(e=>e.kind===k);
 const get=id=>model.entities.find(e=>e.id===id);
 const inRelease=k=>kinds(k).filter(e=>e.data.release_id===releaseId);
@@ -36,8 +38,8 @@ async function render(){
   try{
     if(view==='onboard')html=heading('Project adoption','Import an existing Git project','Use an exact local Git metadata observation to create an editorial workspace without executing or publishing the project.')+gitOnboarding.render();
     else if(!productId){html=heading('Release production','A launch starts with a source.','Build a traceable release package. Keep editorial decisions, evidence and delivery states distinct.')+panel('Create your first workspace',empty('Nothing invented. Nothing published.','Add a product and an explicit build, then define a target and the deliverables it needs.',button('Create product','new-product')+button('Import Git project','navigate-onboard','','secondary')))+`<div class="callout"><strong>What works here</strong>Structured release editing, versioned text exports, input change detection, editorial review and private draft delivery. Browser capture, media rendering and external delivery require their canonical runtime integration.</div>`;}
-    else if(!hasRelease()&&view!=='templates'){html=heading('Product',get(productId).data.name,'Create a release with an explicit build identity.',button('Create release','new-release'))+panel('Release brief',empty('Name the release. Pin the build.','A commercial version is not a resource revision. Launchwright keeps both.',button('Create release','new-release')));}
-    else{const fn={overview,targets,scenarios,claims,locales,deliverables,impact,work,review,delivery,templates,integrations,history}[view];html=await fn();}
+    else if(!hasRelease()&&!['templates','continuity'].includes(view)){html=heading('Product',get(productId).data.name,'Create a release with an explicit build identity.',button('Create release','new-release'))+panel('Release brief',empty('Name the release. Pin the build.','A commercial version is not a resource revision. Launchwright keeps both.',button('Create release','new-release')));}
+    else{const fn={overview,targets,scenarios,claims,locales,deliverables,impact,work,review,continuity,delivery,templates,integrations,history}[view];html=await fn();}
     if(epoch===renderEpoch)$('#view-content').innerHTML=html;
   }catch(err){if(epoch===renderEpoch)$('#view-content').innerHTML=heading('Could not load section','The last result was not replaced.','No mutation was retried.')+panel('Request error',`<div class="panel-body"><p>${esc(err.message)}</p>${button('Refresh observation','refresh','','secondary')}</div>`);}
 }
@@ -87,6 +89,11 @@ async function review(){const cs=inRelease('candidate'),vs=inRelease('verificati
   panel('Candidates',cs.length?table(['Candidate','Digest','Frozen',''],cs.map(c=>`<tr><td>${named(c)}</td><td><code>${esc(c.data.candidate_sha256.slice(0,24))}…</code></td><td>${time(c.created)}<div class="sub">${c.data.manifest.artifact_ids.length} artifacts</div></td><td>${button('Inspect gates','inspect',c.id,'secondary small')}</td></tr>`)):empty('Review a specific version, not a moving page.','Render at least one deliverable, then freeze the exact inputs and bytes.',button('Freeze candidate','freeze')))+
   panel('Verifier records',vs.length?table(['Dimension','Reported / admitted','Coverage',''],vs.map(v=>`<tr><td>${named(v)}<div class="sub">${esc(v.data.verifier.id)} · ${esc(v.data.verifier.authority)}</div></td><td>${stamp(v.data.state,v.data.state==='FAIL'||v.data.state==='ERROR'?'bad':v.data.admission==='canonical-owner-admitted'&&v.data.state==='PASS'?'good':'warn')}<div class="sub">${esc(v.data.admission)}</div></td><td>${esc(v.data.coverage.checked)} / ${esc(v.data.coverage.total)}<div class="sub">${v.data.omissions.length} omissions · ${v.data.findings.length} findings</div></td><td>${v.data.state==='PASS'?'':button('Record waiver','waive-verification',v.id,'secondary small')}</td></tr>`)):empty('No verifier records.','A model, heuristic or imported PASS is retained as a report but remains effective UNKNOWN unless admitted by canonical authority.'))+
   panel('Waiver ledger',ws.length?table(['Waiver','Scope','Underlying state'],ws.map(w=>`<tr><td>${named(w)}<div class="sub">${esc(w.data.author)}</div></td><td>${esc(w.data.scope)}<div class="sub">${esc(w.data.reason)}</div></td><td>${stamp(w.data.underlying_state,w.data.underlying_state==='FAIL'?'bad':'warn')}<div class="sub">State unchanged · ${w.data.expires_at?'expires '+esc(w.data.expires_at):'no expiry'}</div></td></tr>`)):empty('No waivers.','Exceptions are auditable annotations, never replacements for verifier truth.'))+details;
+}
+async function continuity(){
+  return heading('Version-aware publishing','Release continuity',
+    'Compare two frozen Native-backed candidates from one product without replaying or publishing source applications.')+
+    continuityUI.render(inProduct('release'),kinds('candidate'));
 }
 async function delivery(){const ds=inRelease('delivery'),profiles=inProduct('channel_profile'),channels=inRelease('channel_delivery'),cs=inRelease('candidate');const status=await api.channelStatus(releaseId);return heading('Distribution','Delivery board','Package generation, external receipts and activation are separate states. Launchwright never treats PACKAGE_READY as published.',button('Add channel profile','new-channel_profile','','secondary')+button('Build channel package','package-channel'))+
   panel('Private delivery receipts',ds.length?table(['Destination','Candidate','Local state','External state'],ds.map(d=>`<tr><td>${named(d)}<div class="sub">Alias revision ${esc(d.data.alias_version.revision)}</div></td><td><code>${esc(d.data.candidate_sha256.slice(0,22))}…</code></td><td>${stamp('Private draft','warn')}<div class="sub">${time(d.created)}</div></td><td>${stamp('NOT SENT')}<div class="sub">Technical ${esc(d.data.technical_state)}</div></td></tr>`)):empty('Nothing has been delivered.','A reviewed candidate can create an immutable private-draft receipt. Publication to an external channel requires a separate authorized integration.',button('Open review room','navigate-review','','secondary')))+
@@ -170,6 +177,11 @@ function editEntity(kind,e){
  });
 }
 root.addEventListener('change',async event=>{try{
+ if(['continuity-before-release','continuity-after-release',
+  'continuity-before-candidate','continuity-after-candidate'].includes(event.target.id)){
+    continuityUI.choose(event.target.id.replaceAll('-','_').replace(/^continuity_/,'')+'_id',event.target.value);
+    await render();return;
+ }
  if(event.target.id==='git-observation-file'){
   const file=event.target.files?.[0];
   if(!file)return;
@@ -196,6 +208,37 @@ root.addEventListener('click',async event=>{
  const el=event.target.closest('[data-action]');if(!el)return;const action=el.dataset.action,id=el.dataset.id;
  try{
   if(action.startsWith('navigate-')){location.hash=action.slice(9);return;}
+  if(action==='continuity-clear'){
+    continuityUI.clear();await render();notice('The comparison plan was cleared from browser memory.');return;
+  }
+  if(action==='continuity-plan'){
+    await continuityUI.prepare({
+      private:$('#continuity-private-confirm')?.checked,
+      incomplete:$('#continuity-incomplete-confirm')?.checked
+    });
+    await render();notice('Exact Native-backed comparison plan prepared without export.');return;
+  }
+  if(action==='continuity-export'){
+    const p=continuityUI.plan;if(!p)throw Error('Prepare the comparison first');
+    openForm('Confirm exact private continuity export',[
+      textField('confirm_plan_sha256','Type full plan SHA-256',''),
+      textField('confirm_before_candidate_sha256','Type earlier candidate SHA-256',''),
+      textField('confirm_after_candidate_sha256','Type later candidate SHA-256',''),
+      {key:'acknowledge_private_export',label:'Export only to this local private workspace; no technical PASS or external publication.',type:'checkbox',value:false}
+    ],async data=>{await continuityUI.exportPrivate(data);},'Export exact private ZIP',
+    'The private ZIP was checked against its SHA-256 receipt; download is available below.');return;
+  }
+  if(action==='continuity-check'){
+    const p=continuityUI.plan;if(!p)throw Error('Prepare the original plan first');
+    await continuityUI.recover(p.plan_sha256);
+    await render();notice('Exact persisted export status checked; no retry performed.');return;
+  }
+  if(action==='continuity-recover'){
+    openForm('Recover existing local continuity export',[
+      textField('plan_sha256','Full original plan SHA-256','')
+    ],async data=>{await continuityUI.recover(data.plan_sha256);},'Check existing export',
+    'Existing private export inspected without repeating the send.');return;
+  }
   if(action==='onboard-clear'){
    gitOnboarding.clear();await render();
    notice('Private onboarding inputs cleared from the current browser session.');
