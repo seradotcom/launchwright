@@ -2,6 +2,18 @@
 
 This ledger separates implemented behavior from execution evidence. A PASS belongs to an exact SHA, environment and lane; it is never inherited from another commit.
 
+## R70 — Explicit human-reviewed carry-forward between Release builds (pending CI)
+
+- Adds source-Candidate/artifact/approval SHA-bound plans and manually approved
+  NEW Markdown Draft creation through the existing Native SDK dispatcher.
+- Reuses no old artifacts, claims, CopyBlocks, evidence, approvals, verifier
+  status, LTS alias, Platform state, publication or customer execution.
+- Adds a declared incomplete provenance relation and exact lost-reply recovery;
+  stale sources, mismatched targets and edited human drafts fail closed.
+- Node 22 workstation directed tests are supplemental; official three-OS
+  Node 24 app matrix and an owned real Chromium 320/390/768/1440 px path
+  must pass before the R70 scope is accepted. Whole-master remains BLOCKED.
+
 ## R69 — GitHub Draft PR first-send and recover-only from the UI (pending CI)
 
 - Reuses R41 exact GitHub Draft PR transport and Native-linked R40

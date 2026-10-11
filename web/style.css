@@ -44,3 +44,9 @@
 .docs-git-facts{grid-template-columns:repeat(2,minmax(0,1fr))}
 .docs-git-hash{overflow-wrap:anywhere;word-break:break-all}
 @media(max-width:900px){.docs-git-facts{grid-template-columns:minmax(0,1fr)}}
+
+/* R70: exact-plan cross-version editorial review uses bounded mobile columns. */
+.carry-forward-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:16px}
+.carry-forward-facts{grid-template-columns:repeat(2,minmax(0,1fr))}
+.carry-forward-hash{word-break:break-all;overflow-wrap:anywhere}
+@media(max-width:860px){.carry-forward-facts{grid-template-columns:minmax(0,1fr)}}
