@@ -65,3 +65,11 @@ Synthetic tests use actual Launchwright SQLite/Native SDK frozen candidate state
 **No live GitHub Draft PR was created as part of this test**, and this integration cannot establish operator account authentication, external reviewer approval, website deployment, real customer source rights or Semwright Platform Publish. The original master DOCS_GIT profile is **PARTIAL** until independently accepted external draft creation/review and output delivery are proved.
 
 Accepted implementation source SHA `b0016eaa23cc84cfdd9b290432ecee29cc9edae7` passed Node24 Linux/Windows/macOS CI. Consult `evidence/r41/ci-runs.json` for exact job and non-authority boundaries. Remote GitHub live acceptance is not inferred.
+
+## Subsequent R66 live GitHub acceptance
+
+The original R41 tests used an injected GitHub provider. Later, the
+authorized owner created and recovered [real synthetic Draft PR #90](https://github.com/seradotcom/launchwright/pull/90),
+then closed it unmerged and deleted the test branch. This validates
+the real operator transport, not customer review/merge or deployment.
+See [R66 acceptance](GITHUB_DOCS_LIVE_ACCEPTANCE.md).

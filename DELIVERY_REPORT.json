@@ -31,7 +31,7 @@
     "R38 local stdio MCP independent client Node24 CI run 37870767220"
   ],
   "outstanding_core": [
-    "DOCS_GIT local branch/draft-PR mock accepted only; live authorized GitHub PR, merge and docs deployment remain unaccepted",
+    "DOCS_GIT local branch/draft-PR mock accepted only; owned live GitHub Draft PR accepted on synthetic #90; independent customer review/merge and docs deployment remain unaccepted",
     "DECK_PDF R57 exact R55-masked Native screenshots in PPTX/PDF pending Node24 owned visual acceptance; accessibility, customer branding, rich layouts, independent pixel privacy and rights review remain open",
     "INTERACTIVE_DEMO static synthetic offline Chromium navigation accepted; customer interactive actions, pixel privacy, accessibility and independent source admission remain unaccepted",
     "STORE_PACKAGE R56 exact local R55 pixel mask -> Native derivative -> R44 Google Play ZIP subset pending independent Node24 acceptance; original device capture, privacy outside masks, graphics rights, other store profiles and real external account acceptance unestablished",

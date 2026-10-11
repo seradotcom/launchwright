@@ -1,0 +1,50 @@
+{
+  "schema_version": "launchwright-r66-owned-operator-github-draft/1",
+  "app_checkout_source_sha": "de8695b8ccce4464c0e4104af69871e5ee61e5cc",
+  "canonical_native_sdk": "1.0.0",
+  "target_repository": "seradotcom/launchwright",
+  "fixture_origin": "owned-synthetic-generated-local-Native-SDK-candidate",
+  "fixture_production_or_customer_data": false,
+  "local_git_source": {
+    "base_branch": "main",
+    "base_sha": "de8695b8ccce4464c0e4104af69871e5ee61e5cc",
+    "docs_path": "docs/OWNED_GH_DRAFT_E2E_R66.md",
+    "head_branch": "launchwright/docs-ac24bf1d24fa511649f7",
+    "head_sha": "50a995e2f81b507aee609b9aa93c07de320cd2a7",
+    "approved_candidate_sha256": "3db5ff41ddc72975832b186cfcbef3f7a4af534c881a58c735e694f94475bbb0",
+    "source_markdown_sha256": "341850c537057ade5c3c03aa211ab6fa643af5a61155bdc90d40cb0e9a0ea2fc",
+    "r40_plan_sha256": "ac24bf1d24fa511649f7c6ff943403783a11138d34d7f8fef6547df7e505356b",
+    "r41_intent_sha256": "a51981bdb8b98881e38b9d229427f6d3d622d048cab3ae0f8b3c2a069c374d35",
+    "remote_branch_push_separate_operator_action": true,
+    "automated_git_push_by_r41": false,
+    "github_remote_branch_initially_exact": true
+  },
+  "github_draft": {
+    "pull_request": 90,
+    "url": "https://github.com/seradotcom/launchwright/pull/90",
+    "created_at": "2026-10-11T01:27:21Z",
+    "closed_at": "2026-10-11T01:28:21Z",
+    "live_github_api_used": true,
+    "draft_created": true,
+    "title_and_full_body_read_back_by_adapter": true,
+    "remote_branch_and_base_commit_verified": true,
+    "changed_files": 1,
+    "read_only_recover_exact_original_intent": true,
+    "second_pr_created_during_recovery": false,
+    "final_state": "CLOSED",
+    "final_draft": true,
+    "merge_commit": null,
+    "remote_fixture_branch_deleted": true
+  },
+  "admission_boundaries": {
+    "real_authorized_operator_GitHub_Draft_PR_transport_accepted": true,
+    "independent_customer_approval": false,
+    "remote_git_docs_merge": false,
+    "customer_source_capture": false,
+    "public_documentation_activation": false,
+    "semwright_platform_publish_authority": false,
+    "external_customer_acceptance": false
+  },
+  "source_notes": "Original private state and exact local prepared intents remain only on the operator workstation, not in the public Git repo. PR was closed and temporary remote branch removed after acceptance.",
+  "receipt_sha256": "4df18f309e8a80c86ad74fb1333646465ddc577aa005be161ba86316f44e2cb9"
+}

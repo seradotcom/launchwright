@@ -75,7 +75,17 @@
       "evidence": "LOCAL_GIT_BRANCH_CI",
       "source_sha": "b69d17aafbb4badfd84d83205112244a994f02dc",
       "run_id": 37874876016,
-      "remaining": "Live operator GitHub DRAFT PR creation and readback, remote reviewers/merge, docs website deployment, customer ownership and exact published-version acceptance remain external; R41 tests use injected GitHub provider."
+      "remaining": "Owner live synthetic GitHub Draft PR #90 creation/readback/recovery accepted and cleaned; independent customer review/merge, hosted docs activation, rights and Platform Publish remain external.",
+      "operator_live_evidence": {
+        "ref": "evidence/r66/live-github-draft.json",
+        "pr": 90,
+        "url": "https://github.com/seradotcom/launchwright/pull/90",
+        "accepted_scope": "owned-live-draft-create-and-recovery",
+        "merged": false,
+        "remote_branch_deleted": true,
+        "customer_acceptance": false,
+        "platform_publish": false
+      }
     },
     {
       "profile": "VIDEO",
