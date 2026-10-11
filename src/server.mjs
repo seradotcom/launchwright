@@ -8,6 +8,7 @@ import { NativeError, dispatchApplication, applicationContext, requireCondition 
 import { OPERATION_SCOPES, READ_OPERATIONS, makeRequest, str, idText } from './contracts.mjs';
 import { LaunchwrightApplication } from './application.mjs';
 import { buildPrivateChannelBundle } from './channel-bundle.mjs';
+import { planBrowserContinuity, exportBrowserContinuity, inspectBrowserContinuity } from './continuity-web.mjs';
 import { planGitProjectBootstrap, applyGitProjectBootstrap, withGitBootstrapLock } from './git-project-bootstrap.mjs';
 const CODE=dirname(dirname(fileURLToPath(import.meta.url)));
 const statusFor={InvalidArgument:400,PermissionDenied:403,PolicyDenied:403,ConsentRequired:403,NotFound:404,StaleReference:409,Conflict:409,ResourceExhausted:413,Unavailable:503,Unsupported:501};
@@ -44,7 +45,7 @@ export function createAppServer(app,{token=localToken(app.store.root),port=4317,
   ensure(new Set(actors.map(actor=>actor.token)).size===actors.length,'Duplicate bearer principal token','Conflict');
   ensure(new Set(actors.map(actor=>actor.principal)).size===actors.length,'Duplicate bearer principal identity','Conflict');
   const allowedHosts=new Set([`127.0.0.1:${port}`,`localhost:${port}`]);
-  const staticFiles=new Map([['/',['web/index.html','text/html; charset=utf-8']],['/app.mjs',['web/app.mjs','text/javascript; charset=utf-8']],['/git-onboarding.mjs',['web/git-onboarding.mjs','text/javascript; charset=utf-8']],['/style.css',['web/style.css','text/css; charset=utf-8']],['/client.mjs',['client/index.mjs','text/javascript; charset=utf-8']],['/LICENSE',['LICENSE','text/plain; charset=utf-8']]]);
+  const staticFiles=new Map([['/',['web/index.html','text/html; charset=utf-8']],['/app.mjs',['web/app.mjs','text/javascript; charset=utf-8']],['/git-onboarding.mjs',['web/git-onboarding.mjs','text/javascript; charset=utf-8']],['/continuity-ui.mjs',['web/continuity-ui.mjs','text/javascript; charset=utf-8']],['/style.css',['web/style.css','text/css; charset=utf-8']],['/client.mjs',['client/index.mjs','text/javascript; charset=utf-8']],['/LICENSE',['LICENSE','text/plain; charset=utf-8']]]);
   const resolveActor=bearer=>{
     if(equal(bearer,token))return null;
     return actors.find(actor=>equal(bearer,actor.token))??undefined;
@@ -71,6 +72,20 @@ export function createAppServer(app,{token=localToken(app.store.root),port=4317,
       ensure(ownerAuthenticated||actor!==undefined,'Unlock this local workspace with an authorized credential','PermissionDenied');
       if(actor){requestApp=new LaunchwrightApplication(app.store.root,{principal:actor.principal,scopes:actor.scopes});requestOwnsApp=true;}
       const call=(operation,input)=>dispatchApplication(requestApp,'invoke',operation,input,applicationContext(randomUUID(),null));
+      if(req.method==='GET'&&/^\/api\/v1\/local-continuity\/[a-f0-9]{64}\/(?:status|bundle\.zip)$/.test(path)){
+        ensure(ownerAuthenticated,'Only the local owner can recover continuity exports','PermissionDenied');
+        const hash=path.split('/')[4],download=path.endsWith('/bundle.zip');
+        const result=inspectBrowserContinuity(requestApp,hash,{includeBytes:download});
+        if(download){
+          const {bytes}=result;
+          res.writeHead(200,{'Content-Type':'application/zip',
+            'Content-Disposition':`attachment; filename="launchwright-continuity-${hash.slice(0,12)}.zip"`,
+            'Content-Length':bytes.length,'Cache-Control':'no-store',
+            'ETag':`"${result.zip_sha256}"`});
+          res.end(bytes);
+        }else json(res,200,result);
+        return;
+      }
       if(path==='/api/v1/describe'&&req.method==='GET'){json(res,200,await call('workspace.describe',{}));return;}
       if(req.method==='GET'&&/^\/api\/v1\/artifacts\/[a-z0-9_-]+\/download$/.test(path)){
         requestApp.allow('read');const id=path.split('/')[4];idText(id);const artifact=requestApp.get(id,'artifact');const bytes=requestApp.store.readBlob(artifact.data.sha256);
@@ -81,6 +96,14 @@ export function createAppServer(app,{token=localToken(app.store.root),port=4317,
         res.writeHead(200,{'Content-Type':bundle.mime,'Content-Disposition':`attachment; filename="${bundle.filename}"`,'Content-Length':bundle.bytes.length,'Cache-Control':'no-store','ETag':`"${bundle.sha256}"`});res.end(bundle.bytes);return;
       }
       ensure(req.method==='POST','Route not found','NotFound');const data=await body(req);
+      if(path==='/api/v1/local-continuity/plan'){
+        ensure(ownerAuthenticated,'Only the local owner can plan continuity','PermissionDenied');
+        json(res,200,planBrowserContinuity(requestApp,data));return;
+      }
+      if(path==='/api/v1/local-continuity/export'){
+        ensure(ownerAuthenticated,'Only the local owner can export private continuity','PermissionDenied');
+        json(res,200,await exportBrowserContinuity(requestApp,data));return;
+      }
       if(path==='/api/v1/local-git-bootstrap/plan'){
         // R37 deliberately accepts an already observed R32 JSON snapshot, not
         // a server-side Git path, URL, repository command, or browser file handle.

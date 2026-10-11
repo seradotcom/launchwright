@@ -34,3 +34,8 @@
   .topbar-actions{gap:8px}
   .topbar-actions .connection{display:none}
 }
+
+/* R67 exact-hash continuation (no extra client-side script or external CSS). */
+.continuity-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:16px}
+.continuity-hash{overflow-wrap:anywhere;word-break:break-all}
+@media (max-width:520px){.continuity-fields{display:block}}

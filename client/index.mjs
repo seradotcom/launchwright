@@ -27,6 +27,22 @@ export class LaunchwrightClient {
       {observation,plan,confirmations});
   }
 
+  // R67 browser continuity uses original Native R54 plan/export semantics.
+  // No arbitrary filesystem destination, remote send, retry or import of private code.
+  planLocalContinuity(selection){return this.request('/api/v1/local-continuity/plan',selection);}
+  exportLocalContinuity(plan,confirmations){
+    return this.request('/api/v1/local-continuity/export',{plan,...confirmations});
+  }
+  continuityStatus(planSha){
+    if(typeof planSha!=='string'||!/^[a-f0-9]{64}$/.test(planSha))
+      throw Error('Exact plan SHA-256 required');
+    return this.request('/api/v1/local-continuity/'+planSha+'/status',undefined,'GET');
+  }
+  continuityBundleUrl(planSha){
+    if(typeof planSha!=='string'||!/^[a-f0-9]{64}$/.test(planSha))
+      throw Error('Exact plan SHA-256 required');
+    return this.baseUrl+'/api/v1/local-continuity/'+planSha+'/bundle.zip';
+  }
   get(id){return this.request('/api/v1/read',{operation:'resource.get',input:{id}});}
   read(operation,input={}){return this.request('/api/v1/read',{operation,input});}
   snapshotSummary(){return this.read('workspace.snapshot');}
