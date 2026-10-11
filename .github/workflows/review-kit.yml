@@ -1,6 +1,14 @@
 name: Exact multi-format private release review
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/review-kit.yml'
+      - 'src/release-review-kit*.mjs'
+      - 'tests/release-review-kit*.mjs'
+      - 'tests/review-kit*.mjs'
+      - 'scripts/review-kit-owned-smoke.mjs'
+      - 'scripts/release-review-kit.mjs'
 permissions:
   contents: read
 concurrency:
