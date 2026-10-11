@@ -2,6 +2,19 @@
 
 This ledger separates implemented behavior from execution evidence. A PASS belongs to an exact SHA, environment and lane; it is never inherited from another commit.
 
+## R68 — Git docs local branch through the UI (pending exact-SHA CI)
+
+- Implemented against the existing R40 Git plumbing; no arbitrary Git
+  execution, remote push, PR creation or Platform Publish authority.
+- Workstation Node 22.22.0 directed tests: **10/10 PASS** (supplemental
+  only; the SDK requires Node 24).
+- Real disposable Git repository + Semwright Native candidate:
+  SHA-locked plan, index and checkout preservation, hooks disabled,
+  owner-only API, consent, dirty-file/base/branch/receipt drift denial,
+  explicit recovery without resending an unknown outcome.
+- Pending Node 24 three-OS app matrix and real Chromium at
+  1440/768/390/320 px; do not promote this to accepted customer publishing.
+
 ## Supplemental workstation checks
 
 R22 workstation checkpoint (supplemental; exact CI Host acceptance is recorded below):

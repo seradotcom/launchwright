@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 import { LaunchwrightClient } from '/client.mjs';
 import { createContinuityController } from '/continuity-ui.mjs';
+import { createGitDocsController } from '/git-docs-ui.mjs';
 import { createGitOnboardingController, MAX_GIT_OBSERVATION_UPLOAD_BYTES, MAX_GIT_PLAN_UPLOAD_BYTES } from '/git-onboarding.mjs';
 const $=s=>document.querySelector(s), root=$('#app');
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -10,8 +11,9 @@ let pendingStore={save:async p=>{localStorage.setItem('launchwright.pending.'+p.
 const api=new LaunchwrightClient({baseUrl:location.origin,pendingStore});
 const gitOnboarding=createGitOnboardingController(api);
 const continuityUI=createContinuityController(api);
+const gitDocsUI=createGitDocsController(api);
 let model={entities:[],version:null},description=null,productId=localStorage.getItem('launchwright.product'),releaseId=localStorage.getItem('launchwright.release'),view='overview',selected=null,renderEpoch=0;
-const tabs=[['onboard','⌁','Import Git project'],['overview','◫','Overview'],['targets','⊡','Targets & sources'],['scenarios','↳','Scenarios'],['claims','≡','Claims & evidence'],['locales','文','Localization'],['deliverables','▤','Deliverables'],['impact','⌁','Impact'],['work','▷','Work'],['review','◎','Review room'],['continuity','⇄','Release continuity'],['delivery','↗','Delivery'],['templates','◇','Templates'],['integrations','⌘','Integrations'],['history','◷','History']];
+const tabs=[['onboard','⌁','Import Git project'],['overview','◫','Overview'],['targets','⊡','Targets & sources'],['scenarios','↳','Scenarios'],['claims','≡','Claims & evidence'],['locales','文','Localization'],['deliverables','▤','Deliverables'],['impact','⌁','Impact'],['work','▷','Work'],['review','◎','Review room'],['continuity','⇄','Release continuity'],['docs-git','↗','Docs to Git'],['delivery','↗','Delivery'],['templates','◇','Templates'],['integrations','⌘','Integrations'],['history','◷','History']];
 const kinds=k=>model.entities.filter(e=>e.kind===k);
 const get=id=>model.entities.find(e=>e.id===id);
 const inRelease=k=>kinds(k).filter(e=>e.data.release_id===releaseId);
@@ -38,8 +40,8 @@ async function render(){
   try{
     if(view==='onboard')html=heading('Project adoption','Import an existing Git project','Use an exact local Git metadata observation to create an editorial workspace without executing or publishing the project.')+gitOnboarding.render();
     else if(!productId){html=heading('Release production','A launch starts with a source.','Build a traceable release package. Keep editorial decisions, evidence and delivery states distinct.')+panel('Create your first workspace',empty('Nothing invented. Nothing published.','Add a product and an explicit build, then define a target and the deliverables it needs.',button('Create product','new-product')+button('Import Git project','navigate-onboard','','secondary')))+`<div class="callout"><strong>What works here</strong>Structured release editing, versioned text exports, input change detection, editorial review and private draft delivery. Browser capture, media rendering and external delivery require their canonical runtime integration.</div>`;}
-    else if(!hasRelease()&&!['templates','continuity'].includes(view)){html=heading('Product',get(productId).data.name,'Create a release with an explicit build identity.',button('Create release','new-release'))+panel('Release brief',empty('Name the release. Pin the build.','A commercial version is not a resource revision. Launchwright keeps both.',button('Create release','new-release')));}
-    else{const fn={overview,targets,scenarios,claims,locales,deliverables,impact,work,review,continuity,delivery,templates,integrations,history}[view];html=await fn();}
+    else if(!hasRelease()&&!['templates','continuity','docs-git'].includes(view)){html=heading('Product',get(productId).data.name,'Create a release with an explicit build identity.',button('Create release','new-release'))+panel('Release brief',empty('Name the release. Pin the build.','A commercial version is not a resource revision. Launchwright keeps both.',button('Create release','new-release')));}
+    else{const fn={overview,targets,scenarios,claims,locales,deliverables,impact,work,review,continuity,'docs-git':docsGit,delivery,templates,integrations,history}[view];html=await fn();}
     if(epoch===renderEpoch)$('#view-content').innerHTML=html;
   }catch(err){if(epoch===renderEpoch)$('#view-content').innerHTML=heading('Could not load section','The last result was not replaced.','No mutation was retried.')+panel('Request error',`<div class="panel-body"><p>${esc(err.message)}</p>${button('Refresh observation','refresh','','secondary')}</div>`);}
 }
@@ -94,6 +96,12 @@ async function continuity(){
   return heading('Version-aware publishing','Release continuity',
     'Compare two frozen Native-backed candidates from one product without replaying or publishing source applications.')+
     continuityUI.render(inProduct('release'),kinds('candidate'));
+}
+async function docsGit(){
+ const candidates=inRelease('candidate');
+ return heading('Editorial Git delivery','Docs to Git',
+  'An editorially approved frozen Markdown candidate can become one safe local Git review branch. No push, GitHub PR or publication runs here.')+
+  gitDocsUI.render(candidates,inRelease('artifact'));
 }
 async function delivery(){const ds=inRelease('delivery'),profiles=inProduct('channel_profile'),channels=inRelease('channel_delivery'),cs=inRelease('candidate');const status=await api.channelStatus(releaseId);return heading('Distribution','Delivery board','Package generation, external receipts and activation are separate states. Launchwright never treats PACKAGE_READY as published.',button('Add channel profile','new-channel_profile','','secondary')+button('Build channel package','package-channel'))+
   panel('Private delivery receipts',ds.length?table(['Destination','Candidate','Local state','External state'],ds.map(d=>`<tr><td>${named(d)}<div class="sub">Alias revision ${esc(d.data.alias_version.revision)}</div></td><td><code>${esc(d.data.candidate_sha256.slice(0,22))}…</code></td><td>${stamp('Private draft','warn')}<div class="sub">${time(d.created)}</div></td><td>${stamp('NOT SENT')}<div class="sub">Technical ${esc(d.data.technical_state)}</div></td></tr>`)):empty('Nothing has been delivered.','A reviewed candidate can create an immutable private-draft receipt. Publication to an external channel requires a separate authorized integration.',button('Open review room','navigate-review','','secondary')))+
@@ -238,6 +246,72 @@ root.addEventListener('click',async event=>{
       textField('plan_sha256','Full original plan SHA-256','')
     ],async data=>{await continuityUI.recover(data.plan_sha256);},'Check existing export',
     'Existing private export inspected without repeating the send.');return;
+  }
+  if(action==='docs-git-plan'){
+    const cs=inRelease('candidate');
+    const pinned=new Set(cs.flatMap(c=>c.data.manifest?.artifact_ids??[]));
+    const arts=inRelease('artifact').filter(a=>pinned.has(a.id));
+    if(!cs.length||!arts.length)throw Error('Freeze a Markdown candidate first');
+    openForm('Prepare exact local Git docs plan',[
+      textField('repository_root','Absolute local Git repository root',gitDocsUI.repoRoot,'text',
+        'Owner-controlled working tree. Paths are used only by the local server; no remote clone.'),
+      textField('github_repository','Declared GitHub OWNER/REPO',''),
+      textField('base_branch','Existing local base branch','main'),
+      textField('docs_path','Documentation destination','docs/RELEASE_NOTES.md','text',
+        'Must be a safe docs/*.md path. No customer source code is executed.'),
+      selectField('candidate_id','Frozen candidate',cs),
+      selectField('artifact_id','Frozen Markdown artifact',arts),
+      {key:'acknowledge_draft_only',
+        label:'I authorize only a local Git review branch, not push, PR or publication.',
+        type:'checkbox',value:false},
+      {key:'acknowledge_unverified',
+        label:'I acknowledge unverified product evidence stays technical UNKNOWN.',
+        type:'checkbox',value:false}
+    ],async data=>{await gitDocsUI.prepare(data);},
+    'Prepare read-only plan','Exact Git docs plan prepared. No Git ref changed.');
+    return;
+  }
+  if(action==='docs-git-load'){
+    openForm('Restore an existing exact R40 plan',[
+      textField('repository_root','Original absolute Git worktree root',gitDocsUI.repoRoot),
+      jsonField('plan','Paste the complete saved R40 plan JSON',{},
+        'Read-only verification; no Git write or PR. Do not paste credentials.')
+    ],async data=>{await gitDocsUI.restore(data.plan,data.repository_root);},
+    'Verify original plan','Saved plan checked against current Native candidate and Git base.');
+    return;
+  }
+  if(action==='docs-git-clear'){
+    gitDocsUI.clear();await render();
+    notice('Git repository path and plan cleared from browser memory.');return;
+  }
+  if(action==='docs-git-inspect'){
+    await gitDocsUI.inspect();await render();
+    notice('Git branch read back without a write or retry.');return;
+  }
+  if(action==='docs-git-apply'){
+    const p=gitDocsUI.plan;
+    if(!p)throw Error('Prepare or restore an exact plan first');
+    openForm('Confirm one reviewed local Git branch',[
+      textField('confirm_plan_sha256','Re-enter full 64-character R40 plan SHA-256'),
+      textField('confirm_candidate_sha256','Re-enter full 64-character candidate SHA-256'),
+      textField('confirm_base_commit_sha','Re-enter full 40-character Git base commit SHA'),
+      {key:'acknowledge_local_git_write',
+        label:'I authorize writing this one local review branch (no push or PR).',
+        type:'checkbox',value:false}
+    ],async data=>{await gitDocsUI.apply(data);},
+    'Write or recover local branch',
+    'Exact Git docs branch verified. HEAD and checkout remain unchanged.');
+    return;
+  }
+  if(action==='docs-git-save'){
+    const blob=new Blob([gitDocsUI.downloadPlan()],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download='launchwright-private-r40-git-docs-plan.json';
+    document.body.append(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+    notice('Private R40 plan saved by your browser. Protect the file.');
+    return;
   }
   if(action==='onboard-clear'){
    gitOnboarding.clear();await render();

@@ -19,6 +19,16 @@ export class LaunchwrightClient {
   // Explicit local-owner Git onboarding. Unlike mutate(), partial progress is
   // reconciled by resubmitting the SAME plan only after an operator decision.
   // Never auto-retry an ambiguous network outcome; no browser file paths.
+  // R68: exact owner-only reviewed Markdown -> local Git branch. No push,
+  // remote PR, arbitrary repository execution, or automatic send/retry.
+  planLocalGitDocs(input){return this.request('/api/v1/local-git-docs/plan',input);}
+  inspectLocalGitDocs(repository_root,plan){
+    return this.request('/api/v1/local-git-docs/inspect',{repository_root,plan});
+  }
+  applyLocalGitDocs(repository_root,plan,confirmations){
+    return this.request('/api/v1/local-git-docs/apply',
+      {repository_root,plan,...confirmations});
+  }
   planLocalGitBootstrap(observation,config){
     return this.request('/api/v1/local-git-bootstrap/plan',{observation,config});
   }
