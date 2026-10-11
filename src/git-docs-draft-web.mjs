@@ -2,6 +2,8 @@
 // R69: owner-authorized browser facade for the existing R41 GitHub DRAFT PR
 // transport. Never performs push, merge, deployment, public activation.
 import {NativeError,requireCondition as ensure,validateValue} from '@semwright/native-sdk';
+import {openSync,closeSync,unlinkSync} from 'node:fs';
+import {join} from 'node:path';
 import {prepareGitDocsDraftPR,sendGitDocsDraftPR,createGithubDocsTransport} from './git-docs-draft-pr.mjs';
 const exact=(input,fields)=>{
   ensure(input&&typeof input==='object'&&!Array.isArray(input)&&
@@ -48,12 +50,22 @@ export async function sendBrowserGitDocsDraft(app,input,{
     'ConsentRequired');
   // Real environment uses gh CLI's existing owner credentials. Unit/CI runs
   // inject a deterministic transport. No tokens cross the browser protocol.
-  const remote=transport??createGithubDocsTransport();
-  return sendGitDocsDraftPR(app,plan,input.repository_root,intent,remote,{
-    confirm_repository:input.confirm_repository,
-    confirm_branch_plan_sha256:input.confirm_branch_plan_sha256,
-    confirm_local_commit_sha:input.confirm_local_commit_sha,
-    acknowledge_first_send:!recoverOnly,
-    recover_only:recoverOnly
-  });
+  const lockPath=join(app.store.root,'.git-docs-draft-remote.lock');
+  let fd;
+  try{fd=openSync(lockPath,'wx',0o600);}catch{
+    throw new NativeError('Conflict',
+      'Another Draft PR operation is in flight or an unknown crash left a lock; reconcile manually, never send concurrently');
+  }
+  try{
+    const remote=transport??createGithubDocsTransport();
+    return await sendGitDocsDraftPR(app,plan,input.repository_root,intent,remote,{
+      confirm_repository:input.confirm_repository,
+      confirm_branch_plan_sha256:input.confirm_branch_plan_sha256,
+      confirm_local_commit_sha:input.confirm_local_commit_sha,
+      acknowledge_first_send:!recoverOnly,
+      recover_only:recoverOnly
+    });
+  }finally{
+    try{closeSync(fd);}finally{unlinkSync(lockPath);}
+  }
 }

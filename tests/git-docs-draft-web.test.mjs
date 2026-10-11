@@ -2,6 +2,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {setup} from './helpers.mjs';
+import {existsSync,writeFileSync,unlinkSync} from 'node:fs';
+import {join} from 'node:path';
 import {createR68Fixture,ownedGit} from './git-docs-web-fixture.mjs';
 import {createAppServer} from '../src/server.mjs';
 import {LaunchwrightClient} from '../client/index.mjs';
@@ -26,7 +28,7 @@ class OwnedFakeGitHub{
   }
 }
 async function fixture(t){
-  const{app}=setup(t),owned=await createR68Fixture(app);
+  const{app,root}=setup(t),owned=await createR68Fixture(app);
   t.after(()=>owned.cleanup());
   const branchPlan=prepareGitDocsBranch(app,owned.planInput);
   const branch=applyGitDocsBranch(app,branchPlan,owned.repository_root,{
@@ -52,7 +54,7 @@ async function fixture(t){
     confirm_branch_plan_sha256:original.branch_plan_sha256,
     confirm_local_commit_sha:original.local_branch_commit_sha
   };
-  return{...owned,app,branchPlan,branch,remote,server,origin,client,selection,
+  return{...owned,root,app,branchPlan,branch,remote,server,origin,client,selection,
     original,confirmation};
 }
 async function post(f,action,payload,token=OWNER,headers={}){
@@ -177,4 +179,28 @@ test('R69 recover-only rejects absent, tampered and non-DRAFT remote PRs without
     acknowledge_remote_branch_pushed:true,acknowledge_first_send:true
   }),{code:'Conflict'});
   assert.equal(x.remote.created,1);
+});
+
+test('R69 state-scoped exclusive lock blocks overlapping Draft first-send and recovery without contacting GitHub',async t=>{
+  const x=await fixture(t);
+  const path=join(x.root,'.git-docs-draft-remote.lock');
+  const request={repository_root:x.repository_root,branch_plan:x.branchPlan,
+    intent:x.original,...x.confirmation,
+    acknowledge_first_send:true,acknowledge_remote_branch_pushed:true};
+  writeFileSync(path,'Another operator or crashed uncertain result',{mode:0o600});
+  await assert.rejects(x.client.sendLocalGitDocsDraft(request),{code:'Conflict'});
+  await assert.rejects(x.client.recoverLocalGitDocsDraft({
+    repository_root:x.repository_root,branch_plan:x.branchPlan,
+    intent:x.original,...x.confirmation
+  }),{code:'Conflict'});
+  assert.equal(x.remote.created,0);
+  assert.equal(x.remote.reads,0);
+  assert.equal(existsSync(path),true,'Unknown writer lock is never stolen');
+  unlinkSync(path);
+  const readOnly=await x.client.recoverLocalGitDocsDraft({
+    repository_root:x.repository_root,branch_plan:x.branchPlan,
+    intent:x.original,...x.confirmation
+  }).catch(e=>e);
+  assert.equal(readOnly.code,'NotFound');
+  assert.equal(existsSync(path),false);
 });
