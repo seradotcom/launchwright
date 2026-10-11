@@ -2,6 +2,7 @@
 import { LaunchwrightClient } from '/client.mjs';
 import { createContinuityController } from '/continuity-ui.mjs';
 import {createCarryForwardController} from '/carry-forward-ui.mjs';
+import {createCarryForwardBatchController} from '/carry-forward-batch-ui.mjs';
 import { createGitDocsController } from '/git-docs-ui.mjs';
 import { createGitDocsDraftController } from '/git-docs-draft-ui.mjs';
 import { createGitOnboardingController, MAX_GIT_OBSERVATION_UPLOAD_BYTES, MAX_GIT_PLAN_UPLOAD_BYTES } from '/git-onboarding.mjs';
@@ -14,6 +15,7 @@ const api=new LaunchwrightClient({baseUrl:location.origin,pendingStore});
 const gitOnboarding=createGitOnboardingController(api);
 const continuityUI=createContinuityController(api);
 const carryForwardUI=createCarryForwardController(api);
+const carryForwardBatchUI=createCarryForwardBatchController(api);
 const gitDocsUI=createGitDocsController(api);
 const gitDocsDraftUI=createGitDocsDraftController(api);
 let model={entities:[],version:null},description=null,productId=localStorage.getItem('launchwright.product'),releaseId=localStorage.getItem('launchwright.release'),view='overview',selected=null,renderEpoch=0;
@@ -108,7 +110,12 @@ async function carryForward(){
   carryForwardUI.render(releases,
     kinds('candidate').filter(c=>releaseIds.has(c.data.release_id)),
     kinds('artifact').filter(a=>releaseIds.has(a.data.release_id)),
-    kinds('target').filter(t=>releaseIds.has(t.data.release_id)),releaseId);
+    kinds('target').filter(t=>releaseIds.has(t.data.release_id)),releaseId)+
+  carryForwardBatchUI.render(releases,
+    kinds('candidate').filter(c=>releaseIds.has(c.data.release_id)),
+    kinds('artifact').filter(a=>releaseIds.has(a.data.release_id)),
+    kinds('target').filter(t=>releaseIds.has(t.data.release_id)),
+    kinds('deliverable').filter(d=>releaseIds.has(d.data.release_id)),releaseId);
 }
 async function docsGit(){
  const candidates=inRelease('candidate');
@@ -199,6 +206,24 @@ function editEntity(kind,e){
  });
 }
 root.addEventListener('change',async event=>{try{
+ if(event.target.id==='batch-candidate'){
+   carryForwardBatchUI.chooseCandidate(event.target.value);
+   await render();return;
+ }
+ if(event.target.dataset.batchToggle){
+   carryForwardBatchUI.toggle(event.target.dataset.batchToggle,event.target.checked);
+   await render();return;
+ }
+ if(event.target.dataset.batchTarget){
+   carryForwardBatchUI.update(event.target.dataset.batchTarget,
+     'destination_target_id',event.target.value);
+   await render();return;
+ }
+ if(event.target.dataset.batchName){
+   carryForwardBatchUI.update(event.target.dataset.batchName,
+     'destination_name',event.target.value);
+   await render();return;
+ }
  const carryKey={
    'carry-source-candidate':'source_candidate_id',
    'carry-source-artifact':'source_artifact_id',
@@ -240,6 +265,52 @@ root.addEventListener('click',async event=>{
  const el=event.target.closest('[data-action]');if(!el)return;const action=el.dataset.action,id=el.dataset.id;
  try{
   if(action.startsWith('navigate-')){location.hash=action.slice(9);return;}
+  if(action==='batch-plan'){
+    await carryForwardBatchUI.prepare(releaseId,{
+      rights:$('#batch-rights')?.checked,review:$('#batch-review')?.checked
+    });
+    await render();notice('Exact Native batch plan prepared; no drafts created.');return;
+  }
+  if(action==='batch-apply'){
+    const plan=carryForwardBatchUI.plan;
+    if(!plan)throw Error('Prepare or restore the original batch plan first');
+    openForm('Approve selected NEW build drafts',[
+      textField('confirm_plan_sha256','Re-enter full R71 batch plan SHA-256'),
+      textField('confirm_source_candidate_sha256','Re-enter full frozen Candidate SHA-256'),
+      textField('confirm_destination_build','Re-enter exact new build identity'),
+      {key:'acknowledge_create_all_drafts',
+        label:'I authorize all selected NEW review-only drafts. No prior claims, approvals or artifacts are imported.',
+        type:'checkbox',value:false}
+    ],async data=>{await carryForwardBatchUI.apply(data);await refresh();},
+    'Create or reconcile selected drafts',
+    'Exact Native batch complete. Each document still needs current-build review.');
+    return;
+  }
+  if(action==='batch-inspect'){
+    await carryForwardBatchUI.inspect();await render();
+    notice('Only existing Native batch results inspected. No new send or write.');return;
+  }
+  if(action==='batch-load'){
+    openForm('Restore original exact R71 batch plan',[
+      jsonField('plan','Paste original private R71 JSON plan',{},
+        'Read-only source and destination validation. Partial progress is shown, not retried.')
+    ],async data=>{await carryForwardBatchUI.restore(data.plan);},
+    'Inspect original batch',
+    'Original Native batch read back without creating any drafts.');
+    return;
+  }
+  if(action==='batch-clear'){
+    carryForwardBatchUI.clear();await render();
+    notice('Batch selection cleared from tab memory.');return;
+  }
+  if(action==='batch-save'){
+    const blob=new Blob([carryForwardBatchUI.downloadPlan()],{type:'application/json'});
+    const url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download='launchwright-private-r71-carry-forward-batch.json';
+    document.body.append(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+    notice('Exact private batch plan saved for recover-first use.');return;
+  }
   if(action==='carry-plan'){
     await carryForwardUI.prepare(releaseId,{
       rights:$('#carry-rights')?.checked,recheck:$('#carry-recheck')?.checked

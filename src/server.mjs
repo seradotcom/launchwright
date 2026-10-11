@@ -10,6 +10,7 @@ import { LaunchwrightApplication } from './application.mjs';
 import { buildPrivateChannelBundle } from './channel-bundle.mjs';
 import { planBrowserContinuity, exportBrowserContinuity, inspectBrowserContinuity } from './continuity-web.mjs';
 import {prepareCarryForward,inspectCarryForward,applyCarryForward} from './release-carry-forward.mjs';
+import {prepareCarryForwardBatch,inspectCarryForwardBatch,applyCarryForwardBatch} from './release-carry-forward-batch.mjs';
 import { planGitProjectBootstrap, applyGitProjectBootstrap, withGitBootstrapLock } from './git-project-bootstrap.mjs';
 import { planBrowserGitDocs, applyBrowserGitDocs, inspectBrowserGitDocs } from './git-docs-web.mjs';
 import { planBrowserGitDocsDraft, sendBrowserGitDocsDraft } from './git-docs-draft-web.mjs';
@@ -48,7 +49,7 @@ export function createAppServer(app,{token=localToken(app.store.root),port=4317,
   ensure(new Set(actors.map(actor=>actor.token)).size===actors.length,'Duplicate bearer principal token','Conflict');
   ensure(new Set(actors.map(actor=>actor.principal)).size===actors.length,'Duplicate bearer principal identity','Conflict');
   const allowedHosts=new Set([`127.0.0.1:${port}`,`localhost:${port}`]);
-  const staticFiles=new Map([['/',['web/index.html','text/html; charset=utf-8']],['/app.mjs',['web/app.mjs','text/javascript; charset=utf-8']],['/git-onboarding.mjs',['web/git-onboarding.mjs','text/javascript; charset=utf-8']],['/continuity-ui.mjs',['web/continuity-ui.mjs','text/javascript; charset=utf-8']],['/carry-forward-ui.mjs',['web/carry-forward-ui.mjs','text/javascript; charset=utf-8']],['/git-docs-ui.mjs',['web/git-docs-ui.mjs','text/javascript; charset=utf-8']],['/git-docs-draft-ui.mjs',['web/git-docs-draft-ui.mjs','text/javascript; charset=utf-8']],['/style.css',['web/style.css','text/css; charset=utf-8']],['/client.mjs',['client/index.mjs','text/javascript; charset=utf-8']],['/LICENSE',['LICENSE','text/plain; charset=utf-8']]]);
+  const staticFiles=new Map([['/',['web/index.html','text/html; charset=utf-8']],['/app.mjs',['web/app.mjs','text/javascript; charset=utf-8']],['/git-onboarding.mjs',['web/git-onboarding.mjs','text/javascript; charset=utf-8']],['/continuity-ui.mjs',['web/continuity-ui.mjs','text/javascript; charset=utf-8']],['/carry-forward-ui.mjs',['web/carry-forward-ui.mjs','text/javascript; charset=utf-8']],['/carry-forward-batch-ui.mjs',['web/carry-forward-batch-ui.mjs','text/javascript; charset=utf-8']],['/git-docs-ui.mjs',['web/git-docs-ui.mjs','text/javascript; charset=utf-8']],['/git-docs-draft-ui.mjs',['web/git-docs-draft-ui.mjs','text/javascript; charset=utf-8']],['/style.css',['web/style.css','text/css; charset=utf-8']],['/client.mjs',['client/index.mjs','text/javascript; charset=utf-8']],['/LICENSE',['LICENSE','text/plain; charset=utf-8']]]);
   const resolveActor=bearer=>{
     if(equal(bearer,token))return null;
     return actors.find(actor=>equal(bearer,actor.token))??undefined;
@@ -99,6 +100,25 @@ export function createAppServer(app,{token=localToken(app.store.root),port=4317,
         res.writeHead(200,{'Content-Type':bundle.mime,'Content-Disposition':`attachment; filename="${bundle.filename}"`,'Content-Length':bundle.bytes.length,'Cache-Control':'no-store','ETag':`"${bundle.sha256}"`});res.end(bundle.bytes);return;
       }
       ensure(req.method==='POST','Route not found','NotFound');const data=await body(req);
+      if(path==='/api/v1/release-carry-forward-batch/plan'){
+        ensure(ownerAuthenticated,
+          'Only the local owner can plan multi-document carry-forward','PermissionDenied');
+        requestApp.allow('read');
+        json(res,200,prepareCarryForwardBatch(requestApp,data));return;
+      }
+      if(path==='/api/v1/release-carry-forward-batch/inspect'){
+        ensure(ownerAuthenticated,
+          'Only the local owner can inspect multi-document carry-forward','PermissionDenied');
+        requestApp.allow('read');
+        object(data,['plan'],['plan']);
+        json(res,200,inspectCarryForwardBatch(requestApp,data.plan));return;
+      }
+      if(path==='/api/v1/release-carry-forward-batch/apply'){
+        ensure(ownerAuthenticated,
+          'Only the local owner can write multiple review-only draft documents','PermissionDenied');
+        requestApp.allow('edit');
+        json(res,200,await applyCarryForwardBatch(requestApp,data));return;
+      }
       if(path==='/api/v1/release-carry-forward/plan'){
         ensure(ownerAuthenticated,'Only the local workspace owner can plan editorial carry-forward','PermissionDenied');
         requestApp.allow('read');

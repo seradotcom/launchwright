@@ -197,7 +197,7 @@ export function inspectCarryForward(app,plan){
     editorial_approval_inherited:false,external_send_performed:false,
     published:false,platform_authority:false};
 }
-export async function applyCarryForward(app,plan,{
+export async function applyCarryForwardUnderLock(app,plan,{
   confirm_plan_sha256,confirm_source_candidate_sha256,confirm_destination_build,
   acknowledge_create_draft=false
 }={}){
@@ -208,13 +208,6 @@ export async function applyCarryForward(app,plan,{
     acknowledge_create_draft===true,
     'Operator must confirm exact plan, historical candidate and new build',
     'ConsentRequired');
-  const lock=join(app.store.root,'.release-carry-forward.lock');
-  let fd;
-  try{fd=openSync(lock,'wx',0o600);}catch{
-    throw new NativeError('Conflict',
-      'A carry-forward writer or uncertain operation already owns the lock');
-  }
-  try{
     verifyCarryForward(app,plan);
     let{doc,relation}=existing(app,plan);
     const created=doc===null,linked=relation===null;
@@ -249,7 +242,32 @@ export async function applyCarryForward(app,plan,{
       'Conflict');
     return{...readback,created_deliverable:created,created_relation:linked,
       recovered:!created&&!linked,workspace_mutated:created||linked};
-  }finally{
+}
+export async function withCarryForwardLock(app,callback){
+  app.allow('edit');
+  const lock=join(app.store.root,'.release-carry-forward.lock');
+  let fd;
+  try{fd=openSync(lock,'wx',0o600);}catch{
+    throw new NativeError('Conflict',
+      'A carry-forward writer or uncertain operation already owns the lock');
+  }
+  try{return await callback();}
+  finally{
     try{closeSync(fd);}finally{unlinkSync(lock);}
   }
+}
+// R70 public entry point still requires independent confirmation before lock.
+// R71 can use the same shared lock to serialize an entire bounded batch and
+// avoid racing an individual R70 write between two selected documents.
+export async function applyCarryForward(app,plan,confirmation={}){
+  app.allow('edit');
+  verifyCarryForward(app,plan);
+  ensure(confirmation.confirm_plan_sha256===plan.plan_sha256&&
+    confirmation.confirm_source_candidate_sha256===plan.source_candidate_sha256&&
+    confirmation.confirm_destination_build===plan.destination_build&&
+    confirmation.acknowledge_create_draft===true,
+    'Operator must confirm exact plan, historical candidate and new build',
+    'ConsentRequired');
+  return withCarryForwardLock(app,()=>
+    applyCarryForwardUnderLock(app,plan,confirmation));
 }

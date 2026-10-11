@@ -52,6 +52,18 @@ export class LaunchwrightClient {
   // No arbitrary filesystem destination, remote send, retry or import of private code.
   // R70: historical frozen Markdown becomes only NEW build's editable draft.
   // No inherited claims, verifier status, artifact, release approval or Publish.
+  // R71: up to eight fresh editorial drafts share the same original R70
+  // Native writer lock; partial outcomes are recover-first, never automatic.
+  planCarryForwardBatch(input){
+    return this.request('/api/v1/release-carry-forward-batch/plan',input);
+  }
+  inspectCarryForwardBatch(plan){
+    return this.request('/api/v1/release-carry-forward-batch/inspect',{plan});
+  }
+  applyCarryForwardBatch(plan,confirmations){
+    return this.request('/api/v1/release-carry-forward-batch/apply',
+      {plan,...confirmations});
+  }
   planCarryForward(input){
     return this.request('/api/v1/release-carry-forward/plan',input);
   }
