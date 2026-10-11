@@ -638,6 +638,18 @@ Supported Node24 3-OS CI and owned-fixture offline Chromium
 acceptance are pending. No customer product behavior, independent
 privacy/rights/WCAG or Platform Publish is established.
 
+## R66 accepted — real owner-account GitHub Draft PR API
+
+A real operator-authorized synthetic [Draft PR #90](https://github.com/seradotcom/launchwright/pull/90)
+was created via R41 on exact source SHA
+`de8695b8ccce4464c0e4104af69871e5ee61e5cc`, then
+recovered read-only without resending. Source/base SHA, full title/body,
+Draft status and owner repo were verified; the PR was closed unmerged and
+its remote synthetic branch deleted. The exact receipt is
+`evidence/r66/live-github-draft.json`. No customer, website,
+Platform Publish or independent rights approval was established.
+DOCS_GIT remains PARTIAL.
+
 ## Explicitly not established
 
 - Driver Host acceptance is exact-SHA scoped: R22 established the earlier NativeDriver/Effects-readback custody boundary, R28 separately established Driver Host isolation only for the fixed repository-owned DeltaRender/DeltaCLI provider path, and R29 exact SHA `ac83fc358215ec629bf5d7b8abc9de699064862c` separately established the fixed immutable-artifact Effects provider/evaluator plus receipt-admission path. No later SHA inherits any of those results automatically; arbitrary/third-party extension execution, native/browser/Godot mutation-effect correctness, noninterference and scenario-effects authority remain outside those narrower acceptances, and direct-process evidence never substitutes for an exact-SHA Host run;
