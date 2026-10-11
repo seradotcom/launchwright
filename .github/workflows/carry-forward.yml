@@ -1,0 +1,48 @@
+name: R70 owned editorial carry-forward browser
+on:
+  pull_request:
+    paths:
+      - 'src/release-carry-forward.mjs'
+      - 'src/server.mjs'
+      - 'client/index.mjs'
+      - 'web/**'
+      - 'tests/release-carry-forward.test.mjs'
+      - 'tests/carry-forward*.mjs'
+      - '.github/workflows/carry-forward.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: r70-carry-forward-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  owned-native-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm audit --omit=dev --audit-level=high
+      - run: node scripts/verify.mjs
+      - run: node scripts/master-acceptance.mjs --check
+      - name: Native exact-candidate + local API + recovery regressions
+        run: node --test --test-concurrency=1 tests/release-carry-forward.test.mjs tests/carry-forward-ui.test.mjs tests/release-continuity.test.mjs
+      - name: Install Chromium only on isolated GitHub runner
+        run: |
+          npm install --prefix .ci-tools --no-audit --no-fund --ignore-scripts playwright@1.58.2
+          .ci-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Real private UI / two-release Native fixture / no inherited proof
+        run: node tests/carry-forward-browser.mjs
+      - name: Retain bounded exact-source screenshots and Native provenance
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: launchwright-r70-owned-carry-forward-${{ github.sha }}
+          path: evidence/r70/
+          if-no-files-found: warn
+          retention-days: 14

@@ -50,6 +50,18 @@ export class LaunchwrightClient {
 
   // R67 browser continuity uses original Native R54 plan/export semantics.
   // No arbitrary filesystem destination, remote send, retry or import of private code.
+  // R70: historical frozen Markdown becomes only NEW build's editable draft.
+  // No inherited claims, verifier status, artifact, release approval or Publish.
+  planCarryForward(input){
+    return this.request('/api/v1/release-carry-forward/plan',input);
+  }
+  inspectCarryForward(plan){
+    return this.request('/api/v1/release-carry-forward/inspect',{plan});
+  }
+  applyCarryForward(plan,confirmation){
+    return this.request('/api/v1/release-carry-forward/apply',
+      {plan,...confirmation});
+  }
   planLocalContinuity(selection){return this.request('/api/v1/local-continuity/plan',selection);}
   exportLocalContinuity(plan,confirmations){
     return this.request('/api/v1/local-continuity/export',{plan,...confirmations});

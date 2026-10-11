@@ -6,6 +6,14 @@ A green local browser/MCP test is not proof of real customer acceptance.
 
 ## Missing or incomplete CORE paths
 
+- RELEASE_CONTINUITY R70: reviewed Markdown can be carried to a different
+  draft Release as a **new human-review-required document** after explicit
+  author consent; original Candidate must remain frozen and fresh. New
+  claims, evidence, source provenance as verified, rendered artifacts,
+  verifier results and editorial approvals are never inherited. Matching
+  audience/locale/feature flags are an editorial constraint, not proof of
+  equivalent behavior. Real customer, rights/privacy and Platform acceptance
+  remain external.
 - DOCS_GIT: R68 adds owner-only web preparation, exact hash-confirmed R40 local Git branch writes, safe no-send recovery and privately saved plan JSON (Node24/Chromium acceptance pending). R69 also exposes GitHub DRAFT PR intent, first-send and recover-only behind separate explicit consent (Node24/Chromium acceptance pending); it never pushes, merges or publishes. DOCS_GIT: R40 has a real owned local Git Markdown branch with exact source locks. R41 adds a bounded GH Draft PR plan/send/recover adapter tested with injected GitHub API responses. A real owned operator-account synthetic GitHub Draft PR #90 was created/recovered and closed without merge. Independent customer review/merge, customer rights and hosted docs deployment remain unaccepted. R32 Git metadata and R33 outlines are not remote PRs.
 - DECK_PDF: R42 provides source-linked text PPTX/PDF. R57 adds R55 masked Native image lineage to replaceable PPTX images and real PDF XObjects, pending Node24 document CI. Pixel privacy outside operator masks, complex content, rich image layouts, multilingual fonts, customer-brand/accessibility review and production customer acceptance remain unavailable.
 - INTERACTIVE_DEMO: R59 narrows R43 static offline navigation to exact R55 opaque-masked Native screenshots and Media-derived evidence; R55 masks alone cannot prove privacy outside selected rectangles. R43 adds source-pinned offline static navigation of explicitly selected Media-backed sanitized screenshot derivatives (owned synthetic Node24 Chromium Browser acceptance at source SHA 7c6097605584). It does NOT re-execute customer product behavior, independently verify pixel PII/rights, simulate forms/APIs or prove functional user journeys.

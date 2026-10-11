@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 import { LaunchwrightClient } from '/client.mjs';
 import { createContinuityController } from '/continuity-ui.mjs';
+import {createCarryForwardController} from '/carry-forward-ui.mjs';
 import { createGitDocsController } from '/git-docs-ui.mjs';
 import { createGitDocsDraftController } from '/git-docs-draft-ui.mjs';
 import { createGitOnboardingController, MAX_GIT_OBSERVATION_UPLOAD_BYTES, MAX_GIT_PLAN_UPLOAD_BYTES } from '/git-onboarding.mjs';
@@ -12,10 +13,11 @@ let pendingStore={save:async p=>{localStorage.setItem('launchwright.pending.'+p.
 const api=new LaunchwrightClient({baseUrl:location.origin,pendingStore});
 const gitOnboarding=createGitOnboardingController(api);
 const continuityUI=createContinuityController(api);
+const carryForwardUI=createCarryForwardController(api);
 const gitDocsUI=createGitDocsController(api);
 const gitDocsDraftUI=createGitDocsDraftController(api);
 let model={entities:[],version:null},description=null,productId=localStorage.getItem('launchwright.product'),releaseId=localStorage.getItem('launchwright.release'),view='overview',selected=null,renderEpoch=0;
-const tabs=[['onboard','⌁','Import Git project'],['overview','◫','Overview'],['targets','⊡','Targets & sources'],['scenarios','↳','Scenarios'],['claims','≡','Claims & evidence'],['locales','文','Localization'],['deliverables','▤','Deliverables'],['impact','⌁','Impact'],['work','▷','Work'],['review','◎','Review room'],['continuity','⇄','Release continuity'],['docs-git','↗','Docs to Git'],['delivery','↗','Delivery'],['templates','◇','Templates'],['integrations','⌘','Integrations'],['history','◷','History']];
+const tabs=[['onboard','⌁','Import Git project'],['overview','◫','Overview'],['targets','⊡','Targets & sources'],['scenarios','↳','Scenarios'],['claims','≡','Claims & evidence'],['locales','文','Localization'],['deliverables','▤','Deliverables'],['impact','⌁','Impact'],['work','▷','Work'],['review','◎','Review room'],['continuity','⇄','Release continuity'],['carry-forward','↝','Carry-forward drafts'],['docs-git','↗','Docs to Git'],['delivery','↗','Delivery'],['templates','◇','Templates'],['integrations','⌘','Integrations'],['history','◷','History']];
 const kinds=k=>model.entities.filter(e=>e.kind===k);
 const get=id=>model.entities.find(e=>e.id===id);
 const inRelease=k=>kinds(k).filter(e=>e.data.release_id===releaseId);
@@ -42,8 +44,8 @@ async function render(){
   try{
     if(view==='onboard')html=heading('Project adoption','Import an existing Git project','Use an exact local Git metadata observation to create an editorial workspace without executing or publishing the project.')+gitOnboarding.render();
     else if(!productId){html=heading('Release production','A launch starts with a source.','Build a traceable release package. Keep editorial decisions, evidence and delivery states distinct.')+panel('Create your first workspace',empty('Nothing invented. Nothing published.','Add a product and an explicit build, then define a target and the deliverables it needs.',button('Create product','new-product')+button('Import Git project','navigate-onboard','','secondary')))+`<div class="callout"><strong>What works here</strong>Structured release editing, versioned text exports, input change detection, editorial review and private draft delivery. Browser capture, media rendering and external delivery require their canonical runtime integration.</div>`;}
-    else if(!hasRelease()&&!['templates','continuity','docs-git'].includes(view)){html=heading('Product',get(productId).data.name,'Create a release with an explicit build identity.',button('Create release','new-release'))+panel('Release brief',empty('Name the release. Pin the build.','A commercial version is not a resource revision. Launchwright keeps both.',button('Create release','new-release')));}
-    else{const fn={overview,targets,scenarios,claims,locales,deliverables,impact,work,review,continuity,'docs-git':docsGit,delivery,templates,integrations,history}[view];html=await fn();}
+    else if(!hasRelease()&&!['templates','continuity','docs-git','carry-forward'].includes(view)){html=heading('Product',get(productId).data.name,'Create a release with an explicit build identity.',button('Create release','new-release'))+panel('Release brief',empty('Name the release. Pin the build.','A commercial version is not a resource revision. Launchwright keeps both.',button('Create release','new-release')));}
+    else{const fn={overview,targets,scenarios,claims,locales,deliverables,impact,work,review,continuity,'carry-forward':carryForward,'docs-git':docsGit,delivery,templates,integrations,history}[view];html=await fn();}
     if(epoch===renderEpoch)$('#view-content').innerHTML=html;
   }catch(err){if(epoch===renderEpoch)$('#view-content').innerHTML=heading('Could not load section','The last result was not replaced.','No mutation was retried.')+panel('Request error',`<div class="panel-body"><p>${esc(err.message)}</p>${button('Refresh observation','refresh','','secondary')}</div>`);}
 }
@@ -98,6 +100,15 @@ async function continuity(){
   return heading('Version-aware publishing','Release continuity',
     'Compare two frozen Native-backed candidates from one product without replaying or publishing source applications.')+
     continuityUI.render(inProduct('release'),kinds('candidate'));
+}
+async function carryForward(){
+ const releases=inProduct('release'),releaseIds=new Set(releases.map(r=>r.id));
+ return heading('Version-aware editorial work','Carry-forward drafts',
+  'Create a fresh build-scoped review draft from previously approved frozen Markdown. No old evidence, artifact or review is reused.')+
+  carryForwardUI.render(releases,
+    kinds('candidate').filter(c=>releaseIds.has(c.data.release_id)),
+    kinds('artifact').filter(a=>releaseIds.has(a.data.release_id)),
+    kinds('target').filter(t=>releaseIds.has(t.data.release_id)),releaseId);
 }
 async function docsGit(){
  const candidates=inRelease('candidate');
@@ -188,6 +199,16 @@ function editEntity(kind,e){
  });
 }
 root.addEventListener('change',async event=>{try{
+ const carryKey={
+   'carry-source-candidate':'source_candidate_id',
+   'carry-source-artifact':'source_artifact_id',
+   'carry-target':'destination_target_id',
+   'carry-name':'destination_name'
+ }[event.target.id];
+ if(carryKey){
+   carryForwardUI.choose(carryKey,event.target.value);
+   await render();return;
+ }
  if(['continuity-before-release','continuity-after-release',
   'continuity-before-candidate','continuity-after-candidate'].includes(event.target.id)){
     continuityUI.choose(event.target.id.replaceAll('-','_').replace(/^continuity_/,'')+'_id',event.target.value);
@@ -219,6 +240,52 @@ root.addEventListener('click',async event=>{
  const el=event.target.closest('[data-action]');if(!el)return;const action=el.dataset.action,id=el.dataset.id;
  try{
   if(action.startsWith('navigate-')){location.hash=action.slice(9);return;}
+  if(action==='carry-plan'){
+    await carryForwardUI.prepare(releaseId,{
+      rights:$('#carry-rights')?.checked,recheck:$('#carry-recheck')?.checked
+    });
+    await render();notice('Exact historical Candidate and new build pinned. No draft written.');return;
+  }
+  if(action==='carry-apply'){
+    const p=carryForwardUI.plan;
+    if(!p)throw Error('Prepare or restore a source-bound carry-forward plan');
+    openForm('Confirm new build-only editorial draft',[
+      textField('confirm_plan_sha256','Re-enter full source-bound plan SHA-256'),
+      textField('confirm_source_candidate_sha256',
+        'Re-enter full historical approved Candidate SHA-256'),
+      textField('confirm_destination_build','Re-enter exact NEW build identity'),
+      {key:'acknowledge_create_draft',
+        label:'I authorize an unverified editable draft with no inherited claims, approvals or artifacts.',
+        type:'checkbox',value:false}
+    ],async data=>{await carryForwardUI.apply(data);await refresh();},
+    'Create or reconcile reviewed draft',
+    'New Native Markdown draft created or recovered; review is still REQUIRED.');
+    return;
+  }
+  if(action==='carry-inspect'){
+    await carryForwardUI.inspect();await render();
+    notice('Native draft status read without writing, publishing or retrying.');return;
+  }
+  if(action==='carry-restore'){
+    openForm('Restore original carry-forward plan',[
+      jsonField('plan','Paste saved source-bound R70 plan JSON',{},
+        'Read-only source and destination revision verification; no copy or publication.')
+    ],async data=>{await carryForwardUI.restore(data.plan);},
+    'Verify saved plan','Original carry-forward plan inspected without writing.');
+    return;
+  }
+  if(action==='carry-clear'){
+    carryForwardUI.clear();await render();
+    notice('Carry-forward selection and plan cleared from browser memory.');return;
+  }
+  if(action==='carry-save'){
+    const blob=new Blob([carryForwardUI.downloadPlan()],{type:'application/json'});
+    const url=URL.createObjectURL(blob),link=document.createElement('a');
+    link.href=url;link.download='launchwright-private-r70-carry-forward.json';
+    document.body.append(link);link.click();link.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+    notice('Original private carry-forward plan saved to your browser downloads.');return;
+  }
   if(action==='continuity-clear'){
     continuityUI.clear();await render();notice('The comparison plan was cleared from browser memory.');return;
   }
