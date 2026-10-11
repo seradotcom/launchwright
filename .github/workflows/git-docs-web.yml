@@ -1,0 +1,45 @@
+name: R68 owned Git docs browser acceptance
+on:
+  pull_request:
+    paths:
+      - 'src/git-docs-web.mjs'
+      - 'src/server.mjs'
+      - 'client/index.mjs'
+      - 'web/**'
+      - 'tests/git-docs-*.mjs'
+      - '.github/workflows/git-docs-web.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: git-docs-browser-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  owner-git-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm audit --omit=dev --audit-level=high
+      - run: node scripts/verify.mjs
+      - run: node --test --test-concurrency=1 tests/git-docs-pr.test.mjs tests/git-docs-web.test.mjs tests/git-docs-ui.test.mjs
+      - name: Install Chromium on CI runner only
+        run: |
+          npm install --prefix .ci-tools --no-audit --no-fund --ignore-scripts playwright@1.58.2
+          .ci-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Native candidate → real Git branch → browser recovery
+        run: node tests/git-docs-ui-browser.mjs
+      - name: Retain exact SHA, checked-out/index preservation and screenshots
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: launchwright-r68-owned-git-browser-${{ github.sha }}
+          path: evidence/git-docs-web/
+          if-no-files-found: warn
+          retention-days: 14
