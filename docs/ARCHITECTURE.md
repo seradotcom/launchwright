@@ -317,6 +317,21 @@ The local visual synthetic acceptance is not a customer-quality approval.
 See [the deck/PDF export guide](DECK_PDF.md).
 
 
+## R64 cross-output release review kit
+
+R64 is not a new rendering engine or domain backend. It consumes already
+operator-exported and SHA-pinned Native R45 docs, R42 editable PPTX/PDF
+(and optional R61 exact masked demo) through their original private
+plans, explicit receipts and current source revisions. Docs and deck
+must share the identical release and frozen editorial Candidate SHA.
+The assembler re-renders R42 binary outputs from the frozen Native
+Markdown source to reject forged OOXML/PDF receipts, validates the
+script-free R45 internal page graph, and checks the optional R61
+imported Native Media revision while preserving privacy UNKNOWN.
+An immutable plan, private file locks and a deterministic ZIP with
+source manifest permit exact local recovery without publication.
+See [R64 review-kit guide](RELEASE_REVIEW_KIT.md).
+
 ## R41 GitHub Draft PR transport after explicit manual branch push
 
 R41 operates on an R40 exact branch which the operator must have separately

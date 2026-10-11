@@ -1,0 +1,73 @@
+name: Exact multi-format private release review
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: review-kit-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  owned-kit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 23
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Production dependency audit
+        run: npm audit --omit=dev --audit-level=high
+      - name: Native source locks and exact release kit tests
+        run: |
+          set -euo pipefail
+          node scripts/verify.mjs
+          node --test --test-concurrency=1 tests/release-review-kit.test.mjs
+          node scripts/master-acceptance.mjs --check
+      - name: Produce owned synthetic docs/deck/PDF release kit
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/review-kit
+          chmod 0700 evidence/review-kit
+          node scripts/review-kit-owned-smoke.mjs --out-dir "$GITHUB_WORKSPACE/evidence/review-kit" | tee evidence/review-kit/result.json
+          python3 - <<'PY'
+          import json,hashlib,pathlib,zipfile
+          folder=pathlib.Path('evidence/review-kit')
+          report=json.loads((folder/'result.json').read_text())
+          assert report['synthetic_fixture'] is True
+          assert report['real_customer_capture'] is False
+          assert report['external_publish'] is False
+          assert report['platform_authority'] is False
+          receipt=report['receipt']
+          z=folder/receipt['filename']
+          assert hashlib.sha256(z.read_bytes()).hexdigest()==receipt['zip_sha256']
+          with zipfile.ZipFile(z) as bundle:
+              assert bundle.testzip() is None
+              names=bundle.namelist()
+              assert 'docs/index.html' in names and 'index.html' in names
+              assert 'deck/release-deck.pdf' in names
+              assert 'deck/release-deck.pptx' in names
+              manifest=json.loads(bundle.read('manifest.json'))
+              assert all(hashlib.sha256(bundle.read(f['name'])).hexdigest()==f['sha256']
+                for f in manifest['files'])
+              assert manifest['candidate_sha256']==receipt['candidate_sha256']
+              assert manifest['technical_state']=='UNKNOWN'
+              assert not manifest['published'] and not manifest['platform_authority']
+          print('OWNED_CROSS_OUTPUT_KIT_EXACT_SOURCE_PASS',len(names))
+          PY
+      - name: Real offline Chromium navigation and responsive screenshots
+        run: |
+          set -euo pipefail
+          npm install --prefix .ci-tools --ignore-scripts --no-audit --no-fund playwright@1.58.2
+          .ci-tools/node_modules/.bin/playwright install --with-deps chromium
+          node tests/review-kit-browser.mjs evidence/review-kit | tee evidence/review-kit/browser-result.json
+      - name: Retain full owned synthetic kit, hashes and browser evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: launchwright-owned-review-kit-${{ github.sha }}
+          path: evidence/review-kit/
+          if-no-files-found: error
+          retention-days: 14
