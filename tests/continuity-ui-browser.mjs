@@ -52,7 +52,7 @@ try{
   await downloadLink.waitFor();
   const href=await downloadLink.getAttribute('href');
   assert.ok(href.endsWith('/'+planSha+'/bundle.zip'));
-  const res=await page.request.get(origin+href);
+  const res=await page.request.get(new URL(href,origin).href);
   assert.equal(res.status(),200);
   const bytes=await res.body();
   const zipSha=createHash('sha256').update(bytes).digest('hex');
